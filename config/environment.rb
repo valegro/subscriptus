@@ -11,6 +11,8 @@ Rails::Initializer.run do |config|
   # Application configuration should go into files in config/initializers
   # -- all .rb files in that directory are automatically loaded.
 
+  config.action_controller.session = { :key => "_subscriptus_session", :secret => "'446f586e446c1gkjrhgrkehb11bd1feb22e93d3d82f5d83be7e10476baa64d20e835bbc055a2fbf971a06ef0e6772cdc18bbb92a5b2kjh2i3fy823o4e4a24'" }
+
   # Add additional load paths for your own custom dirs
   # config.load_paths += %W( #{RAILS_ROOT}/extras )
 
