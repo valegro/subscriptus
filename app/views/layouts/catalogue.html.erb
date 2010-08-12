@@ -1,0 +1,7 @@
+<% content_for :lower do %>
+  <% semantic_navigation :secondary, :html => { :class => "lower" } do |n| %>
+    <%= n.item 'Gifts', :link => admin_catalogue_gifts_path %>
+    <%= n.item 'Offers', :link => admin_catalogue_offers_path %>
+  <% end %>
+<% end %>
+<%= render :file => 'layouts/admin' %>

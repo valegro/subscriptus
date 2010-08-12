@@ -1,0 +1,26 @@
+<div class="title">
+  <%= content_tag :h2, "View Gift" %>
+  <div class="actions">
+    <%= link_to 'Delete', admin_catalogue_gift_path(@gift), :method => :delete, :confirm => "Are you sure?", :class => "delete" %>
+    <%= link_to 'Edit', edit_admin_catalogue_gift_path(@gift), :class => 'edit' %>
+    <%= link_to 'Back to Gifts', admin_catalogue_gifts_path, :class => 'back' %>
+  </div>
+</div>
+
+<div class="grid">
+  <div class="frame span_3">
+    <%= image_tag(@gift.gift_image.url(:medium)) %> 
+  </div>
+  <div class="frame span_4">
+    <h4><%= h(@gift.name) %></h4>
+    <p><%= h(@gift.description) %></p>
+  </div>
+  <div class="frame span_3 last">
+    <h4>Stock on Hand</h4>
+    <p><%= @gift.on_hand %></p>
+  </div>
+  <div class="frame span_10">
+    <h2>History</h2>
+    TODO
+  </div>
+</div>

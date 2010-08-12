@@ -14,10 +14,10 @@
     <div id="header">
       <h1>Subscriptus Administration</h1>
       <div id="navigation">
-        <ul class="upper">
-          <li><%= link_to('Offers', admin_offers_path) %></li>
-          <li><%= link_to('Gifts', admin_gifts_path) %></li>
-        </ul>
+        <% semantic_navigation :main, :html => { :class => "upper" } do |n| %>
+          <%= n.item 'Catalogue', :link => admin_catalogue_gifts_path, :highlights_on => { :controller => "admin/catalogue/offers" } %>
+          <%= n.item 'Subscribers', :link => admin_subscribers_path %>
+        <% end %>
         <ul class="lower">
           <%= yield :lower %>
         </ul>

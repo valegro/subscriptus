@@ -1,0 +1,13 @@
+<div class="title">
+  <%= content_tag :h2, "Edit Gift" %>
+  <div class="actions">
+    <%= link_to 'Delete', admin_catalogue_gift_path(@gift), :method => :delete, :confirm => "Are you sure?", :class => "delete" %>
+    <%= link_to 'Back to Gifts', admin_catalogue_gifts_path, :class => 'back' %>
+  </div>
+</div>
+
+<% form_for [:admin, :catalogue, @gift], :builder => Reform::Builder, :html => { :class => "form", :multipart => true } do |form| %>
+  <%= form.error_messages %>
+  <%= render :partial => "form", :object => form %>
+  <%= form.submit "Update" %>
+<% end %>

@@ -1,7 +1,10 @@
 ActionController::Routing::Routes.draw do |map|
   map.namespace :admin do |admin|
-    admin.resources :offers
-    admin.resources :gifts
+    admin.resources :subscribers
+    admin.namespace :catalogue do |catalogue|
+      catalogue.resources :offers
+      catalogue.resources :gifts
+    end
   end
 
   # The priority is based upon order of creation: first created -> highest priority.

@@ -1,0 +1,107 @@
+.grid { 
+  clear: both;
+  margin-bottom: 11px;
+  margin-right: -35px;
+  padding-right: 2%;
+}
+
+.grid .frame {
+  float: left;
+  margin: 0 2% 0 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.grid .frame div.title h4 {
+  color: #106dcc;
+  float: left;
+}
+
+.grid .frame.span_1, .grid .frame.span_2, .grid .frame.span_3, .grid .frame.span_4, .grid .frame.span_5, .grid .frame.span_6, .grid .frame.span_7, .grid .frame.span_8, .grid .frame.span_9, .grid .frame.span_10 {
+	margin-right: 2%;
+}
+
+.grid .frame.span_1 { width: 8%; }
+.grid .frame.span_2 { width: 18%; }
+.grid .frame.span_3 { width: 28%; }
+.grid .frame.span_4 { width: 38%; }
+.grid .frame.span_5 { width: 48%; }
+.grid .frame.span_6 { width: 58%; }
+.grid .frame.span_7 { width: 68%; }
+.grid .frame.span_8 { width: 78%; }
+.grid .frame.span_9 { width: 88%; }
+.grid .frame.span_10 { width: 100%; }
+
+.grid .frame.span_1.last { width: 9%; }
+.grid .frame.span_2.last { width: 18%; }
+.grid .frame.span_3.last { width: 29%; }
+.grid .frame.span_4.last { width: 39%; }
+.grid .frame.span_5.last { width: 49.5%; }
+.grid .frame.span_6.last { width: 59%; }
+.grid .frame.span_7.last { width: 69%; }
+.grid .frame.span_8.last { width: 79%; }
+.grid .frame.span_9.last { width: 89%; }
+
+.grid .frame.span_1.last, .grid .frame.span_2.last, .grid .frame.span_3.last, .grid .frame.span_4.last, .grid .frame.span_5.last, .grid .frame.span_6.last, .grid .frame.span_7.last, .grid .frame.span_8.last, .grid .frame.span_9.last, .grid .frame.span_10 {
+	margin-right: 0;
+}
+
+.top { margin-top: 0px !important; }
+.left { margin-left: 0px !important; }
+.right { margin-right: 0px !important; }
+.bottom { margin-bottom: 0px !important; }
+
+.flash {
+  padding:5px 12px;
+  margin-bottom:10px;
+}
+
+.flash p {
+  width:100%;
+  margin:0;
+  padding:0;
+}
+
+.grid .box .title,
+.grid .widget {
+  padding: 5px 10px;
+  overflow: hidden;
+}
+
+.grid .box .title #widget {
+  float: right;
+  display: block;
+  width: 340px;
+}
+
+.grid .frame .box {
+	margin-bottom: 25px;
+}
+
+.grid .box .title {
+  display: block;
+  background: #F6F6F6;
+  border-bottom: 1px solid #D8D8D8;
+  margin-bottom: 10px;
+}
+
+.grid .box .title h4 {
+  color: #106dcc;
+  float: left;
+}
+
+.widget {
+  background: #efefef;
+}
+
+.widget ul {
+  margin-left:12px;
+}
+
+.right {
+  float:right;
+}
+
+.form {
+  margin-left:0;
+}

@@ -1,5 +1,5 @@
-class Admin::GiftsController < AdminController
-  before_filter :find_gift, :only => [ :destroy, :edit, :show ]
+class Admin::Catalogue::GiftsController < Admin::CatalogueController
+  before_filter :find_gift, :only => [ :destroy, :edit, :show, :update ]
 
   def index
     @gifts = Gift.paginate(:page => params[:page] || 1)
@@ -19,6 +19,19 @@ class Admin::GiftsController < AdminController
       redirect_to :action => :index
     else
       render :action => :new
+    end
+  end
+
+  def edit
+  end
+
+  def update
+    @gift.attributes = params[:gift]
+    if @gift.save
+      flash[:notice] = "Updated Gift: #{h(@gift.name)}"
+      redirect_to :action => :show
+    else
+      render :action => :edit
     end
   end
 

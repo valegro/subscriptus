@@ -1,3 +1,5 @@
+@import url("grid.css");
+
 html {
   margin: 0;
   padding: 0;
@@ -74,6 +76,7 @@ body {
   text-decoration: underline; 
 }
 
+#header #navigation ul.upper li.highlighted a,
 #header #navigation ul.upper li a.active {
   background: #ececec;
   border-bottom: 1px solid #ececec;
@@ -231,6 +234,10 @@ body {
 	text-align: right;
 }
 
+.table table a.edit, .table table a {
+  color:blue;
+}
+
 .table table a.edit, .table table a.destroy {
 	padding-left: 16px;
 	margin-right: 5px;
@@ -344,42 +351,3 @@ form.form div.field.field-submit div.field-inner input {
   text-align: right;
 }
 
-#event-header {
-  width:100%;
-  float:left;
-  margin-bottom: 10px;
-}
-
-#event-header #left {
-  float:left;
-  width:300px;
-}
-
-#event-header #body {
-  float:left;
-  width:700px;
-  padding-left:20px;
-}
-
-#event-header #options {
-  float:left;
-  width:200px;
-  padding-left:0px;
-  border:solid 1px blue;
-  margin-left:20px;
-}
-
-#event-header #options ul, #event-header #body ul {
-  list-style:none;
-  padding:0;
-}
-
-#event-header .meta {
-  background-color:#efefef;
-  border:solid 1px #ddd;
-  padding:10px;
-}
-
-#event-header h1 {
-  margin-top:0;
-}
