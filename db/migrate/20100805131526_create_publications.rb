@@ -3,10 +3,10 @@ class CreatePublications < ActiveRecord::Migration
     create_table :publications do |t|
       t.string :name
       t.text :description
-      t.string :image_file_name
-      t.string :image_content_type
-      t.integer :image_file_size
-      t.timestamp :image_updated_at
+      t.string :publication_image_file_name
+      t.string :publication_image_content_type
+      t.integer :publication_image_file_size
+      t.timestamp :publication_image_updated_at
       t.timestamps
     end
   end

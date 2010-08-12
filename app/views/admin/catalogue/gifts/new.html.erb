@@ -6,7 +6,6 @@
 </div>
 
 <% form_for [:admin, :catalogue, @gift], :builder => Reform::Builder, :html => { :class => "form", :multipart => true } do |form| %>
-  <%= form.error_messages %>
   <%= render :partial => "form", :object => form %>
   <%= form.submit "Create" %>
 <% end %>

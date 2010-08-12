@@ -15,7 +15,7 @@
       <h1>Subscriptus Administration</h1>
       <div id="navigation">
         <% semantic_navigation :main, :html => { :class => "upper" } do |n| %>
-          <%= n.item 'Catalogue', :link => admin_catalogue_gifts_path, :highlights_on => { :controller => "admin/catalogue/offers" } %>
+          <%= n.item 'Catalogue', :link => admin_catalogue_publications_path, :highlights_on => { :controller => "admin/catalogue/offers" } %>
           <%= n.item 'Subscribers', :link => admin_subscribers_path %>
         <% end %>
         <ul class="lower">
@@ -24,7 +24,14 @@
       </div>
     </div>
     <div id="content">
-      <p style="color: green"><%= flash[:notice] %></p>
+      <% if flash[:notice] %>
+        <div class="ui-state-highlight ui-corner-all" style="margin-top: 20px; margin-bottom: 20px; padding: 0 .7em;">
+          <p>
+            <span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span>
+            <span><%= flash[:notice] %></span>
+          </p>
+        </div>
+      <% end %>
       <%= yield %>
     </div>
   </div>

@@ -48,10 +48,10 @@ ActiveRecord::Schema.define(:version => 20100808083521) do
   create_table "publications", :force => true do |t|
     t.string   "name"
     t.text     "description"
-    t.string   "image_file_name"
-    t.string   "image_content_type"
-    t.integer  "image_file_size"
-    t.datetime "image_updated_at"
+    t.string   "publication_image_file_name"
+    t.string   "publication_image_content_type"
+    t.integer  "publication_image_file_size"
+    t.datetime "publication_image_updated_at"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

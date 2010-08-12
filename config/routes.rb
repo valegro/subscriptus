@@ -4,6 +4,7 @@ ActionController::Routing::Routes.draw do |map|
     admin.namespace :catalogue do |catalogue|
       catalogue.resources :offers
       catalogue.resources :gifts
+      catalogue.resources :publications
     end
   end
 

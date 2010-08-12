@@ -1,0 +1,11 @@
+<div class="title">
+  <%= content_tag :h2, "Create New Publication" %>
+  <div class="actions">
+    <%= link_to 'Back to Publications', admin_catalogue_publications_path, :class => 'back' %>
+  </div>
+</div>
+
+<% form_for [:admin, :catalogue, @publication], :builder => Reform::Builder, :html => { :class => "form", :multipart => true } do |form| %>
+  <%= render :partial => "form", :object => form %>
+  <%= form.submit "Create" %>
+<% end %>

@@ -1,0 +1,20 @@
+<div class="title">
+  <%= content_tag :h2, "All Publications" %>
+  <div class="actions">
+    <%= link_to 'Create New Publication', new_admin_catalogue_publication_path, :class => 'create' %>
+  </div>
+</div>
+
+<%= render_table @publications do |t|
+  t.header :image, :width => "100"
+  t.header :name
+  t.header :actions, :width => "180"
+
+  t.rows do |row, publication, index|
+    row.image link_to(image_tag(publication.publication_image.url(:thumb)), admin_catalogue_publication_url(publication))
+    row.name link_to(h(publication.name), admin_catalogue_publication_url(publication)) + content_tag(:p, h(publication.description))
+    row.actions link_to("Edit", edit_admin_catalogue_publication_url(publication), :class => "edit") + link_to("Delete", admin_catalogue_publication_url(publication), :class => "destroy", :method => :delete, :confirm => "Are you sure?")
+  end
+end %>
+
+
