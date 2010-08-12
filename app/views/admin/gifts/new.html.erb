@@ -1,0 +1,15 @@
+<div class="title">
+  <%= content_tag :h2, "Create New Gift" %>
+  <div class="actions">
+    <%= link_to 'Back to Gifts', admin_gifts_path, :class => 'back' %>
+  </div>
+</div>
+
+<% form_for [:admin, @gift], :builder => Reform::Builder do |form| %>
+  <%= form.error_messages %>
+  <%= form.text_field :name %>
+  <%= form.text_area :description, :rows => 10 %>
+  <%= form.text_field :on_hand %>
+  <%= form.file_field :gift_image %>
+  <%= form.submit "Create" %>
+<% end %>

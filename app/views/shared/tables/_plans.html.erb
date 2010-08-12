@@ -1,0 +1,22 @@
+<table class="<%= class_name if defined?(class_name) %>" id="<%=name if defined?(name)%>">
+  <thead>
+  <% rows.each do |row| %>
+   <%= content_tag :th, row[:name], :class => row[:_class_name] %>
+  <% end %>
+  </thead>
+  <tfoot>
+    <% rows.each do |row| %>
+     <%= content_tag :td, row[:recommended], :class => row[:_class_name] %>
+    <% end %>
+  </tfoot>
+  <tbody>
+  <% table_headers.each do |header| %>
+    <% next if header[:sym] == :name %>
+    <tr>
+    <% rows.each do |row| %>
+      <%= content_tag :td, row[header[:sym]], :class => [header[:options][:class_name],row[:_class_name]].join(" ") %>
+    <% end %>
+    <tr>
+  <% end %>
+  </tbody>
+</table>

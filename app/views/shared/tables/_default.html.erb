@@ -1,0 +1,11 @@
+<div class="table" id="<%=name if defined?(name)%>">
+  <%= paginate(record_set, (pagination_options || {}).merge(options[:page_entries_info] || {})) if record_set.respond_to?(:total_pages) %>
+  <% if groups.empty? %> 
+    <%= render :partial => 'shared/tables/default_inner', :locals => { :table_headers => table_headers, :rows => rows } %>
+  <% else %>
+    <% groups.each do |group| %>
+      <%= render :partial => 'shared/tables/default_inner', :locals => { :table_headers => group[:table_headers], :rows => group[:rows] } %>
+    <% end %>
+  <% end %>
+  <%= paginate(record_set, (pagination_options || {}).merge({:position=>"bottom", :page_entries=>false})) if record_set.respond_to?(:total_pages) %>
+</div>

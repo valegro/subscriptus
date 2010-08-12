@@ -1,0 +1,20 @@
+
+<div class="title">
+  <%= content_tag :h2, "All Gifts" %>
+  <div class="actions">
+    <%= link_to 'Create New Gift', new_admin_gift_path, :class => 'create' %>
+  </div>
+</div>
+
+<%= render_table @gifts do |t|
+  t.header :image
+  t.header :name
+  t.header :stock
+
+  t.rows do |row, gift, index|
+    row.image image_tag(gift.gift_image.url(:thumb))
+    row.name link_to(gift.name, admin_gift_url(gift))
+    row.stock gift.on_hand
+  end
+end %>
+
