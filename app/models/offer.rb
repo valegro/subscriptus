@@ -1,5 +1,16 @@
 class Offer < ActiveRecord::Base
   belongs_to :publication
   has_many :subscriptions
-  has_and_belongs_to_many :gifts
+  has_many :gift_offers, :dependent => :destroy
+  has_many :gifts, :through => :gift_offers do
+    def add(gift, optional = false)
+      proxy_owner.gift_offers.create(:gift => gift, :included => !optional)
+    end
+  end
+
+  has_many :offer_terms
+  accepts_nested_attributes_for :offer_terms
+
+  validates_presence_of :name, :publication
+  validates_uniqueness_of :name
 end

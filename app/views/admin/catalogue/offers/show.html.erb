@@ -1,0 +1,76 @@
+<div class="title">
+  <%= content_tag :h2, "View Offer" %>
+  <div class="actions">
+    <%= link_to 'Delete', admin_catalogue_offer_path(@offer), :method => :delete, :confirm => "Are you sure?", :class => "delete" %>
+    <%= link_to 'Edit', edit_admin_catalogue_offer_path(@offer), :class => 'edit' %>
+    <%= link_to 'Back to Offers', admin_catalogue_offers_path, :class => 'back' %>
+  </div>
+</div>
+
+<div class="grid">
+  <div class="frame span_3">
+    <h2>Offer Details</h2>
+    <ul>
+      <li><strong>Name</strong>: <%= h(@offer.name) %></h2>
+      <li><strong>Publication</strong>: <%= @offer.publication.name %></li>
+      <li><strong>Expires</strong>: <%= @offer.expires %></li>
+      <li><strong>Auto-renews</strong>: <%= @offer.auto_renews %></li>
+    </ul>
+  </div>
+  <div class="frame span_3">
+    <h2>Term Options</h2>
+    <ul>
+      <%= render :partial => "offer_term", :collection => @offer.offer_terms %>
+    </ul>
+  </div>
+  <div class="frame span_4 last">
+    <h2>Gift Options</h2>
+    <a href="#" id="add_gift">Add Gift</a>
+    <div id="offered_gifts">
+      <%= render :partial => "gifts", :object => @offer.gifts %>
+    </div>
+  </div>
+</div>
+
+<div id="gifts_dialog" style="display:none">
+  <%= render_table @gifts, :template => "shared/tables/no_header" do |t|
+    t.header :image, :width => "100"
+    t.header :name
+
+    t.rows do |row, gift, index|
+      row.image link_to(image_tag(gift.gift_image.url(:thumb)), admin_catalogue_gift_url(gift))
+      row.name do
+        str = content_tag(:h4, h(gift.name))
+        str << content_tag(:ul, content_tag(:li, link_to("Include this gift", add_gift_admin_catalogue_offer_url(@offer), :class => "gift_choice", :gift_id => gift.id)) + content_tag(:li, link_to("Add as an option", add_gift_admin_catalogue_offer_url(@offer), :class => "gift_choice", :gift_id => gift.id, :gift_optional => true)))
+        str
+      end
+    end
+  end %>
+</div>
+
+<script language="javascript">
+  $(document).ready(function() {
+    $('#gifts_dialog').dialog({ autoOpen: false, width: 400 });
+    $('#add_gift').click(function() {
+      $('#gifts_dialog').dialog('open');
+    });
+
+    $('.gift_choice').live('click', function(e) {
+      args = {
+        gift_id: $(this).attr('gift_id'),
+        optional: $(this).attr('gift_optional')
+      };
+      $.post($(this).attr('href'), args);
+      e.preventDefault();
+      return false;
+    });
+
+    $('.gift_remove').live('click', function(e) {
+      args = { gift_id: $(this).attr('gift_id') };
+      $.post($(this).attr('href'), args);
+      e.preventDefault();
+      return false;
+    });
+  });
+</script>
+

@@ -9,10 +9,18 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20100808083521) do
+ActiveRecord::Schema.define(:version => 20100813090518) do
 
   create_table "audit_log_entries", :force => true do |t|
     t.integer  "user_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "gift_offers", :force => true do |t|
+    t.integer  "offer_id"
+    t.integer  "gift_id"
+    t.boolean  "included"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -34,12 +42,18 @@ ActiveRecord::Schema.define(:version => 20100808083521) do
     t.integer "offer_id"
   end
 
+  create_table "offer_terms", :force => true do |t|
+    t.integer  "offer_id"
+    t.decimal  "price"
+    t.integer  "months"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "offers", :force => true do |t|
     t.integer  "publication_id"
     t.string   "name"
-    t.decimal  "price"
     t.datetime "expires"
-    t.integer  "duration"
     t.boolean  "auto_renews"
     t.datetime "created_at"
     t.datetime "updated_at"

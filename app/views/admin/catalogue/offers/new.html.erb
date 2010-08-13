@@ -1,0 +1,21 @@
+<div class="title">
+  <%= content_tag :h2, "Create New Offer" %>
+  <div class="actions">
+    <%= link_to 'Back to Offers', admin_catalogue_offers_path, :class => 'back' %>
+  </div>
+</div>
+
+<% form_for [:admin, :catalogue, @offer], :builder => Reform::Builder, :html => { :class => "form" } do |form| %>
+  <%= form.error_messages %>
+  <%= form.text_field :name %>
+  <%= form.select :publication_id, @publications.map { |p| [ p.name, p.id ] } %>
+  <%= form.check_box :auto_renews %>
+  <%= form.date_select :expires, :label => "Offer expires" %>
+  <% form.fields_for :offer_terms do |term| %>
+    <h2>Offer Term</h2>
+    <p>The basic term of this offer - you can add more options later.</p>
+    <%= term.text_field :price %>
+    <%= term.select :months, OfferTerm::TERM_OPTIONS.map { |t| [ pluralize(t, 'month'), t ] }, :label => "Term" %>
+  <% end %>
+  <%= form.submit "Create" %>
+<% end %>

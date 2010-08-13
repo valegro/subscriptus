@@ -3,9 +3,7 @@ class CreateOffers < ActiveRecord::Migration
     create_table :offers do |t|
       t.references :publication      
       t.string :name
-      t.decimal :price
       t.timestamp :expires
-      t.integer :duration
       t.boolean :auto_renews
       t.timestamps
     end

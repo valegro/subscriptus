@@ -1,0 +1,19 @@
+<table cellspacing="0" cellpadding="0">
+  <% if rows.empty? %>
+    <tbody>
+      <tr>
+        <td colspan="<%= table_headers.length %>" class="no_records">There are currently no records.</td>
+      </tr>
+    </tbody>
+  <% else %>
+    <tbody>
+      <% rows.each do |row| %>
+        <tr class="<%= row[:_class_name] unless row[:_class_name].nil? %> <%= cycle('odd', 'even') %> <%= "last" if row == rows.last%>">
+          <% table_headers.each do |header| %>
+            <td class="<%= header[:options][:cell_class] || "" %>"><%= row[header[:sym]] %></td>
+          <% end %>
+        </tr>
+      <% end %>
+    </tbody>
+  <% end %>
+</table>

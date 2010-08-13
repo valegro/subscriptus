@@ -2,7 +2,7 @@ ActionController::Routing::Routes.draw do |map|
   map.namespace :admin do |admin|
     admin.resources :subscribers
     admin.namespace :catalogue do |catalogue|
-      catalogue.resources :offers
+      catalogue.resources :offers, :member => { :add_gift => :post, :remove_gift => :post }
       catalogue.resources :gifts
       catalogue.resources :publications
     end

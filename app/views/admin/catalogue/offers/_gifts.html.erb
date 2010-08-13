@@ -1,0 +1,24 @@
+<h4>Included Gifts</h4>
+<% included = gifts.included %>
+<% if included.empty? %>
+  <span>No Included Gifts</span>
+<% else %>
+  <ul>
+    <% included.each do |gift| %>
+      <li><%= link_to(h(gift.name), admin_catalogue_gift_url(gift)) %>&nbsp;(<%= link_to('Remove', remove_gift_admin_catalogue_offer_path(@offer), :class => "gift_remove delete", :gift_id => gift.id) %>)</li>
+    <% end %>
+  </ul>
+<% end %>
+
+<h4>Choose from one of</h4>
+<% optional = gifts.optional %>
+<% if optional.empty? %>
+  <span>No Optional Gifts</span>
+<% else %>
+  <ul>
+    <% optional.each do |gift| %>
+      <li><%= link_to(h(gift.name), admin_catalogue_gift_url(gift)) %>&nbsp;(<%= link_to('Remove', remove_gift_admin_catalogue_offer_path(@offer), :class => "gift_remove delete", :gift_id => gift.id) %>)</li>
+    <% end %>
+  </ul>
+<% end %>
+
