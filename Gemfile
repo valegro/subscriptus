@@ -27,6 +27,10 @@ gem 'paperclip'
 gem 'delayed_job'
 gem 'delayed_paperclip'
 
+# Needed for Campaign Master
+gem 'httpclient'
+gem 'soap4r'
+
 group :test, :cucumber do
   gem 'capybara'
   gem 'database_cleaner'
