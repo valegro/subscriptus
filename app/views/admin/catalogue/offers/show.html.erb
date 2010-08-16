@@ -19,8 +19,9 @@
   </div>
   <div class="frame span_3">
     <h2>Term Options</h2>
-    <ul>
-      <%= render :partial => "offer_term", :collection => @offer.offer_terms %>
+    <a href="#" id="add_term_option">Add term option</a>
+    <ul id="offer_terms">
+      <%= render :partial => "admin/catalogue/offer_terms/offer_term", :collection => @offer.offer_terms %>
     </ul>
   </div>
   <div class="frame span_4 last">
@@ -48,11 +49,50 @@
   end %>
 </div>
 
+<div id="term_option_dialog" style="display:none">
+  <% form_for [ :admin, :catalogue, @offer, @offer_term ] do |f| %>
+    <%= f.select :months, OfferTerm::TERM_OPTIONS.map { |t| [ pluralize(t, 'month'), t ] }, :label => "Term" %>
+    for $<%= f.text_field :price %>
+  <% end %>
+</div>
+
 <script language="javascript">
   $(document).ready(function() {
-    $('#gifts_dialog').dialog({ autoOpen: false, width: 400 });
+    $('#gifts_dialog').dialog({
+      autoOpen: false,
+      width: 400,
+      modal: true,
+      buttons: {
+        'Cancel' : function() {
+          $(this).dialog('close');
+        }
+      }
+    });
     $('#add_gift').click(function() {
       $('#gifts_dialog').dialog('open');
+    });
+
+    $('#term_option_dialog').dialog({
+      autoOpen: false,
+      width: 400,
+      modal: true,
+      buttons: {
+        'Create' : function() {
+          rform = $("#new_offer_term");
+          $.ajax({
+            url: rform.attr('action'),
+            type: "POST",
+            data: rform.serialize(),
+            dataType: "script"
+          });
+        },
+        'Cancel' : function() {
+          $(this).dialog('close');
+        }
+      }
+    });
+    $('#add_term_option').click(function() {
+      $('#term_option_dialog').dialog('open');
     });
 
     $('.gift_choice').live('click', function(e) {

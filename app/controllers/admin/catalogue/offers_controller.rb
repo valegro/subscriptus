@@ -2,6 +2,10 @@ class Admin::Catalogue::OffersController < Admin::CatalogueController
   before_filter :load_publications, :except => [ :index, :destroy ]
   before_filter :find_offer, :except => [ :new, :index, :create ]
 
+  def index
+    @offers = Offer.all
+  end
+
   def new
     @offer = Offer.new
     @offer.offer_terms.build
@@ -19,6 +23,7 @@ class Admin::Catalogue::OffersController < Admin::CatalogueController
 
   def show
     @gifts = Gift.in_stock
+    @offer_term = @offer.offer_terms.new
   end
 
   def add_gift
@@ -40,6 +45,12 @@ class Admin::Catalogue::OffersController < Admin::CatalogueController
     render :update do |page|
       page.replace_html "offered_gifts", :partial => "gifts", :object => @offer.gifts
     end
+  end
+
+  def destroy
+    @offer.destroy
+    flash[:notice] = "Deleted Offer"
+    redirect_to :action => :index
   end
 
   private

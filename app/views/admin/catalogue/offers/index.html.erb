@@ -1,1 +1,19 @@
-Offers
+<div class="title">
+  <%= content_tag :h2, "All Offers" %>
+  <div class="actions">
+    <%= link_to 'Create New Offer', new_admin_catalogue_offer_path, :class => 'create' %>
+  </div>
+</div>
+
+<%= render_table @offers do |t|
+  t.header :image, :width => "100"
+  t.header :name
+  t.header :actions, :width => "180"
+
+  t.rows do |row, offer, index|
+    row.image link_to(image_tag(offer.publication.publication_image.url(:thumb)), admin_catalogue_offer_path(offer))
+    row.name link_to(h(offer.name), admin_catalogue_offer_path(offer))
+    row.actions link_to("Edit", edit_admin_catalogue_offer_path(offer), :class => "edit") + link_to("Delete", admin_catalogue_offer_path(offer), :class => "destroy", :method => :delete, :confirm => "Are you sure?")
+  end
+end %>
+
