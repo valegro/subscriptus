@@ -2,6 +2,7 @@
   <%= content_tag :h2, "View Offer" %>
   <div class="actions">
     <%= link_to 'Delete', admin_catalogue_offer_path(@offer), :method => :delete, :confirm => "Are you sure?", :class => "delete" %>
+    <%= link_to 'Promote', "#", :id => "generate_offer_link", :class => 'promote' %>
     <%= link_to 'Edit', edit_admin_catalogue_offer_path(@offer), :class => 'edit' %>
     <%= link_to 'Back to Offers', admin_catalogue_offers_path, :class => 'back' %>
   </div>
@@ -33,7 +34,7 @@
   </div>
 </div>
 
-<div id="gifts_dialog" style="display:none">
+<div id="gifts_dialog" style="display:none" title="Add Gift">
   <%= render_table @gifts, :template => "shared/tables/no_header" do |t|
     t.header :image, :width => "100"
     t.header :name
@@ -49,11 +50,19 @@
   end %>
 </div>
 
-<div id="term_option_dialog" style="display:none">
+<div id="term_option_dialog" style="display:none" title="Add Offer Term Option">
   <% form_for [ :admin, :catalogue, @offer, @offer_term ] do |f| %>
     <%= f.select :months, OfferTerm::TERM_OPTIONS.map { |t| [ pluralize(t, 'month'), t ] }, :label => "Term" %>
     for $<%= f.text_field :price %>
   <% end %>
+</div>
+
+<div id="offer_link_dialog" style="display:none" title="Promote Offer">
+  <p>Generate Link to this Offer</p>
+  <label for="source_select">Source</label>
+  <%= select_tag "Source", options_for_select(@sources), :id => "source_select" %>
+  <p>Copy and paste this link into an email or add to a webpage.</p>
+  <%= text_area_tag "Link", "http://offers.crikey.com.au/subscribe?offer_id=1&source=1", :cols => 40, :rows => 2, :id => "offer_link" %>
 </div>
 
 <script language="javascript">
@@ -67,9 +76,6 @@
           $(this).dialog('close');
         }
       }
-    });
-    $('#add_gift').click(function() {
-      $('#gifts_dialog').dialog('open');
     });
 
     $('#term_option_dialog').dialog({
@@ -91,6 +97,34 @@
         }
       }
     });
+
+    $('#offer_link_dialog').dialog({
+      autoOpen: false,
+      width: 400,
+      modal: true,
+      buttons: {
+        'Cancel' : function() {
+          $(this).dialog('close');
+        }
+      }
+    });
+
+    $('#generate_offer_link').click(function() {
+      $('#offer_link_dialog').dialog('open');
+      $('#offer_link').focus();
+      $('#offer_link').select();
+    });
+
+    $('#source_select').change(function() {
+      $('#offer_link').val(Offer.generate_link(<%= @offer.id %>, $(this).val()));
+      $('#offer_link').focus();
+      $('#offer_link').select();
+    });
+
+    $('#add_gift').click(function() {
+      $('#gifts_dialog').dialog('open');
+    });
+
     $('#add_term_option').click(function() {
       $('#term_option_dialog').dialog('open');
     });

@@ -184,6 +184,13 @@ body {
   background-position: 5px center;
 }
 
+#content div.title .actions a.promote {
+  padding-left: 26px;
+  background-image: url(/images/admin/icons/globe-green.png);
+  background-repeat: no-repeat;
+  background-position: 5px center;
+}
+
 #content div.title h2 {
   float: left;
   color: #666;
