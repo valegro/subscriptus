@@ -22,9 +22,6 @@ class Admin::Catalogue::GiftsController < Admin::CatalogueController
     end
   end
 
-  def edit
-  end
-
   def update
     @gift.attributes = params[:gift]
     if @gift.save

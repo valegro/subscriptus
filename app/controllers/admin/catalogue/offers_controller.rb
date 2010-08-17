@@ -24,7 +24,7 @@ class Admin::Catalogue::OffersController < Admin::CatalogueController
   def show
     @gifts = Gift.in_stock
     @offer_term = @offer.offer_terms.new
-    @sources = [[ 'email', 1 ], [ 'dude', 2 ]] # TODO: Source.all
+    @sources = Source.all.map { |s| [ s.code, s.id ] }
   end
 
   def add_gift

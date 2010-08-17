@@ -17,6 +17,7 @@
         <% semantic_navigation :main, :html => { :class => "upper" } do |n| %>
           <%= n.item 'Catalogue', :link => admin_catalogue_publications_path, :highlights_on => { :controller => "admin/catalogue/offers" } %>
           <%= n.item 'Subscribers', :link => admin_subscribers_path %>
+          <%= n.item 'Sources', :link => admin_sources_path %>
         <% end %>
         <ul class="lower">
           <%= yield :lower %>

@@ -62,7 +62,7 @@
   <label for="source_select">Source</label>
   <%= select_tag "Source", options_for_select(@sources), :id => "source_select" %>
   <p>Copy and paste this link into an email or add to a webpage.</p>
-  <%= text_area_tag "Link", "http://offers.crikey.com.au/subscribe?offer_id=1&source=1", :cols => 40, :rows => 2, :id => "offer_link" %>
+  <%= text_area_tag "Link", "", :cols => 40, :rows => 2, :id => "offer_link" %>
 </div>
 
 <script language="javascript">
@@ -111,6 +111,7 @@
 
     $('#generate_offer_link').click(function() {
       $('#offer_link_dialog').dialog('open');
+      $('#offer_link').val(Offer.generate_link(<%= @offer.id %>, $('#source_select').val()));
       $('#offer_link').focus();
       $('#offer_link').select();
     });

@@ -1,0 +1,22 @@
+
+<div class="title">
+  <%= content_tag :h2, "All Sources" %>
+  <div class="actions">
+    <%= link_to 'Create New Source', new_admin_source_path, :class => 'create' %>
+  </div>
+</div>
+
+<%= render_table @sources do |t|
+  t.header :identifier, :label => 'ID'
+  t.header :code
+  t.header :description
+  t.header :actions, :width => "180"
+
+  t.rows do |row, source, index|
+    row.identifier source.id
+    row.code h(source.code)
+    row.description truncate(h(source.description))
+    row.actions link_to("Edit", edit_admin_source_path(source), :class => "edit") + link_to("Delete", admin_source_path(source), :class => "destroy", :method => :delete, :confirm => "Are you sure?")
+  end
+end %>
+
