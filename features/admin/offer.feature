@@ -86,7 +86,7 @@ Scenario: An Admin can edit a offer
   And I select Gift: "New Gifts"
   And I press "Update"
   Then I should be on the page: "New Offer Name"
-  And I should see "Updated Offer: New Offer Name"
+  And I should see "Updated Offer": New Offer Name"
   And I should see "View Offer"
   And I should see "New Offer Name"
   And I should see "Delete"

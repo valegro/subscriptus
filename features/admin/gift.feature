@@ -51,7 +51,7 @@ Scenario: An Admin can edit a gift
   Given I am on the "EditGift" page
   And a gift: "Gift Name" exists
   And I fill in "Name" with "New Gift Name"
-  And I fill in "Description with "New Gift Description"
+  And I fill in "Description" with "New Gift Description"
   And I fill in "On Hand" with "7"
   And I attach the file "features/data/new_file.jpg" to "Gift Image"
   And I press "Update"

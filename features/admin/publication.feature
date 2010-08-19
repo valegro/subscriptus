@@ -25,7 +25,7 @@ Scenario: An admin goes to the "Create New Publication" page
 Scenario: An admin can create a publication
   Given I am on the "Create New Publication" page
   And I fill in "Name" with "Publication Name"
-  And I fill in "Description with "Publication Description"
+  And I fill in "Description" with "Publication Description"
   And I fill in "On Hand" with "6"
   And I attach the file "features/data/file.jpg" to "Publication Image"
   And I press "Create"
@@ -53,7 +53,7 @@ Scenario: An Admin can edit a publication
   Given I am on the "EditPublication" page
   And a publication: "Publication Name" exists
   And I fill in "Name" with "New Publication Name"
-  And I fill in "Description with "New Publication Description"
+  And I fill in "Description" with "New Publication Description"
   And I fill in "On Hand" with "7"
   And I attach the file "features/data/new_file.jpg" to "Publication Image"
   And I press "Update"
