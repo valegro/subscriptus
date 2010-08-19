@@ -2,7 +2,7 @@ Feature: An admin can CRUD a gift
   As a user with the admin role
   I want to be able to Create, Update and Delete gifts and attach a picture to them
 
- Background:
+Background:
   Given an admin: "AdminA" exists with login: "admin_a"
     And a page: "gifts" exists 
     And I am logged in as admin: "AdminA"
@@ -31,7 +31,7 @@ Scenario: An admin can create a gift
   And I press "Create"
   Then I should be on the "gifts" page
   And I should see "All Gifts"
-  And I should see gift: "Gift Name"
+  And I should see "Gift Name"
   And I should see "Delete"
   And I should see "Edit"
 
@@ -58,7 +58,7 @@ Scenario: An Admin can edit a gift
   Then I should be on the page: "New Gift Name"
   And I should see "Updated Gift: New Gift Name"
   And I should see "View Gift"
-  And I should see gift: "New Gift Name"
+  And I should see "New Gift Name"
   And I should see "Delete"
   And I should see "Edit"
   And I should see "Back to Gifts"
@@ -72,4 +72,4 @@ Scenario: An Admin can delete a gift
  Then I should see "All Gifts"
  And I should see "Gifts List"
  And I should see "Create New Gift"
- And I should not see gift: "Gift Name"
+ And I should not see "Gift Name"
