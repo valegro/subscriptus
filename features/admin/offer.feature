@@ -1,6 +1,6 @@
 Feature: An admin can CRUD an offer
   As a user with the admin role
-  I want to be able to Create, Update and Delete offers and attach a picture to them
+  I want to be able to Create, Update and Delete offers
 
 Background:
   Given an admin: "AdminA" exists with login: "admin_a"
