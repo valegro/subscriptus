@@ -42,6 +42,8 @@ Scenario: An Admin can view a publication
   Then I should be on the page: "Publication Name" 
   And I should see "View Publication"
   And I should see "Publication Name"
+  And I should see "Subscribers"
+  And I should see "Publication Name"
   And I should see "Delete"
   And I should see "Edit"
   And I should see "Back to Publications"

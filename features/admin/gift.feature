@@ -25,7 +25,7 @@ Scenario: An admin goes to the "Create New Gift" page
 Scenario: An admin can create a gift
   Given I am on the "Create New Gift" page
   And I fill in "Name" with "Gift Name"
-  And I fill in "Description with "Gift Description"
+  And I fill in "Description" with "Gift Description"
   And I fill in "On Hand" with "6"
   And I attach the file "features/data/file.jpg" to "Gift Image"
   And I press "Create"
