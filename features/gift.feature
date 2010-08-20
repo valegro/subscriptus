@@ -2,74 +2,111 @@ Feature: An admin can CRUD a gift
   As a user with the admin role
   I want to be able to Create, Update and Delete gifts and attach a picture to them
 
-@active
-Scenario: I want to see a list of gifts 
-#    Given an admin exists with login: "admin_a"
-#    Given I am logged in as admin: "AdminA"
-    Given I am on the gifts page
-    Then I should see "All Gifts"
-    And I should see the list of gifts
-    And I should see "Create New Gift"
+  @active
+  Scenario: I want to see a list of gifts 
+    Given I am on the admin catalogue gifts page
+      Then the following gifts exist
+        | name      | on_hand         |
+        | Book | 1 |
+      And I should see "Create New Gift"
 
-@active
-Scenario: An admin goes to the "Create New Gift" page
-  Given I am on the gifts page
-  When I press "Create New Gift"
-  Then I should be on "Create New Gift" page
-  And I should see "Name"
-  And I should see "Description"
-  And I should see "On Hand"
-  And I should see "Gift Image"
+  @active
+  Scenario: An admin goes to the "Create New Gift" page
+    Given I am on the admin catalogue gifts page
+      When I follow "Create New Gift"
+      Then I should be on the "admin catalogue gifts new" page
 
-@pending
-Scenario: An admin can create a gift
-  Given I am on the "Create New Gift" page
-  And I fill in "Name" with "Gift Name"
-  And I fill in "Description" with "Gift Description"
-  And I fill in "On Hand" with "6"
-  And I attach the file "features/data/file.jpg" to "Gift Image"
-  And I press "Create"
-  Then I should be on the "gifts" page
-  And I should see "All Gifts"
-  And I should see "Gift Name"
-  And I should see "Delete"
-  And I should see "Edit"
+  @active
+  Scenario: An admin fails to create a New Gift
+    Given I am on the "admin catalogue gifts new" page
+      When I fill in "Name" with ""
+        And I fill in "Description" with ""
+        And I fill in "On hand" with ""
+        And I press "Create"
+      Then I should see "There were problems with the following fields"
+        And I should see "Name"
+        And I should see "Description"
 
-@pending
-Scenario: An Admin can view a gift
-  Given I am on the gifts page
-  When I press "Gift Name"
-  Then I should be on the page: "Gift Name" 
-  And I should see "View Gift"
-  And I should see "Gift Name"
-  And I should see "Delete"
-  And I should see "Edit"
-  And I should see "Back to Gifts"
+  @active
+  Scenario: An admin successfully creates a New Gift
+    Given I am on the "admin catalogue gifts new" page
+      When I fill in "Name" with "A book"
+        And I fill in "Description" with "A great book by a well known author"
+        And I fill in "On hand" with "10"
+        And I attach the file "features/data/file.jpg" to "Gift image"
+        And I press "Create"
+      Then I should see "Created Gift"
+        And I should be on the admin catalogue gifts page
 
-@pending
-Scenario: An Admin can edit a gift
-  Given I am on the "EditGift" page
-  And a gift: "Gift Name" exists
-  And I fill in "Name" with "New Gift Name"
-  And I fill in "Description" with "New Gift Description"
-  And I fill in "On Hand" with "7"
-  And I attach the file "features/data/new_file.jpg" to "Gift Image"
-  And I press "Update"
-  Then I should be on the page: "New Gift Name"
-  And I should see "Updated Gift: New Gift Name"
-  And I should see "View Gift"
-  And I should see "New Gift Name"
-  And I should see "Delete"
-  And I should see "Edit"
-  And I should see "Back to Gifts"
+  @active
+  Scenario: An admin can return from the new page to the gifts page
+    Given I am on the "admin catalogue gifts new" page
+      When I follow "Back to Gifts"
+      Then I should be on the admin catalogue gifts page
 
-@pending
-Scenario: An Admin can delete a gift
- Given I am on the gifts page 
- And a gift: "Gift Name" exists
- And I press "Delete"
- Then I should be on the gifts page
- Then I should see "All Gifts"
- And I should see "Gifts List"
- And I should see "Create New Gift"
- And I should not see "Gift Name"
+  @active
+  Scenario: An Admin can view a gift
+    Given a gift: "My Gift" exists with name: "My Gift", id: 1
+      When I am on the admin catalogue gifts page
+        And I follow "My Gift"
+    Then I should be on the admin catalogue gift page for 1
+      And I should see "My Gift"
+      And I should see "Stock on Hand"
+
+  @active
+  Scenario: An admin can return to Gifts from show page
+    Given a gift: "My Gift" exists with name: "My Gift", id: 1
+      When I am on the admin catalogue gift page for 1
+        And I follow "Back to Gifts"
+    Then I should be on the admin catalogue gifts page
+
+  @active
+  Scenario: An admin can edit a gift from the index page
+    Given a gift: "My Gift" exists with name: "My Gift", id: 1
+      When I am on the admin catalogue gifts page
+        And I follow "Edit"
+    Then I should be on the admin catalogue gift edit page for 1
+
+  @active
+  Scenario: An admin can edit a gift from show page
+    Given a gift: "My Gift" exists with name: "My Gift", id: 1
+      When I am on the admin catalogue gift page for 1
+        And I follow "Edit"
+    Then I should be on the admin catalogue gift edit page for 1
+
+  @active
+  Scenario: And admin fails to edit a gift
+    Given a gift: "My Gift" exists with name: "My Gift", id: 1
+      When I am on the admin catalogue gift edit page for 1
+        And I fill in "Name" with ""
+        And I fill in "Description" with ""
+        And I fill in "On hand" with ""
+        And I press "Update"
+      Then I should see "There were problems with the following fields"
+        And I should see "Name"
+        And I should see "Description"
+
+  @active
+  Scenario: And admin edits a gift
+    Given a gift: "My Gift" exists with name: "My Gift", id: 1
+      When I am on the admin catalogue gift edit page for 1
+        And I fill in "Name" with "Another Book"
+        And I fill in "Description" with "The quick brown fox jumps over the lazy dog"
+        And I fill in "On hand" with "-1"
+        And I press "Update"
+      Then I should see "Updated Gift: Another Book"
+        And I should see "Another Book"
+        And I should be on the admin catalogue gift page for 1
+
+  @active
+  Scenario: An admin can delete a gift from the gifts page
+    Given a gift: "My Gift" exists with name: "My Gift", id: 1
+      When I am on the admin catalogue gifts page
+        And I follow "Delete"
+    
+  @active
+  Scenario: An admin can delete a gift from the show page
+    Given a gift: "My Gift" exists with name: "My Gift", id: 1
+      When I am on the admin catalogue gift page for 1
+        And I follow "Delete"
+        #And I press "OK"

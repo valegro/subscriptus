@@ -7,11 +7,10 @@ module NavigationHelpers
   #
   def path_to(page_name)
     case page_name
-
-    when /the home\s?page/
-      '/'
-  when /the gifts page/
-      admin_catalogue_gifts_url
+      when /the home\s?page/ then '/'
+      when /admin catalogue gifts new/ then new_admin_catalogue_gift_path
+      when /admin catalogue gift page for (.*)/ then admin_catalogue_gift_path($1)
+      when /admin catalogue gift edit page for (.*)/ then edit_admin_catalogue_gift_path($1)
 
     # Add more mappings here.
     # Here is an example that pulls values out of the Regexp:
