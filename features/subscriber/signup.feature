@@ -4,6 +4,7 @@ Feature: User registration
   I want to be able to choose a subscription
 
   
+@pending
   Scenario: A user can view the subscription page
     Given I am on the signup page
      When I follow "Register"
@@ -22,6 +23,7 @@ Feature: User registration
       And I should see "Fax"
       And I should see "Mail"
   
+@pending
   Scenario: A user can complete "step 1" of the subscription form 
     Given I am on "step 1" of the subscription page
       And I check "Offer 1"
@@ -37,10 +39,11 @@ Feature: User registration
       And I should see "Next"
       And I should see "Cancel"
 
+@pending
   Scenario: A new user can complete "step 2" of the subscription form 
     Given I am on "step 2" of the subscription page
     And I check "This is my first subscription"
-    and I fill in "Username:" with "usera"
+    And I fill in "Username:" with "usera"
     And I fill in "Password:" with "crikey"
     And I follow "Next"
    Then I should see "Subscribe to Crikey"
@@ -63,6 +66,7 @@ Feature: User registration
     And I should see "Next"
     And I should see "Cancel"
 
+@pending
   Scenario: A new user can complete the next phase of "step 2" in the subscription form 
     Given I am on "step 2" of the subscription page
     And I select "Mr" from "Title"
@@ -75,8 +79,8 @@ Feature: User registration
     And I fill in "Street Address line 1:*" with "Address A"
     And I fill in "Street Address line 2:" with "Address B"	
     And I fill in "City" with "Sydney"
-    and I select "N.S.W" from "State"
-    and I fill in "Post Code:*" with "2000"
+    And I select "N.S.W" from "State"
+    And I fill in "Post Code:*" with "2000"
     And I select "Montecarlo" from "Country"
     When I follw "Next"
    Then I should see "Subscribe to Crikey"
@@ -94,15 +98,17 @@ Feature: User registration
     And I should see "e.g.06/11"
     And I should see "Finish"
 
+@pending
   Scenario: An exsisting user can complete "step 2" of the subscription form 
     Given I am on "step 2" of the subscription page
     And I check "I already have an account with Crikey"
-    and I fill in "Username:" with "userb"
+    And I fill in "Username:" with "userb"
     And I fill in "Password:" with "dikey"
     And I follow "Next"
    Then I should see "Subscribe to Crikey"
     And I should see "step 3"
 
+@pending
 Scenario: A user fails to fill in a required form
   Given I am on "step 2" of the subscription page
     Given I am on "step 2" of the subscription page
@@ -116,8 +122,8 @@ Scenario: A user fails to fill in a required form
     And I fill in "Street Address line 1:*" with "Address A"
     And I fill in "Street Address line 2:" with "Address B"	
     And I fill in "City" with "Sydney"
-    and I select "N.S.W" from "State"
-    and I fill in "Post Code:*" with "2000"
+    And I select "N.S.W" from "State"
+    And I fill in "Post Code:*" with "2000"
     And I select "Montecarlo" from "Country"
     When I follw "Next"
    Then I should be on "step 2" of the subscription page 

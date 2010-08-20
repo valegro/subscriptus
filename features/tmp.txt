@@ -1,0 +1,47 @@
+(in /home/mrentz/Dropbox/code/subscriptus)
+                    admin_subscribers GET    /admin/subscribers(.:format)          {:controller=>"admin/subscribers", :action=>"index"}
+                                      POST   /admin/subscribers(.:format)          {:controller=>"admin/subscribers", :action=>"create"}
+                 new_admin_subscriber GET    /admin/subscribers/new(.:format)      {:controller=>"admin/subscribers", :action=>"new"}
+                edit_admin_subscriber GET    /admin/subscribers/:id/edit(.:format) {:controller=>"admin/subscribers", :action=>"edit"}
+                     admin_subscriber GET    /admin/subscribers/:id(.:format)      {:controller=>"admin/subscribers", :action=>"show"}
+                                      PUT    /admin/subscribers/:id(.:format)      {:controller=>"admin/subscribers", :action=>"update"}
+                                      DELETE /admin/subscribers/:id(.:format)      {:controller=>"admin/subscribers", :action=>"destroy"}
+                        admin_sources GET    /admin/sources(.:format)              {:controller=>"admin/sources", :action=>"index"}
+                                      POST   /admin/sources(.:format)              {:controller=>"admin/sources", :action=>"create"}
+                     new_admin_source GET    /admin/sources/new(.:format)          {:controller=>"admin/sources", :action=>"new"}
+                    edit_admin_source GET    /admin/sources/:id/edit(.:format)     {:controller=>"admin/sources", :action=>"edit"}
+                         admin_source GET    /admin/sources/:id(.:format)          {:controller=>"admin/sources", :action=>"show"}
+                                      PUT    /admin/sources/:id(.:format)          {:controller=>"admin/sources", :action=>"update"}
+                                      DELETE /admin/sources/:id(.:format)          {:controller=>"admin/sources", :action=>"destroy"}
+    admin_catalogue_offer_offer_terms GET    /admin/catalogue/offers/:offer_id/off {:controller=>"admin/catalogue/offer_terms", :action=>"index"}
+                                      POST   /admin/catalogue/offers/:offer_id/off {:controller=>"admin/catalogue/offer_terms", :action=>"create"}
+ new_admin_catalogue_offer_offer_term GET    /admin/catalogue/offers/:offer_id/off {:controller=>"admin/catalogue/offer_terms", :action=>"new"}
+edit_admin_catalogue_offer_offer_term GET    /admin/catalogue/offers/:offer_id/off {:controller=>"admin/catalogue/offer_terms", :action=>"edit"}
+     admin_catalogue_offer_offer_term GET    /admin/catalogue/offers/:offer_id/off {:controller=>"admin/catalogue/offer_terms", :action=>"show"}
+                                      PUT    /admin/catalogue/offers/:offer_id/off {:controller=>"admin/catalogue/offer_terms", :action=>"update"}
+                                      DELETE /admin/catalogue/offers/:offer_id/off {:controller=>"admin/catalogue/offer_terms", :action=>"destroy"}
+               admin_catalogue_offers GET    /admin/catalogue/offers(.:format)     {:controller=>"admin/catalogue/offers", :action=>"index"}
+                                      POST   /admin/catalogue/offers(.:format)     {:controller=>"admin/catalogue/offers", :action=>"create"}
+            new_admin_catalogue_offer GET    /admin/catalogue/offers/new(.:format) {:controller=>"admin/catalogue/offers", :action=>"new"}
+           edit_admin_catalogue_offer GET    /admin/catalogue/offers/:id/edit(.:fo {:controller=>"admin/catalogue/offers", :action=>"edit"}
+       add_gift_admin_catalogue_offer POST   /admin/catalogue/offers/:id/add_gift( {:controller=>"admin/catalogue/offers", :action=>"add_gift"}
+    remove_gift_admin_catalogue_offer POST   /admin/catalogue/offers/:id/remove_gi {:controller=>"admin/catalogue/offers", :action=>"remove_gift"}
+                admin_catalogue_offer GET    /admin/catalogue/offers/:id(.:format) {:controller=>"admin/catalogue/offers", :action=>"show"}
+                                      PUT    /admin/catalogue/offers/:id(.:format) {:controller=>"admin/catalogue/offers", :action=>"update"}
+                                      DELETE /admin/catalogue/offers/:id(.:format) {:controller=>"admin/catalogue/offers", :action=>"destroy"}
+                admin_catalogue_gifts GET    /admin/catalogue/gifts(.:format)      {:controller=>"admin/catalogue/gifts", :action=>"index"}
+                                      POST   /admin/catalogue/gifts(.:format)      {:controller=>"admin/catalogue/gifts", :action=>"create"}
+             new_admin_catalogue_gift GET    /admin/catalogue/gifts/new(.:format)  {:controller=>"admin/catalogue/gifts", :action=>"new"}
+            edit_admin_catalogue_gift GET    /admin/catalogue/gifts/:id/edit(.:for {:controller=>"admin/catalogue/gifts", :action=>"edit"}
+                 admin_catalogue_gift GET    /admin/catalogue/gifts/:id(.:format)  {:controller=>"admin/catalogue/gifts", :action=>"show"}
+                                      PUT    /admin/catalogue/gifts/:id(.:format)  {:controller=>"admin/catalogue/gifts", :action=>"update"}
+                                      DELETE /admin/catalogue/gifts/:id(.:format)  {:controller=>"admin/catalogue/gifts", :action=>"destroy"}
+         admin_catalogue_publications GET    /admin/catalogue/publications(.:forma {:controller=>"admin/catalogue/publications", :action=>"index"}
+                                      POST   /admin/catalogue/publications(.:forma {:controller=>"admin/catalogue/publications", :action=>"create"}
+      new_admin_catalogue_publication GET    /admin/catalogue/publications/new(.:f {:controller=>"admin/catalogue/publications", :action=>"new"}
+     edit_admin_catalogue_publication GET    /admin/catalogue/publications/:id/edi {:controller=>"admin/catalogue/publications", :action=>"edit"}
+          admin_catalogue_publication GET    /admin/catalogue/publications/:id(.:f {:controller=>"admin/catalogue/publications", :action=>"show"}
+                                      PUT    /admin/catalogue/publications/:id(.:f {:controller=>"admin/catalogue/publications", :action=>"update"}
+                                      DELETE /admin/catalogue/publications/:id(.:f {:controller=>"admin/catalogue/publications", :action=>"destroy"}
+                                             /:controller/:action/:id              
+                                             /:controller/:action/:id(.:format)    
