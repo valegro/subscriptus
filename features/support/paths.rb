@@ -16,6 +16,10 @@ module NavigationHelpers
       when /admin catalogue publications new/ then new_admin_catalogue_publication_path
       when /admin catalogue publication page for (.*)/ then admin_catalogue_publication_path($1)
       when /admin catalogue publication edit page for (.*)/ then edit_admin_catalogue_publication_path($1)
+      # Sources
+      when /admin sources new/ then new_admin_source_path
+      when /admin sources page for (.*)/ then admin_source_path($1)
+      when /admin sources edit page for (.*)/ then edit_admin_source_path($1)
 
     # Add more mappings here.
     # Here is an example that pulls values out of the Regexp:
