@@ -103,10 +103,13 @@ Feature: An admin can CRUD a gift
     Given a gift: "My Gift" exists with name: "My Gift", id: 1
       When I am on the admin catalogue gifts page
         And I follow "Delete"
+      Then I should see "Deleted Gift"
+        And I should be on the admin catalogue gifts page
     
   @active
   Scenario: An admin can delete a gift from the show page
     Given a gift: "My Gift" exists with name: "My Gift", id: 1
       When I am on the admin catalogue gift page for 1
         And I follow "Delete"
-        #And I press "OK"
+      Then I should see "Deleted Gift"
+        And I should be on the admin catalogue gifts page
