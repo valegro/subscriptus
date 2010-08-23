@@ -49,18 +49,44 @@ module CM
       end
   end
 
-  class Recipient < Base
+  class Proxy < Base
+    def self.add_recipient(hash, operation = CmOperationType::Insert)
+      recipient = Recipient.new(hash)
+      result = driver.AddRecipient(
+        :token => access_token,
+        :recipientInfo => recipient.info,
+        :operationType => operation,
+        :primaryKeyName => Recipient::PRIMARY_KEY_NAME
+      )
+      ServiceReturn.new(result)
+    end
+  end
+
+  class ServiceReturn < Hash
+    def success?
+      self[:status] != 'Failure'
+    end
+
+    def initialize(result)
+      self[:status] = result.addRecipientResult.callStatus
+      self[:message] = result.addRecipientResult.message
+    end
+  end
+
+  class Recipient
     ::PRIMARY_KEY_NAME = 'EmailAddress'
     ::ATTRS = %w(created_at from_ip email id last_modified_by)
 
-    def self.create(hash)
-      cm_recipient = self.new(hash)
-      driver.AddRecipient(
-        :token => access_token,
-        :recipientInfo => cm_recipient,
-        :operationType => CmOperationType::Insert,
-        :primaryKeyName => ::PRIMARY_KEY_NAME
-      )
+    def self.update(hash)
+      result = Proxy.add_recipient(hash, CmOperationType::Update)
+      raise result[:message] unless result.success?
+      true
+    end
+
+    def self.create!(hash)
+      result = Proxy.add_recipient(hash)
+      raise result[:message] unless result.success?
+      true
     end
 
     def initialize(hash)
@@ -87,6 +113,10 @@ module CM
       field.value = value
       @extra_attrs << field
       @cm_recipient.values = @extra_attrs
+    end
+
+    def info
+      @cm_recipient
     end
 
     protected
