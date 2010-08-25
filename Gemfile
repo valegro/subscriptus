@@ -32,7 +32,7 @@ gem 'httpclient'
 gem 'soap4r'
 
 # Others
-gem 'aws-s3'
+gem 'aws-s3', :require => "aws/s3"
 
 group :test, :cucumber do
   gem 'capybara'

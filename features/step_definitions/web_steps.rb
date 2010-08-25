@@ -25,12 +25,23 @@ When /^(?:|I )go to (.+)$/ do |page_name|
 end
 
 When /^(?:|I )press "([^\"]*)"(?: within "([^\"]*)")?$/ do |button, selector|
+  # I know this is hacky!
+  begin
+    page.evaluate_script("window.confirm = function() { return true; }")
+    page.evaluate_script("window.alert = function() { return true; }")
+  rescue
+  end
   with_scope(selector) do
     click_button(button)
   end
 end
 
 When /^(?:|I )follow "([^\"]*)"(?: within "([^\"]*)")?$/ do |link, selector|
+  begin
+    page.evaluate_script("window.confirm = function() { return true; }")
+    page.evaluate_script("window.alert = function() { return true; }")
+  rescue
+  end
   with_scope(selector) do
     click_link(link)
   end
@@ -149,11 +160,12 @@ end
 Then /^the "([^\"]*)" field(?: within "([^\"]*)")? should contain "([^\"]*)"$/ do |field, selector, value|
   with_scope(selector) do
     field = find_field(field)
-    field_value = (field.tag_name == 'textarea') ? field.text : field.value
+    #field_value = (field.tag_name == 'textarea') ? field.text : field.value
+    field_value = field.value
     if field_value.respond_to? :should
-      field_value.should =~ /#{value}/
+      field_value.should == /#{value}/
     else
-      assert_match(/#{value}/, field_value)
+      assert_match(value, field_value)
     end
   end
 end

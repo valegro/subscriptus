@@ -27,6 +27,16 @@ class Admin::Catalogue::OffersController < Admin::CatalogueController
     @sources = Source.all.map { |s| [ s.code, s.id ] }
   end
 
+  def update
+    @offer.attributes = params[:offer]
+    if @offer.save
+      flash[:notice] = "Updated Offer: #{h(@offer.name)}"
+      redirect_to :action => :show
+    else
+      render :action => :edit
+    end
+  end
+
   def add_gift
     @gift = Gift.find(params[:gift_id])
     render :update do |page|

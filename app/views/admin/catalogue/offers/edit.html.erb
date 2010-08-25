@@ -1,0 +1,12 @@
+<div class="title">
+  <%= content_tag :h2, "Edit Offer Details" %>
+  <div class="actions">
+    <%= link_to 'Back to Offer', admin_catalogue_offer_path(@offer), :class => 'back' %>
+  </div>
+</div>
+
+<% form_for [:admin, :catalogue, @offer], :builder => Reform::Builder, :html => { :class => "form" } do |form| %>
+  <%= form.error_messages %>
+  <%= render :partial => "form", :object => form %>
+  <%= form.submit "Update" %>
+<% end %>
