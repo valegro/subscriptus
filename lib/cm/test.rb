@@ -1,9 +1,7 @@
-require 'rubygems'
+#require 'rubygems'
 gem 'httpclient'
 gem 'soap4r'
 
-require 'soap/wsdlDriver'
-require 'CampaignMasterService'
 
 # In production we may be able to build our own classes for the relevant data types (for sending/marshalling) and use a MappingRegistry http://dev.ctor.org/soap4r/wiki/CustomMappingWithMappingRegistry
 # FOR USE WITH RAILS SEE http://dev.ctor.org/soap4r/wiki/RailsAndSoap4R
@@ -67,8 +65,8 @@ BounceType
 
 arry = ArrayOfCmRecipientValue.new
 mobile = CmRecipientValue.new
-mobile.fieldName = 'MobileNumber'
-mobile.value = '0400333444'
+mobile.fieldName = 'State'
+mobile.value = 'ACTIVE'
 arry << mobile
 
 recip = CmRecipient.new
@@ -82,7 +80,7 @@ recip.isActive = true
 recip.isVerified = true
 recip.lastModified = Time.now
 recip.lastModifiedBy = 'Daniel'
-#recip.values = arry
+recip.values = arry
 
 result = driver.AddRecipient(:token => token, :recipientInfo => recip, :operationType => CmOperationType::Insert, :primaryKeyName => "EmailAddress")
 

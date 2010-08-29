@@ -6,7 +6,7 @@ gem 'pg'
 
 # These are "core" gems we always use
 gem 'authlogic'
-gem 'searchlogic'
+#gem 'searchlogic'
 gem 'navigasmic'
 gem 'will_paginate'
 gem 'json_pure'
@@ -33,6 +33,7 @@ gem 'soap4r'
 
 # Others
 gem 'aws-s3'
+gem 'wizardly'
 
 group :test, :cucumber do
   gem 'capybara'

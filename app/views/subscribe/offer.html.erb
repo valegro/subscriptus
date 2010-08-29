@@ -1,0 +1,38 @@
+<h1>Offer</h1>
+
+
+<%= "<p style=\"color: green\">#{flash[:notice]}<p>" if flash[:notice] %>
+
+<h2><%= @offer.publication.name %></h2>
+<p><%= @offer.publication.description %></p>
+
+<% form_for :subscription, :url => { :action => :offer }, :builder => Reform::Builder, :html => { :class => "form" } do |f| %>
+
+  <h4>Subscription</h4>
+  <% if @offer.offer_terms.size > 1 %>
+    <table>
+      <% @offer.offer_terms.each_with_index do |ot, i| %>
+        <tr>
+          <td>
+            <%= radio_button_tag "term", ot.id %>
+            <label for="">Offer <%= i + 1 %>: <%= pluralize(ot.months, 'month') %></label>
+          </td>
+          <td><%= number_to_currency(ot.price) %></td>
+        </tr>
+      <% end %>
+    </table>
+  <% else %>
+    <p><%= pluralize(@offer.offer_terms.first.months, 'month') %> for <%= number_to_currency(@offer.offer_terms.first.price) %></p>
+  <% end %>
+  <% unless @offer.gifts.blank? %>
+    <h4>Choose a free gift</h4>
+    <%= image_tag(@offer.gifts.first.gift_image.url(:thumb)) %>
+  <% end %>
+  <p>
+    <%= wizardly_image_submit %>
+  </p>
+<% end %>
+
+<script type='text/javascript'>
+  document.getElementById('').focus()
+</script>

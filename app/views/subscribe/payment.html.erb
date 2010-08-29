@@ -1,0 +1,16 @@
+<h1>Payment</h1>
+
+
+<%= "<p style=\"color: green\">#{flash[:notice]}<p>" if flash[:notice] %>
+
+<% form_for :subscription, :url=>{:action=>:payment}  do |f| %>
+  <%= f.error_messages %>
+
+  <p>
+    <%= wizardly_image_submit %>
+  </p>
+<% end %>
+
+<script type='text/javascript'>
+  document.getElementById('').focus()
+</script>

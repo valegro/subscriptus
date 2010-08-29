@@ -105,11 +105,18 @@ module CM
 
       @cm_recipient.isVerified = hash.has_key?(:verified) ? hash[:verified] : true
       @cm_recipient.isActive = hash.has_key?(:active) ? hash[:active] : true
+
+      # Extra Fields
+      if hash.has_key?(:fields)
+        hash[:fields].each_pair do |key,value|
+          add_field(key,value)
+        end
+      end
     end
 
     def add_field(name, value)
       field = CmRecipientValue.new
-      field.fieldName = name
+      field.fieldName = name.to_s
       field.value = value
       @extra_attrs << field
       @cm_recipient.values = @extra_attrs
