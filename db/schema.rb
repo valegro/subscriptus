@@ -37,11 +37,6 @@ ActiveRecord::Schema.define(:version => 20100902065227) do
     t.datetime "updated_at"
   end
 
-  create_table "gifts_offers", :force => true do |t|
-    t.integer "gift_id"
-    t.integer "offer_id"
-  end
-
   create_table "offer_terms", :force => true do |t|
     t.integer  "offer_id"
     t.decimal  "price"
@@ -110,6 +105,14 @@ ActiveRecord::Schema.define(:version => 20100902065227) do
     t.string   "firstname"
     t.string   "lastname"
     t.string   "email"
+    t.string   "phone_number"
+    t.string   "address_1"
+    t.string   "address_2"
+    t.string   "city"
+    t.string   "state"
+    t.string   "postcode"
+    t.string   "country"
+    t.string   "title"
     t.string   "login",                            :null => false
     t.string   "crypted_password",                 :null => false
     t.string   "password_salt",                    :null => false

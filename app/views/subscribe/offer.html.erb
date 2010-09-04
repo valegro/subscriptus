@@ -32,9 +32,9 @@
     <% unless @offer.gifts.included.blank? %>
       <h4>Subscribe and Receive</h4>
       <%= render :partial => "included_gift", :collection => @included_gifts, :locals => { :f => sg } %>
-      <% if @optional_gifts.size == 1 %>
-        <%= render :partial => "included_gift", :object => @optional_gifts.first, :locals => { :f => sg } %>
-      <% end %>
+    <% end %>
+    <% if @optional_gifts.size == 1 %>
+      <%= render :partial => "included_gift", :object => @optional_gifts.first, :locals => { :f => sg } %>
     <% end %>
     <% if @offer.gifts.optional.size > 1 %>
       <% if @offer.gifts.included.empty? %>

@@ -34,6 +34,7 @@ gem 'soap4r'
 # Others
 gem 'aws-s3', :require => "aws/s3"
 gem 'wizardly'
+gem 'enumerated_attribute'
 
 group :test, :cucumber do
   gem 'capybara'

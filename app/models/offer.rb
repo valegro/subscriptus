@@ -13,4 +13,12 @@ class Offer < ActiveRecord::Base
 
   validates_presence_of :name, :publication
   validates_uniqueness_of :name
+
+  def available_included_gifts
+    result = gifts.in_stock.included
+    if gifts.in_stock.optional.size == 1
+      result << gifts.in_stock.optional.first
+    end
+    result
+  end
 end

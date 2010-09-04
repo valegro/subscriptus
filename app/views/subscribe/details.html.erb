@@ -3,14 +3,61 @@
 
 <%= "<p style=\"color: green\">#{flash[:notice]}<p>" if flash[:notice] %>
 
-<% form_for :subscription, :url=>{:action=>:details}  do |f| %>
+
+<% form_for @subscription, :url => { :action => :details }, :builder => Reform::Builder, :html => { :class => "form", :method => 'post' } do |f| %>
   <%= f.error_messages %>
 
+<p><%= radio_button_tag :new_or_existing, "existing", @new_or_existing ? @new_or_existing == 'existing' : true %>Existing User</p>
+<p><%= radio_button_tag :new_or_existing, "new", @new_or_existing ? @new_or_existing == 'new' : false %>New User</p>
+
+  <!-- TODO: Move the login stuff into a separate form -->
+  <% f.fields_for :user, @user do |u| %>
+    <div id="existing_user_fields">
+      <%= u.text_field :login %>
+      <%= u.password_field :password %>
+    </div>
+    <div id="new_user_fields">
+      <%= u.password_field :password_confirmation %>
+      <%= u.error_messages %>
+      <%= u.enum_select :title %>
+      <%= u.text_field :firstname %>
+      <%= u.text_field :lastname %>
+      <%= u.text_field :email, :help => "This is the email address Crikey will be sent to" %>
+      <%= u.text_field :email_confirmation %>
+      <%= u.text_field :phone_number, :help => "If there are problems with email delivery this is how we contact you" %>
+      <%= u.text_field :address_1, :label => "Street Address Line 1" %>
+      <%= u.text_field :address_2, :label => "Street Address Line 2" %>
+      <%= u.text_field :city %>
+      <%= u.enum_select :state %>
+      <%= u.text_field :postcode %>
+      <%= u.country_select :country %>
+    </div>
+  <% end %>
   <p>
     <%= wizardly_image_submit %>
   </p>
 <% end %>
 
 <script type='text/javascript'>
-  document.getElementById('').focus()
+  function showFields() {
+    checked = $('input[name=new_or_existing]:checked').val();
+    if (checked == 'existing') {
+      $('#subscription_user_attributes_login').focus()
+      $('#new_user_fields').hide();
+      $('#new_user_fields :input').attr('disabled', true);
+      $('#existing_user_fields').show();
+    } else {
+      $('#subscription_user_attributes_firstname').focus()
+      $('#new_user_fields').show();
+      $('#existing_user_fields').show();
+      $('#new_user_fields :input').removeAttr('disabled');
+    }
+  }
+
+  $(document).ready(function() {
+    $('input[name=new_or_existing]').change(function(){
+      showFields();
+    });
+    showFields(); 
+  });
 </script>

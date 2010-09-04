@@ -5,9 +5,15 @@ class Subscription < ActiveRecord::Base
   has_many :subscription_log_entries
   has_many :subscription_gifts, :dependent => :destroy
   
-  #has_many :gifts, :through => :subscription_gifts
+  has_many :gifts, :through => :subscription_gifts do
+    def add_uniquely(gifts)
+      gifts.each do |gift|
+        self << gift unless self.include?(gift)
+      end
+    end
+  end
 
-  accepts_nested_attributes_for :subscription_gifts
+  accepts_nested_attributes_for :subscription_gifts, :user
 
   #validates_presence_of :expiry
 

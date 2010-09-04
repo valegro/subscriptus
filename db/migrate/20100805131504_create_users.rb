@@ -1,7 +1,8 @@
 class CreateUsers < ActiveRecord::Migration
   def self.up
     create_table :users do |t|
-      t.string :firstname, :lastname, :email
+      t.string :firstname, :lastname, :email, :phone_number, :address_1, :address_2, :city, :state, :postcode, :country
+      t.enum :title
       t.string :login, :null => false
       t.string :crypted_password, :null => false
       t.string :password_salt, :null => false
