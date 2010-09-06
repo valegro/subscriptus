@@ -1,5 +1,5 @@
 class OfferTerm < ActiveRecord::Base
-  TERM_OPTIONS = [1, 3, 6, 12]
+  TERM_OPTIONS = [1, 3, 6, 12, 24]
   belongs_to :offer
 
   validates_presence_of :price, :months
