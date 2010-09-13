@@ -12,8 +12,14 @@ gem 'will_paginate'
 gem 'json_pure'
 gem 'capistrano'
 
+
+# payment support
+gem 'activemerchant'
+
+
 # State machine support
 gem 'aasm'
+
 
 # jQuery
 gem 'jrails'
