@@ -60,4 +60,3 @@ end
 def admin_login
   controller.stubs(:current_user).returns( Factory.create(:admin) )
 end
-

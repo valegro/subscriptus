@@ -27,6 +27,10 @@ gem 'RedCloth'
 gem 'delayed_job'
 gem 'delayed_paperclip'
 
+# rspec
+gem 'rspec-rails'
+gem 'mechanize'
+
 # Needed for Campaign Master
 gem 'httpclient'
 gem 'soap4r'
