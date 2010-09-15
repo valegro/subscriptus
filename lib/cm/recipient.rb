@@ -14,12 +14,18 @@ module CM
     @@token = nil
     @@static_driver = nil
 
+    @@username = ::CAMPAIGNMASTER_USERNAME
+    @@password = ::CAMPAIGNMASTER_PASSWORD
+    @@client_id = ::CAMPAIGNMASTER_CLIENT_ID
+
     def self.driver
       return @@static_driver if @@static_driver
       fact = SOAP::WSDLDriverFactory.new(V1_URI)
       @@static_driver = fact.create_rpc_driver
       @@static_driver.generate_explicit_type = true
       @@static_driver.options['protocol.http.ssl_config.verify_callback'] = method(:validate_certificate)
+      @@static_driver.options["protocol.http.connect_timeout"] = 60 # XXX should defaults be settable somewhere?
+      @@static_driver.options["protocol.http.receive_timeout"] = 60
       @@static_driver
     end
 
@@ -38,8 +44,7 @@ module CM
       end
 
       def self.login_with_response
-        # TODO: Read from yaml or other
-        client_response = driver.login(:clientID => 5032, :userName => "ddraper", :password => "netfox")
+        client_response = driver.login(:clientID => @@client_id, :userName => @@username, :password => @@password)
         result = LoginResponse.new(client_response.loginResult)
         @@token_expires_at = (Time.now + result.loginResult.minutesTillTokenExpires.to_i.minutes)
         @@token = result.loginResult.tokenString
@@ -61,6 +66,8 @@ module CM
         :primaryKeyName => Recipient::PRIMARY_KEY_NAME
       )
       ServiceReturn.new(result)
+    rescue SocketError, HTTPClient::ReceiveTimeoutError, HTTPClient::ConnectTimeoutError => ex
+      return ServiceReturn.new(false, :message => ex.message)
     end
 
     # you could specify operation in the form like:
@@ -91,6 +98,8 @@ module CM
       end
       result = driver.GetRecipients(:token => access_token, :page => 1, :criteria => criteria)
       return ServiceReturn.new(result)
+    rescue SocketError, HTTPClient::ReceiveTimeoutError, HTTPClient::ConnectTimeoutError => ex
+      return ServiceReturn.new(false, :message => ex.message)
     end
 
     Operators = { '==' => CmBooleanBinaryOperator::Equals,
@@ -105,10 +114,10 @@ module CM
     # this one goes through the Web UI.
     # TODO: find out if there is pagination (then modify if necessary)
     def self.delete_all_recipients
-      web_ui_username = 'ddraper'
-      web_ui_password = 'netfox'
+      web_ui_username = @@username
+      web_ui_password = @@password
       agent = Mechanize.new
-      login_page = agent.get('http://www.ecm7.com/cm/public/5032/clientlogin.clsp')
+      login_page = agent.get("http://www.ecm7.com/cm/public/#{@@client_id}/clientlogin.clsp")
       login_form = login_page.forms[0]
       login_form.send "ctl00$ctl00$ctl00$PageRoot$SiteBody$PageContent$NormalAuthenticationCtrl$txtUsername=", web_ui_username
       login_form.send "ctl00$ctl00$ctl00$PageRoot$SiteBody$PageContent$NormalAuthenticationCtrl$txtPassword=", web_ui_password
@@ -132,7 +141,7 @@ module CM
       self[:status] != 'Failure'
     end
 
-    def initialize(result)
+    def initialize(result, options = {})
       # TODO: use inheritance to avoid if statement?
       if result.respond_to?(:addRecipientResult)
         self[:status] = result.addRecipientResult.callStatus
@@ -144,7 +153,11 @@ module CM
         self[:recipients] = recipients.map { |rcp|
           self.class.hash_from_cm_recipient(rcp)
         }
+      elsif !result # true if false or nil
+        self[:status] = 'Failure'
+        self[:message] = options[:message] if options[:message]
       end
+
       self
     end
 

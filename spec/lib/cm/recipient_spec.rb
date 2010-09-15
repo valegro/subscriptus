@@ -1,5 +1,5 @@
-require 'cm/recipient'
 require 'config/environment' # it's not loaded when you run this file alone.
+require 'cm/recipient'
 
 describe CM::Base do
   before(:each) do
@@ -39,6 +39,8 @@ describe CM::Base do
     CM::Base.send(:validate_certificate, nil, nil).should be_true
   end
 
+  it "should validate certificate"
+
   it "should login and set token" do
     CM::Base.should_receive(:driver).and_return(@driver)
     @client_response = mock('@cleint_response', :loginResult => nil )
@@ -74,18 +76,66 @@ describe CM::Proxy do
   end
 
   # class 
-  it "should call add_recipient" do
-    @driver.should_receive(:AddRecipient).and_return(nil)
-    CM::ServiceReturn.stub!(:new).and_return('spam')
-    @recipient = mock("@recipient", :info => nil)
-    CM::Recipient.stub!(:new).and_return(@recipient)
-    CM::Proxy.add_recipient({}).should == 'spam'
+  describe "adding recpient" do
+    before(:each) do
+      @driver.stub!(:AddRecipient).and_return(nil)
+      @recipient = mock("@recipient", :info => nil)
+      CM::Recipient.stub!(:new).and_return(@recipient)
+    end
+    it "should call add_recipient" do
+      CM::ServiceReturn.stub!(:new).and_return('spam')
+      CM::Proxy.add_recipient({}).should == 'spam'
+    end
+    it "should return failure and message if Timeout Error raised" do
+      @driver.should_receive(:AddRecipient).and_raise(HTTPClient::ConnectTimeoutError.new("spam"))
+      result = ''
+      lambda { result = CM::Proxy.add_recipient({}) }.should_not raise_error
+      result.success?.should be_false
+      result[:message].should == 'spam'
+    end
+    it "should return failure and message if Socket Error raised" do
+      @driver.should_receive(:AddRecipient).and_raise(SocketError.new("spam"))
+      result = ''
+      lambda { result = CM::Proxy.add_recipient({}) }.should_not raise_error
+      result.success?.should be_false
+      result[:message].should == 'spam'
+    end
+    it "should raise if other exceptions raised" do
+      @driver.should_receive(:AddRecipient).and_raise(StandardError.new("spam"))
+      lambda { CM::Proxy.add_recipient({}) }.should raise_error(StandardError)
+    end
   end
 
-  it "should call get_recipients" do
-    CM::ServiceReturn.stub!(:new).and_return('spam')
-    @driver.should_receive(:GetRecipients).and_return(nil)
-    CM::Proxy.get_recipients( :ham => :egg ).should == 'spam'
+  describe "querying" do
+    before(:each) do
+      @driver.stub!(:AddRecipient).and_return(nil)
+      @recipient = mock("@recipient", :info => nil)
+      CM::Recipient.stub!(:new).and_return(@recipient)
+    end
+    it "should call get_recipients" do
+      CM::ServiceReturn.stub!(:new).and_return('spam')
+      @driver.should_receive(:GetRecipients).and_return(nil)
+      CM::ServiceReturn.stub!(:new).and_return('spam')
+      CM::Proxy.get_recipients( :ham => :egg ).should == 'spam'
+    end
+    it "should return failure and message if Timeout Error raised" do
+      @driver.should_receive(:GetRecipients).and_raise(HTTPClient::ReceiveTimeoutError.new("spam"))
+      result = ''
+      lambda { result = CM::Proxy.get_recipients({:ham => :spam}) }.should_not raise_error
+      result.success?.should be_false
+      result[:message].should == 'spam'
+    end
+    it "should return failure and message if Socket Error raised" do
+      @driver.should_receive(:GetRecipients).and_raise(SocketError.new("spam"))
+      result = ''
+      lambda { result = CM::Proxy.get_recipients({:ham => :spam}) }.should_not raise_error
+      result.success?.should be_false
+      result[:message].should == 'spam'
+    end
+    it "should raise if other exceptions raised" do
+      @driver.should_receive(:GetRecipients).and_raise(StandardError.new("spam"))
+      lambda { CM::Proxy.get_recipients({:ham => :spam}) }.should raise_error(StandardError)
+    end
   end
 
   describe "checking hash" do

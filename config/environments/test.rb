@@ -44,3 +44,7 @@ end
 # end
 
 # config.gem 'rspec-rails', :version => '>= 1.3.2', :lib => false unless File.directory?(File.join(Rails.root, 'vendor/plugins/rspec-rails'))
+
+CAMPAIGNMASTER_USERNAME = 'ddraper'
+CAMPAIGNMASTER_PASSWORD = 'netfox'
+CAMPAIGNMASTER_CLIENT_ID = '5032'

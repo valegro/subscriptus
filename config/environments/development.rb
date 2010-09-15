@@ -25,3 +25,6 @@ config.after_initialize do
         :password => "jogkriw7"
   )
 end
+CAMPAIGNMASTER_USERNAME = 'ddraper'
+CAMPAIGNMASTER_PASSWORD = 'netfox'
+CAMPAIGNMASTER_CLIENT_ID = '5032'
