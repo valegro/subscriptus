@@ -15,9 +15,11 @@
       <h1>Subscriptus Administration</h1>
       <div id="navigation">
         <% semantic_navigation :main, :html => { :class => "upper" } do |n| %>
-          <%= n.item 'Catalogue', :link => admin_catalogue_publications_path, :highlights_on => { :controller => "admin/catalogue/offers" } %>
-          <%= n.item 'Subscribers', :link => admin_subscribers_path %>
+          <%= n.item 'Subscriptions', :link => admin_subscriptions_path, :highlights_on => [{:controller => "admin/subscriptions"}, {:controller => "admin/subscribers"}] %>
+          <%= n.item 'Catalogue', :link => admin_catalogue_publications_path, :highlights_on => [proc { params[:controller] =~ /^admin\/catalogue/ ? true : false }] %>
           <%= n.item 'Sources', :link => admin_sources_path %>
+          <%= n.item 'Payments', :link => admin_payments_path %>
+          <%= n.item 'System', :link => admin_system_users_path, :highlights_on => [proc { params[:controller] =~ /^admin\/system/ ? true : false }] %>
         <% end %>
         <ul class="lower">
           <%= yield :lower %>

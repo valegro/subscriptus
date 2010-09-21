@@ -1,0 +1,17 @@
+K 25
+svn:wc:ra_dav:version-url
+V 51
+/svn/netfox4/!svn/ver/474/trunk/lib/billing/charger
+END
+invoicer.rb
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svn/netfox4/!svn/ver/464/trunk/lib/billing/charger/invoicer.rb
+END
+credit_card.rb
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/svn/netfox4/!svn/ver/474/trunk/lib/billing/charger/credit_card.rb
+END

@@ -1,7 +1,7 @@
 class SubscribeController < ApplicationController
   layout 'admin'
 
-  act_wizardly_for :subscription, :form_data => :sandbox, :canceled => "/", :persist_model => :once
+  act_wizardly_for :subscription, :form_data => :sandbox, :canceled => "/", :completed => "/", :persist_model => :once
 
   def index
     redirect_to :action => :offer, :offer_id => params[:offer_id], :source_id => params[:source_id]
@@ -50,7 +50,20 @@ class SubscribeController < ApplicationController
     end
   end
 
+  on_next(:payment) do
+    puts "AAAA"
+    # TODO: Check gateway here
+  end
+
   on_cancel(:all) do
     @subscription.destroy
+  end
+
+  on_finish(:payment) do
+    puts "HERE"
+    @subscription.build_user(session[:user_dat])
+    @subscription.update_attributes(params[:subscription])
+    @subscription.user.save!
+    session[:user_dat] = nil
   end
 end

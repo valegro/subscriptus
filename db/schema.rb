@@ -37,6 +37,11 @@ ActiveRecord::Schema.define(:version => 20100902065227) do
     t.datetime "updated_at"
   end
 
+  create_table "gifts_offers", :force => true do |t|
+    t.integer "gift_id"
+    t.integer "offer_id"
+  end
+
   create_table "offer_terms", :force => true do |t|
     t.integer  "offer_id"
     t.decimal  "price"
@@ -80,6 +85,18 @@ ActiveRecord::Schema.define(:version => 20100902065227) do
     t.datetime "updated_at"
   end
 
+  create_table "subscription_invoices", :force => true do |t|
+    t.integer  "subscription_id"
+    t.float    "amount"
+    t.float    "amount_due"
+    t.string   "invoice_number"
+    t.integer  "harvest_invoice_id"
+    t.string   "state"
+    t.date     "state_updated_at"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "subscription_log_entries", :force => true do |t|
     t.integer  "subscription_id"
     t.integer  "publication_id"
@@ -89,12 +106,27 @@ ActiveRecord::Schema.define(:version => 20100902065227) do
     t.datetime "updated_at"
   end
 
+  create_table "subscription_payments", :force => true do |t|
+    t.integer  "subscription_id"
+    t.integer  "amount"
+    t.boolean  "success"
+    t.string   "transaction_id"
+    t.text     "message"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "subscription_invoice_id"
+  end
+
   create_table "subscriptions", :force => true do |t|
     t.integer  "user_id"
     t.integer  "offer_id"
     t.integer  "publication_id"
     t.string   "state"
+    t.string   "card_number"
+    t.string   "card_expiration"
+    t.string   "payment_method"
     t.decimal  "price"
+    t.boolean  "auto_renew"
     t.datetime "state_updated_at"
     t.datetime "expires_at"
     t.datetime "created_at"

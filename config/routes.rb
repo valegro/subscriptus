@@ -1,11 +1,27 @@
 ActionController::Routing::Routes.draw do |map|
   map.namespace :admin do |admin|
+    admin.resources :subscriptions, :collection => {
+      :activity => :get,
+      :search => [ :get, :post ],
+      :active => :get,
+      :trial => :get,
+      :squatters => :get,
+      :pending => :get,
+      :payment_failed => :get,
+      :payment_due => :get,
+      :recent => :get,
+      :ended => :get
+    }
     admin.resources :subscribers
-    admin.resources :sources
     admin.namespace :catalogue do |catalogue|
       catalogue.resources :offers, :member => { :add_gift => :post, :remove_gift => :post }, :has_many => [ :offer_terms ]
       catalogue.resources :gifts
       catalogue.resources :publications
+    end
+    admin.resources :sources
+    admin.resources :payments
+    admin.namespace :system do |system|
+      system.resources :users
     end
   end
 

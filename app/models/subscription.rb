@@ -1,9 +1,16 @@
 class Subscription < ActiveRecord::Base
-  belongs_to :user
+
+  include Billing::CreditCard
+  include Billing::Charger
+
+  belongs_to :user, :autosave => true
   belongs_to :offer
   belongs_to :publication
   has_many :subscription_log_entries
   has_many :subscription_gifts, :dependent => :destroy
+
+  has_many :payments, :class_name => "::Subscription::Payment", :dependent => :destroy
+  has_many :invoices, :class_name => "::Subscription::Invoice", :dependent => :destroy
   
   has_many :gifts, :through => :subscription_gifts do
     def add_uniquely(gifts)
@@ -23,7 +30,7 @@ class Subscription < ActiveRecord::Base
   validation_group :payment
 
   before_create do |record|
-    record.publication_id = record.offer.publication_id
+    record.publication = record.offer.publication
   end
 
 =begin
@@ -55,4 +62,47 @@ class Subscription < ActiveRecord::Base
     expires :pending => :squatter, :after => 14.days
   end
 =end
+
+  # These are the options sent to the gateway when attempting to save a
+  # credit card.
+  def to_activemerchant
+    returning({}) do |hash|
+      if self.user
+        hash.merge({
+          :title => self.user.title,
+          :country => self.user.country,
+          :company => "",
+          :email => self.user.email
+        })
+      end
+    end
+  end
+
+  # These are the properties that get passed to the ActiveMerchant
+  # credit card object.
+  def to_credit_card
+    # TODO: Should this be the name on card??
+    returning({}) do |hash|
+      if self.user
+        hash.merge({
+          :first_name => self.user.firstname,
+          :last_name => self.user.lastname
+        })
+      end
+    end
+  end
+
+  private
+
+    # If the current account is expired, and the subscription now has a
+    # gateway token, activate the account.
+    def update_from_expired
+      self.activate! if gateway_token_changed? && !gateway_token.blank? && self.expired?
+    end
+
+    def default_payment_method
+      self.payment_method = Billing::Charger::CREDIT_CARD
+    end
+
+
 end

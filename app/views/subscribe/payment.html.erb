@@ -1,18 +1,24 @@
 <h1>Payment</h1>
 
+<br/>
 <%= session.inspect %>
 <%= flash[:subscribe_dat].class %>
 
 <%= "<p style=\"color: green\">#{flash[:notice]}<p>" if flash[:notice] %>
 
-<% form_for :subscription, :url=>{:action=>:payment}  do |f| %>
+<% form_for @subscription, :url => { :action => :payment }, :builder => Reform::Builder, :html => { :class => "form", :method => 'post' } do |f| %>
   <%= f.error_messages %>
+
+  <%= f.select :card_type, Billing::CreditCard::CREDIT_CARDS.map { |x| [ x.to_s.capitalize, x.to_s ] }, :label => "Card Type" %>
+  <%= f.text_field :card_number %>
+  <% #f.text_field :name_on_card %>
+  <% f.row :expiration, :errors_for => [ :expire_month, :expire_year ], :label => "Expires" do %>
+    <%= f.select :expire_month, (1..12).map { |x| [ "#{x.to_s.length == 1 ? ("0" + x.to_s) : x}", x ] } %>
+    <%= f.select :expire_year, (Time.now.year..(Time.now.year + 20)) %>
+  <% end %>
+
 
   <p>
     <%= wizardly_image_submit %>
   </p>
 <% end %>
-
-<script type='text/javascript'>
-  document.getElementById('').focus()
-</script>
