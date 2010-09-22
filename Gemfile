@@ -12,14 +12,8 @@ gem 'will_paginate'
 gem 'json_pure'
 gem 'capistrano'
 
-
-# payment support
-gem 'activemerchant'
-
-
 # State machine support
 gem 'aasm'
-
 
 # jQuery
 gem 'jrails'
@@ -53,4 +47,6 @@ group :test, :cucumber do
   gem 'factory_girl'
   gem 'faker'
   gem 'shoulda'
+  gem 'rspec'
+  gem 'rspec-rails', '~> 1.3.2'
 end

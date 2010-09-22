@@ -15,3 +15,13 @@ config.action_controller.perform_caching             = false
 
 # Don't care if the mailer can't send
 config.action_mailer.raise_delivery_errors = false
+
+# Setup Active Merchant for development
+config.after_initialize do
+	ActiveMerchant::Billing::Base.mode = :test
+  # Eway Gateway Settings
+  ::GATEWAY = ActiveMerchant::Billing::SecurePayAuExtendedGateway.new(  # the default_currency of this gateway is 'AUD'
+        :login => 'CKR0030',  # <MerchantID> input to Au securePay Gateway.
+        :password => "jogkriw7"
+  )
+end

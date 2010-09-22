@@ -1,12 +1,18 @@
 <h1>Payment</h1>
 
-<%= session.inspect %>
-<%= flash[:subscribe_dat].class %>
+<% form_for :payment, :url=>{:controller => :subscribe, :action=>:payment}, :builder => Reform::Builder, :html => { :class => "form", :method => 'post' }  do |p| %>
 
-<%= "<p style=\"color: green\">#{flash[:notice]}<p>" if flash[:notice] %>
+    <div id="new_user_fields">
+      <%= p.error_messages %>
+      <%= p.enum_select :card_type %>
+      <%= p.text_field :card_number %>
+      <%= p.text_field :card_verification %>
 
-<% form_for :subscription, :url=>{:action=>:payment}  do |f| %>
-  <%= f.error_messages %>
+	  <%= p.date_select :card_expires_on, :discard_day => true, :start_year => Date.today.year, :end_year => (Date.today.year+10), :add_month_numbers => true %>
+
+      <%= p.text_field :first_name %>
+      <%= p.text_field :last_name %>
+	</div>
 
   <p>
     <%= wizardly_image_submit %>

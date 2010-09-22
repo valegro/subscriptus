@@ -1,9 +1,5 @@
 <h1>Details</h1>
 
-
-<%= "<p style=\"color: green\">#{flash[:notice]}<p>" if flash[:notice] %>
-
-
 <% form_for @subscription, :url => { :action => :details }, :builder => Reform::Builder, :html => { :class => "form", :method => 'post' } do |f| %>
   <%= f.error_messages %>
 

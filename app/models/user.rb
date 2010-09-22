@@ -21,4 +21,12 @@ class User < ActiveRecord::Base
       errors.add_to_base("Email does not match confirmation")
     end
   end
+  
+  # generates a random number that is saved after a successful recurrent profile creation and used later 
+  # to access the users recurrent profile in secure pay in order to make new payments or cancel the proile
+  # this unique number (called Client ID in AU sequre pay gateway) should be less than 20 characters long
+  def self.generate_recurrent_profile_id
+    #FIXME: keys should be unique as well
+    rand(10000000000000000000)
+  end
 end
