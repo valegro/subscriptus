@@ -23,7 +23,7 @@ gem 'RedCloth'
 
 # Paperclip for attachments, plus DJ for async resizes
 # http://jstorimer.com/ruby/2010/01/30/delayed-paperclip.html
-gem 'paperclip'
+#gem 'paperclip'
 gem 'delayed_job'
 gem 'delayed_paperclip'
 
@@ -32,7 +32,7 @@ gem 'httpclient'
 gem 'soap4r'
 
 # Others
-gem 'aws-s3', :require => "aws/s3"
+#gem 'aws-s3', :require => "aws/s3"
 gem 'wizardly'
 gem 'enumerated_attribute'
 
