@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20100922005654) do
+ActiveRecord::Schema.define(:version => 20100922053807) do
 
   create_table "audit_log_entries", :force => true do |t|
     t.integer  "user_id"
@@ -52,6 +52,7 @@ ActiveRecord::Schema.define(:version => 20100922005654) do
     t.boolean  "auto_renews"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.boolean  "trial"
   end
 
   create_table "payments", :force => true do |t|

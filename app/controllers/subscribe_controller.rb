@@ -102,7 +102,6 @@ class SubscribeController < ApplicationController
       trigger_res = @payment.call_recurrent_profile
       if trigger_res.success?
         # recurrent trigger successul
-
         # because of the belongs_to assosiation, user needs to be saved seperately only if user is new.
         if session[:new_user]
           # new user
