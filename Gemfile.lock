@@ -137,7 +137,6 @@ DEPENDENCIES
   json_pure
   launchy
   navigasmic
-  paperclip
   pg
   pickle
   rack-test (= 0.5.4)
