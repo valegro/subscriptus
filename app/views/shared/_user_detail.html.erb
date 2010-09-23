@@ -1,0 +1,3 @@
+<% if current_user %>
+  <span class="current_user"><%= current_user.name %></span><br /><span class="actions"><%= link_to "Logout", logout_path %></span>
+<% end %>

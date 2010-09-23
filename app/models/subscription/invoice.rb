@@ -1,6 +1,6 @@
 class Subscription::Invoice < ActiveRecord::Base
 
-  include Billing::Invoicer
+  #include Billing::Invoicer
 
   belongs_to :subscription
 

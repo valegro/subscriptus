@@ -1,0 +1,9 @@
+<% content_tag :div, :class => 'title' do%>
+  <%= content_tag :h2, t('.title') %>
+<% end %>  
+<% form_for(@user_session, :url => user_session_path, :builder => Reform::Builder, :html => { :class => "form" }) do |f| %>
+  <%= f.text_field :login %>
+  <%= f.password_field :password %>
+  <%= f.check_box :remember_me %>
+  <%= f.submit "Login" %>
+<% end %>

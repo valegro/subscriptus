@@ -2,6 +2,10 @@ Feature: An admin can CRUD a source
   As a user with the admin role
   I want to be able to Create, Update and Delete sources
 
+  Background:
+    Given an admin: "Homer" exists
+      When I log in as admin "Homer"
+
   @active
   Scenario: I want to see a list of sources 
     Given I am on the admin sources page

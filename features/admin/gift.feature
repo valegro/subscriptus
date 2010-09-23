@@ -2,6 +2,10 @@ Feature: An admin can CRUD a gift
   As a user with the admin role
   I want to be able to Create, Update and Delete gifts and attach a picture to them
 
+  Background:
+    Given an admin: "Homer" exists
+      When I log in as admin "Homer"
+
   @active
   Scenario: I want to see a list of gifts 
     Given I am on the admin catalogue gifts page
@@ -13,42 +17,42 @@ Feature: An admin can CRUD a gift
   @active
   Scenario: An admin goes to the "Create New Gift" page
     Given I am on the admin catalogue gifts page
-      When I follow "Create New Gift"
-      Then I should be on the "admin catalogue gifts new" page
+    When I follow "Create New Gift"
+    Then I should be on the "admin catalogue gifts new" page
 
   @active
   Scenario: An admin fails to create a New Gift
     Given I am on the "admin catalogue gifts new" page
-      When I fill in "Name" with ""
-        And I fill in "Description" with ""
-        And I fill in "On hand" with ""
-        And I press "Create"
-      Then I should see "There were problems with the following fields"
-        And I should see "Name"
-        And I should see "Description"
+      And I fill in "Name" with ""
+      And I fill in "Description" with ""
+      And I fill in "On hand" with ""
+      And I press "Create"
+    Then I should see "There were problems with the following fields"
+      And I should see "Name"
+      And I should see "Description"
 
   @active
   Scenario: An admin successfully creates a New Gift
     Given I am on the "admin catalogue gifts new" page
-      When I fill in "Name" with "A book"
-        And I fill in "Description" with "A great book by a well known author"
-        And I fill in "On hand" with "10"
-        And I attach the file "features/data/file.jpg" to "Gift image"
-        And I press "Create"
-      Then I should see "Created Gift"
-        And I should be on the admin catalogue gifts page
+      And I fill in "Name" with "A book"
+      And I fill in "Description" with "A great book by a well known author"
+      And I fill in "On hand" with "10"
+      And I attach the file "features/data/file.jpg" to "Gift image"
+      And I press "Create"
+    Then I should see "Created Gift"
+      And I should be on the admin catalogue gifts page
 
   @active
   Scenario: An admin can return from the new page to the gifts page
     Given I am on the "admin catalogue gifts new" page
-      When I follow "Back to Gifts"
-      Then I should be on the admin catalogue gifts page
+      And I follow "Back to Gifts"
+    Then I should be on the admin catalogue gifts page
 
   @active
   Scenario: An Admin can view a gift
     Given a gift: "My Gift" exists with name: "My Gift", id: 1
-      When I am on the admin catalogue gifts page
-        And I follow "My Gift"
+      And I am on the admin catalogue gifts page
+      And I follow "My Gift"
     Then I should be on the admin catalogue gift page for 1
       And I should see "My Gift"
       And I should see "Stock on Hand"

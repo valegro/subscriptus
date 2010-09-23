@@ -2,6 +2,10 @@ Feature: An admin can CRUD a publication
   As a user with the admin role
   I want to be able to Create, Update and Delete publications and attach a picture to them
 
+  Background:
+    Given an admin: "Homer" exists
+      When I log in as admin "Homer"
+
   @active
   Scenario: I want to see a list of publications 
     Given I am on the admin catalogue publications page
@@ -30,8 +34,8 @@ Feature: An admin can CRUD a publication
   Scenario: An admin successfully creates a New Publication
     Given I am on the "admin catalogue publications new" page
       When I fill in "Name" with "The Daily Mail"
-        And I fill in "Description" with "Crikey's daily shizzle"
         And I attach the file "features/data/file.jpg" to "Publication image"
+        And I fill in "Description" with "Crikey's daily shizzle"
         And I press "Create"
       Then I should see "Created Publication"
         And I should be on the admin catalogue publications page

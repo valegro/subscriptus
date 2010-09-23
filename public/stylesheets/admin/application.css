@@ -36,13 +36,32 @@ body {
   color: #FFF;
 }
 
+.user_detail {
+  position: absolute;
+  right: 30px;
+  top: 1px;
+  line-height:20px;
+  margin-top:2px;
+}
+
+.user_detail a {
+  color: #fff;
+  text-decoration:none;
+}
+
+.wrapper.welcome {
+  margin-bottom: 0;
+  color: #FFF;
+  position: relative;
+}
+
 #header #navigation {
   height: 70px;
 }
 
 #header #navigation ul {
   float: left;
-  width: 100%;
+  width: 97%;
   margin: 0;
   padding: 0;
 }

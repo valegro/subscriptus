@@ -10,7 +10,7 @@ module Billing
       @@config ||= YAML.load_file(File.join(RAILS_ROOT, 'config', 'harvest.yml'))[RAILS_ENV].symbolize_keys
     end
 
-    Harvest = ::Harvest::Base.new(Billing::Invoicer.config)
+    #Harvest = ::Harvest::Base.new(Billing::Invoicer.config)
 
     class HarvestInvoiceMissing < StandardError; end
     class HarvestAccountMissing < StandardError; end

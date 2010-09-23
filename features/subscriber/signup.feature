@@ -82,7 +82,7 @@ Feature: User registration
     And I select "N.S.W" from "State"
     And I fill in "Post Code:*" with "2000"
     And I select "Montecarlo" from "Country"
-    When I follw "Next"
+    When I follow "Next"
    Then I should see "Subscribe to Crikey"
     And I should see "step 3"
     And I should see "Payment"
@@ -125,7 +125,7 @@ Scenario: A user fails to fill in a required form
     And I select "N.S.W" from "State"
     And I fill in "Post Code:*" with "2000"
     And I select "Montecarlo" from "Country"
-    When I follw "Next"
+    When I follow "Next"
    Then I should be on "step 2" of the subscription page 
    And I should see "There were errorswith the form"
    And I should see "Phone number is required"

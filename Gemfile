@@ -1,5 +1,5 @@
 source 'http://rubygems.org'
-gem "rails", "~> 2.3.8"
+gem "rails", "2.3.9"
 
 # Postgres support
 gem 'pg'
@@ -41,10 +41,12 @@ group :test, :cucumber do
   gem 'database_cleaner'
   gem 'spork'
   gem 'launchy'    # So you can do Then show me the page
-  gem 'cucumber'
+  gem 'cucumber', "0.8.5"
   gem 'cucumber-rails'
   gem 'pickle'
   gem 'factory_girl'
   gem 'faker'
   gem 'shoulda'
+  gem 'gherkin'
+  gem 'rack-test', "0.5.4"
 end

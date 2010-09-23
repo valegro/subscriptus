@@ -2,6 +2,10 @@ Feature: An admin can CRUD an Offer
   As a user with the admin role
   I want to be able to Create, Update and Delete offers
 
+  Background:
+    Given an admin: "Homer" exists
+      When I log in as admin "Homer"
+
   @active
   Scenario: An admin goes to the "Create New Offer" page
     Given I am on the admin catalogue offers page
