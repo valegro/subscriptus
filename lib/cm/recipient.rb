@@ -147,11 +147,11 @@ module CM
         self[:status] = result.addRecipientResult.callStatus
         self[:message] = result.addRecipientResult.message
       elsif result.respond_to?(:getRecipientsResult) && !result.getRecipientsResult.recipients.blank?
-        self[:status] = 'Unknown' # XXX do we need to return status?
+        self[:status] = 'Success' # XXX do we need this?
         # XXX: cmRecipient is single obj or array?
         recipients = [result.getRecipientsResult.recipients.cmRecipient].flatten
         self[:recipients] = recipients.map { |rcp|
-          self.class.hash_from_cm_recipient(rcp)
+          Recipient.new(self.class.hash_from_cm_recipient(rcp))
         }
       elsif !result # true if false or nil
         self[:status] = 'Failure'
@@ -161,39 +161,87 @@ module CM
       self
     end
 
+    # not used any more
     def self.hash_from_cm_recipient(rcp)
       rcp_hash = Hash.new
       # XXX: do we need Id?
-      rcp_hash[:id] = rcp.__xmlele.find { |ele| ele[0].name == 'Id' }.try(:[], 1)
+      if rcp.respond_to?(:__xmlele)
+        rcp_hash[:id] = rcp.__xmlele.find { |ele| ele[0].name == 'Id' }.try(:[], 1)
+      else
+        rcp_hash[:id] = rcp.id
+      end
       rcp_hash[:last_modified] = rcp.lastModified
       rcp_hash[:last_modified_by] = rcp.lastModifiedBy
       rcp_hash[:email_content_type] = rcp.emailContentType
-      rcp_hash[:email_address] = rcp.emailAddress
+      rcp_hash[:email] = rcp.emailAddress
       rcp_hash[:created_by] = rcp.createdBy
       rcp_hash[:create_date_time] = rcp.createDateTime
       rcp_hash[:created_from_ip_address] = rcp.createdFromIpAddress
-      rcp_hash[:is_active] = rcp.isActive
-      rcp_hash[:is_verified] = rcp.isVerified
-      rcp_hash[:fields] = rcp.values
+      rcp_hash[:active] = ['true', true].include?(rcp.isActive)
+      rcp_hash[:verified] = ['true', true].include?(rcp.isVerified)
+      rcp_hash[:fields] = fields_to_hash(rcp.values)
       rcp_hash
+    end
+
+    def self.fields_to_hash(values)
+      # weird... sometimes ArrayOfCmRecipientValue has the array inside cmRecipientValue??
+      values = values.cmRecipientValue if values.respond_to?(:cmRecipientValue)
+      hash = {}
+      values.map { |val|
+        hash[val.fieldName.to_sym] = val.value
+      }
+      return hash
     end
   end
 
   class Recipient
     PRIMARY_KEY_NAME = 'EmailAddress'
     # These 3 fields are server-generated: from_ip id last_modified_by
-    ATTRS = %w(created_at email)
+    # also created_at can be mandatory for create but should not be for update
+    ATTRS = %w(email)
 
     def self.update(hash)
-      result = Proxy.add_recipient(hash, CmOperationType::Update)
+      result = Proxy.add_recipient(hash.merge(:last_modified => nil), CmOperationType::Update)
       raise result[:message] unless result.success?
       true
     end
 
     def self.create!(hash)
-      result = Proxy.add_recipient(hash)
+      result = Proxy.add_recipient(hash.merge(:last_modified => nil))
       raise result[:message] unless result.success?
       true
+    end
+
+    def save
+      return self.class.update(to_hash)
+    end
+
+    # WARNING: This method assumes email is the primary key!
+    # Also assumes no attributes are present except for inside @cm_recipient
+    def reload
+      @cm_recipient = self.class.find_all( :email_address => @cm_recipient.emailAddress )[:recipients].first.instance_variable_get :@cm_recipient
+    end
+
+    def set_expiry_for( publication_name, new_expiry )
+      add_field( publication_name + '{expiry}', new_expiry )
+      return true
+    end
+
+    def set_state_for( publication_name, new_state )
+      add_field( publication_name + '{state}', new_state )
+      return true
+    end
+
+    def expiry_for( publication_name )
+      return @cm_recipient.values.select { |v|
+        v.fieldName == publication_name + '{expiry}'
+      }.first.try(:value)
+    end
+
+    def state_for( publication_name )
+      return @cm_recipient.values.select { |v|
+        v.fieldName == publication_name + '{state}'
+      }.first.try(:value)
     end
 
     def self.find_all(hash)
@@ -206,14 +254,21 @@ module CM
       @extra_attrs = ArrayOfCmRecipientValue.new
 
       @cm_recipient = CmRecipient.new
-      @cm_recipient.createDateTime = Time.now
+      @cm_recipient.createDateTime = hash[:create_date_time] || Time.now
       @cm_recipient.createdBy = hash[:created_by]
       @cm_recipient.emailAddress = hash[:email]
-      @cm_recipient.emailContentType = EmailContentType::HTML
-      @cm_recipient.lastModified = Time.now
+      @cm_recipient.emailContentType = hash[:email_content_type] || EmailContentType::HTML
+
+      # This should be reset when saving
+      @cm_recipient.lastModified = hash[:last_modified] || Time.now
 
       @cm_recipient.isVerified = hash.has_key?(:verified) ? hash[:verified] : true
       @cm_recipient.isActive = hash.has_key?(:active) ? hash[:active] : true
+
+      # system generated & not writable.  only useful as query result
+      @cm_recipient.createdFromIpAddress = hash[:created_from_ip_address]
+      @cm_recipient.lastModifiedBy = hash[:last_modified_by]
+      @cm_recipient.id = hash[:id]
 
       # id, createdFromIpAddress, lastModifiedBy are server-generated
       # so uncommenting the below won't do anything useful.
@@ -229,10 +284,15 @@ module CM
       end
     end
 
+    def to_hash
+      CM::ServiceReturn.hash_from_cm_recipient(@cm_recipient)
+    end
+
     def add_field(name, value)
       field = CmRecipientValue.new
       field.fieldName = name.to_s
       field.value = value
+      @extra_attrs.delete_if { |v| v.fieldName == field.fieldName }
       @extra_attrs << field
       @cm_recipient.values = @extra_attrs
     end

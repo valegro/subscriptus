@@ -194,14 +194,28 @@ describe CM::ServiceReturn do
 
   # TODO: should test when cmRecipient is an array of recipients inside initalize
 
-  it "should set values for get return value" do
-    @recipients = mock('@recipient', :cmRecipient => nil)
-    @getrecsres = mock('@getrecsres', :recipients => @recipients)
-    @result = mock("@result", :getRecipientsResult => @getrecsres)
-    CM::ServiceReturn.should_receive(:hash_from_cm_recipient).with(@recipient).and_return( {:spam => 'spam'} )
-    sr = CM::ServiceReturn.new(@result)
-    sr[:recipients][0][:spam].should == 'spam'
-    sr[:recipients].size.should == 1
+  describe "with get recipients" do
+    before(:each) do
+      @cmrecipient = mock('@cmrecipient', :emailAddress => 'spam@example.com')
+      @recipients = mock('@recipient', :cmRecipient => @cmrecipient)
+      @getrecsres = mock('@getrecsres', :recipients => @recipients)
+      @result = mock("@result", :getRecipientsResult => @getrecsres)
+      CM::ServiceReturn.stub!(:hash_from_cm_recipient).with(@cmrecipient).and_return( {:email => 'spam@example.com'} )
+      @sr = CM::ServiceReturn.new(@result)
+    end
+
+    it "should set values for get return value" do
+      (@sr[:recipients][0].instance_variable_get :@cm_recipient).emailAddress.should == 'spam@example.com'
+      @sr[:recipients].size.should == 1
+    end
+
+    it "should return success for get return value" do
+      @sr[:status].should == 'Success'
+    end
+
+    it "should return a CM::Recipient" do
+      @sr[:recipients].first.should be_kind_of(CM::Recipient)
+    end
   end
 
   it "should make hash from cm_recipient" do
@@ -223,12 +237,12 @@ describe CM::ServiceReturn do
     hash[:last_modified].should == 'lastmod'
     hash[:last_modified_by].should == 'lastmodby'
     hash[:email_content_type].should == 'SGML'
-    hash[:email_address].should == 'spam@spam'
+    hash[:email].should == 'spam@spam'
     hash[:created_by].should == 'user'
     hash[:create_date_time].should == 'cdt'
     hash[:created_from_ip_address].should == 'cfia'
-    hash[:is_active].should == false
-    hash[:is_verified].should == false
+    hash[:active].should == false
+    hash[:verified].should == false
   end
 end
 
@@ -238,7 +252,7 @@ describe CM::Recipient do
   end
 
   it "should have constant ATTRS" do
-    CM::Recipient::ATTRS.should == ['created_at', 'email' ]
+    CM::Recipient::ATTRS.should == [ 'email' ]
   end
 
   it "should call add_recipient for update" do
@@ -323,36 +337,65 @@ describe CM::Recipient do
     @recipient.instance_variable_get(:@cm_recipient).values[0].value.should == 'field1val'
   end
 
-  it "should add extra fields" do
-    @recipient = CM::Recipient.new(:created_at => Time.now,
-                                   :email => 'example@example.com')
-    @recipient.add_field('spam', 'spam')
-    @recipient.add_field('ham', 'ham')
-    @recipient.add_field('bacon', 'bacon')
-    extra_fields = @recipient.instance_variable_get(:@cm_recipient).values
-    extra_fields[0].fieldName.should  == 'spam'
-    extra_fields[0].value.should  == 'spam'
-    extra_fields[1].fieldName.should  == 'ham'
-    extra_fields[1].value.should  == 'ham'
-    extra_fields[2].fieldName.should  == 'bacon'
-    extra_fields[2].value.should  == 'bacon'
+  describe "with simple instance" do
+    before(:each) do
+      @recipient = CM::Recipient.new(:created_at => Time.now,
+                                     :email => 'example@example.com',
+                                     :fields => { :'publication{expiry}' => '10/10/2010',
+                                                  :'publication{state}' => 'spam' }
+                                    )
+    end
+    it "should add extra fields" do
+      @recipient.add_field('spam', 'spam')
+      @recipient.add_field('ham', 'ham')
+      @recipient.add_field('bacon', 'bacon')
+      extra_fields = @recipient.instance_variable_get(:@cm_recipient).values
+      extra_fields[2].fieldName.should  == 'spam'
+      extra_fields[2].value.should  == 'spam'
+      extra_fields[3].fieldName.should  == 'ham'
+      extra_fields[3].value.should  == 'ham'
+      extra_fields[4].fieldName.should  == 'bacon'
+      extra_fields[4].value.should  == 'bacon'
+    end
+
+    it "should return info" do
+      @recipient.instance_variable_set(:@cm_recipient, "spamSPAMspam")
+      @recipient.info.should == 'spamSPAMspam'
+    end
+
+    it "should return true validating params if fields are present" do
+      @recipient.send(:validate_params, {:created_at => nil, :from_ip => nil, :email => nil, :id => nil, :last_modified_by => nil}).should be_true
+    end
+
+    it "should raise when missing fields" do
+      lambda { @recipient.send(:validate_params, { :id => nil }) }.should raise_error(CM::MissingAttribute)
+    end
+
+    it "should set expiry for a publication" do
+      @recipient.set_expiry_for('publication', '10/09/2010')
+      @recipient.to_hash[:fields][:'publication{expiry}'].should == '10/09/2010'
+    end
+
+    it "should get expiry for a publication" do
+      @recipient.expiry_for('publication').should == '10/10/2010'
+    end
+
+    it "should set state for a publication" do
+      @recipient.set_state_for('publication', 'active')
+      @recipient.to_hash[:fields][:'publication{state}'].should == 'active'
+    end
+
+    it "should get state for a publication" do
+      @recipient.state_for('publication').should == 'spam'
+    end
+
+    it "should convert to hash" do
+      h = @recipient.to_hash
+      h[:fields][:"publication{state}"].should == "spam"
+      h[:email].should == "example@example.com"
+    end
   end
-  it "should return info" do
-    @recipient = CM::Recipient.new(:created_at => Time.now,
-                                   :email => 'example@example.com')
-    @recipient.instance_variable_set(:@cm_recipient, "spamSPAMspam")
-    @recipient.info.should == 'spamSPAMspam'
-  end
-  it "should return true validating params if fields are present" do
-    @recipient = CM::Recipient.new(:created_at => Time.now,
-                                   :email => 'example@example.com')
-    @recipient.send(:validate_params, {:created_at => nil, :from_ip => nil, :email => nil, :id => nil, :last_modified_by => nil}).should be_true
-  end
-  it "should raise when missing fields" do
-    @recipient = CM::Recipient.new(:created_at => Time.now,
-                                   :email => 'example@example.com')
-    lambda { @recipient.send(:validate_params, { :id => nil }) }.should raise_error(CM::MissingAttribute)
-  end
+
 end
 
 describe CM::Recipient, "integration" do
@@ -360,19 +403,20 @@ describe CM::Recipient, "integration" do
     CM::Proxy.delete_all_recipients
     CM::Recipient.create!(:created_at => Time.now,
                           :email => 'example@example.com',
+                          :email_content_type => 'HTML',
                           :fields => { :State => 'trial' })
   end
 
   it "should add recipient" do
-    CM::Proxy.get_recipients( :email_address => 'example@example.com' )[:recipients][0][:email_address].should == 'example@example.com'
+    CM::Proxy.get_recipients( :email_address => 'example@example.com' )[:recipients][0].to_hash[:email].should == 'example@example.com'
   end
 
   it "should update recipient" do
     CM::Recipient.update({:created_at => Time.now,
                           :email => 'example@example.com',
-                          :active => false })
+                          :active => true })
 
-    CM::Proxy.get_recipients( :email_address => 'example@example.com' )[:recipients][0][:active].should be_false
+    CM::Proxy.get_recipients( :email_address => 'example@example.com' )[:recipients][0].to_hash[:active].should be_true
     CM::Proxy.get_recipients( nil )[:recipients].size.should == 1
   end
 
@@ -388,5 +432,25 @@ describe CM::Recipient, "integration" do
     CM::Proxy.delete_all_recipients
     CM::Recipient.find_all( nil )[:recipients].should be_blank
   end
+
+  it "should save" do
+    rec = CM::Proxy.get_recipients(nil)[:recipients].first
+    cmr = rec.instance_variable_get(:@cm_recipient)
+    cmr.emailContentType = 'Text'
+    rec.save
+    CM::Proxy.get_recipients(nil)[:recipients].first.to_hash[:email_content_type].should == 'Text'
+  end
+
+  it "should reload" do
+    rec = CM::Proxy.get_recipients(nil)[:recipients].first
+    rec2 = CM::Proxy.get_recipients(nil)[:recipients].first
+    cmr = rec.instance_variable_get(:@cm_recipient)
+    cmr.emailContentType = 'Text'
+    rec.save
+    rec2_content = rec2.to_hash[:email_content_type]
+    rec2.reload
+    rec2_content.should_not == rec2.to_hash[:email_content_type]
+  end
+
 end
 

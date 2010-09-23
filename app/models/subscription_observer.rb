@@ -41,4 +41,13 @@ class SubscriptionObserver < ActiveRecord::Observer
       # TODO: Put in a delayed job
     #end
   end
+
+  def before_create(record)
+    record.publication_id = record.offer.publication_id
+  end
+
+  def after_create(record)
+    record.send_later :add_to_campaignmaster
+  end
+
 end

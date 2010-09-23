@@ -5,3 +5,4 @@ tmp/**/*
 coverage/*
 config/database.yml
 public/system/*
+*.swp

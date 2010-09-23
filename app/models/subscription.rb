@@ -45,6 +45,25 @@ class Subscription < ActiveRecord::Base
     record.publication_id = record.offer.publication_id 
   end
 
+  def add_to_campaignmaster
+    # TODO: determine how publication name on campaignmaster is managed.
+    #       currently (temporarily) using pub123{expiry} style for keys.
+    # TODO: what's the trial expiry time?
+    result = CM::Recipient.create!(:created_at => Time.now,
+                                   :email => self.user.email,
+                                   :fields => { :"pub#{self.publication_id}{state}" => 'trial',
+                                                :"pub#{self.publication_id}{expiry}" => Time.now + 30.days
+    })
+    return result
+  rescue RuntimeError => ex
+    log_error(ex)
+  end
+
+  # TODO: decide what to do, where to record etc.
+  def log_error(ex)
+    logger.error( "#{ex.class.to_s}: #{ex.message}" )
+  end
+
   # Subscription States
   # has_states :incomplete, :trial, :squatter, :active, :pending, :renewal_due, :payment_failed do
   has_states :trial, :squatter, :active, :pending, :renewal_due, :payment_failed, :init => :trial do

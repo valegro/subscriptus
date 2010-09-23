@@ -28,8 +28,10 @@ gem 'delayed_job'
 gem 'delayed_paperclip'
 
 # rspec
+gem 'rspec'
 gem 'rspec-rails'
 gem 'mechanize'
+gem 'factory_girl'
 
 # Needed for Campaign Master
 gem 'httpclient'

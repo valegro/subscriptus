@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 require 'spec_helper'
 
 describe Subscription do
@@ -35,6 +36,40 @@ describe Subscription do
     it "should return per page" do
       Subscription.per_page.should == 20
     end
+    it { should belong_to :user }
+    it { should belong_to :offer }
+    it { should belong_to :publication }
+    it { should have_many :subscription_log_entries }
+    it { should have_many :subscription_gifts }
+    it { should have_many :gifts }
+    # could we easily spec accepts_nested_attributes_for?
+    # could we easily spec wizardly stuff?
+  end
+  describe "with filters" do
+    it "should set publication id before create" do
+      s = Factory.build(:subscription)
+      s.publication_id = nil
+      s.save!
+      s.publication_id.should_not be_nil
+    end
+    it "should create dlayed job" do
+      lambda { Factory.create(:subscription) }.should change(Delayed::Job, :count).by(1)
+    end
+  end
+  it "should invoke campaingmaster create on add_to_campaignmaster" do
+    s = Factory.build(:subscription)
+    CM::Recipient.should_receive(:create!).with(:created_at => anything,
+                                               :email => s.user.email,
+                                               :fields => anything ).and_return("called")
+    s.add_to_campaignmaster.should eql("called")
+  end
+  it "should log error if create fails" do
+    s = Factory.build(:subscription)
+    CM::Recipient.should_receive(:create!).and_raise("spam")
+    @logger = mock('@logger')
+    @logger.should_receive(:error).with( "RuntimeError: spam" )
+    s.should_receive(:logger).and_return(@logger)
+    s.add_to_campaignmaster
   end
   describe "with named scopes" do
     before(:each) do
