@@ -13,6 +13,7 @@
 
 Factory.define :offer do |f|
   f.name { Faker::Name.name }
+  f.trial   false # paid subscription trial
   f.publication { |p| p.association(:publication) }
 end
 
@@ -27,13 +28,15 @@ Factory.define :publication do |f|
 end
 
 Factory.define :offer_term do |f|
-  f.price   20
+  f.price   22
   f.months  3
+  # f.price   rand(100) + 1 # 1...100
+  # f.months  rand(12) + 1  # 1...12
 end
 
 Factory.define :user do |f|
   # f.id                      1
-  f.login                   'login'
+  f.login                    { Faker::Name.first_name }
   f.password                'password122'
   f.password_confirmation   'password122'
   f.firstname { Faker::Name.first_name }

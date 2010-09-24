@@ -6,10 +6,15 @@ class Subscription < ActiveRecord::Base
   has_many :subscription_gifts, :dependent => :destroy
   
   has_many :gifts, :through => :subscription_gifts do
+    # add an array of gifts
     def add_uniquely(gifts)
       gifts.each do |gift|
         self << gift unless self.include?(gift)
       end
+    end
+    # add one gift
+    def add_uniquely_one(gift)
+      self << gift unless self.include?(gift)
     end
   end
   
@@ -26,6 +31,12 @@ class Subscription < ActiveRecord::Base
     record.publication_id = record.offer.publication_id 
   end
 
+  # if the sibscription is new or expired, start it from now
+  # otherwise start it after the expiration time
+  def get_new_expiry_date(months)
+    (self.expires_at.blank? || self.expires_at < Date.today) ? Date.today.months_since(months) + 1.day : self.expires_at.months_since(months) + 1.day
+  end
+  
   # Subscription States
   # has_states :incomplete, :trial, :squatter, :active, :pending, :renewal_due, :payment_failed do
   has_states :trial, :squatter, :active, :pending, :renewal_due, :payment_failed, :init => :trial do

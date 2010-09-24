@@ -14,10 +14,6 @@ class SubscribeController < ApplicationController
 
   act_wizardly_for :subscription, :form_data => :sandbox, :canceled => "/", :persist_model => :once, :guard => false
   
-  # act_wizardly_for :subscription, :form_data => :sandbox, :canceled => "/", :persist_model => :once do
-  #   set_page(:offer).buttons_to :next, :skip, :cancel
-  # end
-
 #TODO: fix gaurd issue.  only non-guard the offer page
 
   # the link of offer is clicked
@@ -29,23 +25,30 @@ class SubscribeController < ApplicationController
   on_get(:offer) do
     @offer = params[:offer_id] ? Offer.find(params[:offer_id]) : Offer.first
     @optional_gifts = @offer.gifts.in_stock.optional
-    @included_gifts = @offer.gifts.in_stock.included #FIXME: never used included_gifts!
+    @included_gifts = @offer.gifts.in_stock.included
     @subscription.offer = @offer
+    # @subscription.gifts.clear
+    # @subscription.gifts << @optional_gifts.first # by default the first one is selected which can be changed by the user
     @subscription.subscription_gifts.clear
     @subscription.subscription_gifts.build(:gift => @optional_gifts.first)
   end
 
   on_next(:offer) do
-    @offer = Offer.find(params[:subscription][:offer_id])
+    # adding user selected optional gifts
+    begin
+      @subscription.gifts.add_uniquely_one(Gift.find(params[:subscription][:subscription_gifts_attributes]["0"]["gift_id"]))
+    rescue Exception => e
+      logger.error("param doesnt exit")
+    end
+    @offer = Offer.find(@subscription.offer.id)
     @ot = params[:offer_term] ? OfferTerm.find(params[:offer_term]) : @offer.offer_terms.first
     @subscription.price = @ot.price
-    @subscription.expires_at = @ot.months.months.from_now
+    @subscription.expires_at = @subscription.get_new_expiry_date(@ot.months) # new subscription starts after the finish date of current subscription/trial
     @subscription.gifts.add_uniquely(@offer.available_included_gifts)
   end
 
   on_get(:details) do
-    # TODO: Check current user here - if logged in skip
-    @user = @subscription.build_user #(session[:user_dat])  # this session is set in on_next(:details) for later visits
+    @user = @subscription.build_user(session[:user_dat])  # this session is set in on_next(:details) for later visits
     @user.country ||= 'Australia'
     @subscription.user_id = @user.id  # weird! we need this line as build doesnt set user_id
   end
@@ -55,23 +58,40 @@ class SubscribeController < ApplicationController
     session[:user_dat] = @subscription.user.attributes
 
     if session[:new_user]
-      session[:user_dat][:password] = @subscription.user.password
-      session[:user_dat][:password_confirmation] = @subscription.user.password_confirmation
-      session[:user_dat][:email_confirmation] = @subscription.user.email_confirmation
+      session[:user_dat]["password"] = @subscription.user.password
+      session[:user_dat]["password_confirmation"] = @subscription.user.password_confirmation
+      session[:user_dat]["email_confirmation"] = @subscription.user.email_confirmation
 
       unless @subscription.user.valid?
-        flash[:notice] = @subscription.errors.full_messages
+        flash[:error] = @subscription.errors.full_messages
         render :action => :details
       end
     else
       user_session = UserSession.new(:login => @subscription.user.attributes["login"], :password => params[:subscription][:user_attributes][:password]) # user's password is set to blank
-      # session[:user_dat] = nil
+      session[:user_dat] = nil
       #FIXME: if user successfully logs in(login and password correct)
       @subscription.user = User.find_by_login(@subscription.user.attributes["login"])
       unless user_session.save
         flash[:error] = "Invalid login name or password: #{user_session.login}, #{user_session.password}"
         render :action => :details
       end
+    end
+
+    # if the offer is a trial, skip payment and
+    # FINISH the wizard
+    if @subscription.offer.is_trial?
+      # subscription should be saved in database before the wizard is finished so that no conflicts happens between has_states and wizardly
+      # the first subscription has a trial state
+      @subscription = Subscription.create(@subscription.attributes)
+      # because of the belongs_to assosiation, user needs to be saved seperately only if user is new.
+      if session[:new_user]
+        # new user
+        @subscription.user = save_new_user(session[:user_dat])
+      end
+      # finish the wizard
+      @subscription.save!
+      flash[:notice] = "Congratulations! Your subscribtion was successful."
+      redirect_to(:action => :offer)
     end
   end
 
@@ -106,18 +126,15 @@ class SubscribeController < ApplicationController
         if session[:new_user]
           # new user
           @subscription.user = save_new_user(session[:user_dat])
-        else
-          # existing user
-          p @subscription
         end
-
         @subscription.user.recurrent_id = @payment.customer_id
         
         #FIXME user should be updated with their recurrent_id
 
-         # customer_id of the payment must be set first
+        # customer_id of the payment must be set first
         # change the state of subscription from trial to active
         @subscription.activate
+        
         flash[:notice] = "Congratulations! Your subscribtion was successful."
         redirect_to(:action=>:offer)
       else

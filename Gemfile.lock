@@ -15,6 +15,10 @@ GEM
     activesupport (2.3.9)
     authlogic (2.1.6)
       activesupport
+    aws-s3 (0.6.2)
+      builder
+      mime-types
+      xml-simple
     builder (2.1.2)
     capistrano (2.5.19)
       highline
@@ -109,6 +113,7 @@ GEM
     trollop (1.16.2)
     will_paginate (2.3.14)
     wizardly (0.1.8.9)
+    xml-simple (1.0.12)
     yard (0.6.0)
 
 PLATFORMS
@@ -118,6 +123,7 @@ DEPENDENCIES
   RedCloth
   aasm
   authlogic
+  aws-s3
   capistrano
   capybara
   cucumber

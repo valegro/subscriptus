@@ -14,7 +14,9 @@ class Gift < ActiveRecord::Base
 
   default_scope :order => :name
   named_scope :in_stock, :conditions => "on_hand > 0"
-  named_scope :optional, :conditions => { "gift_offers.included" =>  false }
+  # named_scope :optional, :conditions => "included = false"
+  # named_scope :included, :conditions => "included = true"
+  named_scope :optional, :conditions => { "gift_offers.included" => false }
   named_scope :included, :conditions => { "gift_offers.included" => true }
 
   after_destroy do |gi55|
