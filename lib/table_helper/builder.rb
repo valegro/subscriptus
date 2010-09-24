@@ -107,7 +107,13 @@ class TableHelper::Builder
       label_text = options.has_key?(:label) ? options[:label] : TableHelpers.titleize(title)
       options.delete(:label) # Just to make sure.
       label_text = '&nbsp;' if label_text.blank?
-      @table_headers << { :label => label_text, :sym => title.to_s.downcase.to_sym, :options => options }
+      sort_by = options.delete(:sort_by)
+      @table_headers << {
+        :label => label_text,
+        :sym => title.to_s.downcase.to_sym,
+        :options => options,
+        :sort_by => sort_by
+      }
     end
   end
   

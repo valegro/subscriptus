@@ -7,8 +7,8 @@
 
 <%= render_table @offers do |t|
   t.header :image, :width => "100"
-  t.header :name
-  t.header :publication
+  t.header :name, :sort_by => :name
+  t.header :publication, :sort_by => :publication
   t.header :actions, :width => "180"
 
   t.rows do |row, offer, index|

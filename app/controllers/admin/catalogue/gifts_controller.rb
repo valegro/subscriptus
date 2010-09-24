@@ -2,7 +2,7 @@ class Admin::Catalogue::GiftsController < Admin::CatalogueController
   before_filter :find_gift, :only => [ :destroy, :edit, :show, :update ]
 
   def index
-    @gifts = Gift.paginate(:page => params[:page] || 1)
+    @gifts = Gift.paginate(:page => params[:page] || 1, :order => sort_order('name'))
   end
 
   def new
