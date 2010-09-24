@@ -40,10 +40,12 @@
     t.header :name
 
     t.rows do |row, gift, index|
-      row.image link_to(image_tag(gift.gift_image.url(:thumb)), admin_catalogue_gift_url(gift))
+      row.image image_tag(gift.gift_image.url(:thumb))
       row.name do
         str = content_tag(:h4, h(gift.name))
-        str << content_tag(:ul, content_tag(:li, link_to("Include this gift", add_gift_admin_catalogue_offer_url(@offer), :class => "gift_choice", :gift_id => gift.id)) + content_tag(:li, link_to("Add as an option", add_gift_admin_catalogue_offer_url(@offer), :class => "gift_choice", :gift_id => gift.id, :gift_optional => true)))
+        str << content_tag(:p, "Add this gift to the offer")
+        str << link_to("Included", add_gift_admin_catalogue_offer_url(@offer), :class => "gift_choice button add first", :gift_id => gift.id)
+        str << link_to("Optional", add_gift_admin_catalogue_offer_url(@offer), :class => "gift_choice button add", :gift_id => gift.id, :gift_optional => true)
         str
       end
     end
