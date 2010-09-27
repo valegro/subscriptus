@@ -67,6 +67,8 @@ GEM
       rake (>= 0.8.1)
     meta_programming (0.2.2)
     mime-types (1.16)
+    mocha (0.9.8)
+      rake
     navigasmic (0.4.1)
     net-scp (1.0.3)
       net-ssh (>= 1.99.1)
@@ -138,6 +140,7 @@ DEPENDENCIES
   jrails
   json_pure
   launchy
+  mocha (~> 0.9.8)
   navigasmic
   paperclip
   pg

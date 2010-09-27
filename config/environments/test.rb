@@ -27,14 +27,20 @@ config.action_mailer.delivery_method = :test
 # like if you have constraints or database-specific column types
 # config.active_record.schema_format = :sql
 
-# Setup Active Merchant for testing
 config.after_initialize do
-	ActiveMerchant::Billing::Base.mode = :test
-  # Secure Pay Gateway Settings
-  ::GATEWAY = ActiveMerchant::Billing::SecurePayAuExtendedGateway.new(  # the default_currency of this gateway is 'AUD'
-        :login => 'CKR0030',  # <MerchantID> input to Au securePay Gateway.
-        :password => "jogkriw7"
-  )
+  ActiveMerchant::Billing::Base.mode = :test
+  # Mock Gateway Settings
+  ::GATEWAY = ActiveMerchant::Billing::BogusGateway.new
 end
+
+# # Setup Active Merchant for testing
+# config.after_initialize do
+#   ActiveMerchant::Billing::Base.mode = :test
+#   # Secure Pay Gateway Settings
+#   ::GATEWAY = ActiveMerchant::Billing::SecurePayAuExtendedGateway.new(  # the default_currency of this gateway is 'AUD'
+#         :login => 'CKR0030',  # <MerchantID> input to Au securePay Gateway.
+#         :password => "jogkriw7"
+#   )
+# end
 
 # config.gem 'rspec-rails', :version => '>= 1.3.2', :lib => false unless File.directory?(File.join(Rails.root, 'vendor/plugins/rspec-rails'))

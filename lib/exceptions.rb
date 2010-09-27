@@ -4,5 +4,6 @@ module  Exceptions
   class CreateRecurrentProfileNotSuccessful   < StandardError; end
   class TriggerRecurrentProfileNotSuccessful  < StandardError; end
   class RemoveRecurrentProfileNotSuccessful   < StandardError; end
-  class Exceptions::UserInvalid               < StandardError; end
+  class UserInvalid                           < StandardError; end
+  class UnableToGenerateRecurrentId           < StandardError; end
 end

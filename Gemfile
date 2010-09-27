@@ -49,4 +49,5 @@ group :test, :cucumber do
   gem 'shoulda'
   gem 'rspec'
   gem 'rspec-rails', '~> 1.3.2'
+  gem 'mocha', '~> 0.9.8'
 end

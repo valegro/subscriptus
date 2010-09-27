@@ -97,6 +97,37 @@ module ActiveMerchant #:nodoc:
           raise Error, UNSTORE_ERROR_MESSAGE
         end
       end
+
+      # secure_pay_extended methods
+      def setup_recurrent(money, creditcard, options = {})
+        money = amount(money)
+        case creditcard.number
+        when '0'
+          Response.new(false, FAILURE_MESSAGE, {:paid_amount => money, :error => FAILURE_MESSAGE },:test => true)
+        else
+          Response.new(true, SUCCESS_MESSAGE, {:paid_amount => money}, :test => true)
+        end
+      end
+
+      def trigger_recurrent(money, options = {})
+        money = amount(money)
+        case options[:customer]
+        when '0'
+          Response.new(false, FAILURE_MESSAGE, {:paid_amount => money, :error => FAILURE_MESSAGE },:test => true)
+        else
+          Response.new(true, SUCCESS_MESSAGE, {:paid_amount => money}, :test => true)
+        end
+      end
+
+      def cancel_recurrent(options = {})
+        case options[:customer]
+        when '0'
+          Response.new(false, FAILURE_MESSAGE, {:paid_amount => money, :error => FAILURE_MESSAGE },:test => true)
+        else
+          Response.new(true, SUCCESS_MESSAGE, {:paid_amount => money}, :test => true)
+        end
+      end
+      
     end
   end
 end

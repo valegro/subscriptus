@@ -10,7 +10,7 @@ class SubscribeController < ApplicationController
 # rescue error
 # end
 
-  # around_filter :catch_exceptions
+  around_filter :catch_exceptions
 
   act_wizardly_for :subscription, :form_data => :sandbox, :canceled => "/", :persist_model => :once, :guard => false
   
@@ -63,15 +63,19 @@ class SubscribeController < ApplicationController
       session[:user_dat]["email_confirmation"] = @subscription.user.email_confirmation
 
       unless @subscription.user.valid?
+        # any type of offer(trial/full subscription), invalid new user
         flash[:error] = @subscription.errors.full_messages
         render :action => :details
       end
     else
       user_session = UserSession.new(:login => @subscription.user.attributes["login"], :password => params[:subscription][:user_attributes][:password]) # user's password is set to blank
       session[:user_dat] = nil
-      #FIXME: if user successfully logs in(login and password correct)
-      @subscription.user = User.find_by_login(@subscription.user.attributes["login"])
-      unless user_session.save
+      if user_session.save
+        # valid login details
+        @subscription.user = User.find_by_login(@subscription.user.attributes["login"]) # only if user_session is correctly saved
+      else
+        # invalid login details
+        # any type of offer(trial/full subscription), invalid existing user
         flash[:error] = "Invalid login name or password: #{user_session.login}, #{user_session.password}"
         render :action => :details
       end
@@ -79,6 +83,7 @@ class SubscribeController < ApplicationController
 
     # if the offer is a trial, skip payment and
     # FINISH the wizard
+    # otherwise just o to the next page of wizard(payment)
     if @subscription.offer.is_trial?
       # subscription should be saved in database before the wizard is finished so that no conflicts happens between has_states and wizardly
       # the first subscription has a trial state
@@ -89,8 +94,8 @@ class SubscribeController < ApplicationController
         @subscription.user = save_new_user(session[:user_dat])
       end
       # finish the wizard
-      @subscription.save!
-      flash[:notice] = "Congratulations! Your subscribtion was successful."
+      @subscription.save
+      flash[:notice] = "Congratulations! Your trial subscribtion was successful."
       redirect_to(:action => :offer)
     end
   end
@@ -114,7 +119,14 @@ class SubscribeController < ApplicationController
     @payment.first_name         = params[:payment]["first_name"]
 
     @payment.money = @subscription.price    # setting the money of payment object
-    @payment.customer_id = User.generate_recurrent_profile_id # setting the options details(customer) of payment object
+
+    # because of the belongs_to assosiation, user needs to be saved seperately only if user is new.
+    if session[:new_user]
+      # new user
+      @subscription.user = save_new_user(session[:user_dat])
+    end
+    @payment.customer_id = @subscription.user.generate_recurrent_profile_id(@subscription.offer_id) # setting the options details(customer) of payment object
+
     # call set up recurrent profile
     setup_res = @payment.create_recurrent_profile
     if setup_res.success?
@@ -122,11 +134,6 @@ class SubscribeController < ApplicationController
       trigger_res = @payment.call_recurrent_profile
       if trigger_res.success?
         # recurrent trigger successul
-        # because of the belongs_to assosiation, user needs to be saved seperately only if user is new.
-        if session[:new_user]
-          # new user
-          @subscription.user = save_new_user(session[:user_dat])
-        end
         @subscription.user.recurrent_id = @payment.customer_id
         
         #FIXME user should be updated with their recurrent_id
@@ -170,7 +177,7 @@ class SubscribeController < ApplicationController
   rescue Exceptions::UserInvalid => e
     logger.error("Exceptions::UserInvalid ---> " + e.message)
     flash[:error] = "Unfortunately your payment was not successfull. Please try again later. There might be some problems with the cookies of your web browser."
-    redirect_to(:action=>:offer)
+    # redirect_to(:action=>:offer)
   rescue Exceptions::TriggerRecurrentProfileNotSuccessful => e
     # triggering recurrent failed
     logger.error("Exceptions::TriggerRecurrentProfileNotSuccessful ---> " + e.message)
