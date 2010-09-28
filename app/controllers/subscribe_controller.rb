@@ -125,8 +125,8 @@ class SubscribeController < ApplicationController
       # new user
       @subscription.user = save_new_user(session[:user_dat])
     end
-    @payment.customer_id = @subscription.user.generate_recurrent_profile_id(@subscription.offer_id) # setting the options details(customer) of payment object
-
+    @payment.customer_id = @subscription.generate_recurrent_profile_id # setting the options details(customer) of payment object
+    
     # call set up recurrent profile
     setup_res = @payment.create_recurrent_profile
     if setup_res.success?
