@@ -130,11 +130,9 @@ class SubscribeController < ApplicationController
     # call set up recurrent profile
     setup_res = @payment.create_recurrent_profile
     if setup_res.success?
-      #TODO -- save transaction- success
       # recurrent setup successul
       trigger_res = @payment.call_recurrent_profile
       if trigger_res.success?
-        #TODO -- save transaction- success
         # recurrent trigger successul
         @subscription.recurrent_id = @payment.customer_id
 
@@ -145,13 +143,11 @@ class SubscribeController < ApplicationController
         flash[:notice] = "Congratulations! Your subscribtion was successful."
         redirect_to(:action=>:offer)
       else
-        #TODO -- save transaction- failure
         # recurrent trigger failed
         flash[:error] = "Unfortunately your payment was not successfull. Please check that your account has the amount and try again later."
         redirect_to(:action=>:offer)
       end
     else
-      #TODO -- save transaction- failure
       # recurrent setup failed.
       flash[:error] = "Unfortunately your payment was not successfull. Please check your credit card details and try again."
       render(:action => :payment)
