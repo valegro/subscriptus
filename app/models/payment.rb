@@ -11,7 +11,7 @@ class Payment
     
     # For the ActiveRecord::Errors object.
     attr_accessor :errors
-
+    
     def initialize(opts = {})
         # Create an Errors object, which is required by validations and to use some view methods.
         @errors = ActiveRecord::Errors.new(self)
@@ -19,6 +19,7 @@ class Payment
     
     def create_recurrent_profile
         response = GATEWAY.setup_recurrent(price_in_cents, credit_card, options)
+        log_transactions("setup new recurrent profile", response)
         response
     rescue Exceptions::ZeroAmount
       raise Exceptions::ZeroAmount
@@ -30,6 +31,7 @@ class Payment
     # amount of money can be specified as an input parameter or set to nil so that the previously set amount is used
     def call_recurrent_profile
         response = GATEWAY.trigger_recurrent(price_in_cents, options)
+        log_transactions("trigger existing recurrent profile", response)
         response
     rescue Exceptions::ZeroAmount
       raise Exceptions::ZeroAmount
@@ -40,6 +42,7 @@ class Payment
     # remove an already setup profile for recurrent transactions
     def remove_recurrent_profile
         response = GATEWAY.cancel_recurrent(options)
+        log_transactions("remove existing recurrent profile", response)
         response
     rescue Exception
       raise Exceptions::RemoveRecurrentProfileNotSuccessful
@@ -77,5 +80,16 @@ class Payment
         :first_name => first_name,
         :last_name => last_name
       )
+    end
+
+    def log_transactions(action, response)
+      t_log = TransactionLog.new()
+      t_log.recurrent_id = customer_id
+      # t_log.user_id = 
+      t_log.action  = action
+      t_log.money   = money
+      t_log.success = response.success?
+      t_log.message = response.message
+      t_log.save!
     end
 end
