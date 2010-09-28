@@ -76,7 +76,7 @@ class SubscribeController < ApplicationController
       else
         # invalid login details
         # any type of offer(trial/full subscription), invalid existing user
-        flash[:error] = "Invalid login name or password: #{user_session.login}, #{user_session.password}"
+        flash[:error] = "Invalid login name or password"
         render :action => :details
       end
     end
@@ -135,8 +135,6 @@ class SubscribeController < ApplicationController
       if trigger_res.success?
         # recurrent trigger successul
         @subscription.user.recurrent_id = @payment.customer_id
-        
-        #FIXME user should be updated with their recurrent_id
 
         # customer_id of the payment must be set first
         # change the state of subscription from trial to active

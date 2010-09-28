@@ -17,15 +17,6 @@ class Payment
         @errors = ActiveRecord::Errors.new(self)
     end
     
-    # def purchase
-    #     response = GATEWAY.purchase(price_in_cents, credit_card, options)
-    #     response
-    # rescue Exceptions::ZeroAmount
-    #   raise Exceptions::ZeroAmount
-    # rescue Exception
-    #   raise Exceptions::PurchaseNotSuccessful
-    # end
-
     def create_recurrent_profile
         response = GATEWAY.setup_recurrent(price_in_cents, credit_card, options)
         response
