@@ -13,12 +13,9 @@ class User < ActiveRecord::Base
   validates_presence_of :firstname, :lastname, :email, :phone_number, :address_1, :city, :postcode, :state, :country
   validates_format_of   :email, :with => /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i
 
-  def validate
-    if self.email_confirmation.blank?
-      errors.add_to_base("Must provide email confirmation")
-    end
-    unless self.email == self.email_confirmation
-      errors.add_to_base("Email does not match confirmation")
-    end
+  validates_confirmation_of :email
+
+  def fullname
+    "#{firstname} #{lastname}"
   end
 end

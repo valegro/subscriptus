@@ -24,6 +24,7 @@ module NavigationHelpers
       when /admin catalogue offers new/ then new_admin_catalogue_offer_path
       when /admin catalogue offer page for (.*)/ then admin_catalogue_offer_path($1)
       when /admin catalogue offer edit page for (.*)/ then edit_admin_catalogue_offer_path($1)
+      when "admin subscription search page" then search_admin_subscriptions_path
 
     # Add more mappings here.
     # Here is an example that pulls values out of the Regexp:

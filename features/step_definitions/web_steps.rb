@@ -229,3 +229,9 @@ end
 Then /^show me the page$/ do
   save_and_open_page
 end
+
+Then /^I should see the following "([^"]*)" table:$/ do |table_id, expected_table|
+  table_on_page = table( tableish("table##{table_id} tr", 'td,th') )
+  expected_table.diff!(table_on_page)
+end
+

@@ -6,7 +6,7 @@ gem 'pg'
 
 # These are "core" gems we always use
 gem 'authlogic'
-#gem 'searchlogic'
+gem 'searchlogic'
 gem 'navigasmic'
 gem 'will_paginate'
 gem 'json_pure'
@@ -14,6 +14,9 @@ gem 'capistrano'
 
 # State machine support
 gem 'aasm'
+
+gem 'rspec-rails'
+gem 'mocha'
 
 # jQuery
 gem 'jrails'

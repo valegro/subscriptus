@@ -7,6 +7,8 @@
 require 'rubygems'
 require 'spork'
  
+#require 'factory_girl'
+
 Spork.prefork do
   ENV["RAILS_ENV"] ||= "cucumber"
   require File.expand_path(File.dirname(__FILE__) + '/../../config/environment')
@@ -15,7 +17,6 @@ Spork.prefork do
   require 'cucumber/rails/world'
   require 'cucumber/rails/active_record'
   require 'cucumber/web/tableish'
-
 
   require 'capybara/rails'
   require 'capybara/cucumber'
@@ -63,4 +64,10 @@ Spork.each_run do
     rescue LoadError => ignore_if_database_cleaner_not_present
     end
   end
+end
+
+# see http://bjeanes.com/2010/09/20/pausing-cucumber-scenarios-to-debug
+AfterStep('@pause') do
+  print "Press Return to continue"
+  STDIN.getc
 end
