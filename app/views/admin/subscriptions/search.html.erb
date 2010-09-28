@@ -1,0 +1,92 @@
+<%= javascript_include_tag 'form_filters.js' %>
+<h2>Search for Subscribers</h2>
+
+<h2>shortcuts</h2>
+<table>
+  <tr><td>active</td></tr>
+  <tr><td>trial</td></tr>
+  <tr><td>squatters</td></tr>
+  <tr><td>pending</td></tr>
+  <tr><td>payment failed</td></tr>
+  <tr><td>payment due</td></tr>
+  <tr><td>new</td></tr>
+  <tr><td>recently ended</td></tr>
+</table>
+
+<h2>Filters</h2>
+
+<% form_for @search, :html => {:id => 'searchform'} do |f| %>
+  <%= select_tag('filter_name', options_for_select(['', 'username', 'state', 'renewal', 'publication', 'gift'])) %>
+  <%= link_to_function('Add', 'add_selected_field(); disable_current_field()') %><br/>
+  <%= f.submit "Search" %>
+  or <%= link_to_function('Reset') %><br/>
+<% end %>
+
+<h2>Results</h2>
+
+<p>
+  <% if @count.to_i > 0 %>
+    Showing <%= @results.offset + 1 %> to <%= @results.offset + @results.size %> of <%= @count %> subscription(s).
+  <% else %>
+    No subscription found.
+  <% end %>
+</p>
+
+<%= will_paginate @results %>
+<table id="search_results">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Email</th>
+      <th>
+        <%= order @search, :by => :publication_id %>
+      </th>
+      <th>State</th>
+      <th>Renewal</th>
+      <th>Signed Up</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @results.each do |result|%>
+      <%= render_result_row( result ) %>
+    <% end %>
+  </tbody>
+</table>
+<%= will_paginate @results %>
+
+<script type="text/javascript"><!--
+  $(document).ready( function() {
+      if( <%= !!@search.publication_id %> ) add_field(filter_element_for('publication'));
+      if( <%= !!@search.username %> ) add_field(filter_element_for('username'));
+      if( <%= !!@search.state %> ) add_field(filter_element_for('state'));
+      if( <%= !!@search.renewal %> ) add_field(filter_element_for('renewal'));
+      if( <%= !!@search.gift %> ) add_field(filter_element_for('gift'));
+    }
+  );
+--></script>
+
+<div style="display:none">
+  <div id="username_field">
+    <strong>name field</strong>
+    <%= link_to_function '[X]', "remove_field($(this).parent()); enable_field('username')", :id => 'remove_username_link' %>
+  </div>
+  <div id="state_field">
+    <strong>state field</strong>
+    <%= link_to_function '[X]', "remove_field($(this).parent()); enable_field('state')", :id => 'remove_state_link' %>
+  </div>
+  <div id="renewal_field">
+    <strong>renewal field</strong>
+    <%= link_to_function '[X]', "remove_field($(this).parent()); enable_field('renewal')", :id => 'remove_renewal_link' %>
+  </div>
+  <div id="publication_field">
+    <strong>publication</strong><br/>
+    <%= label :search, :publication_id %>
+    <%= collection_select :search, :publication_id, Publication.all, :id, :name %>
+    <%= link_to_function '[X]', "remove_field($(this).parent()); enable_field('publication')", :id => 'remove_publication_link' %>
+  </div>
+  <div id="gift_field">
+    <strong>gift field</strong>
+    <%= link_to_function '[X]', "remove_field($(this).parent()); enable_field('gift')", :id => 'remove_gift_link' %>
+  </div>
+  <div id="end_of_fields"/>
+</div>

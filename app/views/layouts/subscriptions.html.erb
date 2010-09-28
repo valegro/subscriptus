@@ -1,0 +1,8 @@
+<% content_for :lower do %>
+  <% semantic_navigation :secondary, :html => { :class => "lower" } do |n| %>
+    <%= n.item 'Activity', :link => activity_admin_subscriptions_path %>
+    <%= n.item 'Search', :link => search_admin_subscriptions_path %>
+    <%= n.item 'Pending', :link => pending_admin_subscriptions_path %>
+  <% end %>
+<% end %>
+<%= render :file => 'layouts/admin' %>

@@ -22,3 +22,4 @@ end
 Factory.define :subscriber, :parent => :user do |a|
   a.role { 'subscriber' }
 end
+

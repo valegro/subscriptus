@@ -26,7 +26,11 @@ class Subscription < ActiveRecord::Base
   end
   
   accepts_nested_attributes_for :subscription_gifts, :user
-  
+
+  def self.per_page
+    20
+  end
+
   #validates_presence_of :expiry
   
   # Signup Wizard

@@ -30,4 +30,10 @@ describe Subscription do
     expected = Date.new(2010, 12, 27)
     @subscription.get_new_expiry_date(months).should == expected
   end
+
+  describe "class def" do
+    it "should return per page" do
+      Subscription.per_page.should == 20
+    end
+  end
 end
