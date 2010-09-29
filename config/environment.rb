@@ -1,7 +1,7 @@
 # Be sure to restart your server when you modify this file
 
 # Specifies gem version of Rails to use when vendor/rails is not present
-RAILS_GEM_VERSION = '2.3.9' unless defined? RAILS_GEM_VERSION
+RAILS_GEM_VERSION = '2.3.8' unless defined? RAILS_GEM_VERSION
 
 # Bootstrap the Rails environment, frameworks, and default configuration
 require File.join(File.dirname(__FILE__), 'boot')
@@ -11,8 +11,9 @@ Rails::Initializer.run do |config|
   # Application configuration should go into files in config/initializers
   # -- all .rb files in that directory are automatically loaded.
 
-  config.action_controller.session = { :key => "_subscriptus_session", :secret => "'446f586e446c1gkjrhgrkehb11bd1feb22e93d3d82f5d83be7e10476baa64d20e835bbc055a2fbf971a06ef0e6772cdc18bbb92a5b2kjh2i3fy823o4e4a24'" }
-
+  # use rake secret to generate new secret keys
+  config.action_controller.session = { :key => "_subscriptus_session", :secret => "ab2d6e75e910ab82d74be6721ee22e4bb514e1110be05748e38f93483385a5233a9cd08aed0bf3383f9dc56bf5d7973bbd46d669236c5cad7f90f48f93e6ef02" }
+  
   # Add additional load paths for your own custom dirs
   # config.load_paths += %W( #{RAILS_ROOT}/extras )
 

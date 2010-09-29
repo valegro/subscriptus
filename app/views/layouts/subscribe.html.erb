@@ -9,6 +9,9 @@
 </head>
 <body>
 
+<%= "<p style=\"color: green\">#{flash[:notice]}<p>" if flash[:notice] %>
+<%= "<p style=\"color: red\">#{flash[:error]}<p>" if flash[:error] %>
+
 <%= yield %>
 
 </body>

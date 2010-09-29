@@ -1,0 +1,17 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  recurrent_id: MyString
+  user_id: 1
+  action: MyString
+  money: 9.99
+  success: false
+  message: MyString
+
+two:
+  recurrent_id: MyString
+  user_id: 1
+  action: MyString
+  money: 9.99
+  success: false
+  message: MyString

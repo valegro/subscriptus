@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20100921062549) do
+ActiveRecord::Schema.define(:version => 20100928020917) do
 
   create_table "audit_log_entries", :force => true do |t|
     t.integer  "user_id"
@@ -57,6 +57,12 @@ ActiveRecord::Schema.define(:version => 20100921062549) do
     t.boolean  "auto_renews"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.boolean  "trial",          :default => false
+  end
+
+  create_table "payments", :force => true do |t|
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "publications", :force => true do |t|
@@ -69,6 +75,16 @@ ActiveRecord::Schema.define(:version => 20100921062549) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  create_table "sessions", :force => true do |t|
+    t.string   "session_id", :null => false
+    t.text     "data"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "sessions", ["session_id"], :name => "index_sessions_on_session_id"
+  add_index "sessions", ["updated_at"], :name => "index_sessions_on_updated_at"
 
   create_table "sources", :force => true do |t|
     t.string   "name"
@@ -129,6 +145,18 @@ ActiveRecord::Schema.define(:version => 20100921062549) do
     t.boolean  "auto_renew"
     t.datetime "state_updated_at"
     t.datetime "expires_at"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.string   "recurrent_id"
+  end
+
+  create_table "transaction_logs", :force => true do |t|
+    t.string   "recurrent_id"
+    t.integer  "user_id"
+    t.string   "action"
+    t.decimal  "money"
+    t.boolean  "success"
+    t.string   "message"
     t.datetime "created_at"
     t.datetime "updated_at"
   end

@@ -11,18 +11,19 @@ class User < ActiveRecord::Base
     labels :INTL => "Outside of Australia"
   end
 
-  validates_presence_of :firstname, :lastname, :email, :phone_number, :address_1, :city, :postcode, :state, :country
+  validates_presence_of :firstname, :lastname, :email, :email_confirmation, :phone_number, :address_1, :city, :postcode, :state, :country
   validates_format_of   :email, :with => /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i
   validates_uniqueness_of :email
+  validates_confirmation_of :email_confirmation
 
-  def validate
-    if self.email_confirmation.blank?
-      errors.add_to_base("Must provide email confirmation")
-    end
-    unless self.email == self.email_confirmation
-      errors.add_to_base("Email does not match confirmation")
-    end
-  end
+  # def validate
+  #   if self.email_confirmation.blank?
+  #     errors.add_to_base("Must provide email confirmation")
+  #   end
+  #   unless self.email == self.email_confirmation
+  #     errors.add_to_base("Email does not match confirmation")
+  #   end
+  # end
 
   def name
     [ self.firstname, self.lastname ].join(" ")

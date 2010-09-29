@@ -1,24 +1,22 @@
 <h1>Payment</h1>
 
-<br/>
-<%= session.inspect %>
-<%= flash[:subscribe_dat].class %>
+<% form_for :payment, :url=>{:controller => :subscribe, :action=>:payment}, :builder => Reform::Builder, :html => { :class => "form", :method => 'post' } do |p| %>
 
-<%= "<p style=\"color: green\">#{flash[:notice]}<p>" if flash[:notice] %>
-
-<% form_for @subscription, :url => { :action => :payment }, :builder => Reform::Builder, :html => { :class => "form", :method => 'post' } do |f| %>
-  <%= f.error_messages %>
-
-  <%= f.select :card_type, Billing::CreditCard::CREDIT_CARDS.map { |x| [ x.to_s.capitalize, x.to_s ] }, :label => "Card Type" %>
-  <%= f.text_field :card_number %>
-  <% #f.text_field :name_on_card %>
-  <% f.row :expiration, :errors_for => [ :expire_month, :expire_year ], :label => "Expires" do %>
-    <%= f.select :expire_month, (1..12).map { |x| [ "#{x.to_s.length == 1 ? ("0" + x.to_s) : x}", x ] } %>
-    <%= f.select :expire_year, (Time.now.year..(Time.now.year + 20)) %>
-  <% end %>
-
+    <div id="new_user_fields">
+      <%= p.error_messages %>
+      <%= p.enum_select :card_type %>
+      <%= p.text_field :card_number %>
+      <%= p.text_field :card_verification %>
+      <%= p.date_select :card_expires_on, :discard_day => true, :start_year => Date.today.year, :end_year => (Date.today.year+10), :add_month_numbers => true %>
+      <%= p.text_field :first_name %>
+      <%= p.text_field :last_name %>
+</div>
 
   <p>
     <%= wizardly_image_submit %>
   </p>
 <% end %>
+
+<script type='text/javascript'>
+  document.getElementById('').focus()
+</script>

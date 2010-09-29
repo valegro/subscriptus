@@ -16,9 +16,15 @@ class Offer < ActiveRecord::Base
 
   def available_included_gifts
     result = gifts.in_stock.included
+    # include the optional gift if there is only one!
     if gifts.in_stock.optional.size == 1
       result << gifts.in_stock.optional.first
     end
     result
+  end
+  
+  # shows whether the current offer is a trial or a full paid offer
+  def is_trial?
+    self.trial
   end
 end

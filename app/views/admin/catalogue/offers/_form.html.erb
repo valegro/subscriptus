@@ -1,5 +1,6 @@
 <%= form.text_field :name %>
 <%= form.select :publication_id, @publications.map { |p| [ p.name, p.id ] } %>
 <%= form.check_box :auto_renews %>
+<%= form.check_box :trial %>
 <%= form.date_select :expires, :label => "Offer expires" %>
 
