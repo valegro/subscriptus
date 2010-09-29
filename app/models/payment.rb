@@ -83,13 +83,14 @@ class Payment
     end
 
     def log_transactions(action, response)
-      t_log = TransactionLog.new()
-      t_log.recurrent_id = customer_id
-      # t_log.user_id = 
-      t_log.action  = action
-      t_log.money   = money
-      t_log.success = response.success?
-      t_log.message = response.message
-      t_log.save!
+      t = TransactionLog.new do |t_log|
+          t_log.recurrent_id = customer_id
+          # t_log.user_id = 
+          t_log.action  = action
+          t_log.money   = money
+          t_log.success = response.success?
+          t_log.message = response.message
+      end
+      t.save!
     end
 end
