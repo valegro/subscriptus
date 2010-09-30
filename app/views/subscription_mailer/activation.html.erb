@@ -1,0 +1,17 @@
+<body style="font-family: arial; text-align: left;">
+
+   <p>Dear <%= @subscription.user.firstname %> <%= @subscription.user.lastname %></p>
+   <p>Congratulations on your successful activation of <%= h @subscription.publication.name %>. The details of your subscription are as follows:</p>
+
+   <p><strong>Your Publication Details</strong></p>
+   <table cellspacing="3" width="80%">
+    <tr>
+		<th align="left" width="50%"><%= h @subscription.publication.name %></th>
+    	<td><%= h @subscription.publication.description %></td>
+	</tr>
+    <tr>
+    	<td><%= image_tag(@subscription.publication.publication_image.url(:medium)) %></td>
+	</tr>
+   </table>
+
+</body>
