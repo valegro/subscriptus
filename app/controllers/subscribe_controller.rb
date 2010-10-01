@@ -109,6 +109,7 @@ class SubscribeController < ApplicationController
   on_finish(:payment) do
     # subscription should be saved in database before the wizard is finished so that no conflicts happens between has_states and wizardly
     # the first subscription has a trial state
+    # p @subscription.attributes
     @subscription = Subscription.create(@subscription.attributes)
 
     @payment = Payment.new() # Payment is not an active record
@@ -123,25 +124,29 @@ class SubscribeController < ApplicationController
     @payment.money = @subscription.price    # setting the money of payment object
 
     # because of the belongs_to assosiation, user needs to be saved seperately only if user is new.
-    if session[:new_user]
-      # new user
-      @subscription.user = save_new_user(session[:user_dat])
-    end
-    @payment.customer_id = @subscription.generate_recurrent_profile_id # setting the options details(customer) of payment object
     
-    # call set up recurrent profile
-    setup_res = @payment.create_recurrent_profile
-    if setup_res.success?
+    # puts "#{User.find(@subscription.user.id).recurrent_id} ,,,,, " if @subscription.user
+    
+    @subscription.user = save_new_user(session[:user_dat]) unless !session[:new_user]
+    if @subscription.user.recurrent_id.blank?
+      @payment.customer_id = @subscription.user.generate_recurrent_profile_id
+      # call set up recurrent profile
+      setup_successful = @payment.create_recurrent_profile.success?
+    else
+      @payment.customer_id = @subscription.user.recurrent_id
+      # no need to call set up recurrent profile
+      setup_successful = true
+    end
+    
+    if setup_successful
       # recurrent setup successul
-      trigger_res = @payment.call_recurrent_profile
+      @subscription.user.recurrent_id = @payment.customer_id # now user has a valid profile in secure pay that can be refered to by their recurrent_id
+      trigger_res = @payment.call_recurrent_profile # make the payment through secure pay
       if trigger_res.success?
         # recurrent trigger successul
-        @subscription.recurrent_id = @payment.customer_id
-
         # customer_id of the payment must be set first
         # change the state of subscription from trial to active
         @subscription.activate
-        
         flash[:notice] = "Congratulations! Your subscribtion was successful."
         redirect_to(:action=>:offer)
       else

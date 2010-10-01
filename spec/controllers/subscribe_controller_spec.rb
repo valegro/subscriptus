@@ -10,10 +10,10 @@ describe SubscribeController do
     @offer = Factory(:offer)
     @offer.offer_terms << @ot1 = Factory(:offer_term)
     @offer.offer_terms << @ot2 = Factory(:offer_term)
-    @offer.gifts << @g1 = Factory(:gift)
-    @offer.gifts << @g2 = Factory(:gift)
+    @offer.gifts << @g1 = Factory(:gift, :on_hand => 10)
+    @offer.gifts << @g2 = Factory(:gift, :on_hand => 10)
     @offer.gifts << @g3 = Factory(:gift, :on_hand => 0)
-    @offer.gifts << @g4 = Factory(:gift)
+    @offer.gifts << @g4 = Factory(:gift, :on_hand => 10)
 
     @subscription = Subscription.new()
     @subscription.offer = @offer
@@ -189,7 +189,7 @@ describe SubscribeController do
     assigns[:subscription].user.city.should           == user.city
     assigns[:subscription].user.state.should          == user.state
     assigns[:subscription].user.country.should        == user.country
-    assigns[:subscription].recurrent_id.should   == nil  # because the subscription is a trial, so the user does not have a recurrent profile yet.
+    assigns[:subscription].user.recurrent_id.should   == nil  # because the subscription is a trial, so the user does not have a recurrent profile yet.
     assigns[:subscription].state.should              == 'trial'
     flash[:error].should                              be_nil
     flash[:notice].should                             == "Congratulations! Your trial subscribtion was successful."
@@ -216,7 +216,7 @@ describe SubscribeController do
     assigns[:subscription].user.city.should           == user.city
     assigns[:subscription].user.state.should          == user.state
     assigns[:subscription].user.country.should        == user.country
-    assigns[:subscription].recurrent_id.should   == nil  # because the subscription is a trial, so the user does not have a recurrent profile yet.
+    assigns[:subscription].user.recurrent_id.should   == nil  # because the subscription is a trial, so the user does not have a recurrent profile yet.
     flash[:error].should                              be_nil
     flash[:notice].should                             be_nil
     response.should                                   redirect_to :action => :payment
@@ -243,7 +243,7 @@ describe SubscribeController do
     assigns[:subscription].user.city.should           == user.city
     assigns[:subscription].user.state.should          == user.state
     assigns[:subscription].user.country.should        == user.country
-    assigns[:subscription].recurrent_id.should        == nil  # because the subscription is a trial, so the user does not have a recurrent profile yet.
+    assigns[:subscription].user.recurrent_id.should        == nil  # because the subscription is a trial, so the user does not have a recurrent profile yet.
     assigns[:subscription].state.should              == 'trial'
     flash[:error].should                              be_nil
     flash[:notice].should                             == "Congratulations! Your trial subscribtion was successful."
@@ -288,17 +288,17 @@ describe SubscribeController do
     assigns[:subscription].publication.should_not be_nil
     assigns[:subscription].user.should_not        be_nil
     assigns[:subscription].user.id.should_not     be_nil
-    assigns[:subscription].recurrent_id.should_not == "0"
-    assigns[:subscription].recurrent_id.to_f.should < 10000000000000000000 # less than 20 numbers
-    TransactionLog.find_by_recurrent_id(assigns[:subscription].recurrent_id.to_s).should_not be_nil
-    TransactionLog.find_by_recurrent_id_and_action(assigns[:subscription].recurrent_id.to_s, "setup new recurrent profile").should_not be_nil
-    TransactionLog.find_by_recurrent_id_and_action(assigns[:subscription].recurrent_id.to_s, "trigger existing recurrent profile").should_not be_nil
+    assigns[:subscription].user.recurrent_id.should_not == "0"
+    assigns[:subscription].user.recurrent_id.to_i.should < 10000000000000000000 # less than 20 numbers
+    TransactionLog.find_by_recurrent_id(assigns[:subscription].user.recurrent_id.to_s).should_not be_nil
+    TransactionLog.find_by_recurrent_id_and_action(assigns[:subscription].user.recurrent_id.to_s, "setup new recurrent profile").should_not be_nil
+    TransactionLog.find_by_recurrent_id_and_action(assigns[:subscription].user.recurrent_id.to_s, "trigger existing recurrent profile").should_not be_nil
     flash[:notice].should == "Congratulations! Your subscribtion was successful."
     flash[:error].should  be_nil
     response.should redirect_to(:action => :offer)
   end
   
-  it "should successfully call on_post method on payment and successfully change from trial to full-subscription- existing user" do
+  it "should successfully call on_post method on payment and successfully change from trial to full-subscription- existing user with non-existing recurrent profile" do #FIXME
     user = Factory(:user) # user exists
     post :payment, {:commit=>'Finish',  :payment => { 
                                               :card_type          => "visa",
@@ -319,11 +319,43 @@ describe SubscribeController do
     assigns[:subscription].publication.should_not be_nil
     assigns[:subscription].user.should_not        be_nil
     assigns[:subscription].user.id.should         == user.id
-    assigns[:subscription].recurrent_id.to_f.should_not == 0
-    assigns[:subscription].recurrent_id.to_f.should < 10000000000000000000 # less than 20 numbers
-    TransactionLog.find_by_recurrent_id(assigns[:subscription].recurrent_id.to_s).should_not be_nil
-    TransactionLog.find_by_recurrent_id_and_action(assigns[:subscription].recurrent_id.to_s, "setup new recurrent profile").success.should be_true
-    TransactionLog.find_by_recurrent_id_and_action(assigns[:subscription].recurrent_id.to_s, "trigger existing recurrent profile").success.should be_true
+    assigns[:subscription].user.recurrent_id.to_i.should_not == 0
+    assigns[:subscription].user.recurrent_id.to_i.should < 10000000000000000000 # less than 20 numbers
+    TransactionLog.find_by_recurrent_id(assigns[:subscription].user.recurrent_id.to_s).should_not be_nil
+    TransactionLog.find_by_recurrent_id_and_action(assigns[:subscription].user.recurrent_id.to_s, "setup new recurrent profile").success.should be_true
+    TransactionLog.find_by_recurrent_id_and_action(assigns[:subscription].user.recurrent_id.to_s, "trigger existing recurrent profile").success.should be_true
+    flash[:notice].should == "Congratulations! Your subscribtion was successful."
+    flash[:error].should  be_nil
+    response.should redirect_to(:action => :offer)
+  end
+
+  it "should successfully call on_post method on payment and successfully change from trial to full-subscription- new user with existing recurrent profile" do
+  end
+  
+  it "should successfully call on_post method on payment and successfully change from trial to full-subscription- existing user with existing recurrent profile" do
+    user = Factory(:user, :recurrent_id => "4332118890") # user exists
+
+    post :payment, {:commit=>'Finish',  :payment => { 
+                                              :card_type          => "visa",
+                                              :card_number        => "4444333322221111",
+                                              :card_verification  => '444',
+                                              "card_expires_on(1i)" => Date.today.year.next,
+                                              "card_expires_on(2i)" => '1',
+                                              "card_expires_on(3i)" => '1'}},
+                    {:new_user => false, :user_dat => nil },    # the session that is used by the wizardly gem
+                    {:subscribe_dat => {:user_id => user.id, :offer_id => @offer.id, :price => 15, :expires_at => Date.new(2010, 10, 5)}} # flash attributes to setup the wizard to its current status
+  
+    assigns[:subscription].should_not             be_new_record       # subscription wizard active record should be saved
+    assigns[:subscription].state.should           == 'active'
+    assigns[:subscription].price.should           == 15
+    assigns[:subscription].expires_at.should_not  be_nil
+    assigns[:subscription].offer.id.should        == @offer.id
+    assigns[:subscription].publication.should_not be_nil
+    assigns[:subscription].user.should_not        be_nil
+    assigns[:subscription].user.id.should         == user.id
+    assigns[:subscription].user.recurrent_id.to_i.should == 4332118890
+    TransactionLog.find_by_recurrent_id(assigns[:subscription].user.recurrent_id.to_s).should_not be_nil
+    TransactionLog.find_by_recurrent_id_and_action(assigns[:subscription].user.recurrent_id.to_s, "trigger existing recurrent profile").success.should be_true
     flash[:notice].should == "Congratulations! Your subscribtion was successful."
     flash[:error].should  be_nil
     response.should redirect_to(:action => :offer)
