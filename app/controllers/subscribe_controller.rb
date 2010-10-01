@@ -109,7 +109,6 @@ class SubscribeController < ApplicationController
   on_finish(:payment) do
     # subscription should be saved in database before the wizard is finished so that no conflicts happens between has_states and wizardly
     # the first subscription has a trial state
-    # p @subscription.attributes
     @subscription = Subscription.create(@subscription.attributes)
 
     @payment = Payment.new() # Payment is not an active record
@@ -124,9 +123,6 @@ class SubscribeController < ApplicationController
     @payment.money = @subscription.price    # setting the money of payment object
 
     # because of the belongs_to assosiation, user needs to be saved seperately only if user is new.
-    
-    # puts "#{User.find(@subscription.user.id).recurrent_id} ,,,,, " if @subscription.user
-    
     @subscription.user = save_new_user(session[:user_dat]) unless !session[:new_user]
     if @subscription.user.recurrent_id.blank?
       @payment.customer_id = @subscription.user.generate_recurrent_profile_id
