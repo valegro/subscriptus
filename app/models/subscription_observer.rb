@@ -35,11 +35,8 @@ class SubscriptionObserver < ActiveRecord::Observer
     # TODO: Set state field
   end
 
-  def after_update(subscription)
-    #if subscription.expires_at_changed?
-      # TODO: Update CM recipient expired at
-      # TODO: Put in a delayed job
-    #end
+  def after_update(record)
+    record.send_later :update_campaignmaster
   end
 
   def before_create(record)
@@ -47,7 +44,7 @@ class SubscriptionObserver < ActiveRecord::Observer
   end
 
   def after_create(record)
-    record.send_later :add_to_campaignmaster
+    record.send_later :update_campaignmaster
   end
 
 end

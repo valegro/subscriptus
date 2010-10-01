@@ -56,20 +56,33 @@ describe Subscription do
       lambda { Factory.create(:subscription) }.should change(Delayed::Job, :count).by(1)
     end
   end
-  it "should invoke campaingmaster create on add_to_campaignmaster" do
+  it "should invoke campaingmaster update on add_to_campaignmaster" do
     s = Factory.build(:subscription)
-    CM::Recipient.should_receive(:create!).with(:created_at => anything,
-                                               :email => s.user.email,
-                                               :fields => anything ).and_return("called")
-    s.add_to_campaignmaster.should eql("called")
+    CM::Recipient.should_receive(:update).with(
+          :fields => { :"publication_#{s.publication_id}{state}" => s.state,
+                       :"publication_#{s.publication_id}{expiry}" => s.expires_at,
+                       :user_id => s.user.id
+          }
+    ).and_return("called")
+    s.update_campaignmaster.should eql("called")
   end
+  it "should invoke campaingmaster update on update_campaignmaster" do
+    s = Factory.create(:subscription)
+    s.reload
+    CM::Recipient.should_receive(:update).with(
+          :fields => { :"publication_#{s.publication_id}{state}" => s.state,
+                       :"publication_#{s.publication_id}{expiry}" => s.expires_at,
+                       :user_id => s.user.id
+          }
+    ).and_return("called")
+    s.update_campaignmaster.should eql("called")
+  end
+  # TODO: how do we log this?
   it "should log error if create fails" do
     s = Factory.build(:subscription)
-    CM::Recipient.should_receive(:create!).and_raise("spam")
-    @logger = mock('@logger')
-    @logger.should_receive(:error).with( "RuntimeError: spam" )
-    s.should_receive(:logger).and_return(@logger)
-    s.add_to_campaignmaster
+    CM::Recipient.should_receive(:update).and_raise("spam")
+    CM::Proxy.should_receive(:log_cm_error)
+    s.update_campaignmaster
   end
   describe "with named scopes" do
     before(:each) do

@@ -1,7 +1,15 @@
 require 'config/environment' # it's not loaded when you run this file alone.
 require 'cm/recipient'
 
+def next_val
+  $val_count ||= 0
+  $val_count += 1
+  return $val_count
+end
+
+
 describe CM::Base do
+
   before(:each) do
     @driver = mock('@driver', :generate_explicit_type= => nil, :options => {})
     @factory = mock("@factory", :create_rpc_driver => @driver)
@@ -248,7 +256,7 @@ end
 
 describe CM::Recipient do
   it "should have constant PRIMARY_KEY_NAME" do
-    CM::Recipient::PRIMARY_KEY_NAME.should == 'EmailAddress'
+    CM::Recipient::PRIMARY_KEY_NAME.should == 'user_id'
   end
 
   it "should have constant ATTRS" do
@@ -332,7 +340,7 @@ describe CM::Recipient do
   it "should initialize with extra fields" do
     @recipient = CM::Recipient.new(:created_at => Time.now,
                                    :email => 'example@example.com',
-                                   :fields => { :field1 => 'field1val' })
+                                   :fields => { :field1 => 'field1val', :user_id => next_val })
     @recipient.instance_variable_get(:@cm_recipient).values[0].fieldName.should == 'field1'
     @recipient.instance_variable_get(:@cm_recipient).values[0].value.should == 'field1val'
   end
@@ -342,7 +350,7 @@ describe CM::Recipient do
       @recipient = CM::Recipient.new(:created_at => Time.now,
                                      :email => 'example@example.com',
                                      :fields => { :'publication{expiry}' => '10/10/2010',
-                                                  :'publication{state}' => 'spam' }
+                                                  :'publication{state}' => 'spam', :user_id => next_val  }
                                     )
     end
     it "should add extra fields" do
@@ -350,12 +358,12 @@ describe CM::Recipient do
       @recipient.add_field('ham', 'ham')
       @recipient.add_field('bacon', 'bacon')
       extra_fields = @recipient.instance_variable_get(:@cm_recipient).values
-      extra_fields[2].fieldName.should  == 'spam'
-      extra_fields[2].value.should  == 'spam'
-      extra_fields[3].fieldName.should  == 'ham'
-      extra_fields[3].value.should  == 'ham'
-      extra_fields[4].fieldName.should  == 'bacon'
-      extra_fields[4].value.should  == 'bacon'
+      extra_fields[3].fieldName.should  == 'spam'
+      extra_fields[3].value.should  == 'spam'
+      extra_fields[4].fieldName.should  == 'ham'
+      extra_fields[4].value.should  == 'ham'
+      extra_fields[5].fieldName.should  == 'bacon'
+      extra_fields[5].value.should  == 'bacon'
     end
 
     it "should return info" do
@@ -401,10 +409,11 @@ end
 describe CM::Recipient, "integration" do
   before(:each) do
     CM::Proxy.delete_all_recipients
+    @user_id = next_val
     CM::Recipient.create!(:created_at => Time.now,
                           :email => 'example@example.com',
                           :email_content_type => 'HTML',
-                          :fields => { :State => 'trial' })
+                          :fields => { :user_id => @user_id })
   end
 
   it "should add recipient" do
@@ -413,17 +422,37 @@ describe CM::Recipient, "integration" do
 
   it "should update recipient" do
     CM::Recipient.update({:created_at => Time.now,
-                          :email => 'example@example.com',
-                          :active => true })
+                          :email => 'updated_email@example.com',
+                          :active => true,
+                          :fields => { :user_id => @user_id,
+                                       :address_1 => 'a1',
+                                       :address_2 => 'a2',
+                                       :city => 'city',
+                                       :country => 'country',
+                                       :firstname => 'first',
+                                       :lastname => 'last',
+                                       :login => 'login',
+                                       :phone_number => 'number',
+                                       :postcode => 'post',
+                                       :state => :TAS,
+                                       :title => :Rev
+                          }
+    })
 
-    CM::Proxy.get_recipients( :email_address => 'example@example.com' )[:recipients][0].to_hash[:active].should be_true
+    rhash = CM::Proxy.get_recipients( :fields => { :user_id => @user_id } )[:recipients][0].to_hash
+    rhash[:email].should == 'updated_email@example.com'
+    rhash[:fields][:address_1].should == 'a1'
+    rhash[:fields][:address_2].should == 'a2'
+    rhash[:fields][:city].should == 'city'
+    rhash[:fields][:state].should == 'TAS'
+    rhash[:fields][:title].should == 'Rev'
     CM::Proxy.get_recipients( nil )[:recipients].size.should == 1
   end
 
   it "should query recipients" do
     CM::Recipient.create!(:created_at => Time.now,
                           :email => 'ham@example.com',
-                          :fields => { :State => 'stateless' })
+                          :fields => { :user_id => next_val })
     CM::Recipient.find_all( nil )[:recipients].size.should == 2
     CM::Recipient.find_all( :email_address => 'ham@example.com' )[:recipients].size.should == 1
     # XXX: Is it possible to query by craete_date_time? 
