@@ -1,17 +1,37 @@
 <body style="font-family: arial; text-align: left;">
 
-   <p>Dear <%= @subscription.user.firstname %> <%= @subscription.user.lastname %></p>
-   <p>Congratulations on your successful activation of <%= h @subscription.publication.name %>. The details of your subscription are as follows:</p>
+	<p>
+		Dear <%= @subscription.user.firstname %> <%= @subscription.user.lastname %><br/>
+		Thank you for subscribing to Crikey.<br/>
+		Your tax invoice appears below.<br/>
+	</p>
 
-   <p><strong>Your Publication Details</strong></p>
-   <table cellspacing="3" width="80%">
-    <tr>
-		<th align="left" width="50%"><%= h @subscription.publication.name %></th>
-    	<td><%= h @subscription.publication.description %></td>
-	</tr>
-    <tr>
-    	<td><%= image_tag(@subscription.publication.publication_image.url(:medium)) %></td>
-	</tr>
-   </table>
+  	<p><strong>Your Order Details</strong></p>
+	<p>
+		Supplier: Crikey<br/>
+		Order Number: <%= h @subscription.order_num %><br/>
+		Order Date: <%= h @subscription.updated_at %><br/>
+		Payment Method: Credit Card<br/>
+		Payment Cost: AUD <%= h @subscription.price %><br/>
+	</p>
 
+   <p><strong>Your Subscription Details</strong></p>
+	<p>
+		Publication Name: <%= h @subscription.publication.name %><br/>
+		Publication Description: <p><%= h @subscription.publication.description %></p><br/>
+		Subscription Ends: <%= h @subscription.expires_at %>
+		<div style="padding: 10pt;">
+			<strong>Included Gifts:</strong><br/>
+			<% @subscription.offer.gifts.each do |gift| %>
+				<%= h gift.name %><br/>
+			<% end %>
+		</div>
+	</p>
+
+	<p>
+		Please reply to this email, quoting your order number if you have any problems.<br/><br/>
+		The Crikey Crew<br/>
+		<a target='_blank' href="www.crikey.com.au">www.crikey.com.au</a><br/><br/>
+		<strong>Copyright © 2010 Private Media Pty Ltd. All rights reserved</strong>
+	</p>
 </body>

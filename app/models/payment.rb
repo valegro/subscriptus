@@ -4,6 +4,7 @@ class Payment
   
     attr_accessor :card_verification, :card_number, :card_expires_on, :first_name, :last_name,
                   :money,   # the amount that should be paid
+                  :order_num, # order_number is a unique number for each paid subscription. it is also saved in subscription table
                   :customer_id # the unique client_id that is used as a reference for later operations(trigger and cancel recurrent profiles)
 
     # refer to: http://www.securepay.com.au/resources/Secure-XML-API/Integration-Guide-Periodic-and-Triggered-add-in-pg37.html#AppendixC
@@ -100,6 +101,7 @@ class Payment
       t = TransactionLog.new do |t_log|
           t_log.recurrent_id = customer_id
           # t_log.user_id = 
+          t_log.order_num = order_num
           t_log.action  = action
           t_log.money   = money
           t_log.success = response.success?

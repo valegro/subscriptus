@@ -290,7 +290,10 @@ describe SubscribeController do
     assigns[:subscription].user.id.should_not     be_nil
     assigns[:subscription].user.recurrent_id.should_not == "0"
     assigns[:subscription].user.recurrent_id.to_i.should < 10000000000000000000 # less than 20 numbers
+    assigns[:subscription].order_num.should_not be_nil
+    assigns[:subscription].order_num.to_i.should < 1000000000000000 # less than 15 numbers
     TransactionLog.find_by_recurrent_id(assigns[:subscription].user.recurrent_id.to_s).should_not be_nil
+    TransactionLog.find_by_order_num(assigns[:subscription].order_num.to_s).should_not be_nil
     TransactionLog.find_by_recurrent_id_and_action(assigns[:subscription].user.recurrent_id.to_s, "setup new recurrent profile").should_not be_nil
     TransactionLog.find_by_recurrent_id_and_action(assigns[:subscription].user.recurrent_id.to_s, "trigger existing recurrent profile").should_not be_nil
     flash[:notice].should == "Congratulations! Your subscribtion was successful."
@@ -321,7 +324,10 @@ describe SubscribeController do
     assigns[:subscription].user.id.should         == user.id
     assigns[:subscription].user.recurrent_id.to_i.should_not == 0
     assigns[:subscription].user.recurrent_id.to_i.should < 10000000000000000000 # less than 20 numbers
+    assigns[:subscription].order_num.should_not be_nil
+    assigns[:subscription].order_num.to_i.should < 1000000000000000 # less than 15 numbers
     TransactionLog.find_by_recurrent_id(assigns[:subscription].user.recurrent_id.to_s).should_not be_nil
+    TransactionLog.find_by_order_num(assigns[:subscription].order_num.to_s).should_not be_nil
     TransactionLog.find_by_recurrent_id_and_action(assigns[:subscription].user.recurrent_id.to_s, "setup new recurrent profile").success.should be_true
     TransactionLog.find_by_recurrent_id_and_action(assigns[:subscription].user.recurrent_id.to_s, "trigger existing recurrent profile").success.should be_true
     flash[:notice].should == "Congratulations! Your subscribtion was successful."
@@ -334,6 +340,7 @@ describe SubscribeController do
   
   it "should successfully call on_post method on payment and successfully change from trial to full-subscription- existing user with existing recurrent profile" do
     user = Factory(:user, :recurrent_id => "4332118890") # user exists
+    Payment.any_instance.stubs(:create_recurrent_profile).returns(ActiveMerchant::Billing::Response.new(true, "Successfull"))
 
     post :payment, {:commit=>'Finish',  :payment => { 
                                               :card_type          => "visa",
@@ -354,6 +361,8 @@ describe SubscribeController do
     assigns[:subscription].user.should_not        be_nil
     assigns[:subscription].user.id.should         == user.id
     assigns[:subscription].user.recurrent_id.to_i.should == 4332118890
+    assigns[:subscription].order_num.should_not be_nil
+    assigns[:subscription].order_num.to_i.should < 1000000000000000 # less than 15 numbers
     TransactionLog.find_by_recurrent_id(assigns[:subscription].user.recurrent_id.to_s).should_not be_nil
     TransactionLog.find_by_recurrent_id_and_action(assigns[:subscription].user.recurrent_id.to_s, "trigger existing recurrent profile").success.should be_true
     flash[:notice].should == "Congratulations! Your subscribtion was successful."
@@ -377,6 +386,7 @@ describe SubscribeController do
   
     assigns[:subscription].should_not       be_new_record # subscription wizard active record should be saved(with trial)
     assigns[:subscription].state.should     == 'trial'    # because the wizard hasnt been completed
+    assigns[:subscription].order_num.should be_nil
     TransactionLog.find_by_action("setup new recurrent profile").success.should be_false
     TransactionLog.find_by_action("trigger existing recurrent profile").should be_nil
     flash[:error].should                    == "Unfortunately your payment was not successfull. Please check your credit card details and try again."
@@ -399,6 +409,7 @@ describe SubscribeController do
   
     assigns[:subscription].should_not       be_new_record # subscription wizard active record should be saved(with trial)
     assigns[:subscription].state.should     == 'trial'    # because the wizard hasnt been completed
+    assigns[:subscription].order_num.should be_nil
     TransactionLog.find_by_action("setup new recurrent profile").should be_nil
     TransactionLog.find_by_action("trigger existing recurrent profile").should be_nil
     flash[:error].should                    == "Unfortunately your payment was not successfull. Please check that your account has the amount and try again later."
@@ -421,6 +432,7 @@ describe SubscribeController do
   
     assigns[:subscription].should_not       be_new_record # subscription wizard active record should be saved(with trial)
     assigns[:subscription].state.should     == 'trial'    # because the wizard hasnt been completed
+    assigns[:subscription].order_num.should be_nil
     TransactionLog.find_by_action("setup new recurrent profile").should be_nil
     TransactionLog.find_by_action("trigger existing recurrent profile").should be_nil
     flash[:error].should                    == "Unfortunately your payment was not successfull. Please check that your account has the amount and try again later."

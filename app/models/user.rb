@@ -36,8 +36,8 @@ class User < ActiveRecord::Base
   # the generated number is 18 numbers long
   def generate_recurrent_profile_id
     len = self.id.to_s.size
-    raise Exception::UnableToGenerateRecurrentId.new("subscription id is too long") unless len < 19
-    raise Exception::UnableToGenerateRecurrentId.new("nil subscription id")         unless self.id > 0
+    raise Exception::UnableToGenerateUniqueNumber.new("user id is too long") unless len < 19
+    raise Exception::UnableToGenerateUniqueNumber.new("nil user id")         unless self.id > 0
     diff = 19 - len # size of the random number
     max = "1"
     for i in 1...diff

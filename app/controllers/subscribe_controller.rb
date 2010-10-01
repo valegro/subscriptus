@@ -135,8 +135,10 @@ class SubscribeController < ApplicationController
     end
     
     if setup_successful
+      @payment.order_num = @subscription.generate_order_number
       # recurrent setup successul
       @subscription.user.recurrent_id = @payment.customer_id # now user has a valid profile in secure pay that can be refered to by their recurrent_id
+      @subscription.order_num = @payment.order_num # now user has a valid profile in secure pay that can be refered to by their recurrent_id
       trigger_res = @payment.call_recurrent_profile # make the payment through secure pay
       if trigger_res.success?
         # recurrent trigger successul
