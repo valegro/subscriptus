@@ -5,6 +5,6 @@ module  Exceptions
   class TriggerRecurrentProfileNotSuccessful  < StandardError; end
   class RemoveRecurrentProfileNotSuccessful   < StandardError; end
   class UserInvalid                           < StandardError; end
-  class UnableToGenerateRecurrentId           < StandardError; end
-  class EmailDataError                        < StandardError; end  
+  class UnableToGenerateUniqueNumber          < StandardError; end
+  class EmailDataError                        < StandardError; end
 end

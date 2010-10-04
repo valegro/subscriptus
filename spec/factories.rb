@@ -17,10 +17,10 @@ Factory.define :offer do |f|
   f.publication { |p| p.association(:publication) }
 end
 
-Factory.define :source do |f|
-  f.code { Faker::Name.name }
-  f.description 'sample source' #{ Faker::Lorem.paragraph }
-end
+# Factory.define :source do |f|
+#   f.code { Faker::Name.name }
+#   f.description 'sample source' #{ Faker::Lorem.paragraph }
+# end
 
 Factory.define :publication do |f|
   f.name { Faker::Name.name }
@@ -34,22 +34,23 @@ Factory.define :offer_term do |f|
   # f.months  rand(12) + 1  # 1...12
 end
 
-Factory.define :user do |f|
-  # f.id                      1
-  f.login                    { Faker::Name.first_name }
-  f.password                'password122'
-  f.password_confirmation   'password122'
-  f.firstname { Faker::Name.first_name }
-  f.lastname { Faker::Name.last_name }
-  f.email                   'sample@sample.com'
-  f.email_confirmation      'sample@sample.com'
-  f.phone_number { Faker::PhoneNumber.phone_number }
-  f.address_1 { Faker::Address.street_address }
-  f.postcode { Faker::Address.zip_code }
-  f.city { Faker::Address.city }
-  f.state                   'SA'
-  f.country                 'Australia'
-end
+# Factory.define :user_rec, :class => User do |f|
+#   # f.id                      1
+#   f.login                    { Faker::Name.first_name }
+#   f.password                'password122'
+#   f.password_confirmation   'password122'
+#   f.firstname { Faker::Name.first_name }
+#   f.lastname { Faker::Name.last_name }
+#   f.email                   'sample@sample.com'
+#   f.email_confirmation      'sample@sample.com'
+#   f.phone_number { Faker::PhoneNumber.phone_number }
+#   f.address_1 { Faker::Address.street_address }
+#   f.postcode { Faker::Address.zip_code }
+#   f.city { Faker::Address.city }
+#   f.state                   'SA'
+#   f.country                 'Australia'
+#   f.recurrent_id            "4332118890"
+# end
 
 Factory.define :subscription do |f|
   f.user_id         1
