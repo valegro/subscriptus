@@ -5,7 +5,10 @@ describe Admin::SubscriptionsController do
   it "should have index"
   it "should have activity"
   it "should have pending"
-  it "should have search"
+  it "should have search" do
+      get :search
+      response.should be_success
+  end
   describe "searching" do
     it "should create an appropriate search object" do
       @s = Subscription.search
@@ -20,5 +23,6 @@ describe Admin::SubscriptionsController do
       assigns[:results].should_not be_nil
       assigns[:count].should_not be_nil
     end
+
   end
 end

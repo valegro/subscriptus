@@ -27,6 +27,9 @@ class Subscription < ActiveRecord::Base
   
   accepts_nested_attributes_for :subscription_gifts, :user
 
+  named_scope :ascend_by_name, :include => 'user', :order => "users.lastname ASC, users.firstname ASC"
+  named_scope :descend_by_name, :include => 'user', :order => "users.lastname DESC, users.firstname DESC"
+
   def self.per_page
     20
   end
