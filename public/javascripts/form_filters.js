@@ -10,13 +10,16 @@ function remove_field(field) {
   field.insertBefore($('#end_of_fields'));
 }
 
-function disable_current_field() {
-  $('#filter_name option[value=' + $('#filter_name').val() + ']').attr('disabled', 'disabled');
-  $('#filter_name').val('')
+function disable_current_option() {
+  disable_option( $('#filter_name').val() );
+}
+function disable_option( option_name ) {
+  $('#filter_name option[value=' + option_name + ']').attr('disabled', 'disabled');
+  $('#filter_name').val('');
 }
 
-function enable_field( field_name ) {
-  $('#filter_name option[value=' + field_name + ']').removeAttr('disabled');
+function enable_option( option_name ) {
+  $('#filter_name option[value=' + option_name + ']').removeAttr('disabled');
 }
 
 function filter_element_for(name) {
