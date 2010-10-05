@@ -76,30 +76,39 @@ module CM
     # Note :'last_modfied=>' will be interpreted as :'last_modified==' due to '=>'
     # not being a valid operator.
     def self.get_recipients(conditions)
-      criteria = []
       if conditions.kind_of?(Hash)
-        i = 1
-        conditions.each_pair { |k,v|
-          criterion = CmCriterion.new
-          match = k.to_s.match(/([\w_]+)([<>=!]+)?/)
-          criterion.fieldName = match[1].camelize
-          criterion.operator = Operators[ ( match[2] || '==' ) ]
-          criterion.operand = v
-
-          # soap4r complains without these
-          criterion.order = i
-          criterion.logicalOperator = LogicalOperator::And
-          criterion.leftParentheses = 1
-          criterion.rightParentheses = 1
-
-          criteria.push(criterion)
-          i += 1
-        }
+        extra_fields = conditions.delete(:fields) || {}
+        criteria = conditions_to_criteria(conditions, true, 1)
+        criteria += conditions_to_criteria(extra_fields, false, criteria.size + 1)
       end
       result = driver.GetRecipients(:token => access_token, :page => 1, :criteria => criteria)
       return ServiceReturn.new(result)
     rescue SocketError, HTTPClient::ReceiveTimeoutError, HTTPClient::ConnectTimeoutError => ex
       return ServiceReturn.new(false, :message => ex.message)
+    end
+
+    def self.conditions_to_criteria(conditions, camelize_field = false, criterion_order = 1)
+      criteria = []
+      return criteria if conditions.blank?
+
+      conditions.each_pair { |k,v|
+        criterion = CmCriterion.new
+        match = k.to_s.match(/([\w{}\d]+)([<>=!]+)?/)
+        criterion.fieldName = match[1]
+        criterion.fieldName = criterion.fieldName.camelize if camelize_field
+        criterion.operator = Operators[ ( match[2] || '==' ) ]
+        criterion.operand = v
+
+        # soap4r complains without these
+        criterion.order = criterion_order
+        criterion.logicalOperator = LogicalOperator::And
+        criterion.leftParentheses = 1
+        criterion.rightParentheses = 1
+
+        criteria.push(criterion)
+        criterion_order += 1
+      }
+      return criteria
     end
 
     Operators = { '==' => CmBooleanBinaryOperator::Equals,
@@ -134,6 +143,11 @@ module CM
       delete_result = agent.submit(delete_form)
     end
 
+    # TODO: decide what to do, where to record etc. maybe new table?
+    def self.log_cm_error(ex)
+      Rails.logger.error( "#{ex.class.to_s}: #{ex.message}" )
+    end
+
   end
 
   class ServiceReturn < Hash
@@ -161,7 +175,6 @@ module CM
       self
     end
 
-    # not used any more
     def self.hash_from_cm_recipient(rcp)
       rcp_hash = Hash.new
       # XXX: do we need Id?
@@ -195,8 +208,8 @@ module CM
   end
 
   class Recipient
-    PRIMARY_KEY_NAME = 'EmailAddress'
-    # These 3 fields are server-generated: from_ip id last_modified_by
+    PRIMARY_KEY_NAME = 'user_id'
+    # These 3 fields are server-generated: from_ip id last_modified_by last_modified
     # also created_at can be mandatory for create but should not be for update
     ATTRS = %w(email)
 
@@ -216,10 +229,9 @@ module CM
       return self.class.update(to_hash)
     end
 
-    # WARNING: This method assumes email is the primary key!
-    # Also assumes no attributes are present except for inside @cm_recipient
+    # XXX: assumes no attributes are present except for inside @cm_recipient
     def reload
-      @cm_recipient = self.class.find_all( :email_address => @cm_recipient.emailAddress )[:recipients].first.instance_variable_get :@cm_recipient
+      @cm_recipient = self.class.find_all( :fields => { :user_id => @cm_recipient.values.find {|v| v.fieldName == 'user_id'}.value } )[:recipients].first.instance_variable_get :@cm_recipient
     end
 
     def set_expiry_for( publication_name, new_expiry )

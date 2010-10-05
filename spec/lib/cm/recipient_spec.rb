@@ -112,6 +112,12 @@ describe CM::Proxy do
       @driver.should_receive(:AddRecipient).and_raise(StandardError.new("spam"))
       lambda { CM::Proxy.add_recipient({}) }.should raise_error(StandardError)
     end
+
+    it "should log to rails error log" do
+      e = mock("e", :class => 'classname', :message => 'hello!')
+      Rails.logger.should_receive(:error).with("classname: hello!")
+      CM::Proxy.log_cm_error(e)
+    end
   end
 
   describe "querying" do
@@ -143,6 +149,51 @@ describe CM::Proxy do
     it "should raise if other exceptions raised" do
       @driver.should_receive(:GetRecipients).and_raise(StandardError.new("spam"))
       lambda { CM::Proxy.get_recipients({:ham => :spam}) }.should raise_error(StandardError)
+    end
+  end
+
+  describe "in conditions to criteria" do
+    it "sholud return blank if blank conditions given" do
+      CM::Proxy.conditions_to_criteria( {} ).should be_blank
+    end
+
+    it "should return blank if null conditions given" do
+      CM::Proxy.conditions_to_criteria( nil ).should be_blank
+    end
+
+    it "should make array of CmCriterion" do
+      CM::Proxy.conditions_to_criteria( { :email => 'spam' } )[0].should be_kind_of( CmCriterion )
+    end
+
+    it "should parse operators" do
+      CM::Proxy.conditions_to_criteria( { :'some_value_here>=' => 'some value' } )[0].operator.should == CmBooleanBinaryOperator::GreaterThanEquals
+    end
+
+    it "should set equality operator by default" do
+      CM::Proxy.conditions_to_criteria( { :'some_value_here' => 'some value' } )[0].operator.should == CmBooleanBinaryOperator::Equals
+    end
+
+    it "should camelize field name when specified" do
+      CM::Proxy.conditions_to_criteria( { :some_value_here => 'some value'}, true )[0].fieldName.should == 'SomeValueHere'
+    end
+
+    it "should not camelize field name when not specified" do
+      CM::Proxy.conditions_to_criteria( { :some_value_here => 'some value' } )[0].fieldName.should == 'some_value_here'
+    end
+
+    it "should start the 'order' value from the specified value" do
+      CM::Proxy.conditions_to_criteria( { :some_value_here => 'some value'}, true, 5 )[0].order.should == 5
+    end
+
+    it "should start the 'order' value from 1 by default" do
+      CM::Proxy.conditions_to_criteria( { :some_value_here => 'some value' } )[0].order.should == 1
+    end
+
+    it "should increase the order for each" do
+      conds = CM::Proxy.conditions_to_criteria( { :v1 => 'v1', :v2 => 'v2', :v3 => 'v3' }, true, 10 )
+      conds[0].order.should == 10
+      conds[1].order.should == 11
+      conds[2].order.should == 12
     end
   end
 
@@ -341,8 +392,8 @@ describe CM::Recipient do
     @recipient = CM::Recipient.new(:created_at => Time.now,
                                    :email => 'example@example.com',
                                    :fields => { :field1 => 'field1val', :user_id => next_val })
-    @recipient.instance_variable_get(:@cm_recipient).values[0].fieldName.should == 'field1'
-    @recipient.instance_variable_get(:@cm_recipient).values[0].value.should == 'field1val'
+    @recipient.instance_variable_get(:@cm_recipient).values.map(&:fieldName).should include 'field1'
+    @recipient.instance_variable_get(:@cm_recipient).values.map(&:value).should include 'field1val'
   end
 
   describe "with simple instance" do
