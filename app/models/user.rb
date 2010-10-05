@@ -35,15 +35,10 @@ class User < ActiveRecord::Base
   # this method uses secure random number generator in combination with offset(unique) that makes the number unique
   # the generated number is 18 numbers long
   def generate_recurrent_profile_id
-    len = self.id.to_s.size
-    raise Exception::UnableToGenerateUniqueNumber.new("user id is too long") unless len < 19
-    raise Exception::UnableToGenerateUniqueNumber.new("nil user id")         unless self.id > 0
+    time_offset = Time.now.to_i
+    len = time_offset.size
     diff = 19 - len # size of the random number
-    max = "1"
-    for i in 1...diff
-      max += "0"
-    end
-    num = SecureRandom.random_number(max.to_i).to_s + self.id.to_s # self.id makes the number unique #FIXME: find sth better than id to substitute
+    num = SecureRandom.random_number(10 ** diff).to_s + time_offset.to_s # time stamp makes the number unique
     num.to_i
   end
 end

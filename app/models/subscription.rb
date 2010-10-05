@@ -108,15 +108,10 @@ class Subscription < ActiveRecord::Base
   # this method uses secure random number generator in combination with offset(unique) that makes the number unique
   # the generated number is 18 numbers long
   def generate_order_number
-    len = self.id.to_s.size
-    raise Exception::UnableToGenerateUniqueNumber.new("subscription id is too long") unless len < 15
-    raise Exception::UnableToGenerateUniqueNumber.new("nil subscription id")         unless self.id > 0
+    time_offset = Time.now.to_i
+    len = time_offset.size
     diff = 15 - len # size of the random number
-    max = "1"
-    for i in 1...diff
-      max += "0"
-    end
-    num = SecureRandom.random_number(max.to_i).to_s + self.id.to_s # self.id makes the number unique
+    num = SecureRandom.random_number(10 ** diff).to_s + time_offset.to_s # time stamp makes the number unique
     num.to_i
   end
 
