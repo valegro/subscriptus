@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 require 'spec_helper'
 
 describe Subscription do
@@ -7,6 +6,7 @@ describe Subscription do
     @subscription = Subscription.new()
     today = Date.new(2010, 9, 27) # today is "Mon, 27 Sep 2010"
     Date.stubs(:today).returns(today)
+    CM::Recipient.stub!(:send)
   end
 
   # tests on get_new_expiry_date method ----------------

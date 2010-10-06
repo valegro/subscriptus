@@ -48,7 +48,7 @@ class User < ActiveRecord::Base
     result = CM::Recipient.send(create_or_update,
         :created_at => created_at,
         :email => email,
-        :fields => { # XXX: do we have a complete list of fields?
+        :fields => {
           :address_1 => address_1,
           :address_2 => address_2,
           :city => city,
