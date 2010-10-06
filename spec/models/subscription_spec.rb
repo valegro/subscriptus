@@ -5,7 +5,7 @@ describe Subscription do
   before(:each) do
     @subscription = Subscription.new()
     today = Date.new(2010, 9, 27) # today is "Mon, 27 Sep 2010"
-    Date.any_instance.stubs(:today).returns(today)
+    Date.stubs(:today).returns(today)
   end
 
   # tests on get_new_expiry_date method ----------------
@@ -43,13 +43,13 @@ describe Subscription do
     end
     it "should have named_scope ascend_by_name" do
       subs = Subscription.ascend_by_name
+      # XXX: sorting is by lastname, firstname. should check first name too?
       # XXX: the DBMS's sorting and ruby's sorting might use different algorithms!
-      subs[0].user.fullname.should <= subs[1].user.fullname
+      subs[0].user.lastname.should <= subs[1].user.lastname
     end
     it "should have named_scope descend_by_name" do
       subs = Subscription.descend_by_name
-      # XXX: the DBMS's sorting and ruby's sorting might use different algorithms!
-      subs[0].user.fullname.should >= subs[1].user.fullname
+      subs[0].user.lastname.should >= subs[1].user.lastname
     end
   end
 end

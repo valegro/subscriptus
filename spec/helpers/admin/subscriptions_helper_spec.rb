@@ -3,13 +3,13 @@ require File.dirname(__FILE__) + '/../../spec_helper'
 describe Admin::SubscriptionsHelper do
   include Admin::SubscriptionsHelper
   before(:each) do
-    @content = mock('@content',
-                    :user => mock('user', :fullname => 'S. Pam', :email => 'spam@ham'),
-                    :publication => mock('publication', :name => 'Hungarian Phrasebook'),
-                    :state => 'Sealand',
-                    :expires_at => Time.parse('2010-09-01'),
-                    :created_at => Time.parse('2010-09-01')
-                   )
+    @content = mock('@content')
+    @content.stubs(:user => mock('user', :fullname => 'S. Pam', :email => 'spam@ham'),
+                   :publication => mock('publication', :name => 'Hungarian Phrasebook'),
+                   :state => 'Sealand',
+                   :expires_at => Time.parse('2010-09-01'),
+                   :created_at => Time.parse('2010-09-01')
+                  )
     @result = render_result_row(@content)
   end
   it "should render row" do

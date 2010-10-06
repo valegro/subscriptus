@@ -13,10 +13,7 @@ gem 'json_pure'
 gem 'capistrano'
 
 # State machine support
-gem 'aasm'
-
-gem 'rspec-rails'
-gem 'mocha'
+#gem 'aasm'
 
 # jQuery
 gem 'jrails'

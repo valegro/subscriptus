@@ -7,7 +7,6 @@ ActionController::Routing::Routes.draw do |map|
 
   # Admin
   map.namespace :admin do |admin|
-<<<<<<< HEAD
     admin.resources :subscriptions, :collection => {
       :activity => :get,
       :search => [ :get, :post ],

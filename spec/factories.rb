@@ -37,12 +37,12 @@ end
 Factory.define :user do |f|
   # f.id                      1
   f.login                    { Faker::Name.first_name }
-  f.password                'password122'
-  f.password_confirmation   'password122'
   f.firstname { Faker::Name.first_name }
   f.lastname { Faker::Name.last_name }
-  f.email                   'sample@sample.com'
-  f.email_confirmation      'sample@sample.com'
+  f.email         { @email= "email_#{Factory.next(:seq)}@example.com" }
+  f.email_confirmation { @email }
+  f.password "password"
+  f.password_confirmation { |x| x.password }
   f.phone_number { Faker::PhoneNumber.phone_number }
   f.address_1 { Faker::Address.street_address }
   f.postcode { Faker::Address.zip_code }
@@ -51,7 +51,14 @@ Factory.define :user do |f|
   f.country                 'Australia'
 end
 
+Factory.define :admin, :parent => :user do |a|
+  a.role { 'admin' }
+end
+
+
 Factory.define :subscription do |f|
+  f.association :offer, :factory => :offer
+  f.association :user, :factory => :user
   f.user_id         1
   f.offer_id        1
   f.publication_id  1
@@ -69,3 +76,11 @@ end
 #   f.money             200
 #   f.customer_id       '123456789123457890'
 # end
+Factory.sequence :seq do |n|
+    "#{n}"
+end
+Factory.define :gift do |f|
+  f.name { Faker::Name.name }
+  f.description { Faker::Lorem.paragraph }
+  f.on_hand { rand(100) }
+end

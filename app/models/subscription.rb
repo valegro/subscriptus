@@ -106,7 +106,7 @@ class Subscription < ActiveRecord::Base
   # if the sibscription is new or expired, start it from now
   # otherwise start it after the expiration time
   def get_new_expiry_date(months)
-    (self.expires_at.blank? || self.expires_at < Date.today) ? Date.today.months_since(months) + 1.day : self.expires_at.months_since(months) + 1.day
+    (self.expires_at.blank? || self.expires_at < Date.today) ? Date.today.months_since(months) : self.expires_at.months_since(months)
   end
   
   # generates a random number that is saved after a successful recurrent profile creation and used later 

@@ -3,7 +3,7 @@ require File.dirname(__FILE__) + '/../../../spec_helper'
 describe 'admin/subscriptions/search.html.erb' do
   before(:each) do
     @search = Subscription.search
-    @search.stub!(
+    @search.stubs(
                    :publication_id => '@s.pid',
                    :user_firstname_or_user_lastname_like => '@s.uname',
                    :state => '@s.state',
@@ -12,7 +12,8 @@ describe 'admin/subscriptions/search.html.erb' do
                    :order => nil, # searchlogic link ordering stuff
                    :conditions => {} # searchlogic link ordering stuff
     )
-    @results = mock('@results', :offset => 0, :size => 10, :total_pages => 1, :each => nil)
+    @results = mock('@results')
+    @results.stubs(:offset => 0, :size => 10, :total_pages => 1, :each => nil)
     assigns[:search] = @search
     assigns[:results] = @results
     assigns[:count] = 10
@@ -48,7 +49,7 @@ describe 'admin/subscriptions/search.html.erb' do
   end
 
   it "should render results description" do
-    @results.stub!( :offset => 110, :size => 10000)
+    @results.stubs( :offset => 110, :size => 10000)
     assigns[:count] = 65535
     render
     response.should have_tag('p', 'Showing 111 to 10110 of 65535 subscription(s).')
@@ -61,7 +62,7 @@ describe 'admin/subscriptions/search.html.erb' do
   end
 
   it "should render pagination nav" do
-    template.should_receive(:will_paginate).twice
+    template.expects(:will_paginate).twice
     render
   end
 
@@ -96,39 +97,39 @@ describe 'admin/subscriptions/search.html.erb' do
 
   describe "with no result" do
     it "should not render any 'content' row" do
-      template.should_not_receive(:render_result_row)
+      template.expects(:render_result_row).never
       render
     end
   end
 
   describe "with results" do
     it "should render 'content' rows" do
-      template.should_receive(:render_result_row).with('render me')
-      @results.should_receive(:each).and_yield('render me')
+      template.expects(:render_result_row).with('render me')
+      @results.expects(:each).yields('render me')
       render
     end
   end
 
   describe "for different searches" do
     it "should render add_field and disable_option for publication" do
-      @search.stub!( :publication_id ).and_return(true)
+      @search.stubs( :publication_id ).returns(true)
       render
       response.body.should include( "add_field(filter_element_for('publication')); disable_option('publication');" )
     end
     it "should render add_field and disable_option for name" do
-      @search.stub!( :user_firstname_or_user_lastname_like ).and_return(true)
+      @search.stubs( :user_firstname_or_user_lastname_like ).returns(true)
       render
       response.body.should include( "add_field(filter_element_for('name')); disable_option('name');" )
     end
 
     it "should not render add_field and disable_option for no publication" do
-      @search.stub!( :publication_id ).and_return(false)
+      @search.stubs( :publication_id ).returns(false)
       render
       response.body.should_not include( "add_field(filter_element_for('publication')); disable_option('publication');" )
     end
 
     it "should not render add_field and disable_option for no name" do
-      @search.stub!( :user_firstname_or_user_lastname_like ).and_return(false)
+      @search.stubs( :user_firstname_or_user_lastname_like ).returns(false)
       render
       response.body.should_not include( "add_field(filter_element_for('name')); disable_option('name');" )
     end
@@ -136,14 +137,14 @@ describe 'admin/subscriptions/search.html.erb' do
 
   describe "with order links" do
     before(:each) do
-      template.stub!(:order)
+      template.stubs(:order)
     end
     it "should render order link for publication" do
-      template.should_receive(:order).with(@search, :by => :name)
+      template.expects(:order).with(@search, :by => :name)
       render
     end
     it "should render order link for name" do
-      template.should_receive(:order).with(@search, :by => :publication_id)
+      template.expects(:order).with(@search, :by => :publication_id)
       render
     end
   end
@@ -153,7 +154,7 @@ describe 'admin/subscriptions/search.html.erb' do
       %w(publication name state renewal gift).each { |key|
         describe "if #{key} set" do
           before(:each) do
-            @search.stub!(:publication_id => '@s.pid',
+            @search.stubs(:publication_id => '@s.pid',
                           :user_firstname_or_user_lastname_like => '@s.uname',
                           :state => '@s.state',
                           :renewal => '@s.ren',
@@ -166,7 +167,7 @@ describe 'admin/subscriptions/search.html.erb' do
         end
         describe "if #{key} not set" do
           before(:each) do
-            @search.stub!(:publication_id => nil,
+            @search.stubs(:publication_id => nil,
                           :user_firstname_or_user_lastname_like => nil,
                           :state => nil,
                           :renewal => nil,

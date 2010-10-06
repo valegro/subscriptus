@@ -52,3 +52,12 @@ Spec::Runner.configure do |config|
   #
   # For more information take a look at Spec::Runner::Configuration and Spec::Runner
 end
+
+def user_login
+  controller.stubs(:current_user).returns( Factory.create(:user) )
+end
+
+def admin_login
+  controller.stubs(:current_user).returns( Factory.create(:admin) )
+end
+
