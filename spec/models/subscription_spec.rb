@@ -6,7 +6,8 @@ describe Subscription do
     @subscription = Subscription.new()
     today = Date.new(2010, 9, 27) # today is "Mon, 27 Sep 2010"
     Date.stubs(:today).returns(today)
-    CM::Recipient.stub!(:send)
+    CM::Recipient.stubs(:update)
+    CM::Recipient.stubs(:create!)
   end
 
   # tests on get_new_expiry_date method ----------------
@@ -58,30 +59,30 @@ describe Subscription do
   end
   it "should invoke campaingmaster update on add_to_campaignmaster" do
     s = Factory.build(:subscription)
-    CM::Recipient.should_receive(:update).with(
+    CM::Recipient.expects(:update).with(
           :fields => { :"publication_#{s.publication_id}{state}" => s.state,
                        :"publication_#{s.publication_id}{expiry}" => s.expires_at,
                        :user_id => s.user.id
           }
-    ).and_return("called")
+    ).returns("called")
     s.update_campaignmaster.should eql("called")
   end
   it "should invoke campaingmaster update on update_campaignmaster" do
     s = Factory.create(:subscription)
     s.reload
-    CM::Recipient.should_receive(:update).with(
+    CM::Recipient.expects(:update).with(
           :fields => { :"publication_#{s.publication_id}{state}" => s.state,
                        :"publication_#{s.publication_id}{expiry}" => s.expires_at,
                        :user_id => s.user.id
           }
-    ).and_return("called")
+    ).returns("called")
     s.update_campaignmaster.should eql("called")
   end
   # TODO: how do we log this?
   it "should log error if create fails" do
     s = Factory.build(:subscription)
-    CM::Recipient.should_receive(:update).and_raise("spam")
-    CM::Proxy.should_receive(:log_cm_error)
+    CM::Recipient.expects(:update).raises("spam")
+    CM::Proxy.expects(:log_cm_error)
     s.update_campaignmaster
   end
   describe "with named scopes" do

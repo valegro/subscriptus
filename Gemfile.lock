@@ -64,6 +64,8 @@ GEM
     launchy (0.3.7)
       configuration (>= 0.0.5)
       rake (>= 0.8.1)
+    mechanize (1.0.0)
+      nokogiri (>= 1.2.1)
     meta_programming (0.2.2)
     mime-types (1.16)
     mocha (0.9.8)
@@ -141,6 +143,7 @@ DEPENDENCIES
   jrails
   json_pure
   launchy
+  mechanize
   mocha (~> 0.9.8)
   navigasmic
   pg

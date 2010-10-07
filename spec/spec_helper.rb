@@ -6,6 +6,15 @@ require 'spec/autorun'
 require 'spec/rails'
 require 'shoulda'
 require 'faker'
+require 'factory_girl'
+factories = Dir.glob('*/factories.rb') + Dir.glob('*/factories/*.rb')
+factories.each { |f|
+  begin
+    require f
+  rescue Factory::DuplicateDefinitionError
+    # warn here?
+  end
+}
 
 # Uncomment the next line to use webrat's matchers
 #require 'webrat/integrations/rspec-rails'
@@ -55,10 +64,48 @@ Spec::Runner.configure do |config|
   # For more information take a look at Spec::Runner::Configuration and Spec::Runner
 end
 
+def login_as(user)
+  controller.stubs(:current_user).returns( user )
+end
+
 def user_login
-  controller.stubs(:current_user).returns( Factory.create(:user) )
+  login_as( Factory.create(:user) )
 end
 
 def admin_login
-  controller.stubs(:current_user).returns( Factory.create(:admin) )
+  login_as( Factory.create(:admin) )
+end
+
+
+# In odre to test Campaign Master lib, comment out below.
+# WARNING:  it will erase all of your Campaign Master records.
+# TODO: unmock for specs for cm lib.
+# I couldn't figure out unmocking to work correctly... :(
+# see http://stufftohelpyouout.blogspot.com/2009/09/how-to-unmock-in-mocha-and-temporarily.html
+# or do class method aliasing (class <<self ; alias_method :original_spam, :spam ; end)
+# test campaignmaster stuff separately after uncommenting these
+CM::Recipient #load if not loaded
+module CM
+  class Recipient
+    def self.create!(hash)
+      return true
+    end
+    def self.update(hash)
+      return true
+    end
+    def self.find_all(hash)
+      return {}
+    end
+  end
+  class Proxy
+    def self.add_recipient
+      return {}
+    end
+    def self.get_recipients
+      return {}
+    end
+    def self.delete_all_recipients
+      return nil
+    end
+  end
 end

@@ -33,8 +33,6 @@ end
 Factory.define :subscription do |f|
   f.association :offer, :factory => :offer
   f.association :user, :factory => :user
-  f.user_id         1
-  f.offer_id        1
   f.publication_id  1
   f.state           "trial"
   f.price           30

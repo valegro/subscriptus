@@ -1,6 +1,14 @@
-require 'config/environment' # it's not loaded when you run this file alone.
+require 'config/environment'
 require 'cm/recipient'
+require 'spec_helper'
 
+# This is commented out at the moment.
+# Should be uncommented if mocking out when the rest of the system is tested,
+# then "unmocking" campaign master stuff while running this spec works.
+# If this test needs to be run, uncomment then run using script/spec.
+# WARNING: it will erase all your data from campaignmaster
+
+=begin
 def next_val
   $val_count ||= 0
   $val_count += 1
@@ -11,9 +19,12 @@ end
 describe CM::Base do
 
   before(:each) do
-    @driver = mock('@driver', :generate_explicit_type= => nil, :options => {})
-    @factory = mock("@factory", :create_rpc_driver => @driver)
+    @driver = mock('@driver')
+    @driver.stubs(:generate_explicit_type= => nil, :options => {})
+    @factory = mock("@factory")
+    @factory.stubs(:create_rpc_driver => @driver)
   end
+
 
   it "should have url constant" do
     CM::Base::V1_URI.should ==
@@ -27,19 +38,19 @@ describe CM::Base do
 
   it "should return new driver if not set" do
     CM::Base.send :class_variable_set, :@@static_driver, nil
-    SOAP::WSDLDriverFactory.should_receive(:new).and_return(@factory)
+    SOAP::WSDLDriverFactory.expects(:new).returns(@factory)
     CM::Base.driver.should == @driver
   end
 
   it "should return cached token" do
-    CM::Base.should_receive(:need_new_token?).and_return(false)
+    CM::Base.expects(:need_new_token?).returns(false)
     CM::Base.send :class_variable_set, :@@token, 'parrot'
     CM::Base.access_token.should == 'parrot'
   end
 
   it "should return new token when needed" do
-    CM::Base.should_receive(:need_new_token?).and_return(true)
-    CM::Base.should_receive(:login_with_response).and_return('killer rabbit')
+    CM::Base.expects(:need_new_token?).returns(true)
+    CM::Base.expects(:login_with_response).returns('killer rabbit')
     CM::Base.access_token.should == 'killer rabbit'
   end
 
@@ -50,12 +61,14 @@ describe CM::Base do
   it "should validate certificate"
 
   it "should login and set token" do
-    CM::Base.should_receive(:driver).and_return(@driver)
+    CM::Base.expects(:driver).returns(@driver)
     @client_response = mock('@cleint_response', :loginResult => nil )
-    @driver.should_receive(:login).and_return( @client_response )
-    @login_result = mock('@login_result', :minutesTillTokenExpires => 1000, :tokenString => 'spam')
-    @result = mock('@result', :loginResult => @login_result)
-    LoginResponse.should_receive(:new).and_return(@result)
+    @driver.expects(:login).returns( @client_response )
+    @login_result = mock('@login_result')
+    @login_result.stubs(:minutesTillTokenExpires => 1000, :tokenString => 'spam')
+    @result = mock('@result')
+    @result.stubs(:loginResult => @login_result)
+    LoginResponse.expects(:new).returns(@result)
     CM::Base.login_with_response.should == 'spam'
   end
 
@@ -78,76 +91,78 @@ end
 describe CM::Proxy do
   before(:each) do
     @driver = mock("@driver")
-    CM::Proxy.stub!(:driver).and_return(@driver)
+    CM::Proxy.stubs(:driver).returns(@driver)
     @token = mock("@token")
-    CM::Proxy.stub!(:access_token).and_return(@token)
+    CM::Proxy.stubs(:access_token).returns(@token)
   end
 
   # class 
   describe "adding recpient" do
     before(:each) do
-      @driver.stub!(:AddRecipient).and_return(nil)
-      @recipient = mock("@recipient", :info => nil)
-      CM::Recipient.stub!(:new).and_return(@recipient)
+      @driver.stubs(:AddRecipient).returns(nil)
+      @recipient = mock("@recipient")
+      @recipient.stubs(:info => nil)
+      CM::Recipient.stubs(:new).returns(@recipient)
     end
     it "should call add_recipient" do
-      CM::ServiceReturn.stub!(:new).and_return('spam')
+      CM::ServiceReturn.stubs(:new).returns('spam')
       CM::Proxy.add_recipient({}).should == 'spam'
     end
     it "should return failure and message if Timeout Error raised" do
-      @driver.should_receive(:AddRecipient).and_raise(HTTPClient::ConnectTimeoutError.new("spam"))
+      @driver.expects(:AddRecipient).raises(HTTPClient::ConnectTimeoutError.new("spam"))
       result = ''
       lambda { result = CM::Proxy.add_recipient({}) }.should_not raise_error
       result.success?.should be_false
       result[:message].should == 'spam'
     end
     it "should return failure and message if Socket Error raised" do
-      @driver.should_receive(:AddRecipient).and_raise(SocketError.new("spam"))
+      @driver.expects(:AddRecipient).raises(SocketError.new("spam"))
       result = ''
       lambda { result = CM::Proxy.add_recipient({}) }.should_not raise_error
       result.success?.should be_false
       result[:message].should == 'spam'
     end
     it "should raise if other exceptions raised" do
-      @driver.should_receive(:AddRecipient).and_raise(StandardError.new("spam"))
+      @driver.expects(:AddRecipient).raises(StandardError.new("spam"))
       lambda { CM::Proxy.add_recipient({}) }.should raise_error(StandardError)
     end
 
     it "should log to rails error log" do
       e = mock("e", :class => 'classname', :message => 'hello!')
-      Rails.logger.should_receive(:error).with("classname: hello!")
+      Rails.logger.expects(:error).with("classname: hello!")
       CM::Proxy.log_cm_error(e)
     end
   end
 
   describe "querying" do
     before(:each) do
-      @driver.stub!(:AddRecipient).and_return(nil)
-      @recipient = mock("@recipient", :info => nil)
-      CM::Recipient.stub!(:new).and_return(@recipient)
+      @driver.stubs(:AddRecipient).returns(nil)
+      @recipient = mock("@recipient")
+      @recipient.stubs(:info => nil)
+      CM::Recipient.stubs(:new).returns(@recipient)
     end
     it "should call get_recipients" do
-      CM::ServiceReturn.stub!(:new).and_return('spam')
-      @driver.should_receive(:GetRecipients).and_return(nil)
-      CM::ServiceReturn.stub!(:new).and_return('spam')
+      CM::ServiceReturn.stubs(:new).returns('spam')
+      @driver.expects(:GetRecipients).returns(nil)
+      CM::ServiceReturn.stubs(:new).returns('spam')
       CM::Proxy.get_recipients( :ham => :egg ).should == 'spam'
     end
     it "should return failure and message if Timeout Error raised" do
-      @driver.should_receive(:GetRecipients).and_raise(HTTPClient::ReceiveTimeoutError.new("spam"))
+      @driver.expects(:GetRecipients).raises(HTTPClient::ReceiveTimeoutError.new("spam"))
       result = ''
       lambda { result = CM::Proxy.get_recipients({:ham => :spam}) }.should_not raise_error
       result.success?.should be_false
       result[:message].should == 'spam'
     end
     it "should return failure and message if Socket Error raised" do
-      @driver.should_receive(:GetRecipients).and_raise(SocketError.new("spam"))
+      @driver.expects(:GetRecipients).raises(SocketError.new("spam"))
       result = ''
       lambda { result = CM::Proxy.get_recipients({:ham => :spam}) }.should_not raise_error
       result.success?.should be_false
       result[:message].should == 'spam'
     end
     it "should raise if other exceptions raised" do
-      @driver.should_receive(:GetRecipients).and_raise(StandardError.new("spam"))
+      @driver.expects(:GetRecipients).raises(StandardError.new("spam"))
       lambda { CM::Proxy.get_recipients({:ham => :spam}) }.should raise_error(StandardError)
     end
   end
@@ -200,8 +215,8 @@ describe CM::Proxy do
   describe "checking hash" do
     before( :each ) do
       @os = OpenStruct.new
-      CmCriterion.should_receive(:new).and_return(@os)
-      @driver.should_receive(:GetRecipients).and_return(nil)
+      CmCriterion.expects(:new).returns(@os)
+      @driver.expects(:GetRecipients).returns(nil)
       CM::Proxy.get_recipients( :'last_modified<=' => '2010-09-09T10:00:00.000' )
     end
 
@@ -244,8 +259,10 @@ describe CM::ServiceReturn do
   end
 
   it "should set values for add return value" do
-    @addrecres = mock('@addrecres', :callStatus => 'spam', :message => 'vikings')
-    @result = mock("@result", :addRecipientResult => @addrecres)
+    @addrecres = mock('@addrecres')
+    @addrecres.stubs(:callStatus => 'spam', :message => 'vikings')
+    @result = mock("@result")
+    @result.stubs(:addRecipientResult => @addrecres)
     sr = CM::ServiceReturn.new(@result)
     sr[:status].should == 'spam'
     sr[:message].should == 'vikings'
@@ -255,11 +272,15 @@ describe CM::ServiceReturn do
 
   describe "with get recipients" do
     before(:each) do
-      @cmrecipient = mock('@cmrecipient', :emailAddress => 'spam@example.com')
-      @recipients = mock('@recipient', :cmRecipient => @cmrecipient)
-      @getrecsres = mock('@getrecsres', :recipients => @recipients)
-      @result = mock("@result", :getRecipientsResult => @getrecsres)
-      CM::ServiceReturn.stub!(:hash_from_cm_recipient).with(@cmrecipient).and_return( {:email => 'spam@example.com'} )
+      @cmrecipient = mock('@cmrecipient')
+      @cmrecipient.stubs(:emailAddress => 'spam@example.com')
+      @recipients = mock('@recipient')
+      @recipients.stubs(:cmRecipient => @cmrecipient)
+      @getrecsres = mock('@getrecsres')
+      @getrecsres.stubs(:recipients => @recipients)
+      @result = mock("@result")
+      @result.stubs(:getRecipientsResult => @getrecsres)
+      CM::ServiceReturn.stubs(:hash_from_cm_recipient).with(@cmrecipient).returns( {:email => 'spam@example.com'} )
       @sr = CM::ServiceReturn.new(@result)
     end
 
@@ -279,7 +300,8 @@ describe CM::ServiceReturn do
 
   it "should make hash from cm_recipient" do
     elems = [ [mock('ele[0]', :name=> 'Id'), 'ID'] ]
-    cmr = mock('@cmRecipient',
+    cmr = mock('@cmRecipient')
+    cmr.stubs(
                :__xmlele => elems,
                :lastModified => 'lastmod',
                :lastModifiedBy => 'lastmodby',
@@ -306,6 +328,8 @@ describe CM::ServiceReturn do
 end
 
 describe CM::Recipient do
+  before(:each) do
+  end
   it "should have constant PRIMARY_KEY_NAME" do
     CM::Recipient::PRIMARY_KEY_NAME.should == 'user_id'
   end
@@ -315,31 +339,31 @@ describe CM::Recipient do
   end
 
   it "should call add_recipient for update" do
-    CM::Proxy.should_receive(:add_recipient).with(anything, CmOperationType::Update).and_return(mock('result', :success? => true))
+    CM::Proxy.expects(:add_recipient).with(anything, CmOperationType::Update).returns(mock('result', :success? => true))
     CM::Recipient.update({}).should be_true
   end
 
   it "should raise if update not success" do
     @result = mock('success', :success? => false)
-    CM::Proxy.should_receive(:add_recipient).and_return(@result)
-    @result.should_receive(:[]).with(:message).and_return 'spam'
+    CM::Proxy.expects(:add_recipient).returns(@result)
+    @result.expects(:[]).with(:message).returns('spam')
     lambda { CM::Recipient.update({}) }.should raise_error( StandardError, "spam" )
   end
 
   it "should call add reicipent for create" do
-    CM::Proxy.should_receive(:add_recipient).and_return(mock('result', :success? => true))
+    CM::Proxy.expects(:add_recipient).returns(mock('result', :success? => true))
     CM::Recipient.create!({}).should be_true
   end
 
   it "should raise if create unsuccessful" do
     @result = mock('success', :success? => false)
-    CM::Proxy.should_receive(:add_recipient).and_return(@result)
-    @result.should_receive(:[]).with(:message).and_return 'spam'
+    CM::Proxy.expects(:add_recipient).returns(@result)
+    @result.expects(:[]).with(:message).returns('spam')
     lambda { CM::Recipient.update({}) }.should raise_error( StandardError, "spam" )
   end
 
   it "should call get recipients for get all" do
-    CM::Proxy.should_receive(:get_recipients).and_return 'spam'
+    CM::Proxy.expects(:get_recipients).returns('spam')
     CM::Recipient.find_all(nil).should == 'spam'
   end
 
@@ -533,4 +557,4 @@ describe CM::Recipient, "integration" do
   end
 
 end
-
+=end
