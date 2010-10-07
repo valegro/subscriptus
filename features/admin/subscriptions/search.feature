@@ -16,16 +16,54 @@ Background:
   @javascript
   Scenario: An admin adds publication field to search form
     Given I am on admin subscription search page
-    When I select "publication" from "filter_name"
+    When I select "Publication" from "filter_name"
     And I follow "Add"
     Then I should see "Publication" within "form div label"
 
   @javascript
+  Scenario: An admin adds name field to search form
+    Given I am on admin subscription search page
+    When I select "Name" from "filter_name"
+    And I follow "Add"
+    Then I should see "Name" within "form div label"
+
+  @javascript
+  Scenario: An admin adds email field to search form
+    Given I am on admin subscription search page
+    When I select "Email" from "filter_name"
+    And I follow "Add"
+    Then I should see "Email" within "form div label"
+
+  @javascript
   Scenario: An admin searches with a publication filter
     Given I am on admin subscription search page
-    When I select "publication" from "filter_name"
+    When I select "Publication" from "filter_name"
     And I follow "Add"
     And I select "publication 01" from "search_publication_id"
+    And I press "Search"
+    Then I should see "TRIAL"
+    And I should see "u01@example.com"
+    And I should not see "ACTIVE"
+    And I should see "Showing 1 to 1 of 1 subscription(s)."
+
+  @javascript
+  Scenario: An admin searches with a name filter
+    Given I am on admin subscription search page
+    When I select "Name" from "filter_name"
+    And I follow "Add"
+    And I fill in "search_user_firstname_or_user_lastname_like" with "l01"
+    And I press "Search"
+    Then I should see "TRIAL"
+    And I should see "u01@example.com"
+    And I should not see "ACTIVE"
+    And I should see "Showing 1 to 1 of 1 subscription(s)."
+
+  @javascript
+  Scenario: An admin searches with a email filter
+    Given I am on admin subscription search page
+    When I select "Email" from "filter_name"
+    And I follow "Add"
+    And I fill in "search_user_email_like" with "u01"
     And I press "Search"
     Then I should see "TRIAL"
     And I should see "u01@example.com"
@@ -36,9 +74,27 @@ Background:
   Scenario: An admin searches with a publication with no subscription
     Given a publication: "p03" exists with name: "publication 03"
     And I am on admin subscription search page
-    When I select "publication" from "filter_name"
+    When I select "Publication" from "filter_name"
     And I follow "Add"
     And I select "publication 03" from "search_publication_id"
+    And I press "Search"
+    Then I should see "No subscription found."
+
+  @javascript
+  Scenario: An admin searches with a name that does not match any name
+    Given I am on admin subscription search page
+    When I select "Name" from "filter_name"
+    And I follow "Add"
+    And I fill in "search_user_firstname_or_user_lastname_like" with "spamspamspamspam"
+    And I press "Search"
+    Then I should see "No subscription found."
+
+  @javascript
+  Scenario: An admin searches with a email that does not match any email
+    Given I am on admin subscription search page
+    When I select "Email" from "filter_name"
+    And I follow "Add"
+    And I fill in "search_user_email_like" with "emailwithnomatch"
     And I press "Search"
     Then I should see "No subscription found."
 
@@ -53,7 +109,7 @@ Background:
   @javascript
   Scenario: An admin searches by publication and result page's form contains publication field
     Given I am on admin subscription search page
-    When I select "publication" from "filter_name"
+    When I select "Publication" from "filter_name"
     And I follow "Add"
     And I select "publication 01" from "search_publication_id"
     And I press "Search"
@@ -76,6 +132,44 @@ Background:
     And I follow "▲ Publication"
     Then I should see the following "search_results" table:
       | Name    | Email           | ▼ Publication  | State  |
+      | f02 l02 | u02@example.com | publication 02 | ACTIVE |
+      | f01 l01 | u01@example.com | publication 01 | TRIAL  |
+
+  Scenario: An admin sorts search results by subscriber name asc
+    Given I am on admin subscription search page
+    When I press "Search"
+    And I follow "Name"
+    Then I should see the following "search_results" table:
+      | ▲ Name  | Email           | Publication    | State  |
+      | f01 l01 | u01@example.com | publication 01 | TRIAL  |
+      | f02 l02 | u02@example.com | publication 02 | ACTIVE |
+
+  Scenario: An admin sorts search results by subscriber name desc
+    Given I am on admin subscription search page
+    When I press "Search"
+    And I follow "Name"
+    And I follow "▲ Name"
+    Then I should see the following "search_results" table:
+      | ▼ Name  | Email           | Publication    | State  |
+      | f02 l02 | u02@example.com | publication 02 | ACTIVE |
+      | f01 l01 | u01@example.com | publication 01 | TRIAL  |
+
+  Scenario: An admin sorts search results by subscriber email asc
+    Given I am on admin subscription search page
+    When I press "Search"
+    And I follow "Email"
+    Then I should see the following "search_results" table:
+      | Name    | ▲ Email         | Publication    | State  |
+      | f01 l01 | u01@example.com | publication 01 | TRIAL  |
+      | f02 l02 | u02@example.com | publication 02 | ACTIVE |
+
+  Scenario: An admin sorts search results by subscriber email desc
+    Given I am on admin subscription search page
+    When I press "Search"
+    And I follow "Email"
+    And I follow "▲ Email"
+    Then I should see the following "search_results" table:
+      | Name    | ▼ Email         | Publication    | State  |
       | f02 l02 | u02@example.com | publication 02 | ACTIVE |
       | f01 l01 | u01@example.com | publication 01 | TRIAL  |
 

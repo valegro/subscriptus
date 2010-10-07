@@ -25,6 +25,7 @@ function enable_option( option_name ) {
 function filter_element_for(name) {
   switch(name) {
     case 'name':
+    case 'email':
     case 'status':
     case 'renewal':
     case 'publication':

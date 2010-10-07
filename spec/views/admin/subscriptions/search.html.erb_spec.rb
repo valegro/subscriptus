@@ -167,8 +167,9 @@ describe 'admin/subscriptions/search.html.erb' do
         end
         describe "if #{key} not set" do
           before(:each) do
-            @search.stubs(:publication_id => nil,
+            @search.stub!(:publication_id => nil,
                           :user_firstname_or_user_lastname_like => nil,
+                          :user_email_like => nil,
                           :state => nil,
                           :renewal => nil,
                           :gift => nil )
@@ -187,7 +188,7 @@ describe 'admin/subscriptions/search.html.erb' do
       it "should have hidden div" do
         response.should have_tag('div[style=display:none]')
       end
-      %w(name state renewal publication gift).each { |key|
+      %w(name email state renewal publication gift).each { |key|
         it "should have a div" do
           response.should have_tag("div[id=#{key}_field]")
         end
@@ -197,6 +198,9 @@ describe 'admin/subscriptions/search.html.erb' do
       }
       it "should have name field" do
         response.should have_tag('input[type=text][id=search_user_firstname_or_user_lastname_like]')
+      end
+      it "should have email field" do
+        response.should have_tag('input[type=text][id=search_user_email_like]')
       end
       it "should have state select"
       it "should have renewal field"
