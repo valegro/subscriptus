@@ -1,22 +1,12 @@
 <%= javascript_include_tag 'form_filters.js' %>
 <h2>Search for Subscribers</h2>
 
-<h2>shortcuts</h2>
-<table>
-  <tr><td>active</td></tr>
-  <tr><td>trial</td></tr>
-  <tr><td>squatters</td></tr>
-  <tr><td>pending</td></tr>
-  <tr><td>payment failed</td></tr>
-  <tr><td>payment due</td></tr>
-  <tr><td>new</td></tr>
-  <tr><td>recently ended</td></tr>
-</table>
-
 <h2>Filters</h2>
 
 <% form_for @search, :html => {:id => 'searchform'} do |f| %>
-  <%= select_tag('filter_name', options_for_select([ ['',''], ['Name','name'], ['State','state'], ['Renewal Due','renewal'], ['Publication','publication'], ['Gift','gift']])) %>
+  <% # TODO: add ['State','state'], ['Renewal Due','renewal'], ['Gift','gift']
+  %>
+  <%= select_tag('filter_name', options_for_select([ ['',''], ['Name','name'], ['Email','email'], ['Publication','publication'] ])) %>
   <%= link_to_function('Add', 'add_selected_field(); disable_current_option()') %><br/>
   <%= f.submit "Search" %>
   or <%= link_to_function('Reset') %><br/>
@@ -39,7 +29,9 @@
       <th>
         <%= order @search, :by => :name %>
       </th>
-      <th>Email</th>
+      <th>
+        <%= order @search, :by => :user_email, :as => 'Email' %>
+      </th>
       <th>
         <%= order @search, :by => :publication_id %>
       </th>
@@ -60,6 +52,7 @@
   $(document).ready( function() {
       <% if @search.publication_id %> add_field(filter_element_for('publication')); disable_option('publication'); <% end -%>
       <% if @search.user_firstname_or_user_lastname_like %> add_field(filter_element_for('name')); disable_option('name'); <% end -%>
+      <% if @search.user_email_like %> add_field(filter_element_for('email')); disable_option('email'); <% end -%>
       <% if @search.state %> add_field(filter_element_for('state')); disable_option('state'); <% end -%>
       <% if @search.renewal %> add_field(filter_element_for('renewal')); disable_option('renewal'); <% end -%>
       <% if @search.gift %> add_field(filter_element_for('gift')); disable_option('gift'); <% end -%>
@@ -72,6 +65,11 @@
     <%= label :search, :name %>
     <%= text_field :search, :user_firstname_or_user_lastname_like %>
     <%= link_to_function '[X]', "remove_field($(this).parent()); enable_option('name')", :id => 'remove_name_link' %>
+  </div>
+  <div id="email_field">
+    <%= label :search, :email %>
+    <%= text_field :search, :user_email_like %>
+    <%= link_to_function '[X]', "remove_field($(this).parent()); enable_option('email')", :id => 'remove_email_link' %>
   </div>
   <div id="state_field">
     <strong>state field</strong>

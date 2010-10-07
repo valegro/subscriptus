@@ -6,6 +6,7 @@ describe 'admin/subscriptions/search.html.erb' do
     @search.stub!(
                    :publication_id => '@s.pid',
                    :user_firstname_or_user_lastname_like => '@s.uname',
+                   :user_email_like => '@s.email',
                    :state => '@s.state',
                    :renewal => '@s.ren',
                    :gift => '@s.g',
@@ -121,6 +122,12 @@ describe 'admin/subscriptions/search.html.erb' do
       response.body.should include( "add_field(filter_element_for('name')); disable_option('name');" )
     end
 
+    it "should render add_field and disable_option for email" do
+      @search.stub!( :user_email_like ).and_return(true)
+      render
+      response.body.should include( "add_field(filter_element_for('email')); disable_option('email');" )
+    end
+
     it "should not render add_field and disable_option for no publication" do
       @search.stub!( :publication_id ).and_return(false)
       render
@@ -132,6 +139,12 @@ describe 'admin/subscriptions/search.html.erb' do
       render
       response.body.should_not include( "add_field(filter_element_for('name')); disable_option('name');" )
     end
+
+    it "should not render add_field and disable_option for no email" do
+      @search.stub!( :user_email_like ).and_return(false)
+      render
+      response.body.should_not include( "add_field(filter_element_for('email')); disable_option('email');" )
+    end
   end
 
   describe "with order links" do
@@ -139,22 +152,27 @@ describe 'admin/subscriptions/search.html.erb' do
       template.stub!(:order)
     end
     it "should render order link for publication" do
-      template.should_receive(:order).with(@search, :by => :name)
+      template.should_receive(:order).with(@search, :by => :publication_id)
       render
     end
     it "should render order link for name" do
-      template.should_receive(:order).with(@search, :by => :publication_id)
+      template.should_receive(:order).with(@search, :by => :name)
+      render
+    end
+    it "should render order link for email" do
+      template.should_receive(:order).with(@search, :by => :user_email, :as => 'Email')
       render
     end
   end
 
   describe "bottom parts" do
     describe "script section" do
-      %w(publication name state renewal gift).each { |key|
+      %w(publication email name state renewal gift).each { |key|
         describe "if #{key} set" do
           before(:each) do
             @search.stub!(:publication_id => '@s.pid',
                           :user_firstname_or_user_lastname_like => '@s.uname',
+                          :user_email_like => '@s.email',
                           :state => '@s.state',
                           :renewal => '@s.ren',
                           :gift => '@s.g' )
@@ -168,6 +186,7 @@ describe 'admin/subscriptions/search.html.erb' do
           before(:each) do
             @search.stub!(:publication_id => nil,
                           :user_firstname_or_user_lastname_like => nil,
+                          :user_email_like => nil,
                           :state => nil,
                           :renewal => nil,
                           :gift => nil )
@@ -186,7 +205,7 @@ describe 'admin/subscriptions/search.html.erb' do
       it "should have hidden div" do
         response.should have_tag('div[style=display:none]')
       end
-      %w(name state renewal publication gift).each { |key|
+      %w(name email state renewal publication gift).each { |key|
         it "should have a div" do
           response.should have_tag("div[id=#{key}_field]")
         end
@@ -196,6 +215,9 @@ describe 'admin/subscriptions/search.html.erb' do
       }
       it "should have name field" do
         response.should have_tag('input[type=text][id=search_user_firstname_or_user_lastname_like]')
+      end
+      it "should have email field" do
+        response.should have_tag('input[type=text][id=search_user_email_like]')
       end
       it "should have state select"
       it "should have renewal field"
