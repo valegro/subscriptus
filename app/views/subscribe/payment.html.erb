@@ -1,17 +1,23 @@
 <h1>Payment</h1>
 
-<% form_for :payment, :url=>{:controller => :subscribe, :action=>:payment}, :builder => Reform::Builder, :html => { :class => "form", :method => 'post' }  do |p| %>
+<% form_for :payment, :url=>{:controller => :subscribe, :action=>:payment}, :builder => Reform::Builder, :html => { :class => "form", :method => 'post' } do |p| %>
+	<%= p.error_messages %>
 
-    <div id="new_user_fields">
-      <%= p.error_messages %>
+	<p><%= radio_button_tag :payment_method, "credit_card", @payment_method ? @payment_method == 'credit_card' : true %>Credit Card</p>
+	<p><%= radio_button_tag :payment_method, "direct_debit", @payment_method ? @payment_method == 'direct_debit' : true %>Direct Debit</p>
+
+    <div id="credit_card_fields">
       <%= p.enum_select :card_type %>
       <%= p.text_field :card_number %>
       <%= p.text_field :card_verification %>
-
-	  <%= p.date_select :card_expires_on, :discard_day => true, :start_year => Date.today.year, :end_year => (Date.today.year+10), :add_month_numbers => true %>
-
+      <%= p.date_select :card_expires_on, :discard_day => true, :start_year => Date.today.year, :end_year => (Date.today.year+10), :add_month_numbers => true %>
       <%= p.text_field :first_name %>
       <%= p.text_field :last_name %>
+	</div>
+    <div id="direct_debit_fields" style="padding:10px">
+		Thank you for subscribing to Crikey.<br/>
+		However, we need a few more details from you in order to activate your subscription.<br/>
+		By clicking on Finish, you will be forwarded to the direct debit page where you can get all the information you need on how to proceed with your payment.
 	</div>
 
   <p>
@@ -20,5 +26,22 @@
 <% end %>
 
 <script type='text/javascript'>
-  document.getElementById('').focus()
+  function showFields() {
+    checked = $('input[name=payment_method]:checked').val();
+    if (checked == 'credit_card') {
+      $('#payment_attributes_card_type').focus()
+      $('#credit_card_fields').show();
+      $('#direct_debit_fields').hide();
+    } else {
+      $('#direct_debit_fields').show();
+      $('#credit_card_fields').hide();
+    }
+  }
+
+  $(document).ready(function() {
+    $('input[name=payment_method]').change(function(){
+      showFields();
+    });
+    showFields(); 
+  });
 </script>

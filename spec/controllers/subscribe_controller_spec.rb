@@ -10,10 +10,10 @@ describe SubscribeController do
     @offer = Factory(:offer)
     @offer.offer_terms << @ot1 = Factory(:offer_term)
     @offer.offer_terms << @ot2 = Factory(:offer_term)
-    @offer.gifts << @g1 = Factory(:gift)
-    @offer.gifts << @g2 = Factory(:gift)
+    @offer.gifts << @g1 = Factory(:gift, :on_hand => 10)
+    @offer.gifts << @g2 = Factory(:gift, :on_hand => 10)
     @offer.gifts << @g3 = Factory(:gift, :on_hand => 0)
-    @offer.gifts << @g4 = Factory(:gift)
+    @offer.gifts << @g4 = Factory(:gift, :on_hand => 10)
 
     @subscription = Subscription.new()
     @subscription.offer = @offer
@@ -189,7 +189,7 @@ describe SubscribeController do
     assigns[:subscription].user.city.should           == user.city
     assigns[:subscription].user.state.should          == user.state
     assigns[:subscription].user.country.should        == user.country
-    assigns[:subscription].recurrent_id.should   == nil  # because the subscription is a trial, so the user does not have a recurrent profile yet.
+    assigns[:subscription].user.recurrent_id.should   == nil  # because the subscription is a trial, so the user does not have a recurrent profile yet.
     assigns[:subscription].state.should              == 'trial'
     flash[:error].should                              be_nil
     flash[:notice].should                             == "Congratulations! Your trial subscribtion was successful."
@@ -216,7 +216,7 @@ describe SubscribeController do
     assigns[:subscription].user.city.should           == user.city
     assigns[:subscription].user.state.should          == user.state
     assigns[:subscription].user.country.should        == user.country
-    assigns[:subscription].recurrent_id.should   == nil  # because the subscription is a trial, so the user does not have a recurrent profile yet.
+    assigns[:subscription].user.recurrent_id.should   == nil  # because the subscription is a trial, so the user does not have a recurrent profile yet.
     flash[:error].should                              be_nil
     flash[:notice].should                             be_nil
     response.should                                   redirect_to :action => :payment
@@ -243,14 +243,14 @@ describe SubscribeController do
     assigns[:subscription].user.city.should           == user.city
     assigns[:subscription].user.state.should          == user.state
     assigns[:subscription].user.country.should        == user.country
-    assigns[:subscription].recurrent_id.should        == nil  # because the subscription is a trial, so the user does not have a recurrent profile yet.
+    assigns[:subscription].user.recurrent_id.should        == nil  # because the subscription is a trial, so the user does not have a recurrent profile yet.
     assigns[:subscription].state.should              == 'trial'
     flash[:error].should                              be_nil
     flash[:notice].should                             == "Congratulations! Your trial subscribtion was successful."
     response.should                                   redirect_to :action => :offer
   end
   
-  # --------------------------------------------- PAYMENT SENARIOs #
+  # --------------------------------------------- PAYMENT SENARIOs- Payments with Credit Card #
   ## GET
   it "should successfully call on_get method on payment and set the payment" do
     get :payment
@@ -266,10 +266,10 @@ describe SubscribeController do
   # the respnce should be success
   # subscription is updated (ex. (state = active), expiry_date, state_updated_at, ...)
   # redirected to (offer page?) with a notice on successful subscription
-  it "should successfully call on_post method on payment and successfully change from trial to full-subscription- new user" do
+  it "should successfully call on_post method on payment and successfully change from trial to full-subscription- new user choosing Credit Card payment method" do
     user = User.new(Factory.attributes_for(:user))
 
-    post :payment, {:commit=>'Finish',  :payment => { 
+    post :payment, {:commit=>'Finish', :payment_method => 'credit_card', :payment => { 
                                               :card_type          => "visa",
                                               :card_number        => "4444333322221111",
                                               :card_verification  => '444',
@@ -288,19 +288,22 @@ describe SubscribeController do
     assigns[:subscription].publication.should_not be_nil
     assigns[:subscription].user.should_not        be_nil
     assigns[:subscription].user.id.should_not     be_nil
-    assigns[:subscription].recurrent_id.should_not == "0"
-    assigns[:subscription].recurrent_id.to_f.should < 10000000000000000000 # less than 20 numbers
-    TransactionLog.find_by_recurrent_id(assigns[:subscription].recurrent_id.to_s).should_not be_nil
-    TransactionLog.find_by_recurrent_id_and_action(assigns[:subscription].recurrent_id.to_s, "setup new recurrent profile").should_not be_nil
-    TransactionLog.find_by_recurrent_id_and_action(assigns[:subscription].recurrent_id.to_s, "trigger existing recurrent profile").should_not be_nil
+    assigns[:subscription].user.recurrent_id.should_not == "0"
+    assigns[:subscription].user.recurrent_id.to_i.should < 10000000000000000000 # less than 20 numbers
+    assigns[:subscription].order_num.should_not be_nil
+    assigns[:subscription].order_num.to_i.should < 1000000000000000 # less than 15 numbers
+    TransactionLog.find_by_recurrent_id(assigns[:subscription].user.recurrent_id.to_s).should_not be_nil
+    TransactionLog.find_by_order_num(assigns[:subscription].order_num.to_s).should_not be_nil
+    TransactionLog.find_by_recurrent_id_and_action(assigns[:subscription].user.recurrent_id.to_s, "setup new recurrent profile").should_not be_nil
+    TransactionLog.find_by_recurrent_id_and_action(assigns[:subscription].user.recurrent_id.to_s, "trigger existing recurrent profile").should_not be_nil
     flash[:notice].should == "Congratulations! Your subscribtion was successful."
     flash[:error].should  be_nil
     response.should redirect_to(:action => :offer)
   end
   
-  it "should successfully call on_post method on payment and successfully change from trial to full-subscription- existing user" do
+  it "should successfully call on_post method on payment and successfully change from trial to full-subscription- existing user with non-existing recurrent profile choosing Credit Card payment method" do #FIXME
     user = Factory(:user) # user exists
-    post :payment, {:commit=>'Finish',  :payment => { 
+    post :payment, {:commit=>'Finish', :payment_method => 'credit_card', :payment => { 
                                               :card_type          => "visa",
                                               :card_number        => "4444333322221111",
                                               :card_verification  => '444',
@@ -319,20 +322,58 @@ describe SubscribeController do
     assigns[:subscription].publication.should_not be_nil
     assigns[:subscription].user.should_not        be_nil
     assigns[:subscription].user.id.should         == user.id
-    assigns[:subscription].recurrent_id.to_f.should_not == 0
-    assigns[:subscription].recurrent_id.to_f.should < 10000000000000000000 # less than 20 numbers
-    TransactionLog.find_by_recurrent_id(assigns[:subscription].recurrent_id.to_s).should_not be_nil
-    TransactionLog.find_by_recurrent_id_and_action(assigns[:subscription].recurrent_id.to_s, "setup new recurrent profile").success.should be_true
-    TransactionLog.find_by_recurrent_id_and_action(assigns[:subscription].recurrent_id.to_s, "trigger existing recurrent profile").success.should be_true
+    assigns[:subscription].user.recurrent_id.to_i.should_not == 0
+    assigns[:subscription].user.recurrent_id.to_i.should < 10000000000000000000 # less than 20 numbers
+    assigns[:subscription].order_num.should_not be_nil
+    assigns[:subscription].order_num.to_i.should < 1000000000000000 # less than 15 numbers
+    TransactionLog.find_by_recurrent_id(assigns[:subscription].user.recurrent_id.to_s).should_not be_nil
+    TransactionLog.find_by_order_num(assigns[:subscription].order_num.to_s).should_not be_nil
+    TransactionLog.find_by_recurrent_id_and_action(assigns[:subscription].user.recurrent_id.to_s, "setup new recurrent profile").success.should be_true
+    TransactionLog.find_by_recurrent_id_and_action(assigns[:subscription].user.recurrent_id.to_s, "trigger existing recurrent profile").success.should be_true
     flash[:notice].should == "Congratulations! Your subscribtion was successful."
     flash[:error].should  be_nil
     response.should redirect_to(:action => :offer)
   end
 
-  it "should redirect to the first page of wizard with errors when trying to finish the wizard with invalid credit card" do
+  it "should successfully call on_post method on payment and successfully change from trial to full-subscription- new user with existing recurrent profile choosing Credit Card payment method" do
+  end
+  
+  it "should successfully call on_post method on payment and successfully change from trial to full-subscription- existing user with existing recurrent profile choosing Credit Card payment method" do
+    user = Factory(:user, :recurrent_id => "4332118890") # user exists
+    Payment.any_instance.stubs(:create_recurrent_profile).returns(ActiveMerchant::Billing::Response.new(true, "Successfull"))
+
+    post :payment, {:commit=>'Finish', :payment_method => 'credit_card', :payment => { 
+                                              :card_type          => "visa",
+                                              :card_number        => "4444333322221111",
+                                              :card_verification  => '444',
+                                              "card_expires_on(1i)" => Date.today.year.next,
+                                              "card_expires_on(2i)" => '1',
+                                              "card_expires_on(3i)" => '1'}},
+                    {:new_user => false, :user_dat => nil },    # the session that is used by the wizardly gem
+                    {:subscribe_dat => {:user_id => user.id, :offer_id => @offer.id, :price => 15, :expires_at => Date.new(2010, 10, 5)}} # flash attributes to setup the wizard to its current status
+  
+    assigns[:subscription].should_not             be_new_record       # subscription wizard active record should be saved
+    assigns[:subscription].state.should           == 'active'
+    assigns[:subscription].price.should           == 15
+    assigns[:subscription].expires_at.should_not  be_nil
+    assigns[:subscription].offer.id.should        == @offer.id
+    assigns[:subscription].publication.should_not be_nil
+    assigns[:subscription].user.should_not        be_nil
+    assigns[:subscription].user.id.should         == user.id
+    assigns[:subscription].user.recurrent_id.to_i.should == 4332118890
+    assigns[:subscription].order_num.should_not be_nil
+    assigns[:subscription].order_num.to_i.should < 1000000000000000 # less than 15 numbers
+    TransactionLog.find_by_recurrent_id(assigns[:subscription].user.recurrent_id.to_s).should_not be_nil
+    TransactionLog.find_by_recurrent_id_and_action(assigns[:subscription].user.recurrent_id.to_s, "trigger existing recurrent profile").success.should be_true
+    flash[:notice].should == "Congratulations! Your subscribtion was successful."
+    flash[:error].should  be_nil
+    response.should redirect_to(:action => :offer)
+  end
+
+  it "should redirect to the first page of wizard with errors when trying to finish the wizard with invalid credit card choosing Credit Card payment method" do
     user = User.new(Factory.attributes_for(:user))
 
-    post :payment, {:commit=>'Finish',  :payment => { 
+    post :payment, {:commit=>'Finish', :payment_method => 'credit_card', :payment => { 
                                               :card_type          => "visa",
                                               :card_number        => '0', # invalid creditcard
                                               :card_verification  => '444',
@@ -345,16 +386,17 @@ describe SubscribeController do
   
     assigns[:subscription].should_not       be_new_record # subscription wizard active record should be saved(with trial)
     assigns[:subscription].state.should     == 'trial'    # because the wizard hasnt been completed
+    assigns[:subscription].order_num.should be_nil
     TransactionLog.find_by_action("setup new recurrent profile").success.should be_false
     TransactionLog.find_by_action("trigger existing recurrent profile").should be_nil
     flash[:error].should                    == "Unfortunately your payment was not successfull. Please check your credit card details and try again."
-    response.should render_template(:payment)
+    response.should redirect_to(:action => :offer)
   end
   
-  it "should redirect to the first page of wizard with errors when trying to finish the wizard with invalid subscription price" do
+  it "should redirect to the first page of wizard with errors when trying to finish the wizard with invalid subscription price choosing Credit Card payment method" do
     user = User.new(Factory.attributes_for(:user))
   
-    post :payment, {:commit=>'Finish',  :payment => { 
+    post :payment, {:commit=>'Finish', :payment_method => 'credit_card', :payment => { 
                                               :card_type          => "visa",
                                               :card_number        => "4444333322221111",
                                               :card_verification  => '444',
@@ -367,16 +409,17 @@ describe SubscribeController do
   
     assigns[:subscription].should_not       be_new_record # subscription wizard active record should be saved(with trial)
     assigns[:subscription].state.should     == 'trial'    # because the wizard hasnt been completed
+    assigns[:subscription].order_num.should be_nil
     TransactionLog.find_by_action("setup new recurrent profile").should be_nil
     TransactionLog.find_by_action("trigger existing recurrent profile").should be_nil
     flash[:error].should                    == "Unfortunately your payment was not successfull. Please check that your account has the amount and try again later."
     response.should redirect_to(:action => :offer)
   end
   
-  it "should redirect to the first page of wizard with errors when trying to finish the wizard with no subscription price" do
+  it "should redirect to the first page of wizard with errors when trying to finish the wizard with no subscription price choosing Credit Card payment method" do
     user = User.new(Factory.attributes_for(:user))
   
-    post :payment, {:commit=>'Finish',  :payment => { 
+    post :payment, {:commit=>'Finish', :payment_method => 'credit_card', :payment => { 
                                               :card_type          => "visa",
                                               :card_number        => "4444333322221111",
                                               :card_verification  => '444',
@@ -389,9 +432,68 @@ describe SubscribeController do
   
     assigns[:subscription].should_not       be_new_record # subscription wizard active record should be saved(with trial)
     assigns[:subscription].state.should     == 'trial'    # because the wizard hasnt been completed
+    assigns[:subscription].order_num.should be_nil
     TransactionLog.find_by_action("setup new recurrent profile").should be_nil
     TransactionLog.find_by_action("trigger existing recurrent profile").should be_nil
     flash[:error].should                    == "Unfortunately your payment was not successfull. Please check that your account has the amount and try again later."
     response.should redirect_to(:action => :offer)
+  end
+
+  # --------------------------------------------- PAYMENT SENARIOs- Payments with Dircet Debit #
+  it "should successfully call on_post method on payment and successfully change from trial to pending-subscription- new user" do
+    # default :payment_method is 'direct_debit'
+    user = User.new(Factory.attributes_for(:user))
+
+    post :payment, {:commit=>'Finish', :payment => { 
+                                              :card_type          => "visa",
+                                              :card_number        => "4444333322221111",
+                                              :card_verification  => '444',
+                                              "card_expires_on(1i)" => Date.today.year.next,
+                                              "card_expires_on(2i)" => '1',
+                                              "card_expires_on(3i)" => '1'}},
+                    {:new_user => true, :user_dat => Factory.attributes_for(:user) },    # the session that is used by the wizardly gem
+                    {:subscribe_dat => {:user => user, :offer_id => @offer.id, :price => 15, :expires_at => Date.new(2010, 10, 5)}} # flash attributes to setup the wizard to its current status
+  
+  
+    assigns[:subscription].should_not             be_new_record       # subscription wizard active record should be saved
+    assigns[:subscription].state.should           == 'pending'
+    assigns[:subscription].price.should           == 15
+    assigns[:subscription].expires_at.should_not  be_nil
+    assigns[:subscription].offer.id.should        == @offer.id
+    assigns[:subscription].publication.should_not be_nil
+    assigns[:subscription].user.should_not        be_nil
+    assigns[:subscription].user.id.should_not     be_nil
+    assigns[:subscription].user.recurrent_id.should_not == "0"
+    assigns[:subscription].user.recurrent_id.to_i.should < 10000000000000000000 # less than 20 numbers
+    assigns[:subscription].order_num.should_not be_nil
+    assigns[:subscription].order_num.to_i.should < 1000000000000000 # less than 15 numbers
+    session[:subscriber_full_name].should         == assigns[:subscription].user.firstname + " " + assigns[:subscription].user.lastname
+    flash[:notice].should be_nil
+    flash[:error].should  be_nil
+    response.should redirect_to(:action => :dd)
+  end
+
+  it "should show the correct content on direct debit page" do
+    post :dd, {}, {:subscriber_full_name => "Crikey User"}
+    
+    assigns[:name] = "Crikey User"
+    flash[:notice].should be_nil
+    flash[:error].should  be_nil
+    response.should include_text "Dear Crikey User"
+    response.should include_text "DIRECT DEBIT OPTIONS"
+    response.should include_text "Download"
+    response.should include_text "Bank Account - direct debit request(PDF)"
+    response.should include_text "Credit Card - direct debit request(PDF)"
+  end
+
+  it "should successfully download the bank pdf file" do #FIXME
+    post :download_pdf, :kind => 'bank'
+    response.should be_success
+  end
+
+  it "should fail on attemp to download a pdf file other than bank or credit" do
+    post :download_pdf, :kind => 'invalid'
+    flash[:error].should  == "There is no such file!"
+    response.should redirect_to(:action=>:dd)
   end
 end

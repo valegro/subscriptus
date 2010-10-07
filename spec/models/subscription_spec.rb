@@ -30,4 +30,9 @@ describe Subscription do
     expected = Date.new(2010, 12, 27)
     @subscription.get_new_expiry_date(months).should == expected
   end
+  
+  it "should generate a correct random number for the order" do
+    @subscription.id = 876
+    @subscription.generate_order_number.should < 1000000000000000
+  end 
 end

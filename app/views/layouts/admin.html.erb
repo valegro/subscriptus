@@ -29,7 +29,14 @@
         <div class="ui-state-highlight ui-corner-all" style="margin-top: 20px; margin-bottom: 20px; padding: 0 .7em;">
           <p>
             <span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span>
-            <span><%= flash[:notice] %></span>
+            <span style="color: green"><%= flash[:notice] %></span>
+          </p>
+        </div>
+      <% elsif flash[:error] %>
+        <div class="ui-state-highlight ui-corner-all" style="margin-top: 20px; margin-bottom: 20px; padding: 0 .7em;">
+          <p>
+            <span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span>
+            <span style="color: red"><%= flash[:error] %></span>
           </p>
         </div>
       <% end %>
