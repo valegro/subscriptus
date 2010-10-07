@@ -15,9 +15,6 @@ gem 'capistrano'
 # State machine support
 #gem 'aasm'
 
-gem 'rspec-rails'
-gem 'mocha'
-
 # jQuery
 gem 'jrails'
 

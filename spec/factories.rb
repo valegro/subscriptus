@@ -29,15 +29,6 @@ Factory.define :offer_term do |f|
   # f.months  rand(12) + 1  # 1...12
 end
 
-
-Factory.define :subscription do |f|
-  f.association :offer, :factory => :offer
-  f.association :user, :factory => :user
-  f.publication_id  1
-  f.state           "trial"
-  f.price           30
-end
-
 # Factory.define :credit_card, :class => Payment do |f|
 #   f.first_name        'sender fname' 
 #   f.last_name         'sender lname'

@@ -167,7 +167,7 @@ describe 'admin/subscriptions/search.html.erb' do
         end
         describe "if #{key} not set" do
           before(:each) do
-            @search.stub!(:publication_id => nil,
+            @search.stubs(:publication_id => nil,
                           :user_firstname_or_user_lastname_like => nil,
                           :user_email_like => nil,
                           :state => nil,
