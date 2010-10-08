@@ -1,4 +1,4 @@
-# Factory.define :source do |f|
-#   f.code { Faker::Name.name }
-#   f.description { Faker::Lorem.paragraph }
-# end
+Factory.define :source do |f|
+  f.code { Faker::Name.name }
+  f.description 'sample source' #{ Faker::Lorem.paragraph }
+end
