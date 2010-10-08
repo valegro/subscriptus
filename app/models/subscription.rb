@@ -76,7 +76,9 @@ class Subscription < ActiveRecord::Base
   # the logs using this number
   # this method uses secure random number generator in combination with offset(unique) that makes the number unique
   # the generated number is 16 numbers long
-  def generate_order_number
-    generate_unique_random_number(15)
+  def generate_and_set_order_number
+    returning num = generate_unique_random_number(15) do
+      self.order_num = num
+    end
   end
 end

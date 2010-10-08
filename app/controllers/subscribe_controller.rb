@@ -108,11 +108,11 @@ class SubscribeController < ApplicationController
     @subscription = Subscription.create(@subscription.attributes)
     # because of the belongs_to assosiation, user needs to be saved seperately only if user is new.
     @subscription.user = User.save_new_user(session[:user_dat]) unless !session[:new_user]
-    
+
     if params[:payment_method] != 'credit_card'
       # Direct Debit payments
       # change the state of subscription from trial to pending
-      @subscription.order_num = @subscription.generate_order_number # order_num is sent to the user as a reference number of their subscriptions
+      @subscription.generate_and_set_order_number # order_num is sent to the user as a reference number of their subscriptions
       @subscription.pay_later
       @subscription.save!
       # FINISHING THE WIZARD
@@ -141,7 +141,7 @@ class SubscribeController < ApplicationController
       end
 
       if setup_successful
-        @subscription.order_num = @payment.order_num = @subscription.generate_order_number # order_num is sent to the user as a reference number of their subscriptions
+        @payment.order_num = @subscription.generate_and_set_order_number # order_num is sent to the user as a reference number of their subscriptions
         # recurrent setup successul
         @subscription.user.recurrent_id = @payment.customer_id # now user has a valid profile in secure pay that can be refered to by their recurrent_id
         trigger_res = @payment.call_recurrent_profile # make the payment through secure pay
