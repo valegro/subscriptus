@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20100928020917) do
+ActiveRecord::Schema.define(:version => 20101001065638) do
 
   create_table "audit_log_entries", :force => true do |t|
     t.integer  "user_id"
@@ -50,11 +50,6 @@ ActiveRecord::Schema.define(:version => 20100928020917) do
     t.integer  "on_hand"
     t.datetime "created_at"
     t.datetime "updated_at"
-  end
-
-  create_table "gifts_offers", :force => true do |t|
-    t.integer "gift_id"
-    t.integer "offer_id"
   end
 
   create_table "offer_terms", :force => true do |t|
@@ -153,16 +148,12 @@ ActiveRecord::Schema.define(:version => 20100928020917) do
     t.integer  "offer_id"
     t.integer  "publication_id"
     t.string   "state"
-    t.string   "card_number"
-    t.string   "card_expiration"
-    t.string   "payment_method"
     t.decimal  "price"
-    t.boolean  "auto_renew"
     t.datetime "state_updated_at"
     t.datetime "expires_at"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "recurrent_id"
+    t.string   "order_num"
   end
 
   create_table "transaction_logs", :force => true do |t|
@@ -174,6 +165,8 @@ ActiveRecord::Schema.define(:version => 20100928020917) do
     t.string   "message"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "subscription_id"
+    t.string   "order_num"
   end
 
   create_table "users", :force => true do |t|
@@ -201,6 +194,8 @@ ActiveRecord::Schema.define(:version => 20100928020917) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "role"
+    t.boolean  "admin"
+    t.string   "recurrent_id"
   end
 
 end

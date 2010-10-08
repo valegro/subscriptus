@@ -126,7 +126,7 @@ class Subscription < ActiveRecord::Base
     self.expires_at = (self.expires_at.blank? || self.expires_at < Date.today) ? Date.today.months_since(months) + 1.day : self.expires_at.months_since(months) + 1.day
   end
 
-  # generates a random number that is saved after a successful recurrent profile creation and used later 
+  # generates a random number that is saved after a successful recurrent profile creation and used later
   # to access the subscription and to be sent to the client so that in case of any problems they can easily refer to
   # the logs using this number
   # this method uses secure random number generator in combination with offset(unique) that makes the number unique

@@ -22,6 +22,11 @@ describe Payment do
   end
 
   # It is assumed that ActiveMerchant::Billing::CreditCard validation is fully tested
+  it "should make a successful purchase given valid credit_card, price and customer Id" do
+    res = @payment.purchase
+    res.success?.should be_true
+  end
+
   it "should create a successful recurrent profile setup given valid credit_card, price and customer Id" do
     res = @payment.create_recurrent_profile
     res.success?.should be_true

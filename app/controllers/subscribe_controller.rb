@@ -5,9 +5,9 @@ class SubscribeController < ApplicationController
 
 # delayed_job , atomic:
 # begin
-#   subscription => campaign_master flag = pending
-#   call delayed_job
-#   subscription => campaign_master flag = done
+# subscription => campaign_master flag = pending
+# call delayed_job
+# subscription => campaign_master flag = done
 # rescue timeout
 # rescue error
 # end
@@ -16,7 +16,7 @@ class SubscribeController < ApplicationController
 
   act_wizardly_for :subscription, :form_data => :sandbox, :canceled => "/", :persist_model => :once, :guard => false
   
-#TODO: fix gaurd issue.  only non-guard the offer page
+#TODO: fix gaurd issue. only non-guard the offer page
 
   # the link of offer is clicked
   # gaurd should be false, otherwise parameters are not instantiated
@@ -48,9 +48,9 @@ class SubscribeController < ApplicationController
   end
 
   on_get(:details) do
-    @user = @subscription.build_user(session[:user_dat])  # this session is set in on_next(:details) for later visits
+    @user = @subscription.build_user(session[:user_dat]) # this session is set in on_next(:details) for later visits
     @user.country ||= 'Australia'
-    @subscription.user_id = @user.id  # weird! we need this line as build doesnt set user_id
+    @subscription.user_id = @user.id # weird! we need this line as build doesnt set user_id
   end
 
   on_next(:details) do
@@ -123,14 +123,14 @@ class SubscribeController < ApplicationController
     else
       # Credit Card payments
       @payment = Payment.new() # Payment is not an active record
-      @payment.card_verification  = params[:payment]["card_verification"]
-      @payment.card_type          = params[:payment]["card_type"]
+      @payment.card_verification = params[:payment]["card_verification"]
+      @payment.card_type = params[:payment]["card_type"]
       expiry_date = "#{params[:payment]['card_expires_on(1i)']}-#{params[:payment]['card_expires_on(2i)']}-#{params[:payment]['card_expires_on(3i)']}"
       @payment.card_expires_on = Date.strptime(expiry_date, '%Y-%m-%d')
-      @payment.card_number        = params[:payment]["card_number"]
-      @payment.last_name          = params[:payment]["last_name"]
-      @payment.first_name         = params[:payment]["first_name"]
-      @payment.money = @subscription.price    # setting the money of payment object
+      @payment.card_number = params[:payment]["card_number"]
+      @payment.last_name = params[:payment]["last_name"]
+      @payment.first_name = params[:payment]["first_name"]
+      @payment.money = @subscription.price # setting the money of payment object
 
       if @subscription.user.recurrent_id.blank?
         @payment.customer_id = @subscription.user.generate_recurrent_profile_id
@@ -214,3 +214,4 @@ class SubscribeController < ApplicationController
     redirect_to(:action=>:offer)
   end
 end
+

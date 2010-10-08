@@ -14,7 +14,7 @@ class User < ActiveRecord::Base
   end
 
   validates_presence_of :firstname, :lastname, :email, :email_confirmation, :phone_number, :address_1, :city, :postcode, :state, :country
-  validates_format_of   :email, :with => /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i
+  validates_format_of :email, :with => /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i
   validates_uniqueness_of :email
   validates_confirmation_of :email
 
@@ -61,7 +61,7 @@ class User < ActiveRecord::Base
     CM::Proxy.log_cm_error(ex)
   end
   
-  # generates a random number that is saved after a successful recurrent profile creation and used later 
+  # generates a random number that is saved after a successful recurrent profile creation and used later
   # to access the users recurrent profile in secure pay in order to make new payments or cancel the proile
   # this unique number (called Client ID in AU sequre pay gateway) should be less than 20 characters long
   # this method uses secure random number generator in combination with offset(unique) that makes the number unique

@@ -21,21 +21,32 @@ config.action_view.cache_template_loading            = true
 # Enable serving of images, stylesheets, and javascripts from an asset server
 # config.action_controller.asset_host = "http://assets.example.com"
 
-# Disable delivery errors, bad email addresses will be ignored
-# config.action_mailer.raise_delivery_errors = false
+# ActionMailer Settings for Heroku
+config.action_mailer.delivery_method = :smtp
+config.action_mailer.perform_deliveries = true
+config.action_mailer.raise_delivery_errors = true
+config.action_mailer.default_charset = "utf-8"
+config.action_mailer.smtp_settings = {
+  :address => "smtp.sendgrid.net",
+  :port => "25",
+  :authentication => :plain,
+  :user_name => ENV['SENDGRID_USERNAME'],
+  :password => ENV['SENDGRID_PASSWORD'],
+  :domain => ENV['SENDGRID_DOMAIN'],
+}
 
 # Enable threaded mode
 # config.threadsafe!
 
 # Setup Active Merchant for development
-config.after_initialize do
-	ActiveMerchant::Billing::Base.mode = :test
-  # Eway Gateway Settings
-  ::GATEWAY = ActiveMerchant::Billing::SecurePayAuExtendedGateway.new(  # the default_currency of this gateway is 'AUD'
-        :login => 'CKR0030',  # <MerchantID> input to Au securePay Gateway.
-        :password => "jogkriw7"
-  )
-end
+# config.after_initialize do
+#   ActiveMerchant::Billing::Base.mode = :test
+#   # SecurePay Gateway Settings
+#   ::GATEWAY = ActiveMerchant::Billing::SecurePayAuExtendedGateway.new(  # the default_currency of this gateway is 'AUD'
+#         :login => 'CKR0030',  # <MerchantID> input to Au securePay Gateway.
+#         :password => "jogkriw7"
+#   )
+# end
 CAMPAIGNMASTER_USERNAME = 'ddraper'
 CAMPAIGNMASTER_PASSWORD = 'netfox'
 CAMPAIGNMASTER_CLIENT_ID = '5032'
