@@ -1,4 +1,5 @@
 require 'active_record/validations'
+
 class Payment
   # include Validatable # validating without activerecord
   
@@ -19,44 +20,54 @@ class Payment
     end
     
     def purchase
-        response = GATEWAY.setup_recurrent(price_in_cents, credit_card, options("purchase"))
+      returning response = GATEWAY.purchase(price_in_cents, credit_card, options("recurrent")) do
         log_transactions("purchase", response)
-        response
-    rescue Exceptions::ZeroAmount
-      raise Exceptions::ZeroAmount
+      end
     rescue Exception => e
-      raise Exceptions::PurchaseNotSuccessful
+      if e.is_a?(Exceptions::ZeroAmount)
+        raise e
+      else
+        raise Exceptions::PurchaseNotSuccessful
+      end
     end
 
     def create_recurrent_profile
-        response = GATEWAY.setup_recurrent(price_in_cents, credit_card, options("recurrent"))
+      returning response = GATEWAY.setup_recurrent(price_in_cents, credit_card, options("recurrent")) do
         log_transactions("setup new recurrent profile", response)
-        response
-    rescue Exceptions::ZeroAmount
-      raise Exceptions::ZeroAmount
+      end
     rescue Exception => e
-      raise Exceptions::CreateRecurrentProfileNotSuccessful
+      if e.is_a?(Exceptions::ZeroAmount)
+        raise e
+      else
+        raise Exceptions::CreateRecurrentProfileNotSuccessful
+      end
     end
 
     # call an already setup profile for recurrent transactions
     # amount of money can be specified as an input parameter or set to nil so that the previously set amount is used
     def call_recurrent_profile
-        response = GATEWAY.trigger_recurrent(price_in_cents, options("recurrent"))
+      returning response = GATEWAY.trigger_recurrent(price_in_cents, options("recurrent")) do
         log_transactions("trigger existing recurrent profile", response)
-        response
-    rescue Exceptions::ZeroAmount
-      raise Exceptions::ZeroAmount
-    rescue Exception
-      raise Exceptions::TriggerRecurrentProfileNotSuccessful
+      end
+    rescue Exception => e
+      if e.is_a?(Exceptions::ZeroAmount)
+        raise e
+      else
+        raise Exceptions::TriggerRecurrentProfileNotSuccessful
+      end
     end
 
     # remove an already setup profile for recurrent transactions
     def remove_recurrent_profile
-        response = GATEWAY.cancel_recurrent(options("recurrent"))
+      returning response = GATEWAY.cancel_recurrent(options("recurrent")) do
         log_transactions("remove existing recurrent profile", response)
-        response
+      end
     rescue Exception
-      raise Exceptions::RemoveRecurrentProfileNotSuccessful
+      if e.is_a?(Exceptions::ZeroAmount)
+        raise e
+      else
+        raise Exceptions::RemoveRecurrentProfileNotSuccessful
+      end
     end
 
     private

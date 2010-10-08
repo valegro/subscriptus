@@ -192,7 +192,7 @@ describe SubscribeController do
     assigns[:subscription].user.recurrent_id.should   == nil  # because the subscription is a trial, so the user does not have a recurrent profile yet.
     assigns[:subscription].state.should              == 'trial'
     flash[:error].should                              be_nil
-    flash[:notice].should                             == "Congratulations! Your trial subscribtion was successful."
+    flash[:notice].should                             == "Congratulations! Your trial subscription was successful."
     response.should                                   redirect_to :action => :offer
   end
 
@@ -246,7 +246,7 @@ describe SubscribeController do
     assigns[:subscription].user.recurrent_id.should        == nil  # because the subscription is a trial, so the user does not have a recurrent profile yet.
     assigns[:subscription].state.should              == 'trial'
     flash[:error].should                              be_nil
-    flash[:notice].should                             == "Congratulations! Your trial subscribtion was successful."
+    flash[:notice].should                             == "Congratulations! Your trial subscription was successful."
     response.should                                   redirect_to :action => :offer
   end
   
@@ -296,7 +296,7 @@ describe SubscribeController do
     TransactionLog.find_by_order_num(assigns[:subscription].order_num.to_s).should_not be_nil
     TransactionLog.find_by_recurrent_id_and_action(assigns[:subscription].user.recurrent_id.to_s, "setup new recurrent profile").should_not be_nil
     TransactionLog.find_by_recurrent_id_and_action(assigns[:subscription].user.recurrent_id.to_s, "trigger existing recurrent profile").should_not be_nil
-    flash[:notice].should == "Congratulations! Your subscribtion was successful."
+    flash[:notice].should == "Congratulations! Your subscription was successful."
     flash[:error].should  be_nil
     response.should redirect_to(:action => :offer)
   end
@@ -330,7 +330,7 @@ describe SubscribeController do
     TransactionLog.find_by_order_num(assigns[:subscription].order_num.to_s).should_not be_nil
     TransactionLog.find_by_recurrent_id_and_action(assigns[:subscription].user.recurrent_id.to_s, "setup new recurrent profile").success.should be_true
     TransactionLog.find_by_recurrent_id_and_action(assigns[:subscription].user.recurrent_id.to_s, "trigger existing recurrent profile").success.should be_true
-    flash[:notice].should == "Congratulations! Your subscribtion was successful."
+    flash[:notice].should == "Congratulations! Your subscription was successful."
     flash[:error].should  be_nil
     response.should redirect_to(:action => :offer)
   end
@@ -365,7 +365,7 @@ describe SubscribeController do
     assigns[:subscription].order_num.to_i.should < 1000000000000000 # less than 15 numbers
     TransactionLog.find_by_recurrent_id(assigns[:subscription].user.recurrent_id.to_s).should_not be_nil
     TransactionLog.find_by_recurrent_id_and_action(assigns[:subscription].user.recurrent_id.to_s, "trigger existing recurrent profile").success.should be_true
-    flash[:notice].should == "Congratulations! Your subscribtion was successful."
+    flash[:notice].should == "Congratulations! Your subscription was successful."
     flash[:error].should  be_nil
     response.should redirect_to(:action => :offer)
   end
@@ -470,11 +470,11 @@ describe SubscribeController do
     session[:subscriber_full_name].should         == assigns[:subscription].user.firstname + " " + assigns[:subscription].user.lastname
     flash[:notice].should be_nil
     flash[:error].should  be_nil
-    response.should redirect_to(:action => :dd)
+    response.should redirect_to(:action => :direct_debit)
   end
 
   it "should show the correct content on direct debit page" do
-    post :dd, {}, {:subscriber_full_name => "Crikey User"}
+    post :direct_debit, {}, {:subscriber_full_name => "Crikey User"}
     
     assigns[:name] = "Crikey User"
     flash[:notice].should be_nil
@@ -494,6 +494,6 @@ describe SubscribeController do
   it "should fail on attemp to download a pdf file other than bank or credit" do
     post :download_pdf, :kind => 'invalid'
     flash[:error].should  == "There is no such file!"
-    response.should redirect_to(:action=>:dd)
+    response.should redirect_to(:action=>:direct_debit)
   end
 end

@@ -27,8 +27,6 @@ class SubscribeController < ApplicationController
     @optional_gifts = @offer.gifts.in_stock.optional
     @included_gifts = @offer.gifts.in_stock.included
     @subscription.offer = @offer
-    # @subscription.gifts.clear
-    # @subscription.gifts << @optional_gifts.first # by default the first one is selected which can be changed by the user
     @subscription.subscription_gifts.clear
     @subscription.subscription_gifts.build(:gift => @optional_gifts.first)
   end
@@ -43,7 +41,7 @@ class SubscribeController < ApplicationController
     @offer = Offer.find(@subscription.offer.id)
     @ot = params[:offer_term] ? OfferTerm.find(params[:offer_term]) : @offer.offer_terms.first
     @subscription.price = @ot.price
-    @subscription.expires_at = @subscription.get_new_expiry_date(@ot.months) # new subscription starts after the finish date of current subscription/trial
+    @subscription.set_expires_at(@ot.months) # new subscription starts after the finish date of current subscription/trial
     @subscription.gifts.add_uniquely(@offer.available_included_gifts)
   end
 
@@ -91,11 +89,11 @@ class SubscribeController < ApplicationController
       # because of the belongs_to assosiation, user needs to be saved seperately only if user is new.
       if session[:new_user]
         # new user
-        @subscription.user = save_new_user(session[:user_dat])
+        @subscription.user = User.save_new_user(session[:user_dat])
       end
       # FINISHING THE WIZARD
-      @subscription.save
-      flash[:notice] = "Congratulations! Your trial subscribtion was successful."
+      @subscription.save!
+      flash[:notice] = "Congratulations! Your trial subscription was successful."
       redirect_to(:action => :offer)
     end
   end
@@ -109,8 +107,7 @@ class SubscribeController < ApplicationController
     # the first subscription has a trial state
     @subscription = Subscription.create(@subscription.attributes)
     # because of the belongs_to assosiation, user needs to be saved seperately only if user is new.
-    @subscription.user = save_new_user(session[:user_dat]) unless !session[:new_user]
-    p @subscription
+    @subscription.user = User.save_new_user(session[:user_dat]) unless !session[:new_user]
     
     if params[:payment_method] != 'credit_card'
       # Direct Debit payments
@@ -120,7 +117,7 @@ class SubscribeController < ApplicationController
       @subscription.save!
       # FINISHING THE WIZARD
       session[:subscriber_full_name] = "#{@subscription.user.firstname} #{@subscription.user.lastname}"
-      redirect_to(:action => :dd)
+      redirect_to(:action => :direct_debit)
     else
       # Credit Card payments
       @payment = Payment.new() # Payment is not an active record
@@ -154,7 +151,7 @@ class SubscribeController < ApplicationController
           # change the state of subscription from trial to active
           @subscription.activate
           # FINISHING THE WIZARD
-          flash[:notice] = "Congratulations! Your subscribtion was successful."
+          flash[:notice] = "Congratulations! Your subscription was successful."
           redirect_to(:action=>:offer)
         else
           # recurrent trigger failed
@@ -171,7 +168,7 @@ class SubscribeController < ApplicationController
     @subscription.destroy
   end
 
-  def dd
+  def direct_debit
     @name = session[:subscriber_full_name]
     session[:subscriber_full_name] = nil
   end
@@ -183,22 +180,12 @@ class SubscribeController < ApplicationController
 
   private
 
-  # creates or updates the user
-  # returns user
-  def save_new_user(user_attributes)
-    user = User.new(user_attributes)
-    user.save!
-    return user
-  rescue Exception => e
-    raise Exceptions::UserInvalid.new(e.message)
-  end
-  
   def catch_exceptions
     yield
   rescue Exceptions::InvalidName => e
     logger.error("Exceptions::InvalidName ---> " + e.message)
     flash[:error] = "There is no such file!"
-    redirect_to(:action=>:dd)
+    redirect_to(:action=>:direct_debit)
   rescue Exceptions::UserInvalid => e
     logger.error("Exceptions::UserInvalid ---> " + e.message)
     flash[:error] = "Unfortunately your payment was not successfull. Please try again later. There might be some problems with the cookies of your web browser."

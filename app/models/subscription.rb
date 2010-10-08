@@ -1,4 +1,6 @@
 class Subscription < ActiveRecord::Base
+  include Utilities
+
   belongs_to :user
   belongs_to :offer
   belongs_to :publication
@@ -65,21 +67,16 @@ class Subscription < ActiveRecord::Base
 
   # if the sibscription is new or expired, start it from now
   # otherwise start it after the expiration time
-  def get_new_expiry_date(months)
-    (self.expires_at.blank? || self.expires_at < Date.today) ? Date.today.months_since(months) + 1.day : self.expires_at.months_since(months) + 1.day
+  def set_expires_at(months)
+    self.expires_at = (self.expires_at.blank? || self.expires_at < Date.today) ? Date.today.months_since(months) + 1.day : self.expires_at.months_since(months) + 1.day
   end
   
   # generates a random number that is saved after a successful recurrent profile creation and used later 
   # to access the subscription and to be sent to the client so that in case of any problems they can easily refer to
   # the logs using this number
   # this method uses secure random number generator in combination with offset(unique) that makes the number unique
-  # the generated number is 18 numbers long
+  # the generated number is 16 numbers long
   def generate_order_number
-    max = 1000000 # we assume self.id is less 6 digit or less
-    offset = (max + self.id).to_s[1..max.size] # omit the first 1 from the beginning of the offset
-    len = offset.size
-    diff = 15 - len # size of the random number
-    num = SecureRandom.random_number(10 ** diff).to_s + offset.to_s # time stamp makes the number unique
-    num.to_i
+    generate_unique_random_number(15)
   end
 end

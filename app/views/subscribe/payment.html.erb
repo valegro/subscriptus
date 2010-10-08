@@ -29,7 +29,7 @@
   function showFields() {
     checked = $('input[name=payment_method]:checked').val();
     if (checked == 'credit_card') {
-      $('#payment_attributes_card_type').focus()
+      $('#payment_attributes_card_type').focus();
       $('#credit_card_fields').show();
       $('#direct_debit_fields').hide();
     } else {
