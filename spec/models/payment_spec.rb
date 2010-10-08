@@ -4,7 +4,7 @@ describe Payment do
   NUM = 1999119
   GATEWAY = ActiveMerchant::Billing::SecurePayAuExtendedGateway.new(  # the default_currency of this gateway is 'AUD'
           :login => 'CKR0030',  # <MerchantID> input to Au securePay Gateway.
-          :password => "jogkriw7"
+          :password => "FkqErHJ0" # "jogkriw7" these password do not work!!! FIXME
     )
 
   before(:each) do

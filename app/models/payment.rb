@@ -1,9 +1,11 @@
 require 'active_record/validations'
+
 class Payment
   # include Validatable # validating without activerecord
   
     attr_accessor :card_verification, :card_number, :card_expires_on, :first_name, :last_name,
                   :money,   # the amount that should be paid
+                  :order_num, # order_number is a unique number for each paid subscription. it is also saved in subscription table
                   :customer_id # the unique client_id that is used as a reference for later operations(trigger and cancel recurrent profiles)
 
     # refer to: http://www.securepay.com.au/resources/Secure-XML-API/Integration-Guide-Periodic-and-Triggered-add-in-pg37.html#AppendixC
@@ -17,35 +19,55 @@ class Payment
         @errors = ActiveRecord::Errors.new(self)
     end
     
-    def create_recurrent_profile
-        response = GATEWAY.setup_recurrent(price_in_cents, credit_card, options)
-        log_transactions("setup new recurrent profile", response)
-        response
-    rescue Exceptions::ZeroAmount
-      raise Exceptions::ZeroAmount
+    def purchase
+      returning response = GATEWAY.purchase(price_in_cents, credit_card, options("recurrent")) do
+        log_transactions("purchase", response)
+      end
     rescue Exception => e
-      raise Exceptions::CreateRecurrentProfileNotSuccessful
+      if e.is_a?(Exceptions::ZeroAmount)
+        raise e
+      else
+        raise Exceptions::PurchaseNotSuccessful
+      end
+    end
+
+    def create_recurrent_profile
+      returning response = GATEWAY.setup_recurrent(price_in_cents, credit_card, options("recurrent")) do
+        log_transactions("setup new recurrent profile", response)
+      end
+    rescue Exception => e
+      if e.is_a?(Exceptions::ZeroAmount)
+        raise e
+      else
+        raise Exceptions::CreateRecurrentProfileNotSuccessful
+      end
     end
 
     # call an already setup profile for recurrent transactions
     # amount of money can be specified as an input parameter or set to nil so that the previously set amount is used
     def call_recurrent_profile
-        response = GATEWAY.trigger_recurrent(price_in_cents, options)
+      returning response = GATEWAY.trigger_recurrent(price_in_cents, options("recurrent")) do
         log_transactions("trigger existing recurrent profile", response)
-        response
-    rescue Exceptions::ZeroAmount
-      raise Exceptions::ZeroAmount
-    rescue Exception
-      raise Exceptions::TriggerRecurrentProfileNotSuccessful
+      end
+    rescue Exception => e
+      if e.is_a?(Exceptions::ZeroAmount)
+        raise e
+      else
+        raise Exceptions::TriggerRecurrentProfileNotSuccessful
+      end
     end
 
     # remove an already setup profile for recurrent transactions
     def remove_recurrent_profile
-        response = GATEWAY.cancel_recurrent(options)
+      returning response = GATEWAY.cancel_recurrent(options("recurrent")) do
         log_transactions("remove existing recurrent profile", response)
-        response
+      end
     rescue Exception
-      raise Exceptions::RemoveRecurrentProfileNotSuccessful
+      if e.is_a?(Exceptions::ZeroAmount)
+        raise e
+      else
+        raise Exceptions::RemoveRecurrentProfileNotSuccessful
+      end
     end
 
     private
@@ -64,10 +86,14 @@ class Payment
       end
     end
 
-    def options
-      {
-        :customer => customer_id # FIXME: generate one(no space, <= 20)
-      }
+    def options(action)
+      case action
+      when "purchase"
+        option = :customer
+      when "recurrent"
+        option = :order_id
+      end
+      { option => customer_id }
     end
 
     def credit_card
@@ -86,6 +112,7 @@ class Payment
       t = TransactionLog.new do |t_log|
           t_log.recurrent_id = customer_id
           # t_log.user_id = 
+          t_log.order_num = order_num
           t_log.action  = action
           t_log.money   = money
           t_log.success = response.success?

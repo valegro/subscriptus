@@ -29,8 +29,6 @@ class SubscribeController < ApplicationController
     @optional_gifts = @offer.gifts.in_stock.optional
     @included_gifts = @offer.gifts.in_stock.included
     @subscription.offer = @offer
-    # @subscription.gifts.clear
-    # @subscription.gifts << @optional_gifts.first # by default the first one is selected which can be changed by the user
     @subscription.subscription_gifts.clear
     @subscription.subscription_gifts.build(:gift => @optional_gifts.first)
   end
@@ -45,7 +43,7 @@ class SubscribeController < ApplicationController
     @offer = Offer.find(@subscription.offer.id)
     @ot = params[:offer_term] ? OfferTerm.find(params[:offer_term]) : @offer.offer_terms.first
     @subscription.price = @ot.price
-    @subscription.expires_at = @subscription.get_new_expiry_date(@ot.months) # new subscription starts after the finish date of current subscription/trial
+    @subscription.set_expires_at(@ot.months) # new subscription starts after the finish date of current subscription/trial
     @subscription.gifts.add_uniquely(@offer.available_included_gifts)
   end
 
@@ -93,11 +91,11 @@ class SubscribeController < ApplicationController
       # because of the belongs_to assosiation, user needs to be saved seperately only if user is new.
       if session[:new_user]
         # new user
-        @subscription.user = save_new_user(session[:user_dat])
+        @subscription.user = User.save_new_user(session[:user_dat])
       end
-      # finish the wizard
-      @subscription.save
-      flash[:notice] = "Congratulations! Your trial subscribtion was successful."
+      # FINISHING THE WIZARD
+      @subscription.save!
+      flash[:notice] = "Congratulations! Your trial subscription was successful."
       redirect_to(:action => :offer)
     end
   end
@@ -110,49 +108,61 @@ class SubscribeController < ApplicationController
     # subscription should be saved in database before the wizard is finished so that no conflicts happens between has_states and wizardly
     # the first subscription has a trial state
     @subscription = Subscription.create(@subscription.attributes)
-
-    @payment = Payment.new() # Payment is not an active record
-    @payment.card_verification  = params[:payment]["card_verification"]
-    @payment.card_type          = params[:payment]["card_type"]
-    expiry_date = "#{params[:payment]['card_expires_on(1i)']}-#{params[:payment]['card_expires_on(2i)']}-#{params[:payment]['card_expires_on(3i)']}"
-    @payment.card_expires_on = Date.strptime(expiry_date, '%Y-%m-%d')
-    @payment.card_number        = params[:payment]["card_number"]
-    @payment.last_name          = params[:payment]["last_name"]
-    @payment.first_name         = params[:payment]["first_name"]
-
-    @payment.money = @subscription.price    # setting the money of payment object
-
     # because of the belongs_to assosiation, user needs to be saved seperately only if user is new.
-    if session[:new_user]
-      # new user
-      @subscription.user = save_new_user(session[:user_dat])
-    end
-    @payment.customer_id = @subscription.generate_recurrent_profile_id # setting the options details(customer) of payment object
-    
-    # call set up recurrent profile
-    setup_res = @payment.create_recurrent_profile
-    if setup_res.success?
-      # recurrent setup successul
-      trigger_res = @payment.call_recurrent_profile
-      if trigger_res.success?
-        # recurrent trigger successul
-        @subscription.recurrent_id = @payment.customer_id
+    @subscription.user = User.save_new_user(session[:user_dat]) unless !session[:new_user]
 
-        # customer_id of the payment must be set first
-        # change the state of subscription from trial to active
-        @subscription.activate
-        
-        flash[:notice] = "Congratulations! Your subscribtion was successful."
-        redirect_to(:action=>:offer)
-      else
-        # recurrent trigger failed
-        flash[:error] = "Unfortunately your payment was not successfull. Please check that your account has the amount and try again later."
-        redirect_to(:action=>:offer)
-      end
+    if params[:payment_method] != 'credit_card'
+      # Direct Debit payments
+      # change the state of subscription from trial to pending
+      @subscription.generate_and_set_order_number # order_num is sent to the user as a reference number of their subscriptions
+      @subscription.pay_later
+      @subscription.save!
+      # FINISHING THE WIZARD
+      session[:subscriber_full_name] = "#{@subscription.user.firstname} #{@subscription.user.lastname}"
+      redirect_to(:action => :direct_debit)
     else
-      # recurrent setup failed.
-      flash[:error] = "Unfortunately your payment was not successfull. Please check your credit card details and try again."
-      render(:action => :payment)
+      # Credit Card payments
+      @payment = Payment.new() # Payment is not an active record
+      @payment.card_verification  = params[:payment]["card_verification"]
+      @payment.card_type          = params[:payment]["card_type"]
+      expiry_date = "#{params[:payment]['card_expires_on(1i)']}-#{params[:payment]['card_expires_on(2i)']}-#{params[:payment]['card_expires_on(3i)']}"
+      @payment.card_expires_on = Date.strptime(expiry_date, '%Y-%m-%d')
+      @payment.card_number        = params[:payment]["card_number"]
+      @payment.last_name          = params[:payment]["last_name"]
+      @payment.first_name         = params[:payment]["first_name"]
+      @payment.money = @subscription.price    # setting the money of payment object
+
+      if @subscription.user.recurrent_id.blank?
+        @payment.customer_id = @subscription.user.generate_recurrent_profile_id
+        # call set up recurrent profile
+        setup_successful = @payment.create_recurrent_profile.success?
+      else
+        @payment.customer_id = @subscription.user.recurrent_id
+        # no need to call set up recurrent profile
+        setup_successful = true
+      end
+
+      if setup_successful
+        @payment.order_num = @subscription.generate_and_set_order_number # order_num is sent to the user as a reference number of their subscriptions
+        # recurrent setup successul
+        @subscription.user.recurrent_id = @payment.customer_id # now user has a valid profile in secure pay that can be refered to by their recurrent_id
+        trigger_res = @payment.call_recurrent_profile # make the payment through secure pay
+        if trigger_res.success?
+          # recurrent trigger successul
+          # customer_id of the payment must be set first
+          # change the state of subscription from trial to active
+          @subscription.activate
+          # FINISHING THE WIZARD
+          flash[:notice] = "Congratulations! Your subscription was successful."
+          redirect_to(:action=>:offer)
+        else
+          # recurrent trigger failed
+          raise Exceptions::TriggerRecurrentProfileNotSuccessful.new("from finish wizard in subscribe_controller")
+        end
+      else
+        # recurrent setup failed.
+        raise Exceptions::CreateRecurrentProfileNotSuccessful.new("from finish wizard in subscribe_controller")
+      end
     end
   end
 
@@ -160,20 +170,24 @@ class SubscribeController < ApplicationController
     @subscription.destroy
   end
 
-  private
-
-  # creates or updates the user
-  # returns user
-  def save_new_user(user_attributes)
-    user = User.new(user_attributes)
-    user.save!
-    return user
-  rescue Exception => e
-    raise Exceptions::UserInvalid.new(e.message)
+  def direct_debit
+    @name = session[:subscriber_full_name]
+    session[:subscriber_full_name] = nil
   end
   
+  def download_pdf
+    raise Exceptions::InvalidName.new("invalid pdf file name") unless params[:kind] == "credit" || params[:kind] == 'bank'
+    send_file "#{RAILS_ROOT}/public/pdfs/crikey_directdebit_#{params[:kind]}.pdf", :type => 'application/pdf'
+  end
+
+  private
+
   def catch_exceptions
     yield
+  rescue Exceptions::InvalidName => e
+    logger.error("Exceptions::InvalidName ---> " + e.message)
+    flash[:error] = "There is no such file!"
+    redirect_to(:action=>:direct_debit)
   rescue Exceptions::UserInvalid => e
     logger.error("Exceptions::UserInvalid ---> " + e.message)
     flash[:error] = "Unfortunately your payment was not successfull. Please try again later. There might be some problems with the cookies of your web browser."

@@ -1,7 +1,7 @@
 class Subscription < ActiveRecord::Base
-
-  include Billing::CreditCard
-  include Billing::Charger
+  # include Billing::CreditCard
+  # include Billing::Charger
+  include Utilities
 
   belongs_to :user, :autosave => true
   belongs_to :offer
@@ -45,26 +45,15 @@ class Subscription < ActiveRecord::Base
     record.publication_id = record.offer.publication_id 
   end
 
-  def update_campaignmaster
-    # TODO: determine how publication name on campaignmaster is managed.
-    #       currently (temporarily) using publication_123{expiry} style for keys.
-    result = CM::Recipient.update(
-        :fields => { :"publication_#{self.publication_id}{state}" => self.state,
-                     :"publication_#{self.publication_id}{expiry}" => self.expires_at,
-                     :user_id => self.user_id
-        }
-    )
-    return result
-  rescue RuntimeError => ex
-    CM::Proxy.log_cm_error(ex)
-  end
-
   # Subscription States
   # has_states :incomplete, :trial, :squatter, :active, :pending, :renewal_due, :payment_failed do
   has_states :trial, :squatter, :active, :pending, :renewal_due, :payment_failed, :init => :trial do
     on :activate do
       transition :trial => :active
       transition :squatter => :active
+    end
+    on :pay_later do
+      transition :trial => :pending
     end
     on :verify do
       transition :pending => :active
@@ -86,6 +75,20 @@ class Subscription < ActiveRecord::Base
     end
     # Expiries
     expires :pending => :squatter, :after => 14.days
+  end
+
+  def update_campaignmaster
+    # TODO: determine how publication name on campaignmaster is managed.
+    #       currently (temporarily) using publication_123{expiry} style for keys.
+    result = CM::Recipient.update(
+        :fields => { :"publication_#{self.publication_id}{state}" => self.state,
+                     :"publication_#{self.publication_id}{expiry}" => self.expires_at,
+                     :user_id => self.user_id
+        }
+    )
+    return result
+  rescue RuntimeError => ex
+    CM::Proxy.log_cm_error(ex)
   end
 
   # These are the options sent to the gateway when attempting to save a
@@ -119,26 +122,19 @@ class Subscription < ActiveRecord::Base
 
   # if the sibscription is new or expired, start it from now
   # otherwise start it after the expiration time
-  def get_new_expiry_date(months)
-    (self.expires_at.blank? || self.expires_at < Date.today) ? Date.today.months_since(months) : self.expires_at.months_since(months)
+  def set_expires_at(months)
+    self.expires_at = (self.expires_at.blank? || self.expires_at < Date.today) ? Date.today.months_since(months) + 1.day : self.expires_at.months_since(months) + 1.day
   end
-  
+
   # generates a random number that is saved after a successful recurrent profile creation and used later 
-  # to access the users recurrent profile in secure pay in order to make new payments or cancel the proile
-  # this unique number (called Client ID in AU sequre pay gateway) should be less than 20 characters long
+  # to access the subscription and to be sent to the client so that in case of any problems they can easily refer to
+  # the logs using this number
   # this method uses secure random number generator in combination with offset(unique) that makes the number unique
-  # the generated number is 18 numbers long
-  def generate_recurrent_profile_id
-    len = self.id.to_s.size
-    raise Exception::UnableToGenerateRecurrentId.new("subscription id is too long") unless len < 19
-    raise Exception::UnableToGenerateRecurrentId.new("nil subscription id")         unless self.id > 0
-    diff = 19 - len # size of the random number
-    max = "1"
-    for i in 1...diff
-      max += "0"
+  # the generated number is 16 numbers long
+  def generate_and_set_order_number
+    returning num = generate_unique_random_number(15) do
+      self.order_num = num
     end
-    num = SecureRandom.random_number(max.to_i).to_s + self.id.to_s # self.id makes the number unique
-    num.to_i
   end
 
   private

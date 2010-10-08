@@ -20,6 +20,11 @@ describe User do
     CM::Recipient.stubs(:create!)
   end
 
+  it "should generate a correct random number for the recurrent" do
+    @user.id = 876579
+    @user.generate_recurrent_profile_id.should < 10000000000000000000
+  end 
+
   describe "class def" do
     # test acts_as_authentic?
     it { should have_many :audit_log_entries }

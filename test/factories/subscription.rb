@@ -3,5 +3,6 @@ Factory.define :subscription do |s|
   s.association :user, :factory => :user
   s.expires_at Time.parse('2010-12-05')
   s.created_at Time.parse('2010-10-05')
+  s.state           "trial"
+  s.price           30
 end
-

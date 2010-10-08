@@ -1,4 +1,6 @@
 class User < ActiveRecord::Base
+  include Utilities
+  
   acts_as_authentic
 
   has_many :audit_log_entries
@@ -26,15 +28,6 @@ class User < ActiveRecord::Base
   def update_campaignmaster
     update_cm(:update)
   end
-
-  # def validate
-  #   if self.email_confirmation.blank?
-  #     errors.add_to_base("Must provide email confirmation")
-  #   end
-  #   unless self.email == self.email_confirmation
-  #     errors.add_to_base("Email does not match confirmation")
-  #   end
-  # end
 
   def name
     [ self.firstname, self.lastname ].join(" ")
@@ -67,5 +60,23 @@ class User < ActiveRecord::Base
   rescue RuntimeError => ex
     CM::Proxy.log_cm_error(ex)
   end
+  
+  # generates a random number that is saved after a successful recurrent profile creation and used later 
+  # to access the users recurrent profile in secure pay in order to make new payments or cancel the proile
+  # this unique number (called Client ID in AU sequre pay gateway) should be less than 20 characters long
+  # this method uses secure random number generator in combination with offset(unique) that makes the number unique
+  # the generated number is 18 numbers long
+  def generate_recurrent_profile_id
+    generate_unique_random_number(19)
+  end
 
+  # creates or updates the user
+  # returns user
+  def self.save_new_user(user_attributes)
+    returning user = User.new(user_attributes) do
+      user.save!
+    end
+  rescue Exception => e
+    raise Exceptions::UserInvalid.new(e.message)
+  end
 end
