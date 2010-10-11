@@ -37,6 +37,10 @@ class User < ActiveRecord::Base
     name
   end
 
+  def admin?
+    self.role == :admin
+  end
+
   def update_cm(create_or_update)
     result = CM::Recipient.send(create_or_update,
         :created_at => created_at,

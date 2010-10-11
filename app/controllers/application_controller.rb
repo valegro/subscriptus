@@ -20,7 +20,7 @@ class ApplicationController < ActionController::Base
 
   def require_admin
     unless current_user && current_user.admin?
-      flash[:notice] = "Permission Denied"
+      flash[:error] = "Permission Denied"
       redirect_to login_url
     end
   end
