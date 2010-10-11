@@ -22,7 +22,7 @@ config.after_initialize do
   # SequrePay Gateway Settings
   ::GATEWAY = ActiveMerchant::Billing::SecurePayAuExtendedGateway.new(  # the default_currency of this gateway is 'AUD'
         :login => 'CKR0030',  # <MerchantID> input to Au securePay Gateway.
-        :password => "jogkriw7"
+        :password => "q02nnn8h"
   )
 end
 CAMPAIGNMASTER_USERNAME = 'ddraper'

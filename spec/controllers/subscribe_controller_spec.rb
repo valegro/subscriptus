@@ -341,7 +341,8 @@ describe SubscribeController do
   it "should successfully call on_post method on payment and successfully change from trial to full-subscription- existing user with existing recurrent profile choosing Credit Card payment method" do
     user = Factory(:user, :recurrent_id => "4332118890") # user exists
     Payment.any_instance.stubs(:create_recurrent_profile).returns(ActiveMerchant::Billing::Response.new(true, "Successfull"))
-
+    Payment.any_instance.stubs(:call_recurrent_profile).returns(ActiveMerchant::Billing::Response.new(true, "Successfull"))
+  
     post :payment, {:commit=>'Finish', :payment_method => 'credit_card', :payment => {
                                               :card_type => "visa",
                                               :card_number => "4444333322221111",
@@ -363,8 +364,6 @@ describe SubscribeController do
     assigns[:subscription].user.recurrent_id.to_i.should == 4332118890
     assigns[:subscription].order_num.should_not be_nil
     assigns[:subscription].order_num.to_i.should < 1000000000000000 # less than 15 numbers
-    TransactionLog.find_by_recurrent_id(assigns[:subscription].user.recurrent_id.to_s).should_not be_nil
-    TransactionLog.find_by_recurrent_id_and_action(assigns[:subscription].user.recurrent_id.to_s, "trigger existing recurrent profile").success.should be_true
     flash[:notice].should == "Congratulations! Your subscription was successful."
     flash[:error].should be_nil
     response.should redirect_to(:action => :offer)

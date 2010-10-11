@@ -89,9 +89,9 @@ class Payment
     def options(action)
       case action
       when "purchase"
-        option = :customer
-      when "recurrent"
         option = :order_id
+      when "recurrent"
+        option = :customer
       end
       { option => customer_id }
     end
