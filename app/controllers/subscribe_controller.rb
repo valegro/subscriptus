@@ -58,16 +58,18 @@ class SubscribeController < ApplicationController
     session[:user_dat] = @subscription.user.attributes
 
     if session[:new_user]
+      session[:new_user] = nil
       session[:user_dat]["password"] = @subscription.user.password
       session[:user_dat]["password_confirmation"] = @subscription.user.password_confirmation
       session[:user_dat]["email_confirmation"] = @subscription.user.email_confirmation
 
       unless @subscription.user.valid?
         # any type of offer(trial/full subscription), invalid new user
-        flash[:error] = @subscription.errors.full_messages
+        flash[:error] = "invalid user"
         render :action => :details
       end
     else
+      session[:new_user] = nil
       user_session = UserSession.new(:login => @subscription.user.attributes["login"], :password => params[:subscription][:user_attributes][:password]) # user's password is set to blank
       session[:user_dat] = nil
       if user_session.save
@@ -143,6 +145,7 @@ class SubscribeController < ApplicationController
       end
 
       if setup_successful
+        p @subscription
         @payment.order_num = @subscription.generate_and_set_order_number # order_num is sent to the user as a reference number of their subscriptions
         # recurrent setup successul
         @subscription.user.recurrent_id = @payment.customer_id # now user has a valid profile in secure pay that can be refered to by their recurrent_id

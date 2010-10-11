@@ -13,8 +13,8 @@
       <%= u.password_field :password %>
     </div>
     <div id="new_user_fields">
+	  	<%= u.error_messages %>
       <%= u.password_field :password_confirmation %>
-      <%= u.error_messages %>
       <%= u.enum_select :title %>
       <%= u.text_field :firstname %>
       <%= u.text_field :lastname %>
