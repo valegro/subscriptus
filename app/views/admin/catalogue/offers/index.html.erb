@@ -15,7 +15,7 @@
     row.image link_to(image_tag(offer.publication.publication_image.url(:thumb)), admin_catalogue_offer_path(offer))
     row.name link_to(h(offer.name), admin_catalogue_offer_path(offer))
     row.publication link_to(h(offer.publication.name), admin_catalogue_publication_path(offer.publication))
-    row.actions link_to("Edit", edit_admin_catalogue_offer_path(offer), :class => "edit") + link_to("Delete", admin_catalogue_offer_path(offer), :class => "destroy", :method => :delete, :confirm => "Are you sure?")
+    row.actions link_to("Edit", admin_catalogue_offer_path(offer), :class => "edit") + link_to("Delete", admin_catalogue_offer_path(offer), :class => "destroy", :method => :delete, :confirm => "Are you sure?")
   end
 end %>
 
