@@ -148,11 +148,16 @@ ActiveRecord::Schema.define(:version => 20101001065638) do
     t.integer  "offer_id"
     t.integer  "publication_id"
     t.string   "state"
+    t.string   "card_number"
+    t.string   "card_expiration"
+    t.string   "payment_method"
     t.decimal  "price"
+    t.boolean  "auto_renew"
     t.datetime "state_updated_at"
     t.datetime "expires_at"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "recurrent_id"
     t.string   "order_num"
   end
 
