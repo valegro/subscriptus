@@ -3,7 +3,7 @@ class Admin::Catalogue::OffersController < Admin::CatalogueController
   before_filter :find_offer, :except => [ :new, :index, :create ]
 
   def index
-    @offers = Offer.paginate(:page => params[:page] || 1, :order => sort_order('name'))
+    @offers = Offer.paginate(:page => params[:page] || 1, :order => sort_order('name'), :include => :publication)
   end
 
   def new
