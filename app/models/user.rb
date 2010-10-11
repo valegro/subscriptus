@@ -2,7 +2,7 @@ class User < ActiveRecord::Base
   include Utilities
   
   acts_as_authentic
-
+  
   has_many :audit_log_entries
   has_many :subscriptions
   attr_accessor :email_confirmation

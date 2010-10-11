@@ -23,15 +23,15 @@ class SubscriptionObserver < ActiveRecord::Observer
   end
 
   def after_update(record)
-    record.send_later :update_campaignmaster
+    # record.send_later :update_campaignmaster
   end
 
   def before_create(record)
-    record.publication_id = record.offer.publication_id
+    # record.publication_id = record.offer.publication_id
   end
 
   def after_create(record)
-    record.send_later :update_campaignmaster
+    # record.send_later :update_campaignmaster
   end
 
 end

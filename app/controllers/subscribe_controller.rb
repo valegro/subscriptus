@@ -157,10 +157,12 @@ class SubscribeController < ApplicationController
           redirect_to(:action=>:offer)
         else
           # recurrent trigger failed
+          logger.error("Exception In Subscribe Controller ..... trigger_res: #{trigger_res}")
           raise Exceptions::TriggerRecurrentProfileNotSuccessful.new("from finish wizard in subscribe_controller")
         end
       else
         # recurrent setup failed.
+        logger.error("Exception In Subscribe Controller ..... setup_successful: #{setup_successful}")
         raise Exceptions::CreateRecurrentProfileNotSuccessful.new("from finish wizard in subscribe_controller")
       end
     end
@@ -206,12 +208,12 @@ class SubscribeController < ApplicationController
     logger.error("Exceptions::ZeroAmount ---> " + e.message)
     flash[:error] = "Unfortunately your payment was not successfull. Please check that your account has the amount and try again later."
     redirect_to(:action=>:offer)
-  rescue Exception => e
-    # Credit card may be invalid.
-    logger.error("Exception ---> " + e.message)
-    flash[:error] = "Unfortunately your payment was not successfull. Something went wrong during your subscription."
-    flash[:notice] = "Unfortunately your payment was not successfull. Something went wrong during your subscription."
-    redirect_to(:action=>:offer)
+  # rescue Exception => e
+  #   # Credit card may be invalid.
+  #   logger.error("Exception ---> " + e.message)
+  #   flash[:error] = "Unfortunately your payment was not successfull. Something went wrong during your subscription."
+  #   flash[:notice] = "Unfortunately your payment was not successfull. Something went wrong during your subscription."
+  #   redirect_to(:action=>:offer)
   end
 end
 

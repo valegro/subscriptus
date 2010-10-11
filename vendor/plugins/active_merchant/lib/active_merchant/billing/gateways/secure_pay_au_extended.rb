@@ -16,6 +16,7 @@ module ActiveMerchant #:nodoc:
       LIVE_URL = 'https://www.securepay.com.au/xmlapi/payment'
       TEST_PERIODIC_URL ='https://test.securepay.com.au/xmlapi/periodic'
       LIVE_PERIODIC_URL ='https://api.securepay.com.au/xmlapi/periodic'
+      TEST_AMOUNT = 1000 # cents. test money should be integer not float
       
       self.supported_countries = ['AU']
       self.supported_cardtypes = [:visa, :master, :american_express, :diners_club, :jcb]
@@ -78,17 +79,17 @@ module ActiveMerchant #:nodoc:
       end
       
       def purchase(money, credit_card, options = {})
-        commit :purchase, build_purchase_request(money, credit_card, options)
+        commit :purchase, build_purchase_request(test? ? TEST_AMOUNT : money, credit_card, options)
       end                       
     
       # options must include customer unique id
       def setup_recurrent(money, credit_card, options = {})
-        commit :add, build_add_request(money, credit_card, options)
+        commit :add, build_add_request(test? ? TEST_AMOUNT : money, credit_card, options)
       end                       
 
       # options must include customer unique id
       def trigger_recurrent(money, options = {})
-        commit :trigger, build_trigger_request(money, options)
+        commit :trigger, build_trigger_request(test? ? TEST_AMOUNT : money, options)
       end                       
 
       # options must include customer unique id
