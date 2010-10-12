@@ -58,7 +58,7 @@ class SubscribeController < ApplicationController
     session[:user_dat] = @subscription.user.attributes
 
     if session[:new_user]
-      session[:new_user] = nil
+      # session[:new_user] = nil
       session[:user_dat]["password"] = @subscription.user.password
       session[:user_dat]["password_confirmation"] = @subscription.user.password_confirmation
       session[:user_dat]["email_confirmation"] = @subscription.user.email_confirmation
@@ -69,7 +69,7 @@ class SubscribeController < ApplicationController
         render :action => :details
       end
     else
-      session[:new_user] = nil
+      # session[:new_user] = nil
       user_session = UserSession.new(:login => @subscription.user.attributes["login"], :password => params[:subscription][:user_attributes][:password]) # user's password is set to blank
       session[:user_dat] = nil
       if user_session.save
