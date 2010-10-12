@@ -21,6 +21,9 @@ class User < ActiveRecord::Base
   after_create { |user| user.update_cm(:create!) }
   after_update { |user| user.update_cm(:update) }
 
+  # Used for search controller
+  named_scope :firstname_or_lastname_like, lambda { |arg| { :conditions => ["lower(firstname) || ' ' || lower(lastname) LIKE ?", "%#{arg.try(:downcase)}%"]} }
+
   def validate_on_create
     if self.email_confirmation.blank?
       errors.add_to_base("Must provide email confirmation")

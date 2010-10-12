@@ -1,6 +1,5 @@
 class Subscription < ActiveRecord::Base
-  # include Billing::CreditCard
-  # include Billing::Charger
+  #include Billing::Cycle
   include Utilities
 
   belongs_to :user, :autosave => true
