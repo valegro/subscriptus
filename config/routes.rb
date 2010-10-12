@@ -32,6 +32,21 @@ ActionController::Routing::Routes.draw do |map|
     end
   end
 
+  # Signup
+  map.with_options  :controller => 'subscribe' do |s|
+    s.subscribe_offer         'subscribe/offer', :action => 'offer', :method => :get
+    s.subscribe_offer_next    'subscribe/offer', :action => 'offer', :method => :post, :commit=>'Next'
+
+    s.subscribe_details         'subscribe/details', :action => 'details', :method => :get
+    s.subscribe_details_next    'subscribe/details', :action => 'details', :method => :post, :commit=>'Next'
+
+    s.subscribe_payment         'subscribe/payment', :action => 'payment', :method => :get
+    s.subscribe_payment_next    'subscribe/payment', :action => 'payment', :method => :post, :commit=>'Finish'
+    s.subscribe_payment_direct_debit  'subscribe/direct_debit', :action => 'direct_debit', :method => :get
+
+    s.subscribe_result  'subscribe/result', :action => 'result', :method => :get
+  end
+  
   # The priority is based upon order of creation: first created -> highest priority.
 
   # Sample of regular route:

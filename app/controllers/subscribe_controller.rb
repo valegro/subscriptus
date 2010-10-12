@@ -1,6 +1,4 @@
 class SubscribeController < ApplicationController
-  layout 'admin'
-
   act_wizardly_for :subscription, :form_data => :sandbox, :canceled => "/", :completed => "/", :persist_model => :once
 
 # delayed_job , atomic:
@@ -58,7 +56,6 @@ class SubscribeController < ApplicationController
     session[:user_dat] = @subscription.user.attributes
 
     if session[:new_user]
-      # session[:new_user] = nil
       session[:user_dat]["password"] = @subscription.user.password
       session[:user_dat]["password_confirmation"] = @subscription.user.password_confirmation
       session[:user_dat]["email_confirmation"] = @subscription.user.email_confirmation
@@ -69,7 +66,6 @@ class SubscribeController < ApplicationController
         render :action => :details
       end
     else
-      # session[:new_user] = nil
       user_session = UserSession.new(:login => @subscription.user.attributes["login"], :password => params[:subscription][:user_attributes][:password]) # user's password is set to blank
       session[:user_dat] = nil
       if user_session.save
@@ -145,7 +141,6 @@ class SubscribeController < ApplicationController
       end
 
       if setup_successful
-        p @subscription
         @payment.order_num = @subscription.generate_and_set_order_number # order_num is sent to the user as a reference number of their subscriptions
         # recurrent setup successul
         @subscription.user.recurrent_id = @payment.customer_id # now user has a valid profile in secure pay that can be refered to by their recurrent_id
@@ -157,7 +152,7 @@ class SubscribeController < ApplicationController
           @subscription.activate
           # FINISHING THE WIZARD
           flash[:notice] = "Congratulations! Your subscription was successful."
-          redirect_to(:action=>:offer)
+          redirect_to(:action=>:result)
         else
           # recurrent trigger failed
           logger.error("Exception In Subscribe Controller ..... trigger_res: #{trigger_res}")
@@ -173,6 +168,14 @@ class SubscribeController < ApplicationController
 
   on_cancel(:all) do
     @subscription.destroy
+  end
+  
+  # Finishing page of the wizard
+  # shows the result of the subscription process
+  # wether it is successful or has failed
+  def result
+    session[:new_user] = nil
+    session[:user_dat] = nil
   end
 
   def direct_debit
@@ -196,27 +199,27 @@ class SubscribeController < ApplicationController
   rescue Exceptions::UserInvalid => e
     logger.error("Exceptions::UserInvalid ---> " + e.message)
     flash[:error] = "Unfortunately your payment was not successfull. Please try again later. There might be some problems with the cookies of your web browser."
-    # redirect_to(:action=>:offer)
+    # redirect_to(:action=>:result)
   rescue Exceptions::TriggerRecurrentProfileNotSuccessful => e
     # triggering recurrent failed
     logger.error("Exceptions::TriggerRecurrentProfileNotSuccessful ---> " + e.message)
     flash[:error] = "Unfortunately your payment was not successfull. Please check that your account has the amount and try again later."
-    redirect_to(:action=>:offer)
+    redirect_to(:action=>:result)
   rescue Exceptions::CreateRecurrentProfileNotSuccessful => e
     # setting up new recurrent profile failed
     logger.error("Exceptions::CreateRecurrentProfileNotSuccessful ---> " + e.message)
     flash[:error] = "Unfortunately your payment was not successfull. Please check your credit card details and try again."
-    redirect_to(:action=>:offer)
+    redirect_to(:action=>:result)
   rescue Exceptions::ZeroAmount => e
     logger.error("Exceptions::ZeroAmount ---> " + e.message)
     flash[:error] = "Unfortunately your payment was not successfull. Please check that your account has the amount and try again later."
-    redirect_to(:action=>:offer)
+    redirect_to(:action=>:result)
   # rescue Exception => e
   #   # Credit card may be invalid.
   #   logger.error("Exception ---> " + e.message)
   #   flash[:error] = "Unfortunately your payment was not successfull. Something went wrong during your subscription."
   #   flash[:notice] = "Unfortunately your payment was not successfull. Something went wrong during your subscription."
-  #   redirect_to(:action=>:offer)
+  #   redirect_to(:action=>:result)
   end
 end
 

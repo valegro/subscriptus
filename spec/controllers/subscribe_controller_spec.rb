@@ -299,7 +299,7 @@ describe SubscribeController do
       TransactionLog.find_by_recurrent_id_and_action(assigns[:subscription].user.recurrent_id.to_s, "trigger existing recurrent profile").should_not be_nil
       flash[:notice].should == "Congratulations! Your subscription was successful."
       flash[:error].should be_nil
-      response.should redirect_to(:action => :offer)
+      response.should redirect_to(:action => :result)
     end
   
     it "should successfully call on_post method on payment and successfully change from trial to pending-subscription- choosing Direct Debit payment method" do
@@ -371,7 +371,7 @@ describe SubscribeController do
       TransactionLog.find_by_recurrent_id_and_action(assigns[:subscription].user.recurrent_id.to_s, "trigger existing recurrent profile").success.should be_true
       flash[:notice].should == "Congratulations! Your subscription was successful."
       flash[:error].should be_nil
-      response.should redirect_to(:action => :offer)
+      response.should redirect_to(:action => :result)
     end
   
     it "should successfully call on_post method on payment and successfully change from trial to full-subscription- with existing recurrent profile choosing Credit Card payment method" do
@@ -417,7 +417,7 @@ describe SubscribeController do
       assigns[:subscription].order_num.to_i.should < 1000000000000000 # less than 15 numbers
       flash[:notice].should == "Congratulations! Your subscription was successful."
       flash[:error].should be_nil
-      response.should redirect_to(:action => :offer)
+      response.should redirect_to(:action => :result)
     end
   end
   
@@ -442,7 +442,7 @@ describe SubscribeController do
     TransactionLog.find_by_action("setup new recurrent profile").success.should be_false
     TransactionLog.find_by_action("trigger existing recurrent profile").should be_nil
     flash[:error].should == "Unfortunately your payment was not successfull. Please check your credit card details and try again."
-    response.should redirect_to(:action => :offer)
+    response.should redirect_to(:action => :result)
   end
   
   it "should redirect to the first page of wizard with errors when trying to finish the wizard with invalid subscription price choosing Credit Card payment method" do
@@ -465,7 +465,7 @@ describe SubscribeController do
     TransactionLog.find_by_action("setup new recurrent profile").should be_nil
     TransactionLog.find_by_action("trigger existing recurrent profile").should be_nil
     flash[:error].should == "Unfortunately your payment was not successfull. Please check that your account has the amount and try again later."
-    response.should redirect_to(:action => :offer)
+    response.should redirect_to(:action => :result)
   end
   
   it "should redirect to the first page of wizard with errors when trying to finish the wizard with no subscription price choosing Credit Card payment method" do
@@ -488,7 +488,7 @@ describe SubscribeController do
     TransactionLog.find_by_action("setup new recurrent profile").should be_nil
     TransactionLog.find_by_action("trigger existing recurrent profile").should be_nil
     flash[:error].should == "Unfortunately your payment was not successfull. Please check that your account has the amount and try again later."
-    response.should redirect_to(:action => :offer)
+    response.should redirect_to(:action => :result)
   end
   
   # --------------------------------------------- PAYMENT SENARIOs- Payments with Dircet Debit #
