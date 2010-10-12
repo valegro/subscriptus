@@ -94,7 +94,7 @@ class SubscribeController < ApplicationController
       # FINISHING THE WIZARD
       @subscription.save!
       flash[:notice] = "Congratulations! Your trial subscription was successful."
-      redirect_to(:action => :offer)
+      redirect_to(:action=>:result)
     end
   end
 

@@ -21,7 +21,8 @@
           <%= n.item 'Step 1', :link => subscribe_offer_path, :highlights_on => [{:controller => "subscribe/offer"}] %>
           <%= n.item 'Step 2', :link => subscribe_details_path, :highlights_on => [{:controller => :subscribe, :action => :details}] %>
           <%= n.item 'Step 3', :link => subscribe_payment_path, :highlights_on => [{:controller => "subscribe/payment"}] %>
-          <%= n.item 'Finish', :link => subscribe_payment_direct_debit_path, :highlights_on => [{:controller => "subscribe/direct_debit"}, {:controller => "subscribe/result"}] %>
+          <%= n.item 'Step 4', :link => subscribe_payment_direct_debit_path, :highlights_on => [{:controller => "subscribe/direct_debit"}] %>
+          <%= n.item 'Finish', :link => subscribe_result_path, :highlights_on => [{:controller => "subscribe/direct_debit"}, {:controller => "subscribe/result"}] %>
         <% end %>
         <ul class="lower">
           <%= yield :lower %>
