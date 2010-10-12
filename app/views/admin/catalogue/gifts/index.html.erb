@@ -9,7 +9,7 @@
 <%= render_table @gifts do |t|
   t.header :image, :width => "100"
   t.header :name, :sort_by => :name
-  t.header :stock, :width => "60", :sort_by => :stock
+  t.header :stock, :width => "60", :sort_by => :on_hand
   t.header :actions, :width => "180"
 
   t.rows do |row, gift, index|
