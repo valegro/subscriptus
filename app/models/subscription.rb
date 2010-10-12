@@ -75,6 +75,7 @@ class Subscription < ActiveRecord::Base
     end
     # Expiries
     expires :pending => :squatter, :after => 14.days
+    # expires :trial => :squatter, :after => 21.days
   end
 
   def update_campaignmaster
