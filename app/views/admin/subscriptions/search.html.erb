@@ -1,65 +1,59 @@
 <%= javascript_include_tag 'form_filters.js' %>
-<h2>Search for Subscribers</h2>
+
+<div class="title">
+  <%= content_tag :h2, "Subscriber Search" %>
+</div>
 
 <h2>Filters</h2>
-
-<% form_for @search, :html => {:id => 'searchform'} do |f| %>
+<% form_for @search, :html => { :id => 'searchform', :class => 'form' }, :builder => Reform::Builder do |f| %>
   <% # TODO: add ['State','state'], ['Renewal Due','renewal'], ['Gift','gift']
   %>
-  <%= select_tag('filter_name', options_for_select([ ['',''], ['Name','name'], ['Email','email'], ['Publication','publication'] ])) %>
-  <%= link_to_function('Add', 'add_selected_field(); disable_current_option()') %><br/>
-  <%= f.submit "Search" %>
-  or <%= link_to_function('Reset') %><br/>
+  <div class="field field-text" id="filter_block">
+    <div class="field-label">
+      <label for="filter_name">Filters</label>
+    </div>
+    <div class="field-inner">
+      <%= select_tag('filter_name', options_for_select([ ['',''], ['Name','name'], ['Email','email'], ['Publication','publication'] ])) %>
+      <%= link_to_function('Add', 'add_selected_field(); disable_current_option()') %><br/>
+    </div>
+  </div>
+  <div class="field field-text">
+    <div class="field-label">&nbsp;</div>
+    <div class="field-inner">
+      <%= submit_tag "Search", :disable_with => "Searching..." %> or <%= link_to_function('Reset', 'reset_form();') %>
+    </div>
+  </div>
 <% end %>
 
 <h2>Results</h2>
 
-<p>
-  <% if @count.to_i > 0 %>
-    Showing <%= @results.offset + 1 %> to <%= @results.offset + @results.size %> of <%= @count %> subscription(s).
-  <% else %>
-    No subscription found.
-  <% end %>
-</p>
-
-<%= will_paginate @results %>
-<table id="search_results">
-  <thead>
-    <tr>
-      <th>
-        <%= order @search, :by => :name %>
-      </th>
-<<<<<<< HEAD
-      <th>Email</th>
-=======
-      <th>
-        <%= order @search, :by => :user_email, :as => 'Email' %>
-      </th>
->>>>>>> 2f24bfff8a9d114dad7f55fe142b52d4c823b037
-      <th>
-        <%= order @search, :by => :publication_id %>
-      </th>
-      <th>State</th>
-      <th>Renewal</th>
-      <th>Signed Up</th>
-    </tr>
-  </thead>
-  <tbody>
-    <% @results.each do |result|%>
-      <%= render_result_row( result ) %>
-    <% end %>
-  </tbody>
-</table>
-<%= will_paginate @results %>
+<%= render_table @results do |t|
+    t.header :name do
+      order @search, :by => :name
+    end
+    t.header :email do
+      order @search, :by => :user_email, :as => 'Email'
+    end
+    t.header :publication do
+      order @search, :by => :publication_id
+    end
+    t.header :state, :renewal, :signed_up
+    t.rows do |row, result, index|
+      row.name         link_to(result.user.try(:fullname) || 'No name', "#")
+      row.email        result.user.try(:email)
+      row.publication  result.publication.try(:name)
+      row.state        result.state
+      row.renewal      result.expires_at.try(:strftime, "%d/%m/%Y")
+      row.signed_up    result.created_at.try(:strftime, "%d/%m/%Y")
+    end
+  end
+%>  
 
 <script type="text/javascript"><!--
   $(document).ready( function() {
       <% if @search.publication_id %> add_field(filter_element_for('publication')); disable_option('publication'); <% end -%>
       <% if @search.user_firstname_or_user_lastname_like %> add_field(filter_element_for('name')); disable_option('name'); <% end -%>
-<<<<<<< HEAD
-=======
       <% if @search.user_email_like %> add_field(filter_element_for('email')); disable_option('email'); <% end -%>
->>>>>>> 2f24bfff8a9d114dad7f55fe142b52d4c823b037
       <% if @search.state %> add_field(filter_element_for('state')); disable_option('state'); <% end -%>
       <% if @search.renewal %> add_field(filter_element_for('renewal')); disable_option('renewal'); <% end -%>
       <% if @search.gift %> add_field(filter_element_for('gift')); disable_option('gift'); <% end -%>
@@ -69,30 +63,45 @@
 
 <div style="display:none">
   <div id="name_field">
-    <%= label :search, :name %>
-    <%= text_field :search, :user_firstname_or_user_lastname_like %>
-    <%= link_to_function '[X]', "remove_field($(this).parent()); enable_option('name')", :id => 'remove_name_link' %>
+    <div class="field field-text">
+      <div class="field-label">
+        <%= label :search, :name %>
+      </div>
+      <div class="field-inner">
+        <%= text_field :search, :user_firstname_or_user_lastname_like %>
+        <%= link_to_function '[X]', "remove_field($('#name_field')); enable_option('name')", :id => 'remove_name_link' %>
+      </div>
+    </div>
   </div>
-<<<<<<< HEAD
-=======
   <div id="email_field">
-    <%= label :search, :email %>
-    <%= text_field :search, :user_email_like %>
-    <%= link_to_function '[X]', "remove_field($(this).parent()); enable_option('email')", :id => 'remove_email_link' %>
+    <div class="field field-text">
+      <div class="field-label">
+        <%= label :search, :email %>
+      </div>
+      <div class="field-inner">
+        <%= text_field :search, :user_email_like %>
+        <%= link_to_function '[X]', "remove_field($('#email_field')); enable_option('email')", :id => 'remove_email_link' %>
+      </div>
+    </div>
   </div>
->>>>>>> 2f24bfff8a9d114dad7f55fe142b52d4c823b037
   <div id="state_field">
     <strong>state field</strong>
-    <%= link_to_function '[X]', "remove_field($(this).parent()); enable_option('state')", :id => 'remove_state_link' %>
+    <%= link_to_function '[X]', "remove_field($('#state_field')); enable_option('state')", :id => 'remove_state_link' %>
   </div>
   <div id="renewal_field">
     <strong>renewal field</strong>
-    <%= link_to_function '[X]', "remove_field($(this).parent()); enable_option('renewal')", :id => 'remove_renewal_link' %>
+    <%= link_to_function '[X]', "remove_field($('#renewal_field')); enable_option('renewal')", :id => 'remove_renewal_link' %>
   </div>
   <div id="publication_field">
-    <%= label :search, :publication_id %>
-    <%= collection_select :search, :publication_id, Publication.all, :id, :name %>
-    <%= link_to_function '[X]', "remove_field($(this).parent()); enable_option('publication')", :id => 'remove_publication_link' %>
+    <div class="field field-text">
+      <div class="field-label">
+        <%= label :search, :publication_id %>
+      </div>
+      <div class="field-inner">
+        <%= collection_select :search, :publication_id, Publication.all, :id, :name %>
+        <%= link_to_function '[X]', "remove_field($('#publication_field')); enable_option('publication')", :id => 'remove_publication_link' %>
+      </div>
+    </div>
   </div>
   <div id="gift_field">
     <strong>gift field</strong>

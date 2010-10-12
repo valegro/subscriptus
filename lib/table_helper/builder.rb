@@ -101,10 +101,16 @@ class TableHelper::Builder
     @record_set
   end
   
-  def header(*args)
+  def header(*args, &block)
     options = args.last.kind_of?(Hash) ? args.pop : {}
     [*args].each do |title|
-      label_text = options.has_key?(:label) ? options[:label] : TableHelpers.titleize(title)
+      label_text = if options.has_key?(:label)
+        options[:label]
+      elsif block_given?
+        label_text = block.call
+      else
+        TableHelpers.titleize(title)
+      end
       options.delete(:label) # Just to make sure.
       label_text = '&nbsp;' if label_text.blank?
       @table_headers << { :label => label_text, :sym => title.to_s.downcase.to_sym, :options => options }

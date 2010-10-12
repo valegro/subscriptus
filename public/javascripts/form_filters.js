@@ -1,5 +1,5 @@
 function add_field(field) {
-  field.insertBefore($('#filter_name'));
+  field.insertBefore($('#filter_block'));
 }
 
 function add_selected_field() {
@@ -7,6 +7,7 @@ function add_selected_field() {
 }
 
 function remove_field(field) {
+  alert(field.html());
   field.insertBefore($('#end_of_fields'));
 }
 
@@ -36,4 +37,12 @@ function filter_element_for(name) {
     default:
       return $('<p>' + name + '</p>');
   }
+}
+
+function reset_form() {
+  $(':input','#searchform')
+     .not(':button, :submit, :reset, :hidden')
+      .val('')
+       .removeAttr('checked')
+        .removeAttr('selected');
 }

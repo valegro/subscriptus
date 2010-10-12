@@ -97,9 +97,10 @@ module Reform
     end
 
     def submit_and_cancel(submit_name, cancel_name, options = {})
+      field_name, label, options, row_class, label_class = field_settings(submit_name, options.merge( :label => "&nbsp;"))
       submit_button = @template.submit_tag(submit_name, options)
-      cancel_button = @template.submit_tag(cancel_name, options)
-      wrapping("submit", nil, nil, "", submit_button+cancel_button, options)
+      cancel_button = cancel_name
+      wrapping("submit", nil, nil, '', '', '', submit_button + cancel_button, options)
     end
 
     def radio_button_group(method, values, options = {})
