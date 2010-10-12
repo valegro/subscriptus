@@ -13,20 +13,21 @@ class User < ActiveRecord::Base
     labels :INTL => "Outside of Australia"
   end
 
-  validates_presence_of :firstname, :lastname, :email, :email_confirmation, :phone_number, :address_1, :city, :postcode, :state, :country
   validates_format_of :email, :with => /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i
+  validates_presence_of :firstname, :lastname, :email, :phone_number, :address_1, :city, :postcode, :state, :country, :role
   validates_uniqueness_of :email
   validates_confirmation_of :email
 
-  after_create :add_to_campaignmaster
-  after_update :update_campaignmaster
+  after_create { |user| user.update_cm(:create!) }
+  after_update { |user| user.update_cm(:update) }
 
-  def add_to_campaignmaster
-    update_cm(:create!)
-  end
-
-  def update_campaignmaster
-    update_cm(:update)
+  def validate_on_create
+    if self.email_confirmation.blank?
+      errors.add_to_base("Must provide email confirmation")
+    end
+    unless self.email == self.email_confirmation
+      errors.add_to_base("Email does not match confirmation")
+    end
   end
 
   def name

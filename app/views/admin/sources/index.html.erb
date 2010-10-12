@@ -7,8 +7,8 @@
 </div>
 
 <%= render_table @sources do |t|
-  t.header :identifier, :label => 'ID'
-  t.header :code
+  t.header :identifier, :label => 'ID', :sort_by => :id
+  t.header :code, :sort_by => :code
   t.header :description
   t.header :actions, :width => "180"
 

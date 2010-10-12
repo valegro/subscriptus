@@ -2,7 +2,7 @@ class Admin::Catalogue::PublicationsController < Admin::CatalogueController
   before_filter :find_publication, :only => [ :destroy, :edit, :show, :update ]
 
   def index
-    @publications = Publication.paginate(:page => params[:page] || 1)
+    @publications = Publication.paginate(:page => params[:page] || 1, :order => sort_order('name'))
   end
 
   def new

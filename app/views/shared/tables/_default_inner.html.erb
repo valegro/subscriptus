@@ -2,7 +2,7 @@
   <thead>
     <tr>
       <% table_headers.each do |header| %>
-        <%= content_tag :th, header[:label], header[:options] %>
+        <%= content_tag(:th, header[:sort_by] ? sort_link(header[:label], header[:sort_by]) : header[:label]) %>
       <% end %>
     </tr>
   </thead>

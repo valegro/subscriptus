@@ -2,7 +2,7 @@ class Admin::SourcesController < AdminController
   before_filter :find_source, :only => [ :edit, :update, :destroy ]
 
   def index
-    @sources = Source.all
+    @sources = Source.paginate(:page => params[:page] || 1, :order => sort_order('code'))
   end
 
   def new
