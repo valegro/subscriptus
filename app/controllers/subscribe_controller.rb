@@ -24,7 +24,7 @@ class SubscribeController < ApplicationController
 
   on_get(:offer) do
     @offer = params[:offer_id] ? Offer.find(params[:offer_id]) : Offer.first
-    source = params[:source_id] ? Source.find(params[:source_id]) : nil
+    source = (params[:source_id] && params[:source_id] != 'null') ? Source.find(params[:source_id]) : nil
     @optional_gifts = @offer.gifts.in_stock.optional
     @included_gifts = @offer.gifts.in_stock.included
     @subscription.offer = @offer
@@ -61,7 +61,8 @@ class SubscribeController < ApplicationController
       session[:user_dat]["password"] = @subscription.user.password
       session[:user_dat]["password_confirmation"] = @subscription.user.password_confirmation
       session[:user_dat]["email_confirmation"] = @subscription.user.email_confirmation
-
+      @subscription.user.role = :subscriber
+      
       unless @subscription.user.valid?
         # any type of offer(trial/full subscription), invalid new user
         flash[:error] = "invalid user"
@@ -216,12 +217,12 @@ class SubscribeController < ApplicationController
     logger.error("Exceptions::ZeroAmount ---> " + e.message)
     flash[:error] = "Unfortunately your payment was not successfull. Please check that your account has the amount and try again later."
     redirect_to(:action=>:result)
-  # rescue Exception => e
-  #   # Credit card may be invalid.
-  #   logger.error("Exception ---> " + e.message)
-  #   flash[:error] = "Unfortunately your payment was not successfull. Something went wrong during your subscription."
-  #   flash[:notice] = "Unfortunately your payment was not successfull. Something went wrong during your subscription."
-  #   redirect_to(:action=>:result)
+  rescue Exception => e
+    # Credit card may be invalid.
+    logger.error("Exception ---> " + e.message)
+    flash[:error] = "Unfortunately your payment was not successfull. Something went wrong during your subscription."
+    flash[:notice] = "Unfortunately your payment was not successfull. Something went wrong during your subscription."
+    redirect_to(:action=>:result)
   end
 end
 
