@@ -61,6 +61,7 @@ class SubscribeController < ApplicationController
       session[:user_dat]["password"] = @subscription.user.password
       session[:user_dat]["password_confirmation"] = @subscription.user.password_confirmation
       session[:user_dat]["email_confirmation"] = @subscription.user.email_confirmation
+      session[:user_dat]["role"] = :subscriber
       @subscription.user.role = :subscriber
       
       unless @subscription.user.valid?

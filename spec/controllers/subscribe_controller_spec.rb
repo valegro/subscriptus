@@ -295,6 +295,7 @@ describe SubscribeController do
       assigns[:subscription].publication.should_not be_nil
       assigns[:subscription].user.should_not be_nil
       assigns[:subscription].user.id.should_not be_nil
+      assigns[:subscription].user.role.should == :subscriber
       assigns[:subscription].user.recurrent_id.should_not == "0"
       assigns[:subscription].user.recurrent_id.to_i.should < 10000000000000000000 # less than 20 numbers
       assigns[:subscription].order_num.should_not be_nil
@@ -332,6 +333,7 @@ describe SubscribeController do
       assigns[:subscription].publication.should_not be_nil
       assigns[:subscription].user.should_not be_nil
       assigns[:subscription].user.id.should_not be_nil
+      assigns[:subscription].user.role.should == :subscriber
       assigns[:subscription].user.recurrent_id.should_not == "0"
       assigns[:subscription].user.recurrent_id.to_i.should < 10000000000000000000 # less than 20 numbers
       assigns[:subscription].order_num.should_not be_nil
@@ -418,6 +420,7 @@ describe SubscribeController do
       assigns[:subscription].publication.should_not be_nil
       assigns[:subscription].user.should_not be_nil
       assigns[:subscription].user.id.should == user.id
+      assigns[:subscription].user.role.should == :subscriber
       assigns[:subscription].user.recurrent_id.to_i.should == 12345678909090909097
       assigns[:subscription].order_num.should_not be_nil
       assigns[:subscription].order_num.to_i.should < 1000000000000000 # less than 15 numbers
