@@ -18,4 +18,8 @@ module ApplicationHelper
     output << content_tag(:div, page_entries_info(object, page_entries_opts), :class=>"page_entries") unless opts[:page_entries] == false
     content_tag(:div, output, :class=>"pagination #{opts[:position].to_s}") 
   end
+
+  def number_to_currency_with_free(number)
+    number == 0 ? "Free" : number_to_currency(number)
+  end
 end
