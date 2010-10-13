@@ -29,6 +29,11 @@ class Subscription < ActiveRecord::Base
   named_scope :ascend_by_name, :include => 'user', :order => "users.lastname ASC, users.firstname ASC"
   named_scope :descend_by_name, :include => 'user', :order => "users.lastname DESC, users.firstname DESC"
 
+  # Used for search controller
+  named_scope :user_firstname_or_user_lastname_like, lambda { |arg|
+    { :include => :user, :conditions => ["lower(users.firstname) || ' ' || lower(users.lastname) LIKE ?", "%#{arg.try(:downcase)}%"] }
+  }
+
   def self.per_page
     20
   end

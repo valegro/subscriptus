@@ -7,7 +7,6 @@ function add_selected_field() {
 }
 
 function remove_field(field) {
-  alert(field.html());
   field.insertBefore($('#end_of_fields'));
 }
 
