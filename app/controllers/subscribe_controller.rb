@@ -41,7 +41,7 @@ class SubscribeController < ApplicationController
     @offer = Offer.find(@subscription.offer.id)
     @ot = params[:offer_term] ? OfferTerm.find(params[:offer_term]) : @offer.offer_terms.first
     @subscription.price = @ot.price
-    @subscription.set_expires_at(@ot.months) # new subscription starts after the finish date of current subscription/trial
+    @subscription.increment_expires_at(@ot)
     @subscription.gifts.add_uniquely(@offer.available_included_gifts)
   end
 

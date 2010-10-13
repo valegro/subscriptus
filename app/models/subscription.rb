@@ -33,8 +33,6 @@ class Subscription < ActiveRecord::Base
     20
   end
 
-  #validates_presence_of :expiry
-  
   # Signup Wizard
   validation_group :offer, :fields => [ :publication_id, :price, :expires_at ]
   validation_group :details
@@ -122,8 +120,11 @@ class Subscription < ActiveRecord::Base
 
   # if the sibscription is new or expired, start it from now
   # otherwise start it after the expiration time
-  def set_expires_at(months)
-    self.expires_at = (self.expires_at.blank? || self.expires_at < Date.today) ? Date.today.months_since(months) + 1.day : self.expires_at.months_since(months) + 1.day
+
+  def increment_expires_at(offer_term)
+    self.expires_at = nil && return unless offer_term.expires?
+    self.expires_at = Date.today if self.expires_at.blank? || self.expires_at < Date.today
+    self.expires_at = self.expires_at.advance(:months => offer_term.months)
   end
 
   # generates a random number that is saved after a successful recurrent profile creation and used later

@@ -1,1 +1,1 @@
-<li><%= pluralize(offer_term.months, "month") %> for <%= number_to_currency(offer_term.price) %></li>
+<li><%= offer_term.expires? ? pluralize(offer_term.months, "month") : "Forever" %> for <%= number_to_currency(offer_term.price) %></li>
