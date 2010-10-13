@@ -217,12 +217,6 @@ class SubscribeController < ApplicationController
     logger.error("Exceptions::ZeroAmount ---> " + e.message)
     flash[:error] = "Unfortunately your payment was not successfull. Please check that your account has the amount and try again later."
     redirect_to(:action=>:result)
-  rescue Exception => e
-    # Credit card may be invalid.
-    logger.error("Exception ---> " + e.message)
-    flash[:error] = "Unfortunately your payment was not successfull. Something went wrong during your subscription."
-    flash[:notice] = "Unfortunately your payment was not successfull. Something went wrong during your subscription."
-    redirect_to(:action=>:result)
   end
 end
 
