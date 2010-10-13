@@ -2,9 +2,12 @@ class Subscription < ActiveRecord::Base
   #include Billing::Cycle
   include Utilities
 
+  acts_as_archive  # so that the records are not actually deleted from database. makes it possible to keep track of used <sources> and <publications>
+
   belongs_to :user, :autosave => true
   belongs_to :offer
   belongs_to :publication
+  belongs_to :source # with this attribute there is no need to have the SubscriptionLogEntry as sources are easily trackable through subscription. but subscription needs to act_as_paranoid
   has_many :subscription_log_entries
   has_many :subscription_gifts, :dependent => :destroy
 

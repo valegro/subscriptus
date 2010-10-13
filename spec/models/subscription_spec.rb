@@ -20,7 +20,7 @@ describe Subscription do
     @subscription.expires_at.month.should == expected.month
     @subscription.expires_at.day.should == expected.day
   end
-
+  
   it "should set expiry_date to 3 months from the end of current expiry date" do
     months = 3
     @subscription.expires_at = Date.new(2010, 10, 4)
@@ -30,7 +30,7 @@ describe Subscription do
     @subscription.expires_at.month.should == expected.month
     @subscription.expires_at.day.should == expected.day
   end
-
+  
   it "should set expiry_date to 3 months from now if no expiry date has been set yet" do
     months = 3
     expected = Date.new(2010, 12, 27)
@@ -39,7 +39,7 @@ describe Subscription do
     @subscription.expires_at.month.should == expected.month
     @subscription.expires_at.day.should == expected.day
   end
-
+  
   describe "class def" do
     it "should return per page" do
       Subscription.per_page.should == 20
@@ -107,5 +107,25 @@ describe Subscription do
       subs = Subscription.descend_by_name
       subs[0].user.lastname.should >= subs[1].user.lastname
     end
+  end
+
+  # -------------------------- Soft Deletion Scenarios
+  it "should archive the deleted subscriptions" do
+    sub_primary_size = Subscription.all.size
+    archive_primary_size = Subscription::Archive.all.size
+    
+    s = Factory(:subscription) # create a new subscription and save in database
+    Subscription.all.size.should == sub_primary_size + 1
+    Subscription::Archive.all.size.should == archive_primary_size
+
+    # primary deletion -> artficial deletion
+    s.destroy
+    Subscription.all.size.should == sub_primary_size
+    Subscription::Archive.all.size.should == archive_primary_size + 1
+
+    # secondary deletion -> no changes!
+    s.destroy
+    Subscription.all.size.should == sub_primary_size
+    Subscription::Archive.all.size.should == archive_primary_size + 1
   end
 end

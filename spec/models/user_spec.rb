@@ -1,7 +1,7 @@
 require 'spec_helper'
 describe User do
   before(:each) do
-    @user = Factory.build(:user)
+    @user = Factory.build(:subscriber)
     @user.stubs(
                      :address_1 => 'a1',
                      :address_2 => 'a2',

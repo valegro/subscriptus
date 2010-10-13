@@ -24,9 +24,11 @@ class SubscribeController < ApplicationController
 
   on_get(:offer) do
     @offer = params[:offer_id] ? Offer.find(params[:offer_id]) : Offer.first
+    source = params[:source_id] ? Source.find(params[:source_id]) : nil
     @optional_gifts = @offer.gifts.in_stock.optional
     @included_gifts = @offer.gifts.in_stock.included
     @subscription.offer = @offer
+    @subscription.source = source
     @subscription.subscription_gifts.clear
     @subscription.subscription_gifts.build(:gift => @optional_gifts.first)
   end

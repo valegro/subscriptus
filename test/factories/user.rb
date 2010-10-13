@@ -1,4 +1,4 @@
-Factory.define :user do |f|
+Factory.define :user do |f| # Dont use this factory. Use either an admin or a subscriber instead
   f.login { Faker::Name.first_name }
   f.firstname { Faker::Name.first_name }
   f.lastname { Faker::Name.last_name }

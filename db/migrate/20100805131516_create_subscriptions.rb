@@ -9,9 +9,13 @@ class CreateSubscriptions < ActiveRecord::Migration
       t.timestamp :expires_at
       t.timestamps
     end
+
+    # create the archive table
+    ActsAsArchive.update Subscription
   end
 
   def self.down
     drop_table :subscriptions
+    drop_table :archived_subscriptions
   end
 end

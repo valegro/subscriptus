@@ -4,7 +4,7 @@ describe SubscriptionMailer do
 
   before(:each) do
     @offer = Factory(:offer)
-    @user = Factory(:user)
+    @user = Factory(:subscriber)
     @offer.publication_id = Factory(:publication).id
   end
 
