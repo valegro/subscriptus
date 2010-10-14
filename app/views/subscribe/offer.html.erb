@@ -20,7 +20,7 @@
       <% end %>
     </table>
   <% else %>
-    <p><%= describe_offer_term(@offer.offer_terms.first) %></p>
+    <p><%= describe_offer_term(@offer.try(:offer_terms).try(:first)) %></p>
   <% end %>
 
   <!-- Gifts -->
