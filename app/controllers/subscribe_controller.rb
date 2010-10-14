@@ -43,7 +43,7 @@ class SubscribeController < ApplicationController
     @offer = Offer.find(@subscription.offer.id)
     @ot = params[:offer_term] ? OfferTerm.find(params[:offer_term]) : @offer.offer_terms.first
     @subscription.price = @ot.price
-    @subscription.set_expires_at(@ot.months) # new subscription starts after the finish date of current subscription/trial
+    @subscription.increment_expires_at(@ot)
     @subscription.gifts.add_uniquely(@offer.available_included_gifts)
   end
 
@@ -86,7 +86,7 @@ class SubscribeController < ApplicationController
     # if the offer is a trial, skip payment and
     # FINISH the wizard
     # otherwise just o to the next page of wizard(payment)
-    if @subscription.offer.is_trial?
+    if @subscription.offer.is_trial? #|| @subscription.price == 0
       # subscription should be saved in database before the wizard is finished so that no conflicts happens between has_states and wizardly
       # the first subscription has a trial state
       @subscription = Subscription.create(@subscription.attributes)

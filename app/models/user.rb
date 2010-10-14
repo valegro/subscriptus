@@ -24,6 +24,9 @@ class User < ActiveRecord::Base
   # Used for search controller
   named_scope :firstname_or_lastname_like, lambda { |arg| { :conditions => ["lower(firstname) || ' ' || lower(lastname) LIKE ?", "%#{arg.try(:downcase)}%"]} }
 
+  named_scope :admins, :conditions => { :role => 'admin' }
+  named_scope :subscribers, :conditions => { :role => 'subscriber' }
+
   def validate_on_create
     if self.email_confirmation.blank?
       errors.add_to_base("Must provide email confirmation")

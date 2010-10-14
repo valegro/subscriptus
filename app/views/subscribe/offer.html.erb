@@ -20,7 +20,7 @@
       <% end %>
     </table>
   <% else %>
-    <p><%= pluralize(@offer.offer_terms.first.months, 'month') %> for <%= number_to_currency(@offer.offer_terms.first.price) %></p>
+    <p><%= describe_offer_term(@offer.try(:offer_terms).try(:first)) %></p>
   <% end %>
 
   <!-- Gifts -->
