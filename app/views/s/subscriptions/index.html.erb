@@ -1,0 +1,15 @@
+<div class="title">
+  <%= content_tag :h2, "My Subscriptions" %>
+</div>
+
+<%= render_table @subscriptions do |t|
+  t.header :publication, :from, :to, :status, :actions
+
+  t.rows do |row, subscription, index|
+    row.publication subscription.publication.name
+    row.from subscription.created_at
+    row.to subscription.expires_at
+    row.status subscription.state
+    row.actions link_to('Pay', s_subscription_payment_path(subscription), :class => "pay")
+  end
+end %>

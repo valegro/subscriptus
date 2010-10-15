@@ -1,5 +1,5 @@
 class SubscribeController < ApplicationController
-  act_wizardly_for :subscription, :form_data => :sandbox, :canceled => "/", :completed => "/", :persist_model => :once
+  # act_wizardly_for :subscription, :form_data => :sandbox, :canceled => "/", :completed => "/", :persist_model => :once
 
 # delayed_job , atomic:
 # begin
@@ -116,7 +116,6 @@ class SubscribeController < ApplicationController
     if params[:payment_method] != 'credit_card'
       # Direct Debit payments
       # change the state of subscription from trial to pending
-      @subscription.generate_and_set_order_number # order_num is sent to the user as a reference number of their subscriptions
       @subscription.pay_later
       @subscription.save!
       # FINISHING THE WIZARD

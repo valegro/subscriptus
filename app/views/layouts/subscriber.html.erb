@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+	"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+	<title>Subscriber Portal: Crikey</title>
+  <%= javascript_include_tag "http://code.jquery.com/jquery-1.4.2.min.js", "jquery-ui-1.8.2.custom.min.js", "application.js" %>
+	<%= stylesheet_link_tag 'admin/application', 'admin/scaffold', "ui-lightness/jquery-ui-1.8.2.custom.css" %>
+</head>
+
+<body>
+  <div class="wrapper">
+    <div id="header">
+      <div class="wrapper welcome">
+        <h1>Subscriber Portal</h1>
+        <ul class="user_detail"><%= link_to 'logout', logout_path %></ul>
+      </div>
+      <div id="navigation">
+        <% semantic_navigation :main, :html => { :class => "upper" } do |n| %>
+          <%= n.item 'Subscriptions', :link => s_subscriptions_path %>
+        <% end %>
+        <ul class="lower">
+          <%= yield :lower %>
+        </ul>
+      </div>
+    </div>
+    <div id="content">
+      <% if flash[:notice] %>
+        <div class="ui-state-highlight ui-corner-all" style="margin-top: 20px; margin-bottom: 20px; padding: 0 .7em;">
+          <p>
+            <span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span>
+            <span style="color: green"><%= flash[:notice] %></span>
+          </p>
+        </div>
+      <% elsif flash[:error] %>
+        <div class="ui-state-highlight ui-corner-all" style="margin-top: 20px; margin-bottom: 20px; padding: 0 .7em;">
+          <p>
+            <span class="ui-icon ui-icon-info" style="float: left; margin-right: .3em;"></span>
+            <span style="color: red"><%= flash[:error] %></span>
+          </p>
+        </div>
+      <% end %>
+      <%= yield %>
+    </div>
+  </div>
+</body>
+</html>

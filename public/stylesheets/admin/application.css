@@ -277,6 +277,10 @@ body {
 	background: transparent url(/images/admin/icons/pencil-small.png) no-repeat left center;
 }
 
+.table table a.pay {
+	background: transparent url(/images/s/icons/dollar-small.png) no-repeat right center;
+}
+
 .table table a.destroy {
 	background: transparent url(/images/admin/icons/cross-small.png) no-repeat left center;
 }

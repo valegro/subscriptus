@@ -10,8 +10,7 @@ class UserSessionsController < ApplicationController
     @user_session = UserSession.new(params[:user_session])
     if @user_session.save
       flash[:notice] = "Login successful!"
-      #redirect_back_or_default(
-      redirect_to admin_subscriptions_path
+      redirect_to current_user.admin? ? admin_subscriptions_path : s_subscriptions_path
     else
       flash[:notice] = "Login Failed!"
       render :action => :new

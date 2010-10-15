@@ -29,6 +29,10 @@ module NavigationHelpers
       when /admin subscriptions/ then admin_subscriptions_path
       # Sessions
       when /login/ then login_path
+      # Subscribers
+      when /s subscription payment page for (.*)/ then s_subscription_payment_path($1)
+      when /s subscription direct debit/ then s_subscription_direct_debit_path
+      when /s subscriptions/ then s_subscriptions_path
 
     # Add more mappings here.
     # Here is an example that pulls values out of the Regexp:

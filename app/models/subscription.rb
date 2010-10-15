@@ -54,13 +54,15 @@ class Subscription < ActiveRecord::Base
 
   # Subscription States
   # has_states :incomplete, :trial, :squatter, :active, :pending, :renewal_due, :payment_failed do
-  has_states :trial, :squatter, :active, :pending, :renewal_due, :payment_failed, :init => :trial do
+  has_states :trial, :squatter, :active, :pending, :extension_pending, :renewal_due, :payment_failed, :init => :trial do
     on :activate do
+      transition :active => :active # when the subscriber extends their subscription while its still active
       transition :trial => :active
       transition :squatter => :active
     end
     on :pay_later do
       transition :trial => :pending
+      transition :active => :extension_pending # when the subscriber is currently active but is going to pay for the new subscription using Direct Debit
     end
     on :verify do
       transition :pending => :active
