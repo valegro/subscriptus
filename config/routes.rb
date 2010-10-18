@@ -34,11 +34,7 @@ ActionController::Routing::Routes.draw do |map|
 
   # Subscriber
   map.namespace :s do |subscriptions|
-    subscriptions.with_options  :controller => 'subscriptions' do |s|
-      s.subscriptions   'subscriptions',  :action => :index, :method => :get
-      s.subscription_payment  'subscription/:id/payment',  :action => :payment, :method => :post
-      s.subscription_direct_debit  'subscriptions/direct_debit',  :action => :direct_debit, :method => :get
-    end
+    subscriptions.resources :subscriptions, :member => { :payment => :get, :pay => :post, :direct_debit => :get }, :collection => { :download_pdf => :get }
   end
 
   # Signup

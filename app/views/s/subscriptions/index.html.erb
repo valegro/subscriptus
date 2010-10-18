@@ -10,6 +10,6 @@
     row.from subscription.created_at
     row.to subscription.expires_at
     row.status subscription.state
-    row.actions link_to('Pay', s_subscription_payment_path(subscription), :class => "pay")
+    row.actions link_to('Pay', payment_s_subscription_path(subscription), :class => "pay")
   end
 end %>

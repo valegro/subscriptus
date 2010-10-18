@@ -2,13 +2,19 @@
 <%= content_tag :h2, "Paying For Subscription: #{@name}" %><br/>
 <%= content_tag :p, "Please choose your method of payment" %>
 
-<% form_for :payment, :url=>{:action=>:pay}, :builder => Reform::Builder, :html => { :class => "form", :method => 'post' } do |p| %>
+<% form_for :payment, :url => pay_s_subscription_path(@subscription), :builder => Reform::Builder, :html => { :class => "form", :method => 'post' } do |p| %>
 	<%= p.error_messages %>
 
-	<p><%= radio_button_tag :payment_method, "credit_card", @payment_method ? @payment_method == 'credit_card' : true %>Credit Card</p>
+	<p><%= radio_button_tag :payment_method, "existing_credit_card", @payment_method ? @payment_method == 'existing_credit_card' : true %>Existing Credit Card</p>
+	<p><%= radio_button_tag :payment_method, "new_credit_card", @payment_method ? @payment_method == 'new_credit_card' : false %>New Credit Card</p>
 	<p><%= radio_button_tag :payment_method, "direct_debit", @payment_method ? @payment_method == 'direct_debit' : false %>Direct Debit</p>
 
-    <div id="credit_card_fields">
+    <div id="existing_credit_card_fields">
+		<p style="padding: 10px">Use this option if you want to use your existing Credit Card details to pay for your subscription.</p>
+	</div>
+
+    <div id="new_credit_card_fields">
+	  <p style="padding: 10px">Use this option if you are a new user or you want to change your Credit Card details.</p>
       <%= p.enum_select :card_type %>
       <%= p.text_field :card_number %>
       <%= p.text_field :card_verification %>
@@ -19,6 +25,7 @@
 
     <div id="direct_debit_fields" style="padding:10px">
 		Thank you for subscribing to Crikey.<br/>
+	  	Please use this option if you want to pay for your subscription using Direct Debit.
 		However, we need a few more details from you in order to activate your subscription.<br/>
 		By clicking on Finish, you will be forwarded to the direct debit page where you can get all the information you need on how to proceed with your payment.
 	</div>
@@ -29,13 +36,19 @@
 <script type='text/javascript'>
   function showFields() {
     checked = $('input[name=payment_method]:checked').val();
-    if (checked == 'credit_card') {
+    if (checked == 'existing_credit_card') {
+      $('#existing_credit_card_fields').show();
+      $('#new_credit_card_fields').hide();
+      $('#direct_debit_fields').hide();
+	} else if (checked == 'new_credit_card') {
       $('#payment_attributes_card_type').focus();
-      $('#credit_card_fields').show();
+      $('#existing_credit_card_fields').hide();
+      $('#new_credit_card_fields').show();
       $('#direct_debit_fields').hide();
     } else {
+      $('#existing_credit_card_fields').hide();
+      $('#new_credit_card_fields').hide();
       $('#direct_debit_fields').show();
-      $('#credit_card_fields').hide();
     }
   }
 

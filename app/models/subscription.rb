@@ -147,6 +147,32 @@ class Subscription < ActiveRecord::Base
     end
   end
 
+  def pay_non_first_time(payment)
+    returning self do
+      payment.money = price # setting the money of payment object
+      payment.customer_id = self.user.recurrent_id
+      payment.order_num = self.generate_and_set_order_number # order_num is sent to the user as a reference number of their subscriptions
+      payment.call_recurrent_profile # make the payment through secure pay
+      # change the state of subscription from trial to active
+      self.activate
+    end
+  end
+  
+  def pay_first_time(payment)
+    returning self do
+      payment.money = self.price # setting the money of payment object
+      payment.customer_id = self.user.generate_recurrent_profile_id # customer_id is used to create recurrent_profile in secure pay
+      payment.create_recurrent_profile
+      # recurrent setup successul, so now the customer_id should be saved as a reference to later transactions
+      self.user.recurrent_id = payment.customer_id
+      payment.order_num = self.generate_and_set_order_number # order_num is sent to the user as a reference number of their subscriptions
+      payment.call_recurrent_profile # make the payment through secure pay
+      # change the state of subscription from trial to active
+      self.activate
+    end
+  end
+  
+  
   private
 
   # If the current account is expired, and the subscription now has a

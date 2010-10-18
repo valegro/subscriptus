@@ -30,7 +30,7 @@ Feature: A subscriber can view subscriptions
 
   Scenario: A new subscriber can pay for a subscription by Credit Card
 	Given I am on the s subscription payment page for 2  # 2 is the id of 'Subscription 2'
-	When I choose "payment_method_credit_card"
+	When I choose "payment_method_new_credit_card"
 	# Then I should be on the s subscription payment page for 2 # the same page
 		Then I should see "Card number"
 		# And I should see "Card type"
@@ -47,13 +47,12 @@ Feature: A subscriber can view subscriptions
 		And I fill in "payment[first_name]" with "Bart"
 		And I fill in "payment[last_name]" with "Miller"
 		And I press "Submit"
-		Then show me the page
 	Then I should be on the s subscriptions page
 		And I should see "Congratulations! Your subscription was successful." within "span[@style='color: green']"
 
-  Scenario: A new subscriber will see an error if she doesnt fill in all credit card details
+  Scenario: A new subscriber will see an error if she doesn't fill in all credit card details
 	Given I am on the s subscription payment page for 2  # 2 is the id of 'Subscription 2'
-	When I choose "payment_method_credit_card"
+	When I choose "payment_method_new_credit_card"
 		And I select "Visa" from "payment[card_type]"
 		And I fill in "payment[card_number]" with ""
 		And I fill in "payment[card_verification]" with "111"
@@ -65,17 +64,12 @@ Feature: A subscriber can view subscriptions
 	Then I should be on the s subscriptions page
 		And I should see "Unfortunately your payment was not successful. Please check your credit card details and try again." within "span[@style='color: red']"
 
-	  @active
   Scenario: A new subscriber can pay for a subscription by Direct Debit
 	Given I am on the s subscription payment page for 2  # 2 is the id of 'Subscription 2'
 	When I choose "payment_method_direct_debit"
 	Then I should see "By clicking on Finish, you will be forwarded to the direct debit page where you can get all the information you need on how to proceed with your payment."
 	When I press "Submit"
-	Then I should be on the s subscription direct debit page
+	Then I should be on the s subscription direct debit page for 2
 	And I should see "Bank Account - direct debit request(PDF)"
 	And I should see "Credit Card - direct debit request(PDF)"
-
-
-  Scenario: An existing subscriber can pay for a subscription by Credit Card
-  Scenario: An existing subscriber can pay for a subscription by Direct Debit
 

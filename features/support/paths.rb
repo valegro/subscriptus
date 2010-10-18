@@ -30,8 +30,8 @@ module NavigationHelpers
       # Sessions
       when /login/ then login_path
       # Subscribers
-      when /s subscription payment page for (.*)/ then s_subscription_payment_path($1)
-      when /s subscription direct debit/ then s_subscription_direct_debit_path
+      when /s subscription payment page for (.*)/ then payment_s_subscription_path($1)
+      when /s subscription direct debit page for (.*)/ then direct_debit_s_subscription_path($1)
       when /s subscriptions/ then s_subscriptions_path
 
     # Add more mappings here.
