@@ -131,11 +131,8 @@ class Subscription < ActiveRecord::Base
   # otherwise start it after the expiration time
   def increment_expires_at(offer_term)
     self.expires_at = nil && return unless offer_term.expires?
-    if self.expires_at.blank? || self.expires_at < Date.today
-      self.starts_at = self.expires_at = Date.today 
-    else
-      self.starts_at = self.expires_at
-    end
+    self.expires_at = Date.today if self.expires_at.blank? || self.expires_at < Date.today
+    self.starts_at = self.expires_at
     self.expires_at = self.expires_at.advance(:months => offer_term.months)
   end
 
