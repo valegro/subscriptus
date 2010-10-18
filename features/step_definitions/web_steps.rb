@@ -84,18 +84,21 @@ When /^(?:|I )select "([^\"]*)" from "([^\"]*)"(?: within "([^\"]*)")?$/ do |val
   end
 end
 
+# used for checkboxes
 When /^(?:|I )check "([^\"]*)"(?: within "([^\"]*)")?$/ do |field, selector|
   with_scope(selector) do
     check(field)
   end
 end
 
+# used for checkboxes
 When /^(?:|I )uncheck "([^\"]*)"(?: within "([^\"]*)")?$/ do |field, selector|
   with_scope(selector) do
     uncheck(field)
   end
 end
 
+# used for radio buttons
 When /^(?:|I )choose "([^\"]*)"(?: within "([^\"]*)")?$/ do |field, selector|
   with_scope(selector) do
     choose(field)
@@ -234,4 +237,3 @@ Then /^I should see the following "([^"]*)" table:$/ do |table_id, expected_tabl
   table_on_page = table( tableish("table##{table_id} tr", 'td,th') )
   expected_table.diff!(table_on_page)
 end
-

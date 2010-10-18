@@ -53,13 +53,15 @@ class Subscription < ActiveRecord::Base
 
   # Subscription States
   # has_states :incomplete, :trial, :squatter, :active, :pending, :renewal_due, :payment_failed do
-  has_states :trial, :squatter, :active, :pending, :renewal_due, :payment_failed, :init => :trial do
+  has_states :trial, :squatter, :active, :pending, :extension_pending, :renewal_due, :payment_failed, :init => :trial do
     on :activate do
+      transition :active => :active # when the subscriber extends their subscription while its still active
       transition :trial => :active
       transition :squatter => :active
     end
     on :pay_later do
       transition :trial => :pending
+      transition :active => :extension_pending # when the subscriber is currently active but is going to pay for the new subscription using Direct Debit
     end
     on :verify do
       transition :pending => :active
@@ -144,6 +146,31 @@ class Subscription < ActiveRecord::Base
   def generate_and_set_order_number
     returning num = generate_unique_random_number(15) do
       self.order_num = num
+    end
+  end
+
+  def pay_non_first_time(payment)
+    returning self do
+      payment.money = price # setting the money of payment object
+      payment.customer_id = self.user.recurrent_id
+      payment.order_num = self.generate_and_set_order_number # order_num is sent to the user as a reference number of their subscriptions
+      payment.call_recurrent_profile # make the payment through secure pay
+      # change the state of subscription from trial to active
+      self.activate
+    end
+  end
+  
+  def pay_first_time(payment)
+    returning self do
+      payment.money = self.price # setting the money of payment object
+      payment.customer_id = self.user.generate_recurrent_profile_id # customer_id is used to create recurrent_profile in secure pay
+      payment.create_recurrent_profile
+      # recurrent setup successul, so now the customer_id should be saved as a reference to later transactions
+      self.user.recurrent_id = payment.customer_id
+      payment.order_num = self.generate_and_set_order_number # order_num is sent to the user as a reference number of their subscriptions
+      payment.call_recurrent_profile # make the payment through secure pay
+      # change the state of subscription from trial to active
+      self.activate
     end
   end
   

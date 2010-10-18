@@ -26,3 +26,17 @@ config.gem 'database_cleaner', :lib => false, :version => '>=0.5.0' unless File.
 config.gem 'capybara',         :lib => false, :version => '>=0.3.5' unless File.directory?(File.join(Rails.root, 'vendor/plugins/capybara'))
 
 config.gem 'spork',            :lib => false, :version => '>=0.7.5' unless File.directory?(File.join(Rails.root, 'vendor/plugins/spork'))
+
+CAMPAIGNMASTER_USERNAME = 'ddraper'
+CAMPAIGNMASTER_PASSWORD = 'netfox'
+CAMPAIGNMASTER_CLIENT_ID = '5032'
+
+# Setup Active Merchant for testing
+config.after_initialize do
+  ActiveMerchant::Billing::Base.mode = :test
+  # Secure Pay Gateway Settings
+  ::GATEWAY = ActiveMerchant::Billing::SecurePayAuExtendedGateway.new(  # the default_currency of this gateway is 'AUD'
+        :login => 'CKR0030',  # <MerchantID> input to Au securePay Gateway.
+        :password => "q02nnn8h"
+  )
+end
