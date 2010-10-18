@@ -1,37 +1,48 @@
 <body style="font-family: arial; text-align: left;">
 
-	<p>
-		Dear <%= @subscription.user.firstname %> <%= @subscription.user.lastname %><br/>
-		Thank you for subscribing to Crikey.<br/>
-		Your tax invoice appears below.<br/>
-	</p>
+	<p style="padding-bottom: 10px"><strong>Dear <%= @subscription.user.firstname %> <%= @subscription.user.lastname %></strong></p>
+	<p style="padding-bottom: 10px">Thank you for subscribing to Crikey.</p>
+	<p style="padding-bottom: 5px"><strong>Your Order Details</strong></p>
 
-  	<p><strong>Your Order Details</strong></p>
 	<p>
 		Supplier: Crikey<br/>
 		Order Number: <%= h @subscription.order_num %><br/>
-		Order Date: <%= h @subscription.updated_at %><br/>
+		Order Date: <%= @subscription.updated_at ? @subscription.updated_at.to_formatted_s(:long) : nil %><br/>
 		Payment Method: Credit Card<br/>
-		Payment Cost: AUD <%= h @subscription.price %><br/>
+		Payment Cost: <%= number_to_currency @subscription.price, :unit => "AUD $" %><br/>
+		(Please note: Blimey Holdings will appear as the transaction detail on your statement)<br/>
 	</p>
 
-   <p><strong>Your Subscription Details</strong></p>
-	<p>
-		Publication Name: <%= h @subscription.publication.name %><br/>
-		Publication Description: <p><%= h @subscription.publication.description %></p><br/>
-		Subscription Ends: <%= h @subscription.expires_at %>
-		<div style="padding: 10pt;">
-			<strong>Included Gifts:</strong><br/>
-			<% @subscription.offer.gifts.each do |gift| %>
-				<%= h gift.name %><br/>
-			<% end %>
-		</div>
+	<p style="padding: 10px 0px 10px 0px"><strong>Your Subscription Details</strong></p>
+	<p style="padding-bottom: 5px">Publication Name: <%= h @subscription.publication.name %></p>
+	<p style="padding-bottom: 5px">
+		Subscription Starts: <%= @subscription.starts_at ? @subscription.starts_at.to_formatted_s(:long) : nil %><br/>
+		Subscription Ends: <%= @subscription.expires_at ? @subscription.expires_at.to_formatted_s(:long) : nil %>
 	</p>
 
+	<p style="padding: 10pt;">
+		<strong>Included Gifts:</strong><br/>
+		<% @subscription.offer.gifts.each do |gift| %>
+			<%= h gift.name %><br/>
+		<% end %>
+	</p>
+
+	<p style="padding: 10px 0px 10px 0px">
+		<strong>Your Address Details:</strong><br/>
+		Address 1: <%= h @subscription.user.try(:address_1) %><br/>
+		Address 2: <%= h @subscription.user.try(:address_2) %><br/>
+		City: <%= h @subscription.user.try(:city) %><br/>
+		Postcode: <%= h @subscription.user.try(:postcode) %><br/>
+		State: <%= h @subscription.user.try(:state) %><br/>
+		Country: <%= h @subscription.user.try(:country) %><br/>
+	</p>
+
+	<p style="padding: 5px 0px 5px 0px">Please reply to this email, quoting your order number if you have any problems.</p>
+
 	<p>
-		Please reply to this email, quoting your order number if you have any problems.<br/><br/>
 		The Crikey Crew<br/>
-		<a target='_blank' href="www.crikey.com.au">www.crikey.com.au</a><br/><br/>
-		<strong>Copyright © 2010 Private Media Pty Ltd. All rights reserved</strong>
+		<a target='_blank' href="http://www.crikey.com.au/">www.crikey.com.au</a><br/><br/>
 	</p>
+
+	<p style="padding: 5px 0px 5px 0px"><strong>Copyright © 2010 Private Media Pty Ltd. All rights reserved</strong></p>
 </body>

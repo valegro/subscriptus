@@ -27,6 +27,7 @@ class Subscription < ActiveRecord::Base
     end
   end
   
+  attr_accessor :starts_at # the start date of the newest subscription
   accepts_nested_attributes_for :subscription_gifts, :user
 
   named_scope :ascend_by_name, :include => 'user', :order => "users.lastname ASC, users.firstname ASC"
@@ -128,10 +129,13 @@ class Subscription < ActiveRecord::Base
 
   # if the sibscription is new or expired, start it from now
   # otherwise start it after the expiration time
-
   def increment_expires_at(offer_term)
     self.expires_at = nil && return unless offer_term.expires?
-    self.expires_at = Date.today if self.expires_at.blank? || self.expires_at < Date.today
+    if self.expires_at.blank? || self.expires_at < Date.today
+      self.starts_at = self.expires_at = Date.today 
+    else
+      self.starts_at = self.expires_at
+    end
     self.expires_at = self.expires_at.advance(:months => offer_term.months)
   end
 
@@ -145,7 +149,7 @@ class Subscription < ActiveRecord::Base
       self.order_num = num
     end
   end
-
+  
   private
 
   # If the current account is expired, and the subscription now has a
