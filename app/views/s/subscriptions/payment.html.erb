@@ -1,5 +1,5 @@
 <%= content_tag :h1, "Payment" %><br/>
-<%= content_tag :h2, "Paying For Subscription: #{@name}" %><br/>
+<%= content_tag :h2, "Paying For Subscription: #{@subscription.publication.try(:name) || 'No Publication'}" %><br/>
 <%= content_tag :p, "Please choose your method of payment" %>
 
 <% form_for :payment, :url => pay_s_subscription_path(@subscription), :builder => Reform::Builder, :html => { :class => "form", :method => 'post' } do |p| %>

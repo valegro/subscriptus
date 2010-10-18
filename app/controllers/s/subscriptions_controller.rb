@@ -11,7 +11,6 @@ class S::SubscriptionsController < SController
   # Choose the payment method paying for the subscription
   def payment
     @payment = Payment.new
-    @name = @subscription.publication ? @subscription.publication.name : "No Publication"
   end
 
   def pay
