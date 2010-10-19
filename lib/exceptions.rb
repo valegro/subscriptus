@@ -8,4 +8,5 @@ module  Exceptions
   class InvalidName                          < StandardError; end
   class EmailDataError                       < StandardError; end
   class CanNotBePaidFor                      < StandardError; end
+  class CanNotBeCanceled                     < StandardError; end
 end

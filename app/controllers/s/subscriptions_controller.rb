@@ -3,9 +3,9 @@ class S::SubscriptionsController < SController
   
   rescue_from Exception, :with => :show_errors
   rescue_from Exceptions::CreateRecurrentProfileNotSuccessful, :with => :invalid_card_details
-  rescue_from Exceptions::CanNotBePaidFor, :with => :invalid_status
+  rescue_from Exceptions::CanNotBePaidFor, Exceptions::CanNotBeCanceled, :with => :invalid_status
   
-  before_filter :find_subscription, :only => [:payment, :pay, :direct_debit]
+  before_filter :find_subscription, :only => [:payment, :pay, :direct_debit, :cancel]
   
   def index
     @subscriptions = current_user.subscriptions
@@ -58,6 +58,13 @@ class S::SubscriptionsController < SController
     send_file "#{RAILS_ROOT}/public/pdfs/crikey_directdebit_#{params[:kind]}.pdf", :type => 'application/pdf'
   end
 
+  def cancel
+    raise Exceptions::CanNotBeCanceled unless can_be_canceled(@subscription.state)
+    @subscription.cancel
+    flash[:error] = "You have successfully canceled your subscription."
+    redirect_to :action=>:index
+  end
+
   protected
   
   def show_errors(exception)
@@ -74,7 +81,13 @@ class S::SubscriptionsController < SController
   
   def invalid_status(exception)
     logger.error(exception)
-    flash[:error] = "You can not pay for this subscription. You may have already chosen another method of payment. Please follow your previous method of payment or contact Crikey for further information."
+
+    if exception.is_a?(Exceptions::CanNotBePaidFor)
+      flash[:error] = "You can not pay for this subscription. You may have already chosen another method of payment. Please follow your previous method of payment or contact Crikey for further information."
+    elsif exception.is_a?(Exceptions::CanNotBeCanceled)
+      flash[:error] = "You can not cancel this subscription. Please contact Crikey for further information."
+    end
+
     redirect_to :action=>:index
   end
 

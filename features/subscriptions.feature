@@ -9,7 +9,7 @@ Feature: A subscriber can view subscriptions
       And a offer: "Offer 1" exists with name: "offer 1", publication: publication "Publication 1"
       And a offer: "Offer 2" exists with name: "offer 2", publication: publication "Publication 2"
       And a subscription: "Subscription 1" exists with offer: offer "Offer 1", user: subscriber "Bart", id: 1
-      And a subscription: "Subscription 2" exists with offer: offer "Offer 2", user: subscriber "Bart", id: 2
+      And a subscription: "Subscription 2" exists with offer: offer "Offer 2", user: subscriber "Bart", id: 2, state: "trial"
   	When I log in as subscriber "Bart"
 
   Scenario: An subscriber can view their subscriptions
@@ -72,4 +72,15 @@ Feature: A subscriber can view subscriptions
 	Then I should be on the s subscription direct debit page for 2
 	And I should see "Bank Account - direct debit request(PDF)"
 	And I should see "Credit Card - direct debit request(PDF)"
+
+  @active
+  Scenario: A subscriber can cancel a trial subscription
+	Given I am on the s subscriptions page
+	When I follow "Cancel" within "tr[@class=' even last']"
+	# Then I should see a confirmation message
+	# Then I should see a "Are you sure you want to cancel Publication 2 ?" confirm dialog
+	# When I press "ok" => do cancelation, when i press "cancel" => stay on the same page!!!
+	Then I should be on the s subscriptions page
+		And I should see "You have successfully canceled your subscription."
+		And I should see "squatter" within "tr[@class=' even last']"
 
