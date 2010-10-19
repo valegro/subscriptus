@@ -1,0 +1,18 @@
+<div class="title">
+  <%= content_tag :h2, "Canceled Subscriptions" %>
+</div>
+
+<%= render_table @subscriptions do |t|
+  t.header :publication, :subscriber, :from, :to, :status, :actions
+
+  t.rows do |row, subscription, index|
+    row.publication subscription.publication.name
+    row.subscriber subscription.get_user.fullname
+    row.from subscription.created_at
+    row.to subscription.expires_at
+    row.status subscription.state
+    row.actions link_to_if(can_be_paid_for(subscription.state) , 'Pay', payment_s_subscription_path(subscription), :class => "pay")
+  end
+end %>
+
+<%= will_paginate @subscriptions %>

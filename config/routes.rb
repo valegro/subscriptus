@@ -17,7 +17,8 @@ ActionController::Routing::Routes.draw do |map|
       :payment_failed => :get,
       :payment_due => :get,
       :recent => :get,
-      :ended => :get
+      :ended => :get,
+      :list_canceled => :get
     }
     admin.resources :subscribers
     admin.namespace :catalogue do |catalogue|

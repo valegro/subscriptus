@@ -42,6 +42,10 @@ class Subscription < ActiveRecord::Base
     20
   end
 
+  def get_user
+    User.find(self.user_id)
+  end
+
   # Signup Wizard
   validation_group :offer, :fields => [ :publication_id, :price, :expires_at ]
   validation_group :details
