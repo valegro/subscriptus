@@ -7,4 +7,5 @@ module  Exceptions
   class UserInvalid                          < StandardError; end
   class InvalidName                          < StandardError; end
   class EmailDataError                       < StandardError; end
+  class CanNotBePaidFor                      < StandardError; end
 end
