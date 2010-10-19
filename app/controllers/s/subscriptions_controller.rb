@@ -1,6 +1,9 @@
 class S::SubscriptionsController < SController
+  include S::SubscriptionsHelper
+  
   rescue_from Exception, :with => :show_errors
   rescue_from Exceptions::CreateRecurrentProfileNotSuccessful, :with => :invalid_card_details
+  rescue_from Exceptions::CanNotBePaidFor, :with => :invalid_status
   
   before_filter :find_subscription, :only => [:payment, :pay, :direct_debit]
   
@@ -10,6 +13,7 @@ class S::SubscriptionsController < SController
   
   # Choose the payment method paying for the subscription
   def payment
+    raise Exceptions::CanNotBePaidFor unless can_be_paid_for(@subscription.state)
     @payment = Payment.new
   end
 
@@ -65,6 +69,12 @@ class S::SubscriptionsController < SController
   def invalid_card_details(exception)
     logger.error(exception.message)
     flash[:error] = "You do not have any profile in Secure Pay. Please fill in your new Credit Card details."
+    redirect_to :action=>:index
+  end
+  
+  def invalid_status(exception)
+    logger.error(exception)
+    flash[:error] = "You can not pay for this subscription. You may have already chosen another method of payment. Please follow your previous method of payment or contact Crikey for further information."
     redirect_to :action=>:index
   end
 
