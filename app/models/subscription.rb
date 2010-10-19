@@ -57,7 +57,7 @@ class Subscription < ActiveRecord::Base
 
   # Subscription States
   # has_states :incomplete, :trial, :squatter, :active, :pending, :renewal_due, :payment_failed do
-  has_states :trial, :squatter, :active, :pending, :extension_pending, :renewal_due, :payment_failed, :init => :trial do
+  has_states :trial, :squatter, :active, :pending, :extension_pending, :canceled, :renewal_due, :payment_failed, :init => :trial do
     on :activate do
       transition :active => :active # when the subscriber extends their subscription while its still active
       transition :trial => :active
@@ -84,6 +84,15 @@ class Subscription < ActiveRecord::Base
     on :fail_payment do
       transition :renewal_due => :payment_failed
       transition :payment_failed => :squatter
+    end
+    on :cancel do
+      transition :trial => :squatter
+      transition :active => :canceled # subscription will remain in canceled state untill it manually processed by admin users
+      transition :pending => :canceled
+      transition :extension_pending => :canceled
+    end
+    on :is_processed do # when the canceled subscription is manually processed by admin users
+      transition :canceled => :squatter
     end
     # Expiries
     expires :pending => :squatter, :after => 14.days

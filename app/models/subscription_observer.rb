@@ -30,6 +30,11 @@ class SubscriptionObserver < ActiveRecord::Observer
     SubscriptionMailer.deliver_activation(subscription)
   end
 
+  def after_enter_canceled(subscription)
+    # send email to the user with their full subscription details
+    SubscriptionMailer.deliver_cancelation(subscription)
+  end
+
   def after_update(record)
     record.send_later :update_campaignmaster
   end
