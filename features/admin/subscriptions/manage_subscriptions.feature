@@ -16,10 +16,16 @@ Feature: Subscription List
 	  And cancel subscription: "Subscription 2" existing with id: 2
 	When I log in as admin "Admin"
 
-  @active
   Scenario: An admin can view all canceled subscriptions
     Given I am on admin canceled subscriptions page
 	Then I should see "Canceled Subscriptions"
 		And I should see "Publication 2"
 		And I should not see "Publication 1"
 
+  @active
+  Scenario: An Admin can mark a cancelled subscription as processed
+	Given I am on admin canceled subscriptions page
+	Then I should see "canceled" within "tr[@class=' odd last']"
+	When I follow "Mark as Processed" within "tr[@class=' odd last']"
+	Then I should not see "canceled"
+	And I should see "You have successfully marked a subscription as processed. It now exists in Squattered subscriptions."
