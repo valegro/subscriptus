@@ -19,6 +19,8 @@ ActionController::Routing::Routes.draw do |map|
       :recent => :get,
       :ended => :get,
       :list_canceled => :get
+    }, :member => {
+      :mark_processed => :get
     }
     admin.resources :subscribers
     admin.namespace :catalogue do |catalogue|

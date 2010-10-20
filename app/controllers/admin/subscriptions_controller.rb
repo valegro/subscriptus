@@ -1,12 +1,20 @@
 class Admin::SubscriptionsController < AdminController
   layout 'admin/subscriptions'
   include Admin::SubscriptionsHelper
+  
+  before_filter :find_subscription, :only => [ :mark_processed ]
 
   def index
   end
 
   def list_canceled
     @subscriptions = Subscription.find_all_by_state('canceled').paginate(:page => params[:page], :per_page => Subscription.per_page, :order => 'updated_at')
+  end
+  
+  def mark_processed
+    @subscription.is_processed
+    @subscription.save!
+    redirect_to :action => :list_canceled
   end
 
   def activitiy
@@ -20,5 +28,11 @@ class Admin::SubscriptionsController < AdminController
   end
 
   def pending
+  end
+
+  protected
+  
+  def find_subscription
+    @subscription = Subscription.find(params[:id])
   end
 end

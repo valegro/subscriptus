@@ -11,8 +11,7 @@
     row.from subscription.created_at
     row.to subscription.expires_at
     row.status subscription.state
-    row.actions link_to_if(can_be_paid_for(subscription.state) , 'Pay', payment_s_subscription_path(subscription), :class => "pay")
+    row.actions link_to('Mark as Processed', mark_processed_admin_subscription_path(subscription), :class => "processed")
   end
 end %>
 
-<%= will_paginate @subscriptions %>
