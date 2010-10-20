@@ -6,7 +6,7 @@ class Admin::SubscriptionsController < AdminController
   end
 
   def list_canceled
-    @subscriptions = Subscription.find_all_by_state('active').paginate(:page => params[:page], :per_page => Subscription.per_page, :order => 'updated_at')
+    @subscriptions = Subscription.find_all_by_state('canceled').paginate(:page => params[:page], :per_page => Subscription.per_page, :order => 'updated_at')
   end
 
   def activitiy

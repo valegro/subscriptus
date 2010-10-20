@@ -57,7 +57,7 @@ class Subscription < ActiveRecord::Base
 
   # Subscription States
   # has_states :incomplete, :trial, :squatter, :active, :pending, :renewal_due, :payment_failed do
-  has_states :trial, :squatter, :active, :pending, :extension_pending, :canceled, :renewal_due, :payment_failed, :init => :trial do
+  has_states :trial, :squatter, :active, :pending, :extension_pending, :canceled, :renewal_due, :payment_failed do
     on :activate do
       transition :active => :active # when the subscriber extends their subscription while its still active
       transition :trial => :active
