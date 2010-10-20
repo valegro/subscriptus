@@ -28,3 +28,4 @@ Feature: Subscription List
 	Then I should see "canceled" within "tr[@class=' odd last']"
 	When I follow "Mark as Processed" within "tr[@class=' odd last']"
 	Then I should not see "canceled"
+	And I should see "You have successfully marked a subscription as processed. It now exists in Squattered subscriptions."
