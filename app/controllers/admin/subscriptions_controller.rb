@@ -12,7 +12,7 @@ class Admin::SubscriptionsController < AdminController
   end
   
   def mark_processed
-    @subscription.is_processed
+    @subscription.mark_processed
     @subscription.save!
     flash[:notice] = "You have successfully marked a subscription as processed. It now exists in Squattered subscriptions."
     redirect_to :action => :list_canceled

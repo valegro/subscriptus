@@ -91,7 +91,7 @@ class Subscription < ActiveRecord::Base
       transition :pending => :canceled
       transition :extension_pending => :canceled
     end
-    on :is_processed do # when the canceled subscription is manually processed by admin users
+    on :mark_processed do # when the canceled subscription is manually processed by admin users
       transition :canceled => :squatter
     end
     # Expiries
