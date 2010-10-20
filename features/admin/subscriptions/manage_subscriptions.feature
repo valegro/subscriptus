@@ -13,7 +13,7 @@ Feature: Subscription List
       And a offer: "Offer 2" exists with name: "offer 2", publication: publication "Publication 2", id: 12
       And a subscription: "Subscription 1" exists with offer: offer "Offer 1", user: subscriber "Alice", id: 1
       And a subscription: "Subscription 2" exists with offer: offer "Offer 2", user: subscriber "Bob", id: 2
-	  And do transition to state "canceled" for subscription: "Subscription 2" existing with id: 2
+	  And cancel subscription: "Subscription 2" existing with id: 2
 	When I log in as admin "Admin"
 
   @active
