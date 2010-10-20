@@ -9,18 +9,6 @@ module NavigationHelpers
     case page_name
 
     when /the home\s?page/ then '/'
-    when /the new list page/
-      new_list_path
-
-    when /the new list page/
-      new_list_path
-
-    when /the new frooble page/
-      new_frooble_path
-
-    when /the new frooble page/
-      new_frooble_path
-
     # Gifts
     when /admin catalogue gifts new/ then new_admin_catalogue_gift_path
     when /admin catalogue gift page for (.*)/ then admin_catalogue_gift_path($1)
