@@ -18,7 +18,7 @@ ActionController::Routing::Routes.draw do |map|
       :payment_due => :get,
       :recent => :get,
       :ended => :get,
-      :list_canceled => :get
+      :list_cancelled => :get
     }, :member => {
       :mark_processed => :get
     }

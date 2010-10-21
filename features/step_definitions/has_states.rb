@@ -4,6 +4,6 @@ Given(/^cancel #{capture_model} existing(?: with #{capture_fields})?$/) do |name
   s = find_model!(name, fields)
   s.state = "active"
   s.save!
-  s.state = "canceled"
+  s.state = "cancelled"
   s.save!
 end

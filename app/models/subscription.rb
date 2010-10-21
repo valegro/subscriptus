@@ -43,7 +43,7 @@ class Subscription < ActiveRecord::Base
   end
 
   def get_user
-    User.find(self.user_id)
+    self.user_id ? User.find(self.user_id) : nil
   end
 
   # Signup Wizard
@@ -57,7 +57,7 @@ class Subscription < ActiveRecord::Base
 
   # Subscription States
   # has_states :incomplete, :trial, :squatter, :active, :pending, :renewal_due, :payment_failed do
-  has_states :trial, :squatter, :active, :pending, :extension_pending, :canceled, :renewal_due, :payment_failed, :init => :trial do
+  has_states :trial, :squatter, :active, :pending, :extension_pending, :cancelled, :renewal_due, :payment_failed, :init => :trial do
     on :activate do
       transition :active => :active # when the subscriber extends their subscription while its still active
       transition :trial => :active
@@ -87,12 +87,12 @@ class Subscription < ActiveRecord::Base
     end
     on :cancel do
       transition :trial => :squatter
-      transition :active => :canceled # subscription will remain in canceled state untill it manually processed by admin users
-      transition :pending => :canceled
-      transition :extension_pending => :canceled
+      transition :active => :cancelled # subscription will remain in cancelled state untill it manually processed by admin users
+      transition :pending => :cancelled
+      transition :extension_pending => :cancelled
     end
-    on :mark_processed do # when the canceled subscription is manually processed by admin users
-      transition :canceled => :squatter
+    on :mark_processed do # when the cancelled subscription is manually processed by admin users
+      transition :cancelled => :squatter
     end
     # Expiries
     expires :pending => :squatter, :after => 14.days
