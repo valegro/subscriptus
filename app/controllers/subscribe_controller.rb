@@ -109,7 +109,8 @@ class SubscribeController < ApplicationController
   on_finish(:payment) do
     # subscription should be saved in database before the wizard is finished so that no conflicts happens between has_states and wizardly
     # the first subscription has a trial state
-    @subscription = Subscription.create(@subscription.attributes)
+    puts "********* Creating with attrs = #{@subscription.attributes.inspect}"
+    @subscription = Subscription.create!(@subscription.attributes)
     # because of the belongs_to assosiation, user needs to be saved seperately only if user is new.
     @subscription.user = User.save_new_user(session[:user_dat]) unless !session[:new_user]
 
@@ -218,6 +219,10 @@ class SubscribeController < ApplicationController
     logger.error("Exceptions::ZeroAmount ---> " + e.message)
     flash[:error] = "Unfortunately your payment was not successfull. Please check that your account has the amount and try again later."
     redirect_to(:action=>:result)
+  rescue Errno::ECONNREFUSED => e
+    logger.error("Unable to send email " + e.message)
+    flash[:error] = "Unable to deliver email"
+    # This is not a fatal exception
   end
 end
 

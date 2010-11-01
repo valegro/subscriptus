@@ -20,7 +20,9 @@ module CM
 
     def self.driver
       return @@static_driver if @@static_driver
+      puts "Calling factory"
       fact = SOAP::WSDLDriverFactory.new(V1_URI)
+      puts "end calling factory"
       @@static_driver = fact.create_rpc_driver
       @@static_driver.generate_explicit_type = true
       @@static_driver.options['protocol.http.ssl_config.verify_callback'] = method(:validate_certificate)
