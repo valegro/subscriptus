@@ -22,6 +22,7 @@ class Payment
     def purchase
       returning response = GATEWAY.purchase(price_in_cents, credit_card, options("recurrent")) do
         log_transactions("purchase", response)
+        raise Exceptions::PurchaseNotSuccessful.new(response.message) unless response.success?
       end
     rescue Exception => e
       if e.is_a?(Exceptions::ZeroAmount)
@@ -34,12 +35,13 @@ class Payment
     def create_recurrent_profile
       returning response = GATEWAY.setup_recurrent(price_in_cents, credit_card, options("recurrent")) do
         log_transactions("setup new recurrent profile", response)
+        raise Exceptions::CreateRecurrentProfileNotSuccessful.new("unsuccessfull responce::" + response.message) unless response.success?
       end
     rescue Exception => e
       if e.is_a?(Exceptions::ZeroAmount)
         raise e
       else
-        raise Exceptions::CreateRecurrentProfileNotSuccessful
+        raise Exceptions::CreateRecurrentProfileNotSuccessful.new(e.message)
       end
     end
 
@@ -48,12 +50,13 @@ class Payment
     def call_recurrent_profile
       returning response = GATEWAY.trigger_recurrent(price_in_cents, options("recurrent")) do
         log_transactions("trigger existing recurrent profile", response)
+        raise Exceptions::TriggerRecurrentProfileNotSuccessful.new(response.message) unless response.success?
       end
     rescue Exception => e
       if e.is_a?(Exceptions::ZeroAmount)
         raise e
       else
-        raise Exceptions::TriggerRecurrentProfileNotSuccessful
+        raise Exceptions::TriggerRecurrentProfileNotSuccessful.new(e.message)
       end
     end
 
@@ -61,12 +64,13 @@ class Payment
     def remove_recurrent_profile
       returning response = GATEWAY.cancel_recurrent(options("recurrent")) do
         log_transactions("remove existing recurrent profile", response)
+        raise Exceptions::RemoveRecurrentProfileNotSuccessful.new(response.message) unless response.success?
       end
     rescue Exception
       if e.is_a?(Exceptions::ZeroAmount)
         raise e
       else
-        raise Exceptions::RemoveRecurrentProfileNotSuccessful
+        raise Exceptions::RemoveRecurrentProfileNotSuccessful.new(e.message)
       end
     end
 
@@ -120,4 +124,5 @@ class Payment
       end
       t.save!
     end
+
 end

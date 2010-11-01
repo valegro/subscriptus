@@ -1,24 +1,16 @@
 <body style="font-family: arial; text-align: left;">
 
 	<p style="padding-bottom: 10px"><strong>Dear <%= @subscription.user.firstname %> <%= @subscription.user.lastname %></strong></p>
-	<p style="padding-bottom: 10px">Thank you for subscribing to Crikey.</p>
-	<p style="padding-bottom: 5px"><strong>Your Order Details</strong></p>
 
-	<p>
-		Supplier: Crikey<br/>
-		Order Number: <%= h @subscription.order_num %><br/>
-		Order Date: <%= @subscription.updated_at ? @subscription.updated_at.to_formatted_s(:long) : nil %><br/>
-		Payment Method: Credit Card<br/>
-		Payment Cost: <%= number_to_currency @subscription.price, :unit => "AUD $" %><br/>
-		(Please note: Blimey Holdings will appear as the transaction detail on your statement)<br/>
-	</p>
+	<% if @subscription.state == :squatter %>
+		<p style="padding-bottom: 10px">Your subscription has been canceled.</p>
+	<% else %>
+		<p style="padding-bottom: 10px">Your have recently requested to cancel your subscription to Crikey.</p>
+		<p style="padding-bottom: 10px">Please note that we are processing your cancelation and inform you shortly about the result with a separate email.</p>
+	<% end %>
 
 	<p style="padding: 10px 0px 10px 0px"><strong>Your Subscription Details</strong></p>
 	<p style="padding-bottom: 5px">Publication Name: <%= h @subscription.publication.name %></p>
-	<p style="padding-bottom: 5px">
-		Subscription Starts: <%= @subscription.starts_at ? @subscription.starts_at.to_formatted_s(:long) : nil %><br/>
-		Subscription Ends: <%= @subscription.expires_at ? @subscription.expires_at.to_formatted_s(:long) : nil %>
-	</p>
 
 	<p style="padding: 10pt;">
 		<strong>Included Gifts:</strong><br/>

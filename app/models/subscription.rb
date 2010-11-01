@@ -27,6 +27,7 @@ class Subscription < ActiveRecord::Base
     end
   end
   
+  attr_accessor :starts_at # the start date of the newest subscription
   accepts_nested_attributes_for :subscription_gifts, :user
 
   named_scope :ascend_by_name, :include => 'user', :order => "users.lastname ASC, users.firstname ASC"
@@ -41,6 +42,10 @@ class Subscription < ActiveRecord::Base
     20
   end
 
+  def get_user
+    self.user_id ? User.find(self.user_id) : nil
+  end
+
   # Signup Wizard
   validation_group :offer, :fields => [ :publication_id, :price, :expires_at ]
   validation_group :details
@@ -52,13 +57,15 @@ class Subscription < ActiveRecord::Base
 
   # Subscription States
   # has_states :incomplete, :trial, :squatter, :active, :pending, :renewal_due, :payment_failed do
-  has_states :trial, :squatter, :active, :pending, :renewal_due, :payment_failed, :init => :trial do
+  has_states :trial, :squatter, :active, :pending, :extension_pending, :cancelled, :renewal_due, :payment_failed, :init => :trial do
     on :activate do
+      transition :active => :active # when the subscriber extends their subscription while its still active
       transition :trial => :active
       transition :squatter => :active
     end
     on :pay_later do
       transition :trial => :pending
+      transition :active => :extension_pending # when the subscriber is currently active but is going to pay for the new subscription using Direct Debit
     end
     on :verify do
       transition :pending => :active
@@ -77,6 +84,15 @@ class Subscription < ActiveRecord::Base
     on :fail_payment do
       transition :renewal_due => :payment_failed
       transition :payment_failed => :squatter
+    end
+    on :cancel do
+      transition :trial => :squatter
+      transition :active => :cancelled # subscription will remain in cancelled state untill it manually processed by admin users
+      transition :pending => :cancelled
+      transition :extension_pending => :cancelled
+    end
+    on :mark_processed do # when the cancelled subscription is manually processed by admin users
+      transition :cancelled => :squatter
     end
     # Expiries
     expires :pending => :squatter, :after => 14.days
@@ -128,10 +144,10 @@ class Subscription < ActiveRecord::Base
 
   # if the sibscription is new or expired, start it from now
   # otherwise start it after the expiration time
-
   def increment_expires_at(offer_term)
     self.expires_at = nil && return unless offer_term.expires?
     self.expires_at = Date.today if self.expires_at.blank? || self.expires_at < Date.today
+    self.starts_at = self.expires_at
     self.expires_at = self.expires_at.advance(:months => offer_term.months)
   end
 
@@ -146,6 +162,31 @@ class Subscription < ActiveRecord::Base
     end
   end
 
+  def pay_non_first_time(payment)
+    returning self do
+      payment.money = price # setting the money of payment object
+      payment.customer_id = self.user.recurrent_id
+      payment.order_num = self.generate_and_set_order_number # order_num is sent to the user as a reference number of their subscriptions
+      payment.call_recurrent_profile # make the payment through secure pay
+      # change the state of subscription from trial to active
+      self.activate
+    end
+  end
+  
+  def pay_first_time(payment)
+    returning self do
+      payment.money = self.price # setting the money of payment object
+      payment.customer_id = self.user.generate_recurrent_profile_id # customer_id is used to create recurrent_profile in secure pay
+      payment.create_recurrent_profile
+      # recurrent setup successul, so now the customer_id should be saved as a reference to later transactions
+      self.user.recurrent_id = payment.customer_id
+      payment.order_num = self.generate_and_set_order_number # order_num is sent to the user as a reference number of their subscriptions
+      payment.call_recurrent_profile # make the payment through secure pay
+      # change the state of subscription from trial to active
+      self.activate
+    end
+  end
+  
   private
 
   # If the current account is expired, and the subscription now has a

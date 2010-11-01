@@ -11,18 +11,33 @@ config.whiny_nils = true
 
 # Show full error reports and disable caching
 config.action_controller.consider_all_requests_local = true
-config.action_controller.perform_caching             = false
+config.action_controller.perform_caching = false
 
 # Disable request forgery protection in test environment
-config.action_controller.allow_forgery_protection    = false
+config.action_controller.allow_forgery_protection = false
 
 # Tell Action Mailer not to deliver emails to the real world.
 # The :test delivery method accumulates sent emails in the
 # ActionMailer::Base.deliveries array.
 config.action_mailer.delivery_method = :test
 
-config.gem 'cucumber-rails',   :lib => false, :version => '>=0.3.1' unless File.directory?(File.join(Rails.root, 'vendor/plugins/cucumber-rails'))
+config.gem 'cucumber-rails', :lib => false, :version => '>=0.3.1' unless File.directory?(File.join(Rails.root, 'vendor/plugins/cucumber-rails'))
 config.gem 'database_cleaner', :lib => false, :version => '>=0.5.0' unless File.directory?(File.join(Rails.root, 'vendor/plugins/database_cleaner'))
-config.gem 'capybara',         :lib => false, :version => '>=0.3.5' unless File.directory?(File.join(Rails.root, 'vendor/plugins/capybara'))
+config.gem 'capybara', :lib => false, :version => '>=0.3.5' unless File.directory?(File.join(Rails.root, 'vendor/plugins/capybara'))
 
-config.gem 'spork',            :lib => false, :version => '>=0.7.5' unless File.directory?(File.join(Rails.root, 'vendor/plugins/spork'))
+config.gem 'spork', :lib => false, :version => '>=0.7.5' unless File.directory?(File.join(Rails.root, 'vendor/plugins/spork'))
+
+CAMPAIGNMASTER_USERNAME = 'ddraper'
+CAMPAIGNMASTER_PASSWORD = 'netfox'
+CAMPAIGNMASTER_CLIENT_ID = '5032'
+
+# Setup Active Merchant for testing
+config.after_initialize do
+  ActiveMerchant::Billing::Base.mode = :test
+  # Secure Pay Gateway Settings
+  ::GATEWAY = ActiveMerchant::Billing::SecurePayAuExtendedGateway.new( # the default_currency of this gateway is 'AUD'
+        :login => 'CKR0030', # <MerchantID> input to Au securePay Gateway.
+        :password => "q02nnn8h"
+  )
+end
+

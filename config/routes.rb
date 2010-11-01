@@ -17,7 +17,10 @@ ActionController::Routing::Routes.draw do |map|
       :payment_failed => :get,
       :payment_due => :get,
       :recent => :get,
-      :ended => :get
+      :ended => :get,
+      :list_cancelled => :get
+    }, :member => {
+      :mark_processed => :get
     }
     admin.resources :subscribers
     admin.namespace :catalogue do |catalogue|
@@ -30,6 +33,11 @@ ActionController::Routing::Routes.draw do |map|
     admin.namespace :system do |system|
       system.resources :users
     end
+  end
+
+  # Subscriber
+  map.namespace :s do |subscriptions|
+    subscriptions.resources :subscriptions, :member => { :payment => :get, :pay => :post, :direct_debit => :get, :cancel => :get }, :collection => { :download_pdf => :get }
   end
 
   # Signup

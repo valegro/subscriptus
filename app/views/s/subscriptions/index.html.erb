@@ -1,0 +1,15 @@
+<div class="title">
+  <%= content_tag :h2, "My Subscriptions" %>
+</div>
+
+<%= render_table @subscriptions do |t|
+  t.header :publication, :from, :to, :status, :actions
+
+  t.rows do |row, subscription, index|
+    row.publication subscription.publication.name
+    row.from subscription.created_at
+    row.to subscription.expires_at
+    row.status subscription.state
+    row.actions link_to_if(can_be_paid_for(subscription.state) , 'Pay', payment_s_subscription_path(subscription), :class => "pay") + ' | ' + link_to_if(can_be_canceled(subscription.state), 'Cancel', cancel_s_subscription_path(subscription), :confirm => "Are you sure you want to cancel #{subscription.publication.try(:name)} ?", :class => "destroy")
+  end
+end %>

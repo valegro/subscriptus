@@ -90,4 +90,9 @@ class User < ActiveRecord::Base
   rescue Exception => e
     raise Exceptions::UserInvalid.new(e.message)
   end
+
+  # recurrent_id shows if the user has used their Credit Card before or not
+  def has_recurrent_profile?
+    !self.recurrent_id.blank?
+  end
 end
