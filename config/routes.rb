@@ -54,6 +54,11 @@ ActionController::Routing::Routes.draw do |map|
 
     s.subscribe_result  'subscribe/result', :action => 'result', :method => :get
   end
+
+  # Webhooks
+  map.namespace :webhooks do |webhooks|
+    webhooks.resource :unbounce
+  end
   
   # The priority is based upon order of creation: first created -> highest priority.
 

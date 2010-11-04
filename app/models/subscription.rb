@@ -47,14 +47,12 @@ class Subscription < ActiveRecord::Base
   end
 
   # Signup Wizard
-  validation_group :offer, :fields => [ :publication_id, :price, :expires_at ]
-  validation_group :details
-  validation_group :payment
-  
-  before_create do |record|
-    record.publication_id = record.offer.publication_id 
-  end
+  #validation_group :offer, :fields => [ :publication_id, :price, :expires_at ]
+  #validation_group :details
+  #validation_group :payment
 
+  validates_presence_of :publication #, :price ??
+  
   # Subscription States
   # has_states :incomplete, :trial, :squatter, :active, :pending, :renewal_due, :payment_failed do
   has_states :trial, :squatter, :active, :pending, :extension_pending, :cancelled, :renewal_due, :payment_failed, :init => :trial do

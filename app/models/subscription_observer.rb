@@ -7,22 +7,9 @@ class SubscriptionObserver < ActiveRecord::Observer
     subscription.generate_and_set_order_number  # order_num is sent to the user as a reference number of their subscriptions
   end
 
+  # TODO: Send Later (DJ)
   def after_enter_trial(subscription)
-   #  # CM::recipient.create (set expiry here too)
-   #  # TODO: Put in Delayed Job
-   #  # TODO: What if a user has multiple subscriptions - we may need to
-   #  # set email address in CM as user+sid@example.com
-   #  # OR use something other than email address as the PKEY
-   #  # TODO: Check for errors
-   # result = CM::Recipient.create!(
-   #   :created_at => Time.now,
-   #   :from_ip => '127.0.0.1',
-   #   :email => subscription.user.email,
-   #   :id => subscription.user.id,
-   #   :last_modified_by => 'Subscriptus'
-   # )
-   # # TODO: Set expiry date
-   # # TODO: Set state field
+    SubscriptionMailer.deliver_new_trial(subscription)
   end
 
   def after_enter_active(subscription)
@@ -40,7 +27,9 @@ class SubscriptionObserver < ActiveRecord::Observer
   end
 
   def before_create(record)
-    record.publication_id = record.offer.publication_id
+    unless record.offer.blank?
+      record.publication_id = record.offer.publication_id
+    end
   end
 
   def after_create(record)

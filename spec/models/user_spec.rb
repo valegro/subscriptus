@@ -25,6 +25,44 @@ describe User do
     @user.generate_recurrent_profile_id.should < 10000000000000000000
   end 
 
+  it "should create a trial user" do
+    cnt = User.count
+    user = User.create_trial_user(:first_name => 'Daniel', :last_name => 'Draper', :email => 'daniel@netfox.com')
+    user.login.should == 'trial_user'
+    user.auto_created.should == true
+    user.password.length.should == 8
+    User.count.should == cnt + 1
+    # Attempt a duplicate email
+    lambda {
+      User.create_trial_user(:first_name => 'Daniel', :last_name => 'Draper', :email => 'daniel@netfox.com')
+    }.should raise_exception
+    User.count.should == cnt + 1
+    # And another with a different email
+    user2 = User.create_trial_user(:first_name => 'Daniel', :last_name => 'Draper', :email => 'daniel2@netfox.com')
+    User.count.should == cnt + 2
+    # Check different passwords
+    user.password.should_not == user2.password
+  end
+
+  it "should only allow one trial per publication" do
+    publication = Factory.build(:publication)
+    @user.save!
+    @user.subscriptions.count.should == 0
+    @user.subscriptions.create(:publication => publication)
+    @user.subscriptions.count.should == 1
+    lambda {
+      @user.subscriptions.create(:publication => publication)
+    }.should raise_exception
+    # Change the first subscription to active
+    @user.subscriptions.first.activate!
+    @user.subscriptions.first.state.should == 'active'
+    lambda {
+      @user.subscriptions.create(:publication => publication)
+    }.should_not raise_exception
+    @user.subscriptions.count.should == 2
+    @user.subscriptions.trial.count.should == 1
+  end
+
   describe "class def" do
     # test acts_as_authentic?
     it { should have_many :audit_log_entries }
@@ -52,8 +90,10 @@ describe User do
   it "should return full name" do
     User.new(:firstname => 'spam', :lastname => 'ham').fullname.should == 'spam ham'
   end
+
   describe "upon creation" do
     it "should call update_cm with :create" do
+      UserMailer.expects(:deliver_new_user)
       @user.expects(:update_cm).with(:create!)
       @user.save!
     end

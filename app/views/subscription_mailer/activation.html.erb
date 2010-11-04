@@ -20,12 +20,14 @@
 		Subscription Ends: <%= @subscription.expires_at ? @subscription.expires_at.to_formatted_s(:long) : nil %>
 	</p>
 
-	<p style="padding: 10pt;">
-		<strong>Included Gifts:</strong><br/>
-		<% @subscription.offer.gifts.each do |gift| %>
-			<%= h gift.name %><br/>
-		<% end %>
-	</p>
+  <% if @subscription.offer && !@subscription.offer.gifts.empty? %>
+    <p style="padding: 10pt;">
+      <strong>Included Gifts:</strong><br/>
+      <% @subscription.offer.gifts.each do |gift| %>
+        <%= h gift.name %><br/>
+      <% end %>
+    </p>
+  <% end %>
 
 	<p style="padding: 10px 0px 10px 0px">
 		<strong>Your Address Details:</strong><br/>

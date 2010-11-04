@@ -304,9 +304,11 @@ module ActiveRecord
               end
               
               state_machine = state_machines[attr_name]
+              puts "Checking state: #{state}"
+              puts "Has state? #{state_machine.has_state?(state)}"
               if state_machine.has_state?(state)
                 if record.new_record?
-                  record.errors.add(attr_name, bad_initial_state % state) unless state_machine.initial_state?(state)
+                  #record.errors.add(attr_name, bad_initial_state % state) unless state_machine.initial_state?(state)
                 elsif record.send("#{attr_name}_changed?")
                   from,to = record.send("#{attr_name}_was"),state
                   # TODO: implement guard support to be more selective?

@@ -24,4 +24,12 @@ class SubscriptionMailer < ActionMailer::Base
     body           :subscription => subscription
     content_type   'text/html'
   end
+
+  def new_trial(subscription)
+    recipients subscription.user.email
+    subject "New Trial Subscription"
+    from "noreply@crikey.com.au"
+    body :user => subscription.user
+    content_type 'text/html'
+  end
 end

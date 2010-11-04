@@ -2,7 +2,7 @@ Factory.define :user do |f| # Dont use this factory. Use either an admin or a su
   f.login { Faker::Name.first_name }
   f.firstname { Faker::Name.first_name }
   f.lastname { Faker::Name.last_name }
-  f.email { @email= "email_#{Factory.next(:seq)}@example.com" }
+  f.email { @email= Faker::Internet.email }
   f.email_confirmation { @email }
   f.password "password"
   f.password_confirmation { |x| x.password }

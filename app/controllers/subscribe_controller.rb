@@ -9,10 +9,10 @@ class SubscribeController < ApplicationController
 # rescue timeout
 # rescue error
 # end
-
+=begin
   around_filter :catch_exceptions
 
-  act_wizardly_for :subscription, :form_data => :sandbox, :canceled => "/", :persist_model => :once, :guard => false
+  #act_wizardly_for :subscription, :form_data => :sandbox, :canceled => "/", :persist_model => :once, :guard => false
   
 #TODO: fix gaurd issue. only non-guard the offer page
 
@@ -223,5 +223,6 @@ class SubscribeController < ApplicationController
     flash[:error] = "Unable to deliver email"
     # This is not a fatal exception
   end
+=end
 end
 

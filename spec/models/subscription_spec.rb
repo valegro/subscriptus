@@ -10,34 +10,37 @@ describe Subscription do
     CM::Recipient.stubs(:create!)
   end
 
-  # tests on get_new_expiry_date method ----------------
-  it "should set expiry_date to 3 months from now if the expiry date has aleady been passed" do
-    months = 3
-    @subscription.expires_at = Date.new(2010, 1, 1)
-    expected = Date.new(2010, 12, 27)
-    @subscription.set_expires_at(months)
-    @subscription.expires_at.year.should == expected.year
-    @subscription.expires_at.month.should == expected.month
-    @subscription.expires_at.day.should == expected.day
-  end
-  
-  it "should set expiry_date to 3 months from the end of current expiry date" do
-    months = 3
-    @subscription.expires_at = Date.new(2010, 10, 4)
-    expected = Date.new(2011, 1, 4)
-    @subscription.set_expires_at(months)
-    @subscription.expires_at.year.should == expected.year
-    @subscription.expires_at.month.should == expected.month
-    @subscription.expires_at.day.should == expected.day
-  end
-  
-  it "should set expiry_date to 3 months from now if no expiry date has been set yet" do
-    months = 3
-    expected = Date.new(2010, 12, 27)
-    @subscription.set_expires_at(months)
-    @subscription.expires_at.year.should == expected.year
-    @subscription.expires_at.month.should == expected.month
-    @subscription.expires_at.day.should == expected.day
+  describe "offer term" do
+    before(:each) do
+      months = 3
+      @offer_term = Factory.create(:offer_term, :months => months)
+    end
+
+    it "should set expiry_date to 3 months from now if the expiry date has aleady been passed" do
+      @subscription.expires_at = Date.new(2010, 1, 1)
+      expected = Date.new(2010, 12, 27)
+      @subscription.increment_expires_at(@offer_term)
+      @subscription.expires_at.localtime.year.should == expected.year
+      @subscription.expires_at.localtime.month.should == expected.month
+      @subscription.expires_at.localtime.day.should == expected.day
+    end
+    
+    it "should set expiry_date to 3 months from the end of current expiry date" do
+      @subscription.expires_at = Date.new(2010, 10, 4)
+      expected = Date.new(2011, 1, 4)
+      @subscription.increment_expires_at(@offer_term)
+      @subscription.expires_at.localtime.year.should == expected.year
+      @subscription.expires_at.localtime.month.should == expected.month
+      @subscription.expires_at.localtime.day.should == expected.day
+    end
+    
+    it "should set expiry_date to 3 months from now if no expiry date has been set yet" do
+      expected = Date.new(2010, 12, 27)
+      @subscription.increment_expires_at(@offer_term)
+      @subscription.expires_at.localtime.year.should == expected.year
+      @subscription.expires_at.localtime.month.should == expected.month
+      @subscription.expires_at.localtime.day.should == expected.day
+    end
   end
   
   describe "class def" do
@@ -53,6 +56,21 @@ describe Subscription do
     # could we easily spec accepts_nested_attributes_for?
     # could we easily spec wizardly stuff?
   end
+
+  describe "upon creation" do
+    it "should deliver a trial email for new trials" do
+      SubscriptionMailer.expects(:deliver_new_trial)
+      @subscription = Factory.create(:subscription)
+    end
+
+    it "should deliver an active email for new active subscriptions" do
+      SubscriptionMailer.expects(:deliver_new_trial).never
+      SubscriptionMailer.expects(:deliver_activation).never
+      @user = Factory.create(:subscriber)
+      @user.subscriptions << Factory.build(:subscription, :state => :active)
+    end
+  end
+
   describe "with filters" do
     it "should set publication id before create" do
       s = Factory.build(:subscription)
@@ -60,10 +78,12 @@ describe Subscription do
       s.save!
       s.publication_id.should_not be_nil
     end
+
     it "should create dlayed job" do
       lambda { Factory.create(:subscription) }.should change(Delayed::Job, :count).by(1)
     end
   end
+
   it "should invoke campaingmaster update on add_to_campaignmaster" do
     s = Factory.build(:subscription)
     CM::Recipient.expects(:update).with(
@@ -74,6 +94,7 @@ describe Subscription do
     ).returns("called")
     s.update_campaignmaster.should eql("called")
   end
+
   it "should invoke campaingmaster update on update_campaignmaster" do
     s = Factory.create(:subscription)
     s.reload
@@ -85,6 +106,7 @@ describe Subscription do
     ).returns("called")
     s.update_campaignmaster.should eql("called")
   end
+
   # TODO: how do we log this?
   it "should log error if create fails" do
     s = Factory.build(:subscription)
@@ -92,17 +114,20 @@ describe Subscription do
     CM::Proxy.expects(:log_cm_error)
     s.update_campaignmaster
   end
+
   describe "with named scopes" do
     before(:each) do
       Factory.create(:subscription)
       Factory.create(:subscription)
     end
+
     it "should have named_scope ascend_by_name" do
       subs = Subscription.ascend_by_name
       # XXX: sorting is by lastname, firstname. should check first name too?
       # XXX: the DBMS's sorting and ruby's sorting might use different algorithms!
       subs[0].user.lastname.should <= subs[1].user.lastname
     end
+
     it "should have named_scope descend_by_name" do
       subs = Subscription.descend_by_name
       subs[0].user.lastname.should >= subs[1].user.lastname

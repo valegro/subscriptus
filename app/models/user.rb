@@ -1,10 +1,12 @@
 class User < ActiveRecord::Base
   include Utilities
   
-  acts_as_authentic
+  acts_as_authentic do |c|
+    c.validate_login_field = false
+  end
   
   has_many :audit_log_entries
-  has_many :subscriptions
+  has_many :subscriptions, :before_add => :only_one_trial_allowed
   attr_accessor :email_confirmation
 
   enum_attr :role, %w(admin subscriber)
@@ -14,12 +16,10 @@ class User < ActiveRecord::Base
   end
 
   validates_format_of :email, :with => /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i
-  validates_presence_of :firstname, :lastname, :email, :phone_number, :address_1, :city, :postcode, :state, :country, :role
+  validates_presence_of :firstname, :lastname, :email, :phone_number, :address_1, :city, :postcode, :state, :country, :role, :unless => Proc.new { |user| user.auto_created? }
   validates_uniqueness_of :email
-  validates_confirmation_of :email
-
-  after_create { |user| user.update_cm(:create!) }
-  after_update { |user| user.update_cm(:update) }
+  validates_uniqueness_of :login, :unless => Proc.new { |user| user.auto_created? }
+  validates_confirmation_of :email, :on => :create
 
   # Used for search controller
   named_scope :firstname_or_lastname_like, lambda { |arg| { :conditions => ["lower(firstname) || ' ' || lower(lastname) LIKE ?", "%#{arg.try(:downcase)}%"]} }
@@ -27,12 +27,42 @@ class User < ActiveRecord::Base
   named_scope :admins, :conditions => { :role => 'admin' }
   named_scope :subscribers, :conditions => { :role => 'subscriber' }
 
-  def validate_on_create
-    if self.email_confirmation.blank?
-      errors.add_to_base("Must provide email confirmation")
-    end
-    unless self.email == self.email_confirmation
-      errors.add_to_base("Email does not match confirmation")
+  # Used by the Unbounce Webhook
+  def self.find_or_create_with_trial(publication, trial_period_in_days, referrer, user_attributes)
+    user_attributes.symbolize_keys!
+    user = self.find_by_email(user_attributes[:email].to_s)
+    user ||= self.create_trial_user(user_attributes)
+    # Weekender & Solus options
+    solus = !user_attributes.fetch(:options, []).select { |s| /advertisers/i === s }.empty?
+    weekender = !user_attributes.fetch(:options, []).select { |s| /weekender/i === s }.empty?
+    # Add the subscription
+    user.subscriptions.create!(
+      :publication => publication,
+      :expires_at => trial_period_in_days.days.from_now,
+      :referrer => referrer,
+      :weekender => weekender,
+      :solus => solus
+    )
+  end
+
+  # Used for creating new users from trial forms
+  def self.create_trial_user(attributes)
+    r_password = (0...7).map { ('a'..'z').to_a[rand(26)] }.join << rand(9).to_s
+    self.create!(
+      :firstname => attributes[:first_name].to_s,
+      :lastname => attributes[:last_name].to_s,
+      :email => attributes[:email].to_s,
+      :email_confirmation => attributes[:email].to_s,
+      :password => r_password,
+      :password_confirmation => r_password,
+      :login => 'trial_user',
+      :auto_created => true
+    )
+  end
+
+  def only_one_trial_allowed(subscription)
+    if self.subscriptions.trial.find(:first, :conditions => { :publication_id => subscription.publication_id })
+      raise "User already has a trial for publication"
     end
   end
 
