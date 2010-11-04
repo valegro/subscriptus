@@ -1,5 +1,5 @@
 * Move the mailers to app/models/mailers
-* Move all callbacks to observers
 * Specs for CM Calls for User and Subscription (expectations)
 * Appropriate content for all emails
 * Use Delayed Job for callbacks to email and CM
+* Move all callbacks to observers
