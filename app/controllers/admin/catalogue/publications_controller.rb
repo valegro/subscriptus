@@ -9,6 +9,10 @@ class Admin::Catalogue::PublicationsController < Admin::CatalogueController
     @publication = Publication.new
   end
 
+  def show
+    @request_host = request.host
+  end
+
   def create
     @publication = Publication.new(params[:publication])
     if @publication.save

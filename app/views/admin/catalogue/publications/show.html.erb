@@ -1,6 +1,7 @@
 <div class="title">
   <%= content_tag :h2, "View Publication" %>
   <div class="actions">
+    <%= link_to 'Webhook', "#", :id => "webhook_link", :class => "webhook" %>
     <%= link_to 'Delete', admin_catalogue_publication_path(@publication), :method => :delete, :confirm => "Are you sure?", :class => "delete" %>
     <%= link_to 'Edit', edit_admin_catalogue_publication_path(@publication), :class => 'edit' %>
     <%= link_to 'Back to Publications', admin_catalogue_publications_path, :class => 'back' %>
@@ -25,3 +26,31 @@
     TODO
   </div>
 </div>
+
+<div id="webhook_dialog" title="Webhook URL">
+  <p>Generate a Webhook URL for this publication. This will enable you to take trial subscriptions from Unbounce.</p>
+  <p>Copy and paste this link into the Webhook section of an Unbounce landing page.</p>
+  <label for="offer_link">Link</label>
+  <%= text_area_tag "Link", webhooks_unbounce_url(:publication_id => @publication.id), :cols => 40, :rows => 2, :id => "webhook_link" %>
+</div>
+
+<script language="javascript">
+  $(document).ready(function() {
+    $('#webhook_dialog').dialog({
+      autoOpen: false,
+      width: 400,
+      modal: true,
+      buttons: {
+        'Cancel' : function() {
+          $(this).dialog('close');
+        }
+      }
+    });
+
+    $('#webhook_link').click(function() {
+      $('#webhook_dialog').dialog('open');
+    });
+  });
+</script>
+
+

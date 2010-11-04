@@ -210,6 +210,13 @@ body {
   background-position: 5px center;
 }
 
+#content div.title .actions a.webhook {
+  padding-left: 26px;
+  background-image: url(/images/admin/icons/webhook.png);
+  background-repeat: no-repeat;
+  background-position: 5px center;
+}
+
 #content div.title h2 {
   float: left;
   color: #666;
