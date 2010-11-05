@@ -43,3 +43,28 @@ Rails::Initializer.run do |config|
   # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}')]
   # config.i18n.default_locale = :de
 end
+
+__END__
+gem 'httpclient' 
+gem 'soap4r' 
+gem 'mechanize'
+
+require 'soap/wsdlDriver' 
+require 'cm/CampaignMasterService'
+
+require 'cm/recipient'
+
+      def self.validate_certificate(is_ok, ctx)
+        true
+      end
+
+puts "Calling factory in ENV"
+fact = SOAP::WSDLDriverFactory.new(CM::Base::V1_URI)
+puts "end calling factory in ENV"
+driver = fact.create_rpc_driver
+driver.generate_explicit_type = true
+driver.options['protocol.http.ssl_config.verify_callback'] = method(:validate_certificate)
+driver.options["protocol.http.connect_timeout"] = 60 # XXX should defaults be settable somewhere?
+driver.options["protocol.http.receive_timeout"] = 60
+
+CM::Base.driver = driver

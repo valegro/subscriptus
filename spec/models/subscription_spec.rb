@@ -64,10 +64,10 @@ describe Subscription do
     end
 
     it "should deliver an active email for new active subscriptions" do
-      SubscriptionMailer.expects(:deliver_new_trial).never
-      SubscriptionMailer.expects(:deliver_activation).never
+      #SubscriptionMailer.expects(:deliver_new_trial).never
+      SubscriptionMailer.expects(:deliver_activation)
       @user = Factory.create(:subscriber)
-      @user.subscriptions << Factory.build(:subscription, :state => :active)
+      @user.subscriptions << Factory.create(:subscription, :state => :active)
     end
   end
 

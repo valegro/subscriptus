@@ -3,3 +3,4 @@
 * Appropriate content for all emails
 * Use Delayed Job for callbacks to email and CM
 * Move all callbacks to observers
+* Stop CM Loading the API EVERY SINGLE REQUEST!

@@ -112,3 +112,13 @@ Feature: An admin can CRUD a publication
         And I follow "Delete"
       Then I should see "Deleted Publication"
         And I should be on the admin catalogue publications page
+
+  @javascript
+  Scenario: An admin can generate a webhook URL for a publication
+    Given a publication: "Daily Mail" exists with name: "Daily Mail", id: 1
+    When I am on the admin catalogue publication page for 1
+      And I follow "Webhook"
+    Then I should see "Generate a Webhook URL for this publication."
+      And the "Link" field should contain "http://localhost:9887/webhooks/unbounce?publication_id=1"
+
+
