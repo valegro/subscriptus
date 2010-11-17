@@ -4,3 +4,23 @@
 * Use Delayed Job for callbacks to email and CM
 * Move all callbacks to observers
 * Stop CM Loading the API EVERY SINGLE REQUEST!
+
+Signup
+* Set titles
+* Set gender from title
+* Fix reform fields
+* Do we auto generate login for active users as well?
+* Cukes
+* Set offer and source properly
+* Email lookup for active users
+* Set amount and offer term on subscription
+* Set order ID properly
+* Link for Terms and Conditions
+* Spec for payment
+* Set subscription to active for paid subs
+* Set expires_at - this may not be set with webhooks either
+
+DONE
+* Check integration tests for webhooks
+* Validate Card
+

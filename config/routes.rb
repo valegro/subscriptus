@@ -42,6 +42,9 @@ ActionController::Routing::Routes.draw do |map|
 
   # Signup
   map.with_options  :controller => 'subscribe' do |s|
+    s.resource :subscribe, :collection => { :thanks => :get }
+    #s.subscribe "subscribe", :action => 'new', :method => :get
+=begin
     s.subscribe_offer         'subscribe/offer', :action => 'offer', :method => :get
     s.subscribe_offer_next    'subscribe/offer', :action => 'offer', :method => :post, :commit=>'Next'
 
@@ -53,6 +56,7 @@ ActionController::Routing::Routes.draw do |map|
     s.subscribe_payment_direct_debit  'subscribe/direct_debit', :action => 'direct_debit', :method => :get
 
     s.subscribe_result  'subscribe/result', :action => 'result', :method => :get
+=end
   end
 
   # Webhooks

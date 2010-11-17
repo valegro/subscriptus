@@ -90,7 +90,10 @@ module ActiveMerchant
     
     private
     def http
-      http = Net::HTTP.new(endpoint.host, endpoint.port)
+      #http = Net::HTTP.new(endpoint.host, endpoint.port)
+      # HACK to use an upstream proxy server in dev
+      proxy = Net::HTTP::Proxy('netproxy', '80')
+      http = proxy.new(endpoint.host, endpoint.port)
       configure_debugging(http)
       configure_timeouts(http)
       configure_ssl(http)

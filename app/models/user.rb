@@ -27,6 +27,11 @@ class User < ActiveRecord::Base
   named_scope :admins, :conditions => { :role => 'admin' }
   named_scope :subscribers, :conditions => { :role => 'subscriber' }
 
+  def after_initialize
+    # Default to subscriber role
+    self.role ||= 'subscriber'
+  end
+
   # Used by the Unbounce Webhook
   def self.find_or_create_with_trial(publication, trial_period_in_days, referrer, user_attributes)
     user_attributes.symbolize_keys!
@@ -76,6 +81,18 @@ class User < ActiveRecord::Base
 
   def admin?
     self.role == :admin
+  end
+
+  # Used by ActiveMerchant
+  def address_hash
+    {
+      :address1 => address_1,
+      :address2 => address_2,
+      :city => city,
+      :country => country,
+      :state => state,
+      :zip => postcode,
+    }
   end
 
   def update_cm(create_or_update)

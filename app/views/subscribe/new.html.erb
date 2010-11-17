@@ -1,0 +1,82 @@
+<h1>Subscribe to Crikey</h1>
+
+<h2><%= @offer.publication.name %></h2>
+<p><%= @offer.publication.description %></p>
+
+<% form_for @subscription, :url => subscribe_path, :builder => Reform::Builder, :html => { :class => "form" } do |f| %>
+  <%= f.hidden_field :offer_id %>
+  <%= f.error_messages %>
+
+  <h4>Subscription</h4>
+  <% if @offer.offer_terms.size > 1 %>
+    <table>
+      <% @offer.offer_terms.each_with_index do |ot, i| %>
+        <tr>
+          <td>
+            <%= radio_button_tag "offer_term", ot.id, (i == 0) %>
+            <label for="">Offer <%= i + 1 %>: <%= pluralize(ot.months, 'month') %></label>
+          </td>
+          <td><%= number_to_currency(ot.price) %></td>
+        </tr>
+      <% end %>
+    </table>
+  <% else %>
+    <p><%= describe_offer_term(@offer.try(:offer_terms).try(:first)) %></p>
+  <% end %>
+
+  <!-- Gifts -->
+
+  <% f.fields_for :subscription_gifts do |sg| %>
+    <% unless @offer.gifts.included.blank? %>
+      <h4>Subscribe and Receive</h4>
+      <%= render :partial => "included_gift", :collection => @included_gifts, :locals => { :f => sg } %>
+    <% end %>
+    <% if @optional_gifts.size == 1 %>
+      <%= render :partial => "included_gift", :object => @optional_gifts.first, :locals => { :f => sg } %>
+    <% end %>
+    <% if @offer.gifts.optional.size > 1 %>
+      <% if @offer.gifts.included.empty? %>
+        <h4>Choose a free gift!</h4>
+      <% else %>
+        <h4>Plus, choose one of the following:</h4>
+      <% end %>
+      <% @optional_gifts.each_with_index do |o_gift, i| %>
+        <%= render :partial => "optional_gift", :object => o_gift, :locals => { :f => sg, :checked => (i == 0) } %>
+      <% end %>
+    <% end %>
+  <% end %>
+
+  <span><em>Enter your details</em></span>
+  <% f.fields_for :user do |u| %>
+    <%= u.enum_select :title %>
+    <%= u.text_field :firstname, :required => true %>
+    <%= u.text_field :lastname, :required => true %>
+    <%= u.select :hear_about, [ "The web", "Someone else" ], :required => true %>
+    <%= u.text_field :email, :help => "This is the email address Crikey will be sent to", :required => true %>
+    <%= u.text_field :email_confirmation, :required => true %>
+    <%= u.password_field :password %>
+    <%= u.password_field :password_confirmation %>
+    <%= u.text_field :phone_number, :help => "If there are problems with email delivery this is how we contact you", :required => true %>
+    <%= u.text_field :company %>
+    <%= u.text_field :address_1, :label => "Street Address Line 1", :required => true %>
+    <%= u.text_field :address_2, :label => "Street Address Line 2" %>
+    <%= u.text_field :city, :required => true %>
+    <%= u.enum_select :state, :required => true %>
+    <%= u.text_field :postcode, :required => true %>
+    <%= u.country_select :country, :required => true %>
+  <% end %>
+
+  <% f.fields_for :payments do |p| %>
+    <%= p.enum_select :card_type, :required => true %>
+    <% p.row("Name on Card", :required => true) do %>
+      <%= p.text_field :first_name, :required => true %>
+      <%= p.text_field :last_name, :required => true %>
+    <% end %>
+    <%= p.text_field :card_number, :required => true %>
+    <%= p.date_select :card_expiry_date, :discard_day => true, :start_year => Time.now.year, :label => "Expiry", :required => true %>
+    <%= p.text_field :card_verification, :size => 3, :required => true %>
+  <% end %>
+
+  <%= f.check_box :terms, :label => "I agree to the Crikey terms and conditions" %>
+  <%= f.submit 'Subscribe', :disable_with => "Processing..." %>
+<% end %>

@@ -26,12 +26,6 @@ class SubscriptionObserver < ActiveRecord::Observer
     record.send_later :update_campaignmaster
   end
 
-  def before_create(record)
-    unless record.offer.blank?
-      record.publication_id = record.offer.publication_id
-    end
-  end
-
   def after_create(record)
     record.send_later :update_campaignmaster
   end

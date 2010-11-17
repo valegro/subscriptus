@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20101102034735) do
+ActiveRecord::Schema.define(:version => 20101117003856) do
 
   create_table "audit_log_entries", :force => true do |t|
     t.integer  "user_id"
@@ -52,11 +52,6 @@ ActiveRecord::Schema.define(:version => 20101102034735) do
     t.datetime "updated_at"
   end
 
-  create_table "gifts_offers", :force => true do |t|
-    t.integer "gift_id"
-    t.integer "offer_id"
-  end
-
   create_table "offer_terms", :force => true do |t|
     t.integer  "offer_id"
     t.decimal  "price"
@@ -76,6 +71,12 @@ ActiveRecord::Schema.define(:version => 20101102034735) do
   end
 
   create_table "payments", :force => true do |t|
+    t.string   "card_number"
+    t.string   "first_name"
+    t.string   "last_name"
+    t.datetime "card_expiry_date"
+    t.decimal  "amount"
+    t.integer  "subscription_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -210,6 +211,8 @@ ActiveRecord::Schema.define(:version => 20101102034735) do
     t.boolean  "admin"
     t.string   "recurrent_id"
     t.boolean  "auto_created"
+    t.string   "hear_about"
+    t.string   "company"
   end
 
 end

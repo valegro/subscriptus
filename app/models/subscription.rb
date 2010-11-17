@@ -10,9 +10,7 @@ class Subscription < ActiveRecord::Base
   belongs_to :source # with this attribute there is no need to have the SubscriptionLogEntry as sources are easily trackable through subscription. but subscription needs to act_as_paranoid
   has_many :subscription_log_entries
   has_many :subscription_gifts, :dependent => :destroy
-
-  has_many :payments, :class_name => "::Subscription::Payment", :dependent => :destroy
-  has_many :invoices, :class_name => "::Subscription::Invoice", :dependent => :destroy
+  has_many :payments, :autosave => true, :before_add => Proc.new { |s,p| p.amount = 10 } # TODO: FIX this!
   
   has_many :gifts, :through => :subscription_gifts do
     # add an array of gifts
@@ -27,8 +25,9 @@ class Subscription < ActiveRecord::Base
     end
   end
   
+  attr_accessor :terms
   attr_accessor :starts_at # the start date of the newest subscription
-  accepts_nested_attributes_for :subscription_gifts, :user
+  accepts_nested_attributes_for :subscription_gifts, :payments, :user
 
   named_scope :ascend_by_name, :include => 'user', :order => "users.lastname ASC, users.firstname ASC"
   named_scope :descend_by_name, :include => 'user', :order => "users.lastname DESC, users.firstname DESC"
@@ -38,23 +37,10 @@ class Subscription < ActiveRecord::Base
     { :include => :user, :conditions => ["lower(users.firstname) || ' ' || lower(users.lastname) LIKE ?", "%#{arg.try(:downcase)}%"] }
   }
 
-  def self.per_page
-    20
-  end
-
-  def get_user
-    self.user_id ? User.find(self.user_id) : nil
-  end
-
-  # Signup Wizard
-  #validation_group :offer, :fields => [ :publication_id, :price, :expires_at ]
-  #validation_group :details
-  #validation_group :payment
-
-  validates_presence_of :publication #, :price ??
+  validates_presence_of :publication
+  validates_acceptance_of :terms
   
   # Subscription States
-  # has_states :incomplete, :trial, :squatter, :active, :pending, :renewal_due, :payment_failed do
   has_states :trial, :squatter, :active, :pending, :extension_pending, :cancelled, :renewal_due, :payment_failed, :init => :trial do
     on :activate do
       transition :active => :active # when the subscriber extends their subscription while its still active
@@ -97,6 +83,19 @@ class Subscription < ActiveRecord::Base
     # expires :trial => :squatter, :after => 21.days
   end
 
+  def use_offer(offer)
+    self.offer = offer
+    self.publication = offer.publication
+  end
+
+  def self.per_page
+    20
+  end
+
+  def get_user
+    self.user_id ? User.find(self.user_id) : nil
+  end
+
   def update_campaignmaster
     # TODO: determine how publication name on campaignmaster is managed.
     #       currently (temporarily) using publication_123{expiry} style for keys.
@@ -111,33 +110,18 @@ class Subscription < ActiveRecord::Base
     CM::Proxy.log_cm_error(ex)
   end
 
-  # These are the options sent to the gateway when attempting to save a
-  # credit card.
-  def to_activemerchant
-    returning({}) do |hash|
-      if self.user
-        hash.merge({
-          :title => self.user.title,
-          :country => self.user.country,
-          :company => "",
-          :email => self.user.email
-        })
+  def save_in_transaction
+    Subscription.transaction do
+      begin
+        save!
+      rescue PaymentFailedException => e
+        payment.errors.add_to_base("Unable to charge card: #{e.message}")
+        return false
+      rescue ActiveRecord::RecordInvalid => e
+        return false
       end
     end
-  end
-
-  # These are the properties that get passed to the ActiveMerchant
-  # credit card object.
-  def to_credit_card
-    # TODO: Should this be the name on card??
-    returning({}) do |hash|
-      if self.user
-        hash.merge({
-          :first_name => self.user.firstname,
-          :last_name => self.user.lastname
-        })
-      end
-    end
+    true
   end
 
   # if the sibscription is new or expired, start it from now
