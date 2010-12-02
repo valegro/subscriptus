@@ -64,10 +64,11 @@ describe Subscription do
     end
 
     it "should deliver an active email for new active subscriptions" do
-      #SubscriptionMailer.expects(:deliver_new_trial).never
+      SubscriptionMailer.expects(:deliver_new_trial).never
       SubscriptionMailer.expects(:deliver_activation)
       @user = Factory.create(:subscriber)
-      @user.subscriptions << Factory.create(:subscription, :state => :active)
+      sub = Factory.build(:subscription, :state => 'active')
+      @user.subscriptions << sub
     end
   end
 
@@ -117,8 +118,8 @@ describe Subscription do
 
   describe "with named scopes" do
     before(:each) do
-      Factory.create(:subscription)
-      Factory.create(:subscription)
+      a = Factory.create(:subscription)
+      b = Factory.create(:subscription)
     end
 
     it "should have named_scope ascend_by_name" do

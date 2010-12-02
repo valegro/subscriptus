@@ -1,8 +1,8 @@
 class UserObserver < ActiveRecord::Observer
 
   def before_create(user)
-    puts "USER HERE"
-    user.login = 'loginfu'
+    # TODO: Why do we do this here?
+    #user.login = 'loginfu'
   end
 
   # TODO: Delayed Job

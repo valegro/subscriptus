@@ -37,7 +37,7 @@ class Subscription < ActiveRecord::Base
     { :include => :user, :conditions => ["lower(users.firstname) || ' ' || lower(users.lastname) LIKE ?", "%#{arg.try(:downcase)}%"] }
   }
 
-  validates_presence_of :publication
+  validates_presence_of :publication, :user, :state
   validates_acceptance_of :terms
   
   # Subscription States

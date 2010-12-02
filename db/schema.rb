@@ -9,7 +9,30 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20101117003856) do
+ActiveRecord::Schema.define(:version => 20101123232213) do
+
+  create_table "archived_subscriptions", :id => false, :force => true do |t|
+    t.integer  "id"
+    t.integer  "user_id"
+    t.integer  "offer_id"
+    t.integer  "publication_id"
+    t.string   "state"
+    t.string   "card_number"
+    t.string   "card_expiration"
+    t.string   "payment_method"
+    t.decimal  "price"
+    t.boolean  "auto_renew"
+    t.datetime "state_updated_at"
+    t.datetime "expires_at"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.string   "order_num"
+    t.integer  "source_id"
+    t.text     "referrer"
+    t.boolean  "solus"
+    t.boolean  "weekender"
+    t.datetime "deleted_at"
+  end
 
   create_table "audit_log_entries", :force => true do |t|
     t.integer  "user_id"

@@ -11,19 +11,17 @@ describe SubscriptionMailer do
   # tests on activation method ----------------
   describe "if the subscription, offer an user are valid and available" do
     it "should successfully deliver the email containing the correct subscription details to the activated user" do
-      valid_params = { :offer_id => @offer.id,
-                        :price => 20,
-                        :user_id => @user.id}
-      subscription = Subscription.create(valid_params)
+      subscription = Factory.stub(:subscription)
+      subscription.use_offer(@offer)
       subscription.order_num = 333
       res = SubscriptionMailer.deliver_activation(subscription)
 
       res.should_not      be_nil
       res.subject.should  == 'Crikey Online Order 333'
-      res.to.should       == [@user.email]
+      res.to.should       == [subscription.user.email]
       res.from.should     == SubscriptionMailer::SEND_TO
-      res.body.should     include_text(@user.firstname)
-      res.body.should     include_text(@user.lastname)
+      res.body.should     include_text(subscription.user.firstname)
+      res.body.should     include_text(subscription.user.lastname)
       res.body.should     include_text(@offer.publication.name)
       #FIXME add more body.should include
       res.content_type.should == 'text/html'

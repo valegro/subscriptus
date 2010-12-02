@@ -41,7 +41,7 @@ gem 'aws-s3', :require => "aws/s3"
 gem 'wizardly'
 gem 'enumerated_attribute'
 
-group :test, :cucumber do
+group :test, :cucumber, :development do
   gem 'capybara'
   gem 'database_cleaner'
   gem 'spork'
@@ -54,7 +54,9 @@ group :test, :cucumber do
   gem 'shoulda'
   gem 'gherkin'
   gem 'rack-test', "0.5.4"
-  gem 'rspec'
-  gem 'rspec-rails', '~> 1.3.2'
+  gem 'rspec', '1.3.1'
+  gem 'rspec-rails', '1.3.3'
   gem 'mocha', '~> 0.9.8'
+#  gem 'ZenTest'
+#  gem 'autotest-rails'
 end
