@@ -18,8 +18,11 @@ class SubscribeController < ApplicationController
 
   def create
     @offer = params[:offer_id] ? Offer.find(params[:offer_id]) : Offer.first
+    @term = params[:offer_term] ? OfferTerm.find(params[:offer_term]) : @offer.offer_terms.first
     @subscription = Subscription.new(params[:subscription])
-    @subscription.use_offer(@offer)
+    # Set to active because we are taking payment
+    @subscription.state = 'active'
+    @subscription.use_offer(@offer, @term)
     if @subscription.save_in_transaction
       redirect_to :action => :thanks
     else

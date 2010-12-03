@@ -14,6 +14,9 @@ class Payment < ActiveRecord::Base
   end
 
   before_save do |payment|
+    # Set the price
+    payment.amount = payment.subscription.price
+
     # Charge the card
     response = GATEWAY.purchase((payment.amount * 100).to_i, payment.credit_card,
       :order_id => "123", # FIXME

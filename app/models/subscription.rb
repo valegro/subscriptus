@@ -10,7 +10,7 @@ class Subscription < ActiveRecord::Base
   belongs_to :source # with this attribute there is no need to have the SubscriptionLogEntry as sources are easily trackable through subscription. but subscription needs to act_as_paranoid
   has_many :subscription_log_entries
   has_many :subscription_gifts, :dependent => :destroy
-  has_many :payments, :autosave => true, :before_add => Proc.new { |s,p| p.amount = 10 } # TODO: FIX this!
+  has_many :payments, :autosave => true
   
   has_many :gifts, :through => :subscription_gifts do
     # add an array of gifts
@@ -83,9 +83,12 @@ class Subscription < ActiveRecord::Base
     # expires :trial => :squatter, :after => 21.days
   end
 
-  def use_offer(offer)
+  def use_offer(offer, term)
+    raise "Offer Term not valid for Offer" if term.offer_id != offer.id # TODO: Spec this
     self.offer = offer
     self.publication = offer.publication
+    self.price = term.price
+    increment_expires_at(term) 
   end
 
   def self.per_page
