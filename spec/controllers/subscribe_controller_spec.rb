@@ -89,4 +89,8 @@ describe SubscribeController do
     end
   end
 
+  # TODO: Check create of a gift order
+  # TODO: Make a model spec for for GiftOrder
+  # GiftOrder should decrement the gift's stock count and it should also validate that stock is available
+
 end
