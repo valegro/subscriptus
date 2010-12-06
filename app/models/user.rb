@@ -7,6 +7,7 @@ class User < ActiveRecord::Base
   
   has_many :audit_log_entries
   has_many :subscriptions, :before_add => :only_one_trial_allowed
+  has_many :orders
   attr_accessor :email_confirmation
 
   enum_attr :role, %w(admin subscriber)

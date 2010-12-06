@@ -1,6 +1,7 @@
 class Gift < ActiveRecord::Base
   has_many :gift_offers, :dependent => :destroy
   has_many :offers, :through => :gift_offers
+  has_many :orders
   has_attached_file :gift_image,
     :styles => { :medium => "350x350>", :thumb => "100x100>" },
     :storage => :s3,

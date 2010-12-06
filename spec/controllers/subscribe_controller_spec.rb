@@ -25,6 +25,7 @@ describe SubscribeController do
   it "should show gifts for offer" do
     get 'new', { :offer_id => @offer.id, :source_id => @source.id }
   end
+  # TODO: Need to test the different GIFT options on new
   
   it "should show errors if data is missing" do
     GATEWAY.expects(:purchase).never
@@ -53,7 +54,8 @@ describe SubscribeController do
         :offer_term => @ot2.id,
         :subscription => {
           :user_attributes => @user_attributes,
-          :payments_attributes => { "0" => @payment_attributes }
+          :payments_attributes => { "0" => @payment_attributes },
+          :subscription_gifts_attributes => { "0" => { :gift_id => @g2.id }}
         }
       } 
     end
@@ -84,8 +86,12 @@ describe SubscribeController do
     end
 
     it "should create a gift order" do
-      # TODO
-      pending
+      @g2.reload
+      @g2.on_hand.should == 9
+      assigns[:subscription].user.orders.count.should == 1
+      assigns[:subscription].user.orders.first.user.blank?.should == false
+      assigns[:subscription].user.orders.first.gifts.count.should == 1
+      # MORE
     end
   end
 

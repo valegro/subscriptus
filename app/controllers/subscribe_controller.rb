@@ -1,12 +1,10 @@
 class SubscribeController < ApplicationController
   layout 'signup'
+  before_filter :load_offer
+  before_filter :load_gifts
 
   def new
-    # TODO: We can clean this code up a bit
-    @offer = params[:offer_id] ? Offer.find(params[:offer_id]) : Offer.first
     source = (params[:source_id] && params[:source_id] != 'null') ? Source.find(params[:source_id]) : nil
-    @optional_gifts = @offer.gifts.in_stock.optional
-    @included_gifts = @offer.gifts.in_stock.included
     @subscription = Subscription.new
     # TODO: Accepts nested attributes for offer and source??
     @subscription.offer = @offer
@@ -17,7 +15,6 @@ class SubscribeController < ApplicationController
   end
 
   def create
-    @offer = params[:offer_id] ? Offer.find(params[:offer_id]) : Offer.first
     @term = params[:offer_term] ? OfferTerm.find(params[:offer_term]) : @offer.offer_terms.first
     @subscription = Subscription.new(params[:subscription])
     # Set to active because we are taking payment
@@ -29,4 +26,14 @@ class SubscribeController < ApplicationController
       render :action => :new
     end
   end
+
+  private
+    def load_offer
+      @offer = params[:offer_id] ? Offer.find(params[:offer_id]) : Offer.first
+    end
+
+    def load_gifts
+      @optional_gifts = @offer.gifts.in_stock.optional
+      @included_gifts = @offer.gifts.in_stock.included
+    end
 end

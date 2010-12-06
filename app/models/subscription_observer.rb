@@ -15,6 +15,14 @@ class SubscriptionObserver < ActiveRecord::Observer
   def after_enter_active(subscription)
     # send email to the user with their full subscription details
     SubscriptionMailer.deliver_activation(subscription)
+    unless subscription.gifts.empty?
+      Order.transaction do
+        order = Order.create(:user => subscription.user)
+        subscription.gifts.each do |gift|
+          order.gifts << gift
+        end
+      end
+    end
   end
 
   def after_enter_canceled(subscription)

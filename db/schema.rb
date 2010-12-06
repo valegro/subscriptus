@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20101123232213) do
+ActiveRecord::Schema.define(:version => 20101206033416) do
 
   create_table "archived_subscriptions", :id => false, :force => true do |t|
     t.integer  "id"
@@ -26,7 +26,6 @@ ActiveRecord::Schema.define(:version => 20101123232213) do
     t.datetime "expires_at"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "recurrent_id"
     t.string   "order_num"
     t.integer  "source_id"
     t.text     "referrer"
@@ -37,13 +36,6 @@ ActiveRecord::Schema.define(:version => 20101123232213) do
 
   create_table "audit_log_entries", :force => true do |t|
     t.integer  "user_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  create_table "carrots", :force => true do |t|
-    t.string   "state"
-    t.datetime "state_updated_at"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -83,11 +75,6 @@ ActiveRecord::Schema.define(:version => 20101123232213) do
     t.datetime "updated_at"
   end
 
-  create_table "gifts_offers", :force => true do |t|
-    t.integer "gift_id"
-    t.integer "offer_id"
-  end
-
   create_table "offer_terms", :force => true do |t|
     t.integer  "offer_id"
     t.decimal  "price"
@@ -104,6 +91,19 @@ ActiveRecord::Schema.define(:version => 20101123232213) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.boolean  "trial",          :default => false
+  end
+
+  create_table "order_items", :force => true do |t|
+    t.integer  "order_id"
+    t.integer  "gift_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "orders", :force => true do |t|
+    t.integer  "user_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "payments", :force => true do |t|
@@ -199,7 +199,6 @@ ActiveRecord::Schema.define(:version => 20101123232213) do
     t.datetime "expires_at"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "recurrent_id"
     t.string   "order_num"
     t.integer  "source_id"
     t.text     "referrer"
