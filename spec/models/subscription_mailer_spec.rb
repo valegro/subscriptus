@@ -4,6 +4,7 @@ describe SubscriptionMailer do
 
   before(:each) do
     @offer = Factory(:offer)
+    @offer_term = Factory.create(:offer_term, :months => 3, :offer_id => @offer.id)
     @user = Factory(:subscriber)
     @offer.publication_id = Factory(:publication).id
   end
@@ -12,7 +13,7 @@ describe SubscriptionMailer do
   describe "if the subscription, offer an user are valid and available" do
     it "should successfully deliver the email containing the correct subscription details to the activated user" do
       subscription = Factory.stub(:subscription)
-      subscription.use_offer(@offer)
+      subscription.use_offer(@offer, @offer_term)
       subscription.order_num = 333
       res = SubscriptionMailer.deliver_activation(subscription)
 
