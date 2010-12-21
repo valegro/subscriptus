@@ -6,18 +6,18 @@ class SubscribeController < ApplicationController
   def new
     source = (params[:source_id] && params[:source_id] != 'null') ? Source.find(params[:source_id]) : nil
     @subscription = Subscription.new
-    # TODO: Accepts nested attributes for offer and source??
     @subscription.offer = @offer
     @subscription.source = source
     @subscription.subscription_gifts.build(:gift => @optional_gifts.first)
     if params[:delivered_to]
       # TODO: Spec
-      user = User.find_by_email(params[:delivered_to])
-      if user && user.active?
-        @subscription.user = user
+      @user = User.find_by_email(params[:delivered_to])
+      puts "USER = #{@user.inspect}"
+      if @user && @user.has_active_subscriptions?
+        @subscription.user = @user
       end
     end
-    @user = @subscription.build_user(:title => 'Mr', :state => :act) #unless user
+    @user ||= @subscription.build_user(:title => 'Mr', :state => :act)
     @subscription.payments.build
   end
 

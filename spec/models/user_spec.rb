@@ -70,7 +70,10 @@ describe User do
     @user.subscriptions.create(:publication => publication)
     @user.subscriptions.count.should == 1
     @user.has_active_subscriptions?.should_not == true
-
+    # Add an active
+    @user.subscriptions.create(:publication => publication, :state => 'active')
+    @user.subscriptions.count.should == 2
+    @user.has_active_subscriptions?.should == true
   end
 
   describe "class def" do

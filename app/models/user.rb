@@ -75,6 +75,7 @@ class User < ActiveRecord::Base
   end
 
   def only_one_trial_allowed(subscription)
+    return if subscription.active?
     if self.subscriptions.trial.find(:first, :conditions => { :publication_id => subscription.publication_id })
       raise "User already has a trial for publication"
     end
@@ -82,7 +83,7 @@ class User < ActiveRecord::Base
 
   # Returns true if user has at least one active sub
   def has_active_subscriptions?
-    subscriptions.detect(&:active?)
+    subscriptions.any?(&:active?)
   end
 
   def name
