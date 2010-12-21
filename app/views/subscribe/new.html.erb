@@ -3,8 +3,7 @@
 <h2><%= @offer.publication.name %></h2>
 <p><%= @offer.publication.description %></p>
 
-<% form_for @subscription, :url => subscribe_path, :builder => Reform::Builder, :html => { :class => "form" } do |f| %>
-  <%= f.hidden_field :offer_id %>
+<% form_for @subscription, :url => subscribe_path(:offer_id => @offer.id), :builder => Reform::Builder, :html => { :class => "form" } do |f| %>
   <%= f.error_messages %>
 
   <h4>Subscription</h4>
@@ -29,10 +28,14 @@
   <% f.fields_for :subscription_gifts do |sg| %>
     <% unless @offer.gifts.included.blank? %>
       <h4>Subscribe and Receive</h4>
-      <%= render :partial => "included_gift", :collection => @included_gifts, :locals => { :f => sg } %>
+      <table>
+        <%= render :partial => "included_gift", :collection => @included_gifts, :locals => { :f => sg } %>
+      </table>
     <% end %>
     <% if @optional_gifts.size == 1 %>
-      <%= render :partial => "included_gift", :object => @optional_gifts.first, :locals => { :f => sg } %>
+      <table>
+        <%= render :partial => "included_gift", :object => @optional_gifts.first, :locals => { :f => sg } %>
+      </table>
     <% end %>
     <% if @offer.gifts.optional.size > 1 %>
       <% if @offer.gifts.included.empty? %>
@@ -40,30 +43,36 @@
       <% else %>
         <h4>Plus, choose one of the following:</h4>
       <% end %>
-      <% @optional_gifts.each_with_index do |o_gift, i| %>
-        <%= render :partial => "optional_gift", :object => o_gift, :locals => { :f => sg, :checked => (i == 0) } %>
-      <% end %>
+      <table>
+        <% @optional_gifts.each_with_index do |o_gift, i| %>
+          <%= render :partial => "optional_gift", :object => o_gift, :locals => { :f => sg, :checked => (i == 0) } %>
+        <% end %>
+      </table>
     <% end %>
   <% end %>
 
-  <span><em>Enter your details</em></span>
-  <% f.fields_for :user do |u| %>
-    <%= u.enum_select :title %>
-    <%= u.text_field :firstname, :required => true %>
-    <%= u.text_field :lastname, :required => true %>
-    <%= u.select :hear_about, [ "The web", "Someone else" ], :required => true %>
-    <%= u.text_field :email, :help => "This is the email address Crikey will be sent to", :required => true %>
-    <%= u.text_field :email_confirmation, :required => true %>
-    <%= u.password_field :password %>
-    <%= u.password_field :password_confirmation %>
-    <%= u.text_field :phone_number, :help => "If there are problems with email delivery this is how we contact you", :required => true %>
-    <%= u.text_field :company %>
-    <%= u.text_field :address_1, :label => "Street Address Line 1", :required => true %>
-    <%= u.text_field :address_2, :label => "Street Address Line 2" %>
-    <%= u.text_field :city, :required => true %>
-    <%= u.enum_select :state, :required => true %>
-    <%= u.text_field :postcode, :required => true %>
-    <%= u.country_select :country, :required => true %>
+  <hr/>
+
+  <% if @user.new_record? %>
+    <span><em>Enter your details</em></span>
+    <% f.fields_for :user do |u| %>
+      <%= u.enum_select :title %>
+      <%= u.text_field :firstname, :required => true %>
+      <%= u.text_field :lastname, :required => true %>
+      <%= u.select :hear_about, [ "The web", "Someone else" ], :required => true %>
+      <%= u.text_field :email, :help => "This is the email address Crikey will be sent to", :required => true %>
+      <%= u.text_field :email_confirmation, :required => true %>
+      <%= u.password_field :password %>
+      <%= u.password_field :password_confirmation %>
+      <%= u.text_field :phone_number, :help => "If there are problems with email delivery this is how we contact you", :required => true %>
+      <%= u.text_field :company %>
+      <%= u.text_field :address_1, :label => "Street Address Line 1", :required => true %>
+      <%= u.text_field :address_2, :label => "Street Address Line 2" %>
+      <%= u.text_field :city, :required => true %>
+      <%= u.enum_select :state, :required => true %>
+      <%= u.text_field :postcode, :required => true %>
+      <%= u.country_select :country, ['Australia'], :required => true %>
+    <% end %>
   <% end %>
 
   <% f.fields_for :payments do |p| %>

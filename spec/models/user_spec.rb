@@ -63,6 +63,16 @@ describe User do
     @user.subscriptions.trial.count.should == 1
   end
 
+  it "should show active subscriptions" do
+    publication = Factory.build(:publication)
+    @user.save!
+    @user.subscriptions.count.should == 0
+    @user.subscriptions.create(:publication => publication)
+    @user.subscriptions.count.should == 1
+    @user.has_active_subscriptions?.should_not == true
+
+  end
+
   describe "class def" do
     # test acts_as_authentic?
     it { should have_many :audit_log_entries }

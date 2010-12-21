@@ -10,7 +10,7 @@ Factory.define :user do |f| # Dont use this factory. Use either an admin or a su
   f.address_1 { Faker::Address.street_address }
   f.postcode { Faker::Address.zip_code }
   f.city { Faker::Address.city }
-  f.state 'SA'
+  f.state :sa
   f.country 'Australia'
 end
 

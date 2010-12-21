@@ -1,4 +1,7 @@
-<%= f.radio_button :gift_id, optional_gift.id, :checked => checked %>
-<%= image_tag(optional_gift.gift_image.url(:thumb)) %>
-<%= h(optional_gift.name) %>
+<tr>
+  <td><%= image_tag(optional_gift.gift_image.url(:thumb)) %></td>
+  <td>
+    <%= f.radio_button :gift_id, optional_gift.id, :checked => checked, :label => h(optional_gift.name) %>
+  </td>
+</tr>
 

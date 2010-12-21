@@ -25,11 +25,12 @@ describe SubscribeController do
   it "should show gifts for offer" do
     get 'new', { :offer_id => @offer.id, :source_id => @source.id }
   end
+
   # TODO: Need to test the different GIFT options on new
   
   it "should show errors if data is missing" do
     GATEWAY.expects(:purchase).never
-    post 'create', { :subscription => {} } 
+    post 'create', { :subscription => {:user_attributes => {}} } 
     assigns[:subscription].valid?.should == false
     # TODO: Test offer id is correct
     response.should render_template('new')

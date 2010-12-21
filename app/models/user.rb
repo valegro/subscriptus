@@ -11,9 +11,17 @@ class User < ActiveRecord::Base
   attr_accessor :email_confirmation
 
   enum_attr :role, %w(admin subscriber)
-  enum_attr :title, %w(Dr Hon Lady Miss Mr Mrs Ms Prof Rev Sen Sir)
-  enum_attr :state, %w(ACT NSW NT QLD SA TAS VIC WA INTL) do
-    labels :INTL => "Outside of Australia"
+  enum_attr :title, %w(Mr Mrs Ms Miss)
+  enum_attr :state, %w(act nsw nt qld sa tas vic wa intl) do
+    labels :intl => "Outside of Australia"
+    labels :act => 'ACT'
+    labels :nsw => 'NSW'
+    labels :nt  => 'NT'
+    labels :qld => 'QLD'
+    labels :sa  => 'SA'
+    labels :tas => 'TAS'
+    labels :vic => 'VIC'
+    labels :wa  => 'WA'
   end
 
   validates_format_of :email, :with => /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i
@@ -70,6 +78,11 @@ class User < ActiveRecord::Base
     if self.subscriptions.trial.find(:first, :conditions => { :publication_id => subscription.publication_id })
       raise "User already has a trial for publication"
     end
+  end
+
+  # Returns true if user has at least one active sub
+  def has_active_subscriptions?
+    subscriptions.detect(&:active?)
   end
 
   def name

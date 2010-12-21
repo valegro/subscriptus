@@ -10,16 +10,26 @@ class SubscribeController < ApplicationController
     @subscription.offer = @offer
     @subscription.source = source
     @subscription.subscription_gifts.build(:gift => @optional_gifts.first)
-    @subscription.build_user
+    if params[:delivered_to]
+      # TODO: Spec
+      user = User.find_by_email(params[:delivered_to])
+      if user && user.active?
+        @subscription.user = user
+      end
+    end
+    @user = @subscription.build_user(:title => 'Mr', :state => :act) #unless user
     @subscription.payments.build
   end
 
   def create
     @term = params[:offer_term] ? OfferTerm.find(params[:offer_term]) : @offer.offer_terms.first
     @subscription = Subscription.new(params[:subscription])
+    @user = @subscription.user
+
     # Set to active because we are taking payment
     @subscription.state = 'active'
     @subscription.use_offer(@offer, @term)
+
     if @subscription.save_in_transaction
       redirect_to :action => :thanks
     else

@@ -6,6 +6,8 @@
 * Stop CM Loading the API EVERY SINGLE REQUEST!
 
 Signup
+* What do we do if the email address already exists?
+ - could be an existing active user or not
 * Maybe we need allocated for gifts as well as on_hand??
 * Set titles
 * Set gender from title
@@ -24,4 +26,3 @@ Signup
 DONE
 * Check integration tests for webhooks
 * Validate Card
-

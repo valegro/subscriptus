@@ -1,5 +1,4 @@
 class Subscription < ActiveRecord::Base
-  #include Billing::Cycle
   include Utilities
 
   acts_as_archive  # so that the records are not actually deleted from database. makes it possible to keep track of used <sources> and <publications>
@@ -88,6 +87,8 @@ class Subscription < ActiveRecord::Base
     self.offer = offer
     self.publication = offer.publication
     self.price = term.price
+    # Set the payment price
+    payments.last.try(:amount=, self.price)
     increment_expires_at(term) 
   end
 

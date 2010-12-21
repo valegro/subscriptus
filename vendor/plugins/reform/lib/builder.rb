@@ -54,6 +54,16 @@ module Reform
       wrapping("select", method, field_name, label, row_class, label_class, super, options)
     end
 
+    def enum_select(method, options = {}, html_options = {})
+      field_name, label, options, row_class, label_class = field_settings(method, options)
+      wrapping("enum_select", method, field_name, label, row_class, label_class, super, options)
+    end
+
+    def country_select(method, priority_countries = nil, options = {}, html_options = {})
+      field_name, label, options, row_class, label_class = field_settings(method, options)
+      wrapping("country_select", method, field_name, label, row_class, label_class, super, options)
+    end
+
     def time_zone_select(method, options = {}, html_options = {})
       field_name, label, options, row_class, label_class = field_settings(method, options)
       wrapping("time-zone-select", method, field_name, label, row_class, label_class, super, options)    
