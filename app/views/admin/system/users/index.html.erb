@@ -11,11 +11,13 @@
   t.header :name, :sort_by => :name
   t.header :email
   t.header :last_login, :label => "Last Logged In"
+  t.header :actions
 
   t.rows do |row, admin, index|
     row.login admin.login
     row.name admin.name
     row.email admin.email
     row.last_login (admin.last_login_at ? "#{time_ago_in_words(admin.last_login_at)} ago" : "Never")
+    row.actions link_to("Edit", edit_admin_system_user_path(admin), :class => "edit") 
   end
 end %>
