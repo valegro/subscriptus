@@ -1,0 +1,21 @@
+<div class="title">
+  <%= content_tag :h2, "All Admins" %>
+  <div class="actions">
+    <%= link_to 'Create New Admin', new_admin_system_user_path, :class => 'create' %>
+  </div>
+</div>
+
+
+<%= render_table @admins do |t|
+  t.header :login, :sort_by => :login
+  t.header :name, :sort_by => :name
+  t.header :email
+  t.header :last_login, :label => "Last Logged In"
+
+  t.rows do |row, admin, index|
+    row.login admin.login
+    row.name admin.name
+    row.email admin.email
+    row.last_login "#{time_ago_in_words(admin.last_login_at)} ago"
+  end
+end %>
