@@ -25,10 +25,11 @@ class User < ActiveRecord::Base
   end
 
   validates_format_of :email, :with => /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i
-  validates_presence_of :firstname, :lastname, :email, :phone_number, :address_1, :city, :postcode, :state, :country, :role, :unless => Proc.new { |user| user.auto_created? }
+  validates_presence_of :login, :firstname, :lastname, :email, :role, :unless => Proc.new { |user| user.auto_created? }, :if => Proc.new { |user| user.admin? }
+  validates_presence_of :firstname, :lastname, :email, :phone_number, :address_1, :city, :postcode, :state, :country, :role, :unless => Proc.new { |user| user.auto_created? or user.admin? }
   validates_uniqueness_of :email
   validates_uniqueness_of :login, :unless => Proc.new { |user| user.auto_created? }
-  validates_confirmation_of :email, :on => :create
+  validates_confirmation_of :email, :on => :create, :unless => Proc.new { |user| user.admin? }
 
   # Used for search controller
   named_scope :firstname_or_lastname_like, lambda { |arg| { :conditions => ["lower(firstname) || ' ' || lower(lastname) LIKE ?", "%#{arg.try(:downcase)}%"]} }

@@ -16,6 +16,6 @@
     row.login admin.login
     row.name admin.name
     row.email admin.email
-    row.last_login "#{time_ago_in_words(admin.last_login_at)} ago"
+    row.last_login (admin.last_login_at ? "#{time_ago_in_words(admin.last_login_at)} ago" : "Never")
   end
 end %>

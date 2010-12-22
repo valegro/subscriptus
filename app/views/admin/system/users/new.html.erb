@@ -1,0 +1,11 @@
+<div class="title">
+  <%= content_tag :h2, "Create New Admin" %>
+  <div class="actions">
+    <%= link_to 'Back to Admins', admin_system_users_path, :class => 'back' %>
+  </div>
+</div>
+
+<% form_for [:admin, :system, @user], :builder => Reform::Builder, :html => { :class => "form", :multipart => true } do |form| %>
+  <%= render :partial => "form", :object => form %>
+  <%= form.submit "Create" %>
+<% end %>
