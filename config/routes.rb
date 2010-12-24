@@ -22,6 +22,7 @@ ActionController::Routing::Routes.draw do |map|
     }, :member => {
       :mark_processed => :get
     }
+    admin.resources :orders, :member => { :fulfill => :get, :delay => :get }, :collection => { :delayed => :get, :completed => :get }
     admin.resources :subscribers
     admin.namespace :catalogue do |catalogue|
       catalogue.resources :offers, :member => { :add_gift => :post, :remove_gift => :post }, :has_many => [ :offer_terms ]

@@ -78,7 +78,7 @@ module ActiveRecord
       def transition?(from, to)
         @transitions[from].try(:include?, to)
       end
-      
+
     protected
       def on(event_name, &block)
         Event.new(event_name, @model, @column_name, &block).transitions.each do |from,from_transitions|
@@ -228,6 +228,10 @@ module ActiveRecord
 
         def event_error_for(attr_name)
           @event_error if @event_error && @event_error.last.column_name == attr_name
+        end
+
+        def allowed_events_for(state_column)
+          self.class.state_events.select { |k, ev| ev.transitions.has_key?(send(state_column)) }.map(&:first)
         end
         
       protected

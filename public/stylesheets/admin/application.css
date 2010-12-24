@@ -275,7 +275,7 @@ body {
   color:blue;
 }
 
-.table table a.edit, .table table a.destroy {
+.table table a.edit, .table table a.destroy, .table table a.complete {
 	padding-left: 16px;
 	margin-right: 5px;
 }
@@ -294,6 +294,10 @@ body {
 
 .table table a.processed { 
 	background: transparent url(/images/s/icons/processed-small.png) no-repeat right center;
+}
+
+.table table a.complete { 
+	background: transparent url(/images/admin/icons/arrow-180-small.png) no-repeat right center;
 }
 
 .table.list table tr th, .table.list table tr td {

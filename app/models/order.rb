@@ -5,6 +5,19 @@ class Order < ActiveRecord::Base
 
   validates_presence_of :user
 
+  named_scope :oldest_first, :order => "created_at"
+  named_scope :newest_first, :order => "created_at desc"
+
+  has_states :pending, :completed, :delayed do
+    on :fulfill do
+      transition :pending => :completed
+      transition :delayed => :completed
+    end
+    on :delay do
+      transition :pending => :delayed
+    end
+  end
+
   private
     def check_gift_on_hand(gift)
       unless gift.try(:on_hand).to_i > 0

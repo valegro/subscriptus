@@ -1,0 +1,17 @@
+<%= render_table orders do |t|
+  t.header :order_id, :label => "ID"
+  t.header :recipient, :sort_by => :recipient
+  t.header :items
+  t.header :submitted, :sort_by => :created_at
+  t.header :actions
+
+  t.rows do |row, order, index|
+    row.order_id order.id
+    row.recipient order.user.name
+    row.items order.gifts.count
+    row.submitted "#{time_ago_in_words(order.created_at)} ago"
+    row.actions link_to("View", admin_order_path(order), :class => "edit") + order_event_links(order).join('&nbsp;') 
+  end
+end %>
+
+

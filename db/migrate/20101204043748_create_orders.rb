@@ -3,6 +3,8 @@ class CreateOrders < ActiveRecord::Migration
     create_table :orders do |t|
       t.references :user
       t.timestamps
+      t.timestamp :state_updated_at
+      t.string :state
     end
   end
 
