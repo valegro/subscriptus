@@ -4,6 +4,11 @@
 * Use Delayed Job for callbacks to email and CM
 * Move all callbacks to observers
 * Stop CM Loading the API EVERY SINGLE REQUEST!
+* Need many more tests for subscriptions - test the entire workflow!
+* When activating a subscription should we increase the expires_at value? Ie; not do this at the controller level? This will make it easier to log stuff too
+* Log that a payment was made in activity log
+* Format all times in Melbourne TZ (or a config option)
+* Split the subscription observers up into tasks - eg; logging, campaign master, mail etc
 
 Signup
 * What do we do if the email address already exists?

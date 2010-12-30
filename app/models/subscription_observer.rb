@@ -12,6 +12,11 @@ class SubscriptionObserver < ActiveRecord::Observer
     SubscriptionMailer.deliver_new_trial(subscription)
   end
 
+  def before_enter_active(subscription)
+    # TODO: Set expires_at here
+    # The only case this won't work is active -> active transition (perhaps we need to hack has_states again)
+  end
+
   def after_enter_active(subscription)
     # send email to the user with their full subscription details
     SubscriptionMailer.deliver_activation(subscription)
@@ -36,5 +41,20 @@ class SubscriptionObserver < ActiveRecord::Observer
 
   def after_create(record)
     record.send_later :update_campaignmaster
+  end
+
+  def after_save(record)
+    attributes = {}
+    if record.state_changed?
+      state_changes = record.changes['state']
+      attributes.merge!(
+        :old_state => state_changes.first,
+        :new_state => state_changes.last
+      )
+    end
+    if record.expires_at_changed?
+      attributes[:description] = "Expiry Date set to #{record.changes['expires_at'].last.strftime("%d/%m/%y")}"
+    end
+    record.log_entries.create(attributes) unless attributes.empty?
   end
 end

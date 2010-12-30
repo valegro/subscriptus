@@ -5,6 +5,7 @@ class Admin::SubscriptionsController < AdminController
   before_filter :find_subscription, :only => [ :mark_processed ]
 
   def index
+    @log_entries = SubscriptionLogEntry.recent.paginate(:page => params[:page] || 1)
   end
 
   def list_cancelled

@@ -6,8 +6,9 @@ class Subscription < ActiveRecord::Base
   belongs_to :user, :autosave => true
   belongs_to :offer
   belongs_to :publication
-  belongs_to :source # with this attribute there is no need to have the SubscriptionLogEntry as sources are easily trackable through subscription. but subscription needs to act_as_paranoid
-  has_many :subscription_log_entries
+  belongs_to :source
+
+  has_many :log_entries, :class_name => "SubscriptionLogEntry"
   has_many :subscription_gifts, :dependent => :destroy
   has_many :payments, :autosave => true
   
@@ -35,6 +36,8 @@ class Subscription < ActiveRecord::Base
   named_scope :user_firstname_or_user_lastname_like, lambda { |arg|
     { :include => :user, :conditions => ["lower(users.firstname) || ' ' || lower(users.lastname) LIKE ?", "%#{arg.try(:downcase)}%"] }
   }
+
+  named_scope :recent, :order => "updated_at desc"
 
   validates_presence_of :publication, :user, :state
   validates_acceptance_of :terms
@@ -89,6 +92,7 @@ class Subscription < ActiveRecord::Base
     self.price = term.price
     # Set the payment price
     payments.last.try(:amount=, self.price)
+    # TODO: Move this to the observer for on_enter_active
     increment_expires_at(term) 
   end
 

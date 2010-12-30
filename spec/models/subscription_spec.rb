@@ -43,18 +43,17 @@ describe Subscription do
     end
   end
   
-  describe "class def" do
+  describe "class definition" do
     it "should return per page" do
       Subscription.per_page.should == 20
     end
     it { should belong_to :user }
     it { should belong_to :offer }
     it { should belong_to :publication }
-    it { should have_many :subscription_log_entries }
+    it { should have_many :log_entries }
     it { should have_many :subscription_gifts }
     it { should have_many :gifts }
     # could we easily spec accepts_nested_attributes_for?
-    # could we easily spec wizardly stuff?
   end
 
   describe "upon creation" do
@@ -69,6 +68,25 @@ describe Subscription do
       @user = Factory.create(:subscriber)
       sub = Factory.build(:subscription, :state => 'active')
       @user.subscriptions << sub
+    end
+
+    it "should create a log entry" do
+      @subscription = Factory.create(:subscription)
+      @subscription.log_entries.size.should == 1
+      # Check the Entry
+      log_entry = @subscription.log_entries.first
+      log_entry.old_state.should == nil
+      log_entry.new_state.should == 'trial'
+    end
+  end
+
+  # TODO: Split the tests up into events
+  describe "upon activate!" do
+    it "should create a log entry" do
+      @subscription = Factory.create(:subscription)
+      @subscription.log_entries.size.should == 1
+      @subscription.activate!
+      @subscription.log_entries.size.should == 2
     end
   end
 

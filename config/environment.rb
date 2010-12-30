@@ -44,6 +44,10 @@ Rails::Initializer.run do |config|
   # config.i18n.default_locale = :de
 end
 
+# TODO: Make confir options
+STANDARD_TIME_FORMAT = '%H:%M %d/%m/%y %Z'
+APP_TIMEZONE = 'Melbourne'
+
 __END__
 gem 'httpclient' 
 gem 'soap4r' 
