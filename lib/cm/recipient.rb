@@ -152,7 +152,7 @@ module CM
 
     # TODO: decide what to do, where to record etc. maybe new table?
     def self.log_cm_error(ex)
-      Rails.logger.error( "#{ex.class.to_s}: #{ex.message}" )
+      Rails.logger.error( "CAMPAIGN MASTER ERROR: #{ex.class.to_s}: #{ex.message}" )
     end
 
   end
@@ -228,6 +228,12 @@ module CM
 
     def self.create!(hash)
       result = Proxy.add_recipient(hash.merge(:last_modified => nil))
+      raise result[:message] unless result.success?
+      true
+    end
+
+    def self.create_or_update(hash)
+      result = Proxy.add_recipient(hash.merge(:last_modified => nil), CmOperationType::InsertOrUpdate)
       raise result[:message] unless result.success?
       true
     end

@@ -1,5 +1,4 @@
 class Subscription < ActiveRecord::Base
-  include Utilities
 
   acts_as_archive  # so that the records are not actually deleted from database. makes it possible to keep track of used <sources> and <publications>
 
@@ -104,14 +103,23 @@ class Subscription < ActiveRecord::Base
     self.user_id ? User.find(self.user_id) : nil
   end
 
-  def update_campaignmaster
-    # TODO: determine how publication name on campaignmaster is managed.
-    #       currently (temporarily) using publication_123{expiry} style for keys.
-    result = CM::Recipient.update(
-        :fields => { :"publication_#{self.publication_id}{state}" => self.state,
-                     :"publication_#{self.publication_id}{expiry}" => self.expires_at,
-                     :user_id => self.user_id
-        }
+  def order_number
+    "S%07d" % id
+  end
+
+  # TODO: This code will need to be changed once CM have changed the primary key
+  # See notes in campaign_master observer for more details
+  # TODO: A note on atomicity - if we use delayed job we cannot guarantee atomicity
+  # If we are to save and update CM in a transaction we can abort the transaction
+  # if the CM process throws and exception - but do we want to expose that info to a user??
+  #
+  def sync_to_campaign_master
+    result = CM::Recipient.create_or_update(
+      :fields => {
+        :"publication_#{self.publication_id}{state}" => self.state,
+        :"publication_#{self.publication_id}{expiry}" => self.expires_at,
+        :user_id => self.user_id
+      }
     )
     return result
   rescue RuntimeError => ex
@@ -139,17 +147,6 @@ class Subscription < ActiveRecord::Base
     self.expires_at = Date.today if self.expires_at.blank? || self.expires_at < Date.today
     self.starts_at = self.expires_at
     self.expires_at = self.expires_at.advance(:months => offer_term.months)
-  end
-
-  # generates a random number that is saved after a successful recurrent profile creation and used later
-  # to access the subscription and to be sent to the client so that in case of any problems they can easily refer to
-  # the logs using this number
-  # this method uses secure random number generator in combination with offset(unique) that makes the number unique
-  # the generated number is 16 numbers long
-  def generate_and_set_order_number
-    returning num = generate_unique_random_number(15) do
-      self.order_num = num
-    end
   end
 
   def pay_non_first_time(payment)

@@ -1,5 +1,4 @@
 class User < ActiveRecord::Base
-  include Utilities
   
   acts_as_authentic do |c|
     c.validate_login_field = false
@@ -135,15 +134,6 @@ class User < ActiveRecord::Base
     CM::Proxy.log_cm_error(ex)
   end
   
-  # generates a random number that is saved after a successful recurrent profile creation and used later
-  # to access the users recurrent profile in secure pay in order to make new payments or cancel the proile
-  # this unique number (called Client ID in AU sequre pay gateway) should be less than 20 characters long
-  # this method uses secure random number generator in combination with offset(unique) that makes the number unique
-  # the generated number is 18 numbers long
-  def generate_recurrent_profile_id
-    generate_unique_random_number(19)
-  end
-
   # creates or updates the user
   # returns user
   def self.save_new_user(user_attributes)
@@ -154,8 +144,7 @@ class User < ActiveRecord::Base
     raise Exceptions::UserInvalid.new(e.message)
   end
 
-  # recurrent_id shows if the user has used their Credit Card before or not
-  def has_recurrent_profile?
-    !self.recurrent_id.blank?
+  def gateway_token
+    "%020d" % id
   end
 end

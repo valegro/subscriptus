@@ -8,7 +8,9 @@
 * When activating a subscription should we increase the expires_at value? Ie; not do this at the controller level? This will make it easier to log stuff too
 * Log that a payment was made in activity log
 * Format all times in Melbourne TZ (or a config option)
-* Split the subscription observers up into tasks - eg; logging, campaign master, mail etc
+* Check CM Callbacks in User model
+* When creating a payment should we be adding it to the subscription or to the user? - Which model needs recurrent_id - should we call this gateway_token?
+* For the moment, I suggest using the user_id for the payment reference number but perhaps we should salt this later?? (we only have 20 chars which is the max 64 bit number as a str)
 
 Signup
 * What do we do if the email address already exists?
@@ -31,3 +33,4 @@ Signup
 DONE
 * Check integration tests for webhooks
 * Validate Card
+* Split the subscription observers up into tasks - eg; logging, campaign master, mail etc

@@ -44,12 +44,6 @@ describe SubscribeController do
       gw_response = stub(:success? => true)
       GATEWAY.expects(:purchase).returns(gw_response)
 
-      # Campaign Master
-      Subscription.any_instance.expects(:send_later).with(:update_campaignmaster)
-      
-      # Mailer
-      SubscriptionMailer.expects(:deliver_activation)
-
       post 'create', {
         :offer_id => @offer.id, :source_id => @source.id,
         :offer_term => @ot2.id,
@@ -94,6 +88,8 @@ describe SubscribeController do
       assigns[:subscription].user.orders.first.gifts.count.should == 1
       # MORE
     end
+
+    # TODO: Verify that the subscription is actually created!
   end
 
   # TODO: Check create of a gift order

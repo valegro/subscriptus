@@ -20,11 +20,6 @@ describe User do
     CM::Recipient.stubs(:create!)
   end
 
-  it "should generate a correct random number for the recurrent" do
-    @user.id = 876579
-    @user.generate_recurrent_profile_id.should < 10000000000000000000
-  end 
-
   it "should create a trial user" do
     cnt = User.count
     user = User.create_trial_user(:first_name => 'Daniel', :last_name => 'Draper', :email => 'daniel@netfox.com')
@@ -109,6 +104,11 @@ describe User do
       UserMailer.expects(:deliver_new_user)
       @user.expects(:update_cm).with(:create!)
       @user.save!
+    end
+
+    it "should have a 20 digit gateway_token" do
+      @user.save!
+      @user.gateway_token.length.should == 20
     end
   end
 

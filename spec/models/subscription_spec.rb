@@ -7,6 +7,7 @@ describe Subscription do
     today = Date.new(2010, 9, 27) # today is "Mon, 27 Sep 2010"
     Date.stubs(:today).returns(today)
     CM::Recipient.stubs(:update)
+    CM::Recipient.stubs(:create_or_update)
     CM::Recipient.stubs(:create!)
   end
 
@@ -54,84 +55,6 @@ describe Subscription do
     it { should have_many :subscription_gifts }
     it { should have_many :gifts }
     # could we easily spec accepts_nested_attributes_for?
-  end
-
-  describe "upon creation" do
-    it "should deliver a trial email for new trials" do
-      SubscriptionMailer.expects(:deliver_new_trial)
-      @subscription = Factory.create(:subscription)
-    end
-
-    it "should deliver an active email for new active subscriptions" do
-      SubscriptionMailer.expects(:deliver_new_trial).never
-      SubscriptionMailer.expects(:deliver_activation)
-      @user = Factory.create(:subscriber)
-      sub = Factory.build(:subscription, :state => 'active')
-      @user.subscriptions << sub
-    end
-
-    it "should create a log entry" do
-      @subscription = Factory.create(:subscription)
-      @subscription.log_entries.size.should == 1
-      # Check the Entry
-      log_entry = @subscription.log_entries.first
-      log_entry.old_state.should == nil
-      log_entry.new_state.should == 'trial'
-    end
-  end
-
-  # TODO: Split the tests up into events
-  describe "upon activate!" do
-    it "should create a log entry" do
-      @subscription = Factory.create(:subscription)
-      @subscription.log_entries.size.should == 1
-      @subscription.activate!
-      @subscription.log_entries.size.should == 2
-    end
-  end
-
-  describe "with filters" do
-    it "should set publication id before create" do
-      s = Factory.build(:subscription)
-      s.publication_id = nil
-      s.save!
-      s.publication_id.should_not be_nil
-    end
-
-    it "should create dlayed job" do
-      lambda { Factory.create(:subscription) }.should change(Delayed::Job, :count).by(1)
-    end
-  end
-
-  it "should invoke campaingmaster update on add_to_campaignmaster" do
-    s = Factory.build(:subscription)
-    CM::Recipient.expects(:update).with(
-          :fields => { :"publication_#{s.publication_id}{state}" => s.state,
-                       :"publication_#{s.publication_id}{expiry}" => s.expires_at,
-                       :user_id => s.user.id
-          }
-    ).returns("called")
-    s.update_campaignmaster.should eql("called")
-  end
-
-  it "should invoke campaingmaster update on update_campaignmaster" do
-    s = Factory.create(:subscription)
-    s.reload
-    CM::Recipient.expects(:update).with(
-          :fields => { :"publication_#{s.publication_id}{state}" => s.state,
-                       :"publication_#{s.publication_id}{expiry}" => s.expires_at,
-                       :user_id => s.user.id
-          }
-    ).returns("called")
-    s.update_campaignmaster.should eql("called")
-  end
-
-  # TODO: how do we log this?
-  it "should log error if create fails" do
-    s = Factory.build(:subscription)
-    CM::Recipient.expects(:update).raises("spam")
-    CM::Proxy.expects(:log_cm_error)
-    s.update_campaignmaster
   end
 
   describe "with named scopes" do
