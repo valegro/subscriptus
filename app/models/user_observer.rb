@@ -8,10 +8,9 @@ class UserObserver < ActiveRecord::Observer
   # TODO: Delayed Job
   def after_create(user)
     UserMailer.deliver_new_user(user)
-    user.update_cm(:create!)
   end
 
-  def after_update(user)
-    user.update_cm(:update)
+  def after_save(user)
+    user.send_later :sync_to_campaign_master
   end
 end

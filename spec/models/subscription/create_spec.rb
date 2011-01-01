@@ -5,8 +5,10 @@ describe Subscription do
   before(:each) do
     today = Date.new(2010, 9, 27) # today is "Mon, 27 Sep 2010"
     Date.stubs(:today).returns(today)
+    cm_return = stub(:success? => true)
+    #cm_return.expects(:has_key?).with(:recipients).returns(false)
+    CM::Recipient.stubs(:find_all).returns(cm_return)
     CM::Recipient.stubs(:update)
-    CM::Recipient.stubs(:create_or_update)
     CM::Recipient.stubs(:create!)
   end
 
@@ -41,25 +43,9 @@ describe Subscription do
     end
 
     it "should create a recipient in Campaign Master" do
-      pending
-=begin
       s = Factory.build(:subscription)
-      CM::Recipient.expects(:create_or_update).with(
-        :fields => {
-          :"publication_#{s.publication_id}{state}" => s.state,
-          :"publication_#{s.publication_id}{expiry}" => s.expires_at,
-          :user_id => s.user.id
-        }
-      ).returns('called')
+      s.expects(:send_later).with(:sync_to_campaign_master)
       s.save!
-=end
-    end
-
-    it "should log error if create fails" do
-      s = Factory.build(:subscription)
-      CM::Recipient.expects(:create_or_update).raises("spam")
-      CM::Proxy.expects(:log_cm_error)
-      s.sync_to_campaign_master
     end
   end
 end

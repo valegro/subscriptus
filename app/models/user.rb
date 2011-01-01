@@ -110,40 +110,10 @@ class User < ActiveRecord::Base
     }
   end
 
-  def update_cm(create_or_update)
-    result = CM::Recipient.send(create_or_update,
-        :created_at => created_at,
-        :email => email,
-        :fields => {
-          :address_1 => address_1,
-          :address_2 => address_2,
-          :city => city,
-          :country => country,
-          :firstname => firstname,
-          :lastname => lastname,
-          :login => login,
-          :phone_number => phone_number,
-          :postcode => postcode,
-          :state => state,
-          :title => title,
-          :user_id => id
-        }
-    )
-    return result
-  rescue RuntimeError => ex
-    CM::Proxy.log_cm_error(ex)
+  def sync_to_campaign_master
+    self.subscriptions.each(&:sync_to_campaign_master)
   end
   
-  # creates or updates the user
-  # returns user
-  def self.save_new_user(user_attributes)
-    returning user = User.new(user_attributes) do
-      user.save!
-    end
-  rescue Exception => e
-    raise Exceptions::UserInvalid.new(e.message)
-  end
-
   def gateway_token
     "%020d" % id
   end

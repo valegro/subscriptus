@@ -4,6 +4,11 @@ describe Webhooks::UnbouncesController do
 
   before(:each) do
     @publication = Factory(:publication)
+    cm_return = stub(:success? => true)
+    CM::Recipient.stubs(:exists?).returns(true)
+    CM::Recipient.stubs(:find_all).returns(cm_return)
+    CM::Recipient.stubs(:update)
+    CM::Recipient.stubs(:create!)
   end
 
   it "should create a new trial subscription" do

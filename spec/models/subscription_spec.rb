@@ -6,8 +6,11 @@ describe Subscription do
     @subscription = Subscription.new()
     today = Date.new(2010, 9, 27) # today is "Mon, 27 Sep 2010"
     Date.stubs(:today).returns(today)
+
+    cm_return = stub(:success? => true)
+    CM::Recipient.stubs(:exists?).returns(true)
+    CM::Recipient.stubs(:find_all).returns(cm_return)
     CM::Recipient.stubs(:update)
-    CM::Recipient.stubs(:create_or_update)
     CM::Recipient.stubs(:create!)
   end
 

@@ -215,7 +215,7 @@ module CM
   end
 
   class Recipient
-    PRIMARY_KEY_NAME = 'user_id'
+    PRIMARY_KEY_NAME = 'subscription_id'
     # These 3 fields are server-generated: from_ip id last_modified_by last_modified
     # also created_at can be mandatory for create but should not be for update
     ATTRS = %w(email)
@@ -232,14 +232,13 @@ module CM
       true
     end
 
-    def self.create_or_update(hash)
-      result = Proxy.add_recipient(hash.merge(:last_modified => nil), CmOperationType::InsertOrUpdate)
-      raise result[:message] unless result.success?
-      true
-    end
-
     def save
       return self.class.update(to_hash)
+    end
+
+    def self.exists?(hash)
+      result = self.find_all(hash)
+      result.success? && result.has_key?(:recipients) && !result[:recipients].empty?
     end
 
     # XXX: assumes no attributes are present except for inside @cm_recipient
@@ -247,31 +246,8 @@ module CM
       @cm_recipient = self.class.find_all( :fields => { :user_id => @cm_recipient.values.find {|v| v.fieldName == 'user_id'}.value } )[:recipients].first.instance_variable_get :@cm_recipient
     end
 
-    def set_expiry_for( publication_name, new_expiry )
-      add_field( publication_name + '{expiry}', new_expiry )
-      return true
-    end
-
-    def set_state_for( publication_name, new_state )
-      add_field( publication_name + '{state}', new_state )
-      return true
-    end
-
-    def expiry_for( publication_name )
-      return @cm_recipient.values.select { |v|
-        v.fieldName == publication_name + '{expiry}'
-      }.first.try(:value)
-    end
-
-    def state_for( publication_name )
-      return @cm_recipient.values.select { |v|
-        v.fieldName == publication_name + '{state}'
-      }.first.try(:value)
-    end
-
     def self.find_all(hash)
-      result = Proxy.get_recipients(hash)
-      return result
+      Proxy.get_recipients(hash)
     end
 
     def initialize(hash)

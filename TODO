@@ -1,16 +1,16 @@
 * Move the mailers to app/models/mailers
-* Specs for CM Calls for User and Subscription (expectations)
 * Appropriate content for all emails
 * Use Delayed Job for callbacks to email and CM
-* Move all callbacks to observers
 * Stop CM Loading the API EVERY SINGLE REQUEST!
 * Need many more tests for subscriptions - test the entire workflow!
 * When activating a subscription should we increase the expires_at value? Ie; not do this at the controller level? This will make it easier to log stuff too
 * Log that a payment was made in activity log
 * Format all times in Melbourne TZ (or a config option)
-* Check CM Callbacks in User model
 * When creating a payment should we be adding it to the subscription or to the user? - Which model needs recurrent_id - should we call this gateway_token?
 * For the moment, I suggest using the user_id for the payment reference number but perhaps we should salt this later?? (we only have 20 chars which is the max 64 bit number as a str)
+* Re-enable tests for CM library
+* Change all fields in CM to CamelCase and always camelize in CM lib
+* Move CM test code to one spec - test create/update and log on failure - CM work in the callbacks are just calls to DJ so all good
 
 Signup
 * What do we do if the email address already exists?
@@ -34,3 +34,6 @@ DONE
 * Check integration tests for webhooks
 * Validate Card
 * Split the subscription observers up into tasks - eg; logging, campaign master, mail etc
+* Specs for CM Calls for User and Subscription (expectations)
+* Move all callbacks to observers
+* Check CM Callbacks in User model

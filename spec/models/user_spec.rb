@@ -16,8 +16,7 @@ describe User do
                      :password => 'password',
                      :password_confirmation => 'password'
                )
-    CM::Recipient.stubs(:update)
-    CM::Recipient.stubs(:create!)
+    cm_return = stub(:success? => true)
   end
 
   it "should create a trial user" do
@@ -102,7 +101,7 @@ describe User do
   describe "upon creation" do
     it "should call update_cm with :create" do
       UserMailer.expects(:deliver_new_user)
-      @user.expects(:update_cm).with(:create!)
+      @user.expects(:send_later).with(:sync_to_campaign_master)
       @user.save!
     end
 
@@ -113,52 +112,20 @@ describe User do
   end
 
   describe "upon update" do
-    it "should call update_cm with :update" do
+    it "should call sync_to_campaign_master" do
       @user.save!
-      @user.expects(:update_cm).with(:update)
-      @user.address_1 = 'new address 1'
+      @user.expects(:send_later).with(:sync_to_campaign_master)
       @user.save!
     end
   end
 
-  describe "in update_cm" do
-    it "should call update with its attributes" do
+  describe "upon call to sync_to_campaign_master" do
+    it "should call sync on all subscriptions" do
       @user.save!
-      CM::Recipient.expects(:update).with(
-            { :created_at => @user.created_at,
-              :email => @user.email,
-              :fields => { 
-                :address_1 => @user.address_1,
-                :address_2 => @user.address_2,
-                :city => @user.city,
-                :country => @user.country,
-                :firstname => @user.firstname,
-                :lastname => @user.lastname,
-                :login => @user.login,
-                :phone_number => @user.phone_number,
-                :postcode => @user.postcode,
-                :state => @user.state,
-                :title => @user.title,
-                :user_id => @user.id
-              }
-            }
-      )
-      @user.save!
-    end
-
-    it "should call create with its attributes" do
-      Time.stubs(:now).returns(Time.parse('2010-01-01'))
-      # XXX:  mocha's 'anything' matcher does not work within hash?
-      # cannot check parameters like above but with :user_id => anything...
-      CM::Recipient.expects(:create!)
-      CM::Recipient.expects(:update).never
-      @user.save!
-    end
-
-    it "should log if runtime error raised" do
-      CM::Recipient.expects(:create!).raises( RuntimeError )
-      CM::Proxy.expects(:log_cm_error)
-      @user.save!
+      @subscription = Factory.build(:subscription)
+      @user.subscriptions << @subscription
+      @subscription.expects(:sync_to_campaign_master)
+      @user.sync_to_campaign_master
     end
   end
 end

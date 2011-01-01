@@ -19,6 +19,12 @@ describe SubscribeController do
 
     @user_attributes = Factory.attributes_for(:user)
     @payment_attributes = Factory.attributes_for(:payment)
+
+    cm_return = stub(:success? => true)
+    CM::Recipient.stubs(:exists?).returns(true)
+    CM::Recipient.stubs(:find_all).returns(cm_return)
+    CM::Recipient.stubs(:update)
+    CM::Recipient.stubs(:create!)
   end
 
   # --------------------------------------------- OFFER SENARIOs #

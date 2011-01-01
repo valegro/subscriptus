@@ -107,21 +107,34 @@ class Subscription < ActiveRecord::Base
     "S%07d" % id
   end
 
-  # TODO: This code will need to be changed once CM have changed the primary key
-  # See notes in campaign_master observer for more details
-  # TODO: A note on atomicity - if we use delayed job we cannot guarantee atomicity
-  # If we are to save and update CM in a transaction we can abort the transaction
-  # if the CM process throws and exception - but do we want to expose that info to a user??
-  #
   def sync_to_campaign_master
-    result = CM::Recipient.create_or_update(
+    hash = {
+      :email => self.user.email,
       :fields => {
-        :"publication_#{self.publication_id}{state}" => self.state,
-        :"publication_#{self.publication_id}{expiry}" => self.expires_at,
-        :user_id => self.user_id
+        :subscription_id  => self.id,
+        :status           => self.state,
+        :publication_id   => self.publication_id,
+        :user_id          => self.user_id,
+        :expires_at       => self.expires_at.try(:strftime, "%d/%m/%y"),
+        :firstname        => self.user.firstname,
+        :lastname         => self.user.lastname,
+        :country          => self.user.country,
+        :city             => self.user.city,
+        :state            => self.user.state,
+        :title            => self.user.title,
+        :phone_number     => self.user.phone_number,
+        :postcode         => self.user.postcode,
+        :address_1        => self.user.address_1,
+        :address_2        => self.user.address_2
       }
-    )
-    return result
+    }
+    # TODO: Solus, Weekender? Are these even needed?
+
+    if CM::Recipient.exists?(:fields => { 'subscription_id' => self.id })
+      CM::Recipient.update(hash)
+    else
+      CM::Recipient.create!(hash)
+    end
   rescue RuntimeError => ex
     CM::Proxy.log_cm_error(ex)
   end
