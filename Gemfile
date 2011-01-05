@@ -42,7 +42,7 @@ gem 'wizardly'
 gem 'enumerated_attribute'
 
 group :test, :cucumber, :development do
-  gem 'capybara'
+  gem 'capybara', "0.3.9"
   gem 'database_cleaner'
   gem 'spork'
   gem 'launchy'    # So you can do Then show me the page

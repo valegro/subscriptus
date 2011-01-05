@@ -8,18 +8,16 @@ class Admin::SubscriptionsController < AdminController
     @log_entries = SubscriptionLogEntry.recent.paginate(:page => params[:page] || 1)
   end
 
-  def list_cancelled
-    @subscriptions = Subscription.find_all_by_state('cancelled').paginate(:page => params[:page], :per_page => Subscription.per_page, :order => 'updated_at')
+  def cancelled
+    @subscriptions = Subscription.cancelled.paginate(:page => params[:page], :per_page => Subscription.per_page, :order => 'updated_at')
   end
   
+  # TODO: Do we really need this?
   def mark_processed
     @subscription.mark_processed
     @subscription.save!
     flash[:notice] = "You have successfully marked a subscription as processed. It now exists in Squattered subscriptions."
-    redirect_to :action => :list_cancelled
-  end
-
-  def activitiy
+    redirect_to :action => :cancelled
   end
 
   def search
@@ -30,6 +28,7 @@ class Admin::SubscriptionsController < AdminController
   end
 
   def pending
+    @subscriptions = Subscription.pending.paginate(:page => params[:page], :per_page => Subscription.per_page, :order => 'updated_at') 
   end
 
   protected

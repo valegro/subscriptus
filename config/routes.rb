@@ -8,7 +8,6 @@ ActionController::Routing::Routes.draw do |map|
   # Admin
   map.namespace :admin do |admin|
     admin.resources :subscriptions, :collection => {
-      :activity => :get,
       :search => [ :get, :post ],
       :active => :get,
       :trial => :get,
@@ -18,9 +17,13 @@ ActionController::Routing::Routes.draw do |map|
       :payment_due => :get,
       :recent => :get,
       :ended => :get,
-      :list_cancelled => :get
+      :cancelled => :get
     }, :member => {
-      :mark_processed => :get
+      :mark_processed => :get,
+      :expire => :get,
+      :activate => :get,
+      :cancel => :get,
+      :verify => :get
     }
     admin.resources :orders, :member => { :fulfill => :get, :delay => :get }, :collection => { :delayed => :get, :completed => :get }
     admin.resources :subscribers

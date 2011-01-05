@@ -26,24 +26,15 @@ ActiveRecord::Schema.define(:version => 20101206033416) do
     t.datetime "expires_at"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "recurrent_id"
-    t.string   "order_num"
+    t.datetime "deleted_at"
     t.integer  "source_id"
     t.text     "referrer"
-    t.boolean  "solus"
-    t.boolean  "weekender"
-    t.datetime "deleted_at"
+    t.boolean  "solus",            :default => false
+    t.boolean  "weekender",        :default => true
   end
 
   create_table "audit_log_entries", :force => true do |t|
     t.integer  "user_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  create_table "carrots", :force => true do |t|
-    t.string   "state"
-    t.datetime "state_updated_at"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -81,11 +72,6 @@ ActiveRecord::Schema.define(:version => 20101206033416) do
     t.integer  "on_hand"
     t.datetime "created_at"
     t.datetime "updated_at"
-  end
-
-  create_table "gifts_offers", :force => true do |t|
-    t.integer "gift_id"
-    t.integer "offer_id"
   end
 
   create_table "offer_terms", :force => true do |t|
@@ -215,8 +201,6 @@ ActiveRecord::Schema.define(:version => 20101206033416) do
     t.datetime "expires_at"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "recurrent_id"
-    t.string   "order_num"
     t.integer  "source_id"
     t.text     "referrer"
     t.boolean  "solus",            :default => false
@@ -262,7 +246,6 @@ ActiveRecord::Schema.define(:version => 20101206033416) do
     t.datetime "updated_at"
     t.string   "role"
     t.boolean  "admin"
-    t.string   "recurrent_id"
     t.boolean  "auto_created"
     t.string   "hear_about"
     t.string   "company"

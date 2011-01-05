@@ -81,7 +81,7 @@ class Subscription < ActiveRecord::Base
     end
     # Expiries
     expires :pending => :squatter, :after => 14.days
-    # expires :trial => :squatter, :after => 21.days
+    expires :trial => :squatter, :after => 21.days
   end
 
   def use_offer(offer, term)
@@ -97,10 +97,6 @@ class Subscription < ActiveRecord::Base
 
   def self.per_page
     20
-  end
-
-  def get_user
-    self.user_id ? User.find(self.user_id) : nil
   end
 
   def order_number

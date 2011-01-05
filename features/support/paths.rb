@@ -28,7 +28,8 @@ module NavigationHelpers
     when "admin subscription search page" then search_admin_subscriptions_path
     # Subscriptions
     when /admin subscriptions/ then admin_subscriptions_path
-    when /admin cancelled subscriptions/ then list_cancelled_admin_subscriptions_path
+    when /admin cancelled subscriptions/ then cancelled_admin_subscriptions_path
+    when /admin pending subscriptions/ then pending_admin_subscriptions_path
     # Sessions
     when /login/ then login_path
     # Subscribers

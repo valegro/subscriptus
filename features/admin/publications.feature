@@ -119,6 +119,6 @@ Feature: An admin can CRUD a publication
     When I am on the admin catalogue publication page for 1
       And I follow "Webhook"
     Then I should see "Generate a Webhook URL for this publication."
-      And the "Link" field should contain "http://localhost:9887/webhooks/unbounce?publication_id=1"
+      And the "Link" field should be exactly "http://localhost:9887/webhooks/unbounce?publication_id=1"
 
 
