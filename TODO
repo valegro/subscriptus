@@ -11,6 +11,13 @@
 * Re-enable tests for CM library
 * Change all fields in CM to CamelCase and always camelize in CM lib
 * Move CM test code to one spec - test create/update and log on failure - CM work in the callbacks are just calls to DJ so all good
+* Need an integration test for subscribe - check that gift order is created
+
+
+Pending
+* Should there be two types of pending? Pending payment and pending verification?
+* If we are waiting on payment we need to verify with a payment object, otherwise perhaps simply a comment
+Perhaps just have one "pending" state and then have a "pending_what" column which could be payment or verification
 
 Signup
 * What do we do if the email address already exists?

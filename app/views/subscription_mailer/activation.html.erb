@@ -6,7 +6,7 @@
 
 	<p>
 		Supplier: Crikey<br/>
-		Order Number: <%= h @subscription.order_num %><br/>
+		Order Number: <%= h @subscription.reference %><br/>
 		Order Date: <%= @subscription.updated_at ? @subscription.updated_at.to_formatted_s(:long) : nil %><br/>
 		Payment Method: Credit Card<br/>
 		Payment Cost: <%= number_to_currency @subscription.price, :unit => "AUD $" %><br/>

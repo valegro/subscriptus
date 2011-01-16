@@ -44,5 +44,37 @@ describe Payment do
       assert_equal Payment.count, count + 1
       assert_equal payment.card_number, "XXXX-XXXX-XXXX-1111"
     end
+
+    it "should not attempt a CC payment if payment_type is not credit_card" do
+      count = Payment.count
+      GATEWAY.expects(:purchase).never
+      payment = Factory.build(:direct_debit_payment)
+      payment.subscription = @subscription
+      assert payment.valid?
+      payment.save!
+      assert_equal Payment.count, count + 1
+    end
+  end
+
+  describe "payment description" do
+    it "should be correct for credit card" do
+      @payment = Factory.create(:payment, :payment_type => 'credit_card')
+      @payment.description.should == '$100.00 by Credit card'
+    end
+
+    it "should be correct for credit card with reference" do
+      @payment = Factory.create(:payment, :payment_type => 'credit_card', :reference => "1234")
+      @payment.description.should == '$100.00 by Credit card (Ref: 1234)'
+    end
+
+    it "should be correct for direct debit" do
+      @payment = Factory.create(:payment, :payment_type => 'direct_debit')
+      @payment.description.should == '$100.00 by Direct debit'
+    end
+
+    it "should be correct for cheque" do
+      @payment = Factory.create(:payment, :payment_type => 'cheque')
+      @payment.description.should == '$100.00 by Cheque'
+    end
   end
 end

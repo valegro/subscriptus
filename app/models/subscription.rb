@@ -40,9 +40,12 @@ class Subscription < ActiveRecord::Base
 
   validates_presence_of :publication, :user, :state
   validates_acceptance_of :terms
+
+  # Used to specify what the pending state is waiting on
+  enum_attr :pending, %w(payment verification)
   
   # Subscription States
-  has_states :trial, :squatter, :active, :pending, :extension_pending, :cancelled, :renewal_due, :payment_failed, :init => :trial do
+  has_states :trial, :squatter, :active, :pending, :renewal_due, :payment_failed, :init => :trial do
     on :activate do
       transition :active => :active # when the subscriber extends their subscription while its still active
       transition :trial => :active
@@ -50,7 +53,7 @@ class Subscription < ActiveRecord::Base
     end
     on :pay_later do
       transition :trial => :pending
-      transition :active => :extension_pending # when the subscriber is currently active but is going to pay for the new subscription using Direct Debit
+      transition :active => :pending # when the subscriber is currently active but is going to pay for the new subscription using Direct Debit
     end
     on :verify do
       transition :pending => :active
@@ -72,16 +75,29 @@ class Subscription < ActiveRecord::Base
     end
     on :cancel do
       transition :trial => :squatter
-      transition :active => :cancelled # subscription will remain in cancelled state untill it manually processed by admin users
-      transition :pending => :cancelled
-      transition :extension_pending => :cancelled
-    end
-    on :mark_processed do # when the cancelled subscription is manually processed by admin users
-      transition :cancelled => :squatter
+      transition :active => :squatter
+      transition :pending => :squatter
     end
     # Expiries
     expires :pending => :squatter, :after => 14.days
     expires :trial => :squatter, :after => 21.days
+
+  end
+
+  alias_method :state_verify!, :verify!
+  # TODO: Also alias verify
+
+  def verify!(object)
+    puts "Calling verify"
+    # TODO: Transaction?
+        puts "HERE (#{pending})"
+    case pending.to_sym
+      when :payment
+        raise "Requires Payment to verify" unless object.kind_of?(Payment)
+        payments << object
+      when :verification
+    end
+    self.state_verify!
   end
 
   def use_offer(offer, term)
@@ -99,7 +115,7 @@ class Subscription < ActiveRecord::Base
     20
   end
 
-  def order_number
+  def reference
     "S%07d" % id
   end
 
@@ -162,7 +178,6 @@ class Subscription < ActiveRecord::Base
     returning self do
       payment.money = price # setting the money of payment object
       payment.customer_id = self.user.recurrent_id
-      payment.order_num = self.generate_and_set_order_number # order_num is sent to the user as a reference number of their subscriptions
       payment.call_recurrent_profile # make the payment through secure pay
       # change the state of subscription from trial to active
       self.activate

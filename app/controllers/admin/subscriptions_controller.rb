@@ -2,22 +2,10 @@ class Admin::SubscriptionsController < AdminController
   layout 'admin/subscriptions'
   include Admin::SubscriptionsHelper
   
-  before_filter :find_subscription, :only => [ :mark_processed ]
+  before_filter :find_subscription, :only => [ :verify ]
 
   def index
     @log_entries = SubscriptionLogEntry.recent.paginate(:page => params[:page] || 1)
-  end
-
-  def cancelled
-    @subscriptions = Subscription.cancelled.paginate(:page => params[:page], :per_page => Subscription.per_page, :order => 'updated_at')
-  end
-  
-  # TODO: Do we really need this?
-  def mark_processed
-    @subscription.mark_processed
-    @subscription.save!
-    flash[:notice] = "You have successfully marked a subscription as processed. It now exists in Squattered subscriptions."
-    redirect_to :action => :cancelled
   end
 
   def search
@@ -29,6 +17,18 @@ class Admin::SubscriptionsController < AdminController
 
   def pending
     @subscriptions = Subscription.pending.paginate(:page => params[:page], :per_page => Subscription.per_page, :order => 'updated_at') 
+  end
+
+  def verify
+    @payment = Payment.new(:amount => @subscription.price, :payment_type => 'direct_debit')
+    if request.post?
+      # TODO: Do pending verification
+      @payment = Payment.new(params[:payment])
+      @payment.amount = @subscription.price
+      @subscription.verify!(@payment)
+      # TODO: Validations? Exceptions?
+      redirect_to :action => :pending
+    end
   end
 
   protected

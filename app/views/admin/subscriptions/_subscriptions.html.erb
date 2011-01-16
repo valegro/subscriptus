@@ -1,7 +1,8 @@
 <%= render_table subscriptions do |t|
-  t.header :publication, :subscriber, :from, :to, :status, :actions
+  t.header :ref, :publication, :subscriber, :from, :to, :status, :actions
 
   t.rows do |row, subscription, index|
+    row.ref subscription.reference
     row.publication link_to(subscription.publication.name, admin_catalogue_publication_path(subscription.publication))
     row.subscriber link_to(subscription.user.try(:fullname), admin_subscriber_path(subscription.user))
     row.from subscription.created_at

@@ -39,7 +39,8 @@ describe Subscription do
 
     it "should set an order number based on id" do
       @subscription = Factory.create(:subscription)
-      @subscription.order_number.length.should == 8
+      @subscription.reference.length.should == 8
+      @subscription.reference.should =~ /#{@subscription.id}/
     end
 
     it "should create a recipient in Campaign Master" do

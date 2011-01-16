@@ -1,0 +1,15 @@
+<div class="title">
+  <%= content_tag :h2, "Verify Pending Subscription" %>
+</div>
+
+<% if @subscription.pending == :payment %>
+  <p>Subscription is pending payment of <strong><%= number_to_currency(@subscription.price) %></strong></p>
+  <% form_for @payment, :url => verify_admin_subscription_path(@subscription), :builder => Reform::Builder, :html => { :class => "form" } do |f| %>
+    <%= f.enum_select :payment_type %>
+    <%= f.text_field :reference %>
+    <%= f.submit "Verify" %>
+    <%= link_to "Cancel", pending_admin_subscriptions_path %>
+  <% end %>
+<% elsif @subscription.pending == :verification %>
+
+<% end %>

@@ -9,6 +9,13 @@ class Subscription::LoggingObserver < ActiveRecord::Observer
         :old_state => state_changes.first,
         :new_state => state_changes.last
       )
+      if state_changes.first == 'pending' && state_changes.last == 'active'
+        if subscription.pending == :payment
+          attributes[:description] = subscription.payments.last.try(:description)
+        end
+        # Set the pending column to nil if we are no longer pending anything
+        subscription.pending = nil
+      end
     end
     if subscription.expires_at_changed?
       attributes[:description] = "Expiry Date set to #{subscription.changes['expires_at'].last.strftime("%d/%m/%y")}"

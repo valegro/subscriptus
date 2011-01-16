@@ -1,34 +1,39 @@
 class PaymentFailedException < StandardError; end
 
 class Payment < ActiveRecord::Base
+  include ActionView::Helpers::NumberHelper
+
   belongs_to :subscription
 
-  validates_presence_of :card_number, :card_expiry_date, :first_name, :last_name, :amount
+  validates_presence_of :card_number, :card_expiry_date, :first_name, :last_name, :if => Proc.new { |payment| payment.credit_card? }
+  validates_presence_of :amount
   validates_numericality_of :amount, :greater_than_or_equal_to => 0
 
   attr_accessor :card_verification
-  enum_attr :card_type, %w(visa master american_express diners_club jcb) #, :init=>visa
+  enum_attr :card_type, %w(visa master american_express diners_club jcb)
+  enum_attr :payment_type, %w(credit_card direct_debit cheque)
 
   def validate_on_create
-    errors.add_to_base("Credit Card is not valid - check the details and try again") unless credit_card.valid?
+    if credit_card? && !credit_card.valid?
+      errors.add_to_base("Credit Card is not valid - check the details and try again")
+    end
   end
 
   before_save do |payment|
-    # Set the price
-    payment.amount = payment.subscription.price
-
-    # Charge the card
-    response = GATEWAY.purchase((payment.amount * 100).to_i, payment.credit_card,
-      :order_id => "123", # FIXME
-      :address => (payment.subscription.try(:user).try(:address_hash) || {}),
-      :description => 'Crikey Subscription Payment',
-      :email => payment.subscription.try(:user).try(:email)
-    )
-    unless response.success?
-      raise PaymentFailedException.new(response.message)
+    if payment.credit_card?
+      # Charge the card
+      response = GATEWAY.purchase((payment.amount * 100).to_i, payment.credit_card,
+        :order_id => "123", # FIXME
+        :address => (payment.subscription.try(:user).try(:address_hash) || {}),
+        :description => 'Crikey Subscription Payment',
+        :email => payment.subscription.try(:user).try(:email)
+      )
+      unless response.success?
+        raise PaymentFailedException.new(response.message)
+      end
+      # Save a reference
+      payment.card_number = "XXXX-XXXX-XXXX-#{payment.card_number[-4..-1]}"
     end
-    # Save a reference
-    payment.card_number = "XXXX-XXXX-XXXX-#{payment.card_number[-4..-1]}"
   end
 
   def credit_card
@@ -41,6 +46,12 @@ class Payment < ActiveRecord::Base
       :last_name  => self.last_name,
       :verification_value  => self.card_verification
     )
+  end
+
+  def description
+    returning str = [ number_to_currency(amount), payment_type.to_s.humanize ].join(" by ") do
+      str << " (Ref: #{reference})" if reference
+    end
   end
 end
 

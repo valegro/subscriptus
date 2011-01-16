@@ -8,7 +8,7 @@ class SubscriptionMailer < ActionMailer::Base
     raise Exceptions::EmailDataError.new("nil subscription") unless !subscription.blank?
     raise Exceptions::EmailDataError.new("nil user/ email") unless !subscription.user.blank? && !subscription.user.email.blank?
     recipients     "#{subscription.user.email}"
-    subject        "Crikey Online Order #{subscription.order_num}"
+    subject        "Crikey Online Order #{subscription.reference}"
     from           SEND_TO
     body           :subscription => subscription
     content_type   'text/html'

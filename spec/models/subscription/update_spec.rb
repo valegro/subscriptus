@@ -17,20 +17,61 @@ describe Subscription do
 
   describe "upon verify!" do
     before(:each) do
-      @subscription = Factory.create(:subscription, :state => 'pending')
+      @subscription = Factory.create(:subscription, :state => 'pending', :pending => "verification")
+      @verify_note = "Verified student card"
     end
 
-    it "should create a log entry" do
-      @subscription.log_entries.size.should == 1
-      @subscription.verify!
-      @subscription.log_entries.size.should == 2
-      entry = @subscription.log_entries.last
-      entry.new_state.should == 'active'
+    it "should be active" do
+      @subscription.verify!(@verify_note)
+      @subscription.state.should == 'active'
     end
 
     it "should deliver an email" do
       SubscriptionMailer.expects(:send_later).with(:deliver_activation, @subscription)
-      @subscription.verify!
+      @subscription.verify!(@verify_note)
+    end
+
+    it "should create a log entry when pending verification" do
+      @subscription.log_entries.size.should == 1
+      @subscription.verify!(@verify_note)
+      @subscription.log_entries.size.should == 2
+      entry = @subscription.log_entries.last
+      entry.old_state.should == 'pending'
+      entry.new_state.should == 'active'
+      # TODO: Description?
+    end
+
+    describe "if pending payment" do
+      before(:each) do
+        @subscription.pending = 'payment'
+      end
+
+      it "should require a payment if pending payment" do
+        lambda {
+          @subscription.verify!('bogus str')
+        }.should raise_exception
+        @subscription.verify!(Payment.new(:payment_type => 'direct_debit', :amount => 100))
+      end
+
+      it "should create a log entry if pending payment when verified" do
+        le_count = @subscription.log_entries.count
+        @subscription.verify!(Payment.new(:payment_type => 'direct_debit', :amount => 100))
+        @subscription.log_entries.count.should == (le_count + 1)
+        @subscription.log_entries.last.old_state.should == 'pending'
+        @subscription.log_entries.last.new_state.should == 'active'
+        @subscription.log_entries.last.description.should == '$100.00 by Direct debit'
+      end
+
+      it "should create a paymemt if pending payment" do
+        payment_count = @subscription.payments.count
+        @subscription.verify!(Payment.new(:payment_type => 'direct_debit', :amount => 100))
+        @subscription.payments.count.should == (payment_count + 1)
+      end
+
+      it "should be active" do
+        @subscription.verify!(Payment.new(:payment_type => 'direct_debit', :amount => 100))
+        @subscription.state.should == 'active'
+      end
     end
   end
 

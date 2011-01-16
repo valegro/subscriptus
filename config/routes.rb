@@ -16,14 +16,12 @@ ActionController::Routing::Routes.draw do |map|
       :payment_failed => :get,
       :payment_due => :get,
       :recent => :get,
-      :ended => :get,
-      :cancelled => :get
+      :ended => :get
     }, :member => {
-      :mark_processed => :get,
       :expire => :get,
       :activate => :get,
       :cancel => :get,
-      :verify => :get
+      :verify => [ :get, :post ]
     }
     admin.resources :orders, :member => { :fulfill => :get, :delay => :get }, :collection => { :delayed => :get, :completed => :get }
     admin.resources :subscribers

@@ -12,6 +12,7 @@ describe Admin::SubscriptionsController, "as admin" do
     get :search
     response.should be_success
   end
+
   describe "searching" do
     it "should create an appropriate search object" do
       @s = Subscription.search
@@ -27,7 +28,25 @@ describe Admin::SubscriptionsController, "as admin" do
       assigns[:results].should_not be_nil
       assigns[:count].should_not be_nil
     end
+  end
 
+  describe "pending" do
+    before(:each) do
+      @subscription = Factory.create(:subscription, :state => 'pending')
+    end
+
+    it "should list all pending subscriptions" do
+      get :pending
+      assigns[:subscriptions].empty?.should be_false
+    end
+
+    it "should create log entry on verify with payment" do
+      @subscription.pending = 'payment'
+      @subscription.save!
+      Subscription.any_instance.expects(:verify!)
+      post :verify, :id => @subscription.id, :payment => { "reference" => "1234", "payment_type" => "direct_debit" }
+      response.should redirect_to :action => :pending
+    end
   end
 end
 

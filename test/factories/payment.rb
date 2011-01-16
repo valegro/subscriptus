@@ -6,4 +6,10 @@ Factory.define :payment do |f|
   f.amount { 100 }
   f.card_verification { '123' }
   f.card_type { 'visa' }
+  f.payment_type { 'credit_card' }
+end
+
+Factory.define :direct_debit_payment, :class => 'Payment' do |f|
+  f.amount { 100 }
+  f.payment_type { 'direct_debit' }
 end
