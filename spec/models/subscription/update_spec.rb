@@ -17,28 +17,29 @@ describe Subscription do
 
   describe "upon verify!" do
     before(:each) do
-      @subscription = Factory.create(:subscription, :state => 'pending', :pending => "verification")
+      @subscription = Factory.create(:subscription, :state => 'pending', :pending => :concession)
       @verify_note = "Verified student card"
     end
 
     it "should be active" do
-      @subscription.verify!(@verify_note)
+      @subscription.verify!
       @subscription.state.should == 'active'
     end
 
     it "should deliver an email" do
       SubscriptionMailer.expects(:send_later).with(:deliver_activation, @subscription)
-      @subscription.verify!(@verify_note)
+      @subscription.verify!
     end
 
-    it "should create a log entry when pending verification" do
+    it "should create a log entry when pending concession" do
+      @subscription.note = "A note about the sub"
       @subscription.log_entries.size.should == 1
-      @subscription.verify!(@verify_note)
+      @subscription.verify!
       @subscription.log_entries.size.should == 2
       entry = @subscription.log_entries.last
       entry.old_state.should == 'pending'
       entry.new_state.should == 'active'
-      # TODO: Description?
+      entry.description.should == 'Concession: A note about the sub'
     end
 
     describe "if pending payment" do

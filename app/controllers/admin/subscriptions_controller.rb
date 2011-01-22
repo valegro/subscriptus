@@ -2,7 +2,7 @@ class Admin::SubscriptionsController < AdminController
   layout 'admin/subscriptions'
   include Admin::SubscriptionsHelper
   
-  before_filter :find_subscription, :only => [ :verify ]
+  before_filter :find_subscription, :only => [ :verify, :cancel ]
 
   def index
     @log_entries = SubscriptionLogEntry.recent.paginate(:page => params[:page] || 1)
@@ -22,13 +22,24 @@ class Admin::SubscriptionsController < AdminController
   def verify
     @payment = Payment.new(:amount => @subscription.price, :payment_type => 'direct_debit')
     if request.post?
-      # TODO: Do pending verification
-      @payment = Payment.new(params[:payment])
-      @payment.amount = @subscription.price
-      @subscription.verify!(@payment)
-      # TODO: Validations? Exceptions?
+      if params[:payment]
+        @payment = Payment.new(params[:payment])
+        @payment.amount = @subscription.price
+        @subscription.verify!(@payment)
+        # TODO: Validations? Exceptions?
+      else
+        @subscription.update_attributes(params[:subscription])
+        @subscription.verify!
+      end
+      flash[:notice] = "Verified Subscription"
       redirect_to :action => :pending
     end
+  end
+
+  def cancel
+    @subscription.cancel!
+    flash[:notice] = "Subscription Canceled"
+    redirect_to :action => :index
   end
 
   protected

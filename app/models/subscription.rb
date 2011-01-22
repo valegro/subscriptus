@@ -24,8 +24,9 @@ class Subscription < ActiveRecord::Base
     end
   end
   
+  attr_accessor :note # Used to save notes to the subscription
   attr_accessor :terms
-  attr_accessor :starts_at # the start date of the newest subscription
+  attr_accessor :starts_at # the start date of the newest subscription #TODO: Is this used anywhere?
   accepts_nested_attributes_for :subscription_gifts, :payments, :user
 
   named_scope :ascend_by_name, :include => 'user', :order => "users.lastname ASC, users.firstname ASC"
@@ -42,7 +43,7 @@ class Subscription < ActiveRecord::Base
   validates_acceptance_of :terms
 
   # Used to specify what the pending state is waiting on
-  enum_attr :pending, %w(payment verification)
+  enum_attr :pending, %w(payment concession)
   
   # Subscription States
   has_states :trial, :squatter, :active, :pending, :renewal_due, :payment_failed, :init => :trial do
@@ -87,15 +88,13 @@ class Subscription < ActiveRecord::Base
   alias_method :state_verify!, :verify!
   # TODO: Also alias verify
 
-  def verify!(object)
-    puts "Calling verify"
+  def verify!(object = nil)
     # TODO: Transaction?
-        puts "HERE (#{pending})"
     case pending.to_sym
       when :payment
         raise "Requires Payment to verify" unless object.kind_of?(Payment)
         payments << object
-      when :verification
+      when :concession
     end
     self.state_verify!
   end

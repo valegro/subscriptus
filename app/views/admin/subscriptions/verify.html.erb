@@ -10,6 +10,12 @@
     <%= f.submit "Verify" %>
     <%= link_to "Cancel", pending_admin_subscriptions_path %>
   <% end %>
-<% elsif @subscription.pending == :verification %>
+<% elsif @subscription.pending == :concession %>
+  <p>Subscription is pending verification of concession</p>
+  <% form_for :subscription, :url => verify_admin_subscription_path(@subscription), :builder => Reform::Builder, :html => { :class => "form" } do |f| %>
+    <%= f.text_area "note", :rows => 3 %>
+    <%= f.submit "Verify" %>
+    <%= link_to "Cancel", pending_admin_subscriptions_path %>
+  <% end %>
 
 <% end %>
