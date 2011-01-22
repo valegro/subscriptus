@@ -11,29 +11,29 @@ Feature: Subscription search
       And an offer: "o02" exists with publication: publication "p02"
       And a user: "u01" exists with firstname: "f01", lastname: "l01", email: "u01@example.com", email_confirmation: "u01@example.com"
       And a user: "u02" exists with firstname: "f02", lastname: "l02", email: "u02@example.com", email_confirmation: "u02@example.com"
-      And a subscription exists with offer: offer "o01", user: user "u01", state: "trial"
-      And a subscription exists with offer: offer "o02", user: user "u02", state: "active"
+      And a subscription exists with publication: publication "p01", user: user "u01", state: "trial"
+      And a subscription exists with publication: publication "p02", user: user "u02", state: "active"
     When I log in as admin "Homer"
 
   @javascript
   Scenario: An admin adds publication field to search form
     Given I am on admin subscription search page
-    When I select "Publication" from "filter_name"
-    And I follow "Add"
+      When I select "Publication" from "filter_name"
+      And I follow "Add"
     Then I should see "Publication" within "form div label"
 
   @javascript
   Scenario: An admin adds name field to search form
     Given I am on admin subscription search page
-    When I select "Name" from "filter_name"
-    And I follow "Add"
+      When I select "Name" from "filter_name"
+      And I follow "Add"
     Then I should see "Name" within "form div label"
 
   @javascript
   Scenario: An admin adds email field to search form
     Given I am on admin subscription search page
-    When I select "Email" from "filter_name"
-    And I follow "Add"
+      When I select "Email" from "filter_name"
+      And I follow "Add"
     Then I should see "Email" within "form div label"
 
   @javascript
@@ -46,66 +46,66 @@ Feature: Subscription search
     Then I should see "trial"
       And I should see "u01@example.com"
       And I should not see "active"
-      And I should see "Showing 1 to 1 of 1 subscription(s)."
+      And I should see "Displaying 1 subscription"
 
   @javascript
   Scenario: An admin searches with a name filter
     Given I am on admin subscription search page
-    When I select "Name" from "filter_name"
-    And I follow "Add"
-    And I fill in "search_user_firstname_or_user_lastname_like" with "l01"
-    And I press "Search"
+      When I select "Name" from "filter_name"
+      And I follow "Add"
+      And I fill in "search_user_firstname_or_user_lastname_like" with "l01"
+      And I press "Search"
     Then I should see "trial"
-    And I should see "u01@example.com"
-    And I should not see "active"
-    And I should see "Showing 1 to 1 of 1 subscription(s)."
+      And I should see "u01@example.com"
+      And I should not see "active"
+      And I should see "Displaying 1 subscription"
 
   @javascript
   Scenario: An admin searches with a email filter
     Given I am on admin subscription search page
-    When I select "Email" from "filter_name"
-    And I follow "Add"
-    And I fill in "search_user_email_like" with "u01"
-    And I press "Search"
+      When I select "Email" from "filter_name"
+      And I follow "Add"
+      And I fill in "search_user_email_like" with "u01"
+      And I press "Search"
     Then I should see "trial"
-    And I should see "u01@example.com"
-    And I should not see "active"
-    And I should see "Showing 1 to 1 of 1 subscription(s)."
+      And I should see "u01@example.com"
+      And I should not see "active"
+      And I should see "Displaying 1 subscription"
 
   @javascript
   Scenario: An admin searches with a publication with no subscription
     Given a publication: "p03" exists with name: "publication 03"
-    And I am on admin subscription search page
+      And I am on admin subscription search page
     When I select "Publication" from "filter_name"
-    And I follow "Add"
-    And I select "publication 03" from "search_publication_id"
-    And I press "Search"
-    Then I should see "No subscription found."
+      And I follow "Add"
+      And I select "publication 03" from "search_publication_id"
+      And I press "Search"
+    Then I should see "No entries found"
 
   @javascript
   Scenario: An admin searches with a name that does not match any name
     Given I am on admin subscription search page
     When I select "Name" from "filter_name"
-    And I follow "Add"
-    And I fill in "search_user_firstname_or_user_lastname_like" with "spamspamspamspam"
-    And I press "Search"
-    Then I should see "No subscription found."
+      And I follow "Add"
+      And I fill in "search_user_firstname_or_user_lastname_like" with "spamspamspamspam"
+      And I press "Search"
+    Then I should see "No entries found"
 
   @javascript
   Scenario: An admin searches with a email that does not match any email
     Given I am on admin subscription search page
     When I select "Email" from "filter_name"
-    And I follow "Add"
-    And I fill in "search_user_email_like" with "emailwithnomatch"
-    And I press "Search"
-    Then I should see "No subscription found."
+      And I follow "Add"
+      And I fill in "search_user_email_like" with "emailwithnomatch"
+      And I press "Search"
+    Then I should see "No entries found"
 
   Scenario: An admin searches with no filter
     Given I am on admin subscription search page
     When I press "Search"
-    Then I should see "Showing 1 to 2 of 2 subscription(s)."
-    And I should see "publication 01"
-    And I should see "publication 02"
+    Then I should see "Displaying all 2 subscriptions"
+      And I should see "publication 01"
+      And I should see "publication 02"
 
 
   @javascript
@@ -177,10 +177,10 @@ Feature: Subscription search
 
   @javascript
   Scenario: An admin searches for 22 results and result is paginated
-    #XXX: per_page is hardcoded to be 20.  is it okay?
     Given 20 subscriptions exist with offer: offer "o01", user: user "u01", state: "trial"
-    And I am on admin subscription search page
+      And I am on admin subscription search page
     When I press "Search"
-    Then I should see "Showing 1 to 20 of 22 subscription(s)."
-    And I should see "« Previous 1 2 Next »"
+      Then show me the page
+      Then I should see "Displaying subscriptions"
+      And I should see "« Previous 1 2 Next »"
 
