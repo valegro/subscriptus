@@ -9,7 +9,11 @@ class Admin::SubscriptionsController < AdminController
   end
 
   def search
+    if params[:search] && params[:search].has_key?(:id)
+      params[:search][:id] = Subscription.id_from_reference(params[:search][:id])
+    end
     @search = Subscription.search(params[:search])
+    
     @search.class.send :attr_accessor, :renewal   # TODO: renewal search
     @search.class.send :attr_accessor, :gift      # TODO: gift search
     @results, @count = @search.all.paginate(:page => params[:page], :per_page => Subscription.per_page), @search.count

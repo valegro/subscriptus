@@ -13,7 +13,7 @@
       <label for="filter_name">Filters</label>
     </div>
     <div class="field-inner">
-      <%= select_tag('filter_name', options_for_select([ ['',''], ['Name','name'], ['Email','email'], ['Publication','publication'] ])) %>
+      <%= select_tag('filter_name', options_for_select([ ['',''], ['Name','name'], ['Email','email'], ['Reference', 'id'],['Publication','publication'] ])) %>
       <%= link_to_function('Add', 'add_selected_field(); disable_current_option()') %><br/>
     </div>
   </div>
@@ -28,6 +28,10 @@
 <h2>Results</h2>
 
 <%= render_table @results do |t|
+    t.header :reference do
+      order @search, :by => :id, :as => 'Reference'
+    end
+    
     t.header :name do
       order @search, :by => :name
     end
@@ -39,6 +43,7 @@
     end
     t.header :state, :renewal_due, :signed_up
     t.rows do |row, result, index|
+      row.reference    result.reference
       row.name         link_to(result.user.try(:fullname) || 'No name', admin_subscriber_path(result.user))
       row.email        result.user.try(:email)
       row.publication  result.publication.try(:name)
@@ -51,6 +56,7 @@
 
 <script type="text/javascript"><!--
   $(document).ready( function() {
+      <% if @search.id %> add_field(filter_element_for('id')); disable_option('id'); <% end -%>    
       <% if @search.publication_id %> add_field(filter_element_for('publication')); disable_option('publication'); <% end -%>
       <% if @search.user_firstname_or_user_lastname_like %> add_field(filter_element_for('name')); disable_option('name'); <% end -%>
       <% if @search.user_email_like %> add_field(filter_element_for('email')); disable_option('email'); <% end -%>
@@ -62,6 +68,18 @@
 --></script>
 
 <div style="display:none">
+  <div id="id_field">
+    <div class="field field-text">
+      <div class="field-label">
+        <%= label :search, :id, 'Reference' %>
+      </div>
+      <div class="field-inner">
+        <%= text_field :search, :id, :value => Subscription.format_reference(@search.id) %>
+        <%= link_to_function '[X]', "remove_field($('#id_field')); enable_option('id')", :id => 'remove_name_link' %>
+      </div>
+    </div>
+  </div>
+  
   <div id="name_field">
     <div class="field field-text">
       <div class="field-label">

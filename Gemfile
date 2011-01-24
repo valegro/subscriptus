@@ -27,7 +27,7 @@ gem 'RedCloth'
 # Paperclip for attachments, plus DJ for async resizes
 # http://jstorimer.com/ruby/2010/01/30/delayed-paperclip.html
 #gem 'paperclip'
-gem 'delayed_job'
+gem 'delayed_job', '2.0.3'
 gem 'delayed_paperclip'
 
 gem 'mechanize'
@@ -40,6 +40,8 @@ gem 'soap4r'
 gem 'aws-s3', :require => "aws/s3"
 gem 'wizardly'
 gem 'enumerated_attribute'
+
+gem 'ruby-debug'
 
 group :test, :cucumber, :development do
   gem 'capybara', "0.3.9"

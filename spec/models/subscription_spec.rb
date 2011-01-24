@@ -13,6 +13,20 @@ describe Subscription do
     CM::Recipient.stubs(:update)
     CM::Recipient.stubs(:create!)
   end
+  
+  describe "reference" do
+    before(:each) do
+      @subscription = Factory.create(:subscription)
+    end
+    
+    it 'should return a reference number related to the id' do
+      @subscription.reference.should == ("S%07d" % @subscription.id)
+    end
+    
+    it 'should return an id from a reference number' do
+      Subscription.id_from_reference(@subscription.reference).should == @subscription.id
+    end
+  end
 
   describe "offer term" do
     before(:each) do

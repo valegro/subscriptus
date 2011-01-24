@@ -85,10 +85,11 @@ class Subscription < ActiveRecord::Base
 
   end
 
-  alias_method :state_verify!, :verify!
+  
+  # alias_method :state_verify!, :verify!
   # TODO: Also alias verify
 
-  def verify!(object = nil)
+  def verify_with_params!(object = nil)
     # TODO: Transaction?
     case pending.to_sym
       when :payment
@@ -96,8 +97,12 @@ class Subscription < ActiveRecord::Base
         payments << object
       when :concession
     end
-    self.state_verify!
+    #self.state_verify!
+    self.verify_without_params!
   end
+  
+  alias_method_chain :verify!, :params
+  
 
   def use_offer(offer, term)
     raise "Offer Term not valid for Offer" if term.offer_id != offer.id # TODO: Spec this
@@ -114,8 +119,16 @@ class Subscription < ActiveRecord::Base
     20
   end
 
+  def self.format_reference(reference)
+    "S%07d" % reference
+  end
+  
+  def self.id_from_reference(reference)
+    reference.sub(/^S/i, '').to_i
+  end
+  
   def reference
-    "S%07d" % id
+    Subscription.format_reference(self.id)
   end
 
   def sync_to_campaign_master

@@ -37,6 +37,13 @@ Feature: Subscription search
     Then I should see "Email" within "form div label"
 
   @javascript
+  Scenario: An admin adds Reference field to search form
+    Given I am on admin subscription search page
+     When I select "Reference" from "filter_name"
+      And I follow "Add"
+     Then I should see "Reference" within "form div label"
+
+  @javascript
   Scenario: An admin searches with a publication filter
     Given I am on admin subscription search page
     When I select "Publication" from "filter_name"
@@ -71,6 +78,34 @@ Feature: Subscription search
       And I should see "u01@example.com"
       And I should not see "active"
       And I should see "Displaying 1 subscription"
+
+  @javascript
+  Scenario: An admin searches with an Reference filter
+    Given I am on admin subscription search page
+      And a subscription exists with id: 1234, publication: publication "p01", user: user "u01", state: "trial"
+      When I select "Reference" from "filter_name"
+      And I follow "Add"
+      And I fill in "search_id" with "S0001234"
+      And I press "Search"
+    Then I should see "trial"
+      And I should see "u01@example.com"
+      And I should not see "active"
+      And I should see "Displaying 1 subscription"
+      
+     When I fill in "search_id" with "s0001234"
+      And I press "Search"
+     Then I should see "trial"
+      And I should see "u01@example.com"
+      And I should not see "active"
+      And I should see "Displaying 1 subscription"
+
+    When I fill in "search_id" with "1234"
+     And I press "Search"
+    Then I should see "trial"
+     And I should see "u01@example.com"
+     And I should not see "active"
+     And I should see "Displaying 1 subscription"
+
 
   @javascript
   Scenario: An admin searches with a publication with no subscription
@@ -180,7 +215,6 @@ Feature: Subscription search
     Given 20 subscriptions exist with offer: offer "o01", user: user "u01", state: "trial"
       And I am on admin subscription search page
     When I press "Search"
-      Then show me the page
       Then I should see "Displaying subscriptions"
       And I should see "« Previous 1 2 Next »"
 
