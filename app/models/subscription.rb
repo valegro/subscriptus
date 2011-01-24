@@ -86,9 +86,7 @@ class Subscription < ActiveRecord::Base
   end
 
   
-  # alias_method :state_verify!, :verify!
   # TODO: Also alias verify
-
   def verify_with_params!(object = nil)
     # TODO: Transaction?
     case pending.to_sym
@@ -97,11 +95,12 @@ class Subscription < ActiveRecord::Base
         payments << object
       when :concession
     end
-    #self.state_verify!
-    self.verify_without_params!
+    verify_without_params!
   end
   
   alias_method_chain :verify!, :params
+  # Hide the chained methods
+  private :verify_with_params!, :verify_without_params!
   
 
   def use_offer(offer, term)
