@@ -6,3 +6,5 @@ coverage/*
 config/database.yml
 public/system/*
 *.swp
+capybara-*.html
+.bundle/
