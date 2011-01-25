@@ -104,6 +104,21 @@ class Subscription < ActiveRecord::Base
     end
   end
 
+  after_exit_suspended :restore_subscription_expiry
+  
+  def restore_subscription_expiry
+    if self.state_expires_at
+      
+      days_to_restore = (Date.yesterday - self.state_expires_at.to_date).to_i
+      # debugger
+      if (days_to_restore < 0)
+        self.expires_at = self.expires_at.advance(:days => days_to_restore).to_datetime
+      end
+      self.state_expires_at = nil
+      self.save
+    end
+  end
+
   # TODO: Also alias verify
   def verify_with_params!(object = nil)
     # TODO: Transaction?
