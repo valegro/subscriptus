@@ -1,0 +1,11 @@
+<div class="title">
+  <%= content_tag :h2, "Suspend Subscription" %>
+</div>
+
+<% form_for :subscription, :url => suspend_admin_subscription_path(@subscription), :builder => Reform::Builder, :html => { :class => "form" } do |f| %>
+  <%= f.text_field :state_expiry_period_in_days, :label => 'Number of days to suspend subscription' %>
+  <% f.row '' do %>
+    <%= f.submit 'Suspend' %>
+    <%= link_to "Cancel", search_admin_subscriptions_path %>
+  <% end %>
+<% end %>

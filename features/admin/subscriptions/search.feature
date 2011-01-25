@@ -123,9 +123,11 @@ Feature: Subscription search
     And I follow "Publication"
     #TODO: We have to specify what time zone we use to display time.
     Then I should see the following "search_results" table:
-      | Name    | Email           | ▲ Publication  | State  | Renewal    | Signed Up  |
-      | f01 l01 | u01@example.com | publication 01 | trial  | 04/12/2010 | 04/10/2010 |
-      | f02 l02 | u02@example.com | publication 02 | active | 04/12/2010 | 04/10/2010 |
+      | Name    | Email           | ▲ Publication  | State  | Renewal Due   | Signed Up  | Actions |
+      | f01 l01 | u01@example.com | publication 01 | trial  | about 1 month | 04/10/2010 |         |
+      | f02 l02 | u02@example.com | publication 02 | active | about 1 month | 04/10/2010 | Suspend |
+
+
 
   Scenario: An admin sorts search results by publication desc
     Given I am on admin subscription search page
