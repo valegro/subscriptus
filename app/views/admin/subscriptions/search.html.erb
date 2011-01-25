@@ -41,7 +41,7 @@
     t.header :publication do
       order @search, :by => :publication_id
     end
-    t.header :state, :renewal_due, :signed_up
+    t.header :state, :renewal_due, :signed_up, :actions
     t.rows do |row, result, index|
       row.reference    result.reference
       row.name         link_to(result.user.try(:fullname) || 'No name', admin_subscriber_path(result.user))
@@ -50,6 +50,14 @@
       row.state        result.state
       row.renewal_due  result.expires_at ? time_ago_in_words(result.expires_at) : ''
       row.signed_up    result.created_at.try(:strftime, "%d/%m/%Y")
+      row.actions do
+        case 
+        when result.active?
+          link_to 'Suspend', suspend_admin_subscription_path(result)
+        when result.suspended?
+          link_to 'Unsuspend', unsuspend_admin_subscription_path(result), :method => :post
+        end
+      end
     end
   end
 %>  

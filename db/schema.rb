@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110115082611) do
+ActiveRecord::Schema.define(:version => 20110125030746) do
 
   create_table "archived_subscriptions", :id => false, :force => true do |t|
     t.integer  "id"
@@ -32,6 +32,7 @@ ActiveRecord::Schema.define(:version => 20110115082611) do
     t.boolean  "solus",            :default => false
     t.boolean  "weekender",        :default => true
     t.string   "pending"
+    t.datetime "state_expires_at"
   end
 
   create_table "audit_log_entries", :force => true do |t|
@@ -209,6 +210,7 @@ ActiveRecord::Schema.define(:version => 20110115082611) do
     t.boolean  "solus",            :default => false
     t.boolean  "weekender",        :default => true
     t.string   "pending"
+    t.datetime "state_expires_at"
   end
 
   create_table "transaction_logs", :force => true do |t|

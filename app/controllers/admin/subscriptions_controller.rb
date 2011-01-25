@@ -2,7 +2,7 @@ class Admin::SubscriptionsController < AdminController
   layout 'admin/subscriptions'
   include Admin::SubscriptionsHelper
   
-  before_filter :find_subscription, :only => [ :verify, :cancel ]
+  before_filter :find_subscription, :only => [ :verify, :cancel, :suspend, :unsuspend ]
 
   def index
     @log_entries = SubscriptionLogEntry.recent.paginate(:page => params[:page] || 1)
@@ -38,6 +38,22 @@ class Admin::SubscriptionsController < AdminController
       flash[:notice] = "Verified Subscription"
       redirect_to :action => :pending
     end
+  end
+  
+  def suspend
+    if request.post?
+      if period = params[:subscription][:state_expiry_period_in_days]
+        @subscription.suspend!(period.to_i.days)
+        flash[:notice] = "Subscription to #{@subscription.publication.name} for #{@subscription.user.name} suspended for #{period} days"
+        redirect_to search_admin_subscriptions_path
+      end
+    end
+  end
+  
+  def unsuspend
+    @subscription.unsuspend!
+    flash[:notice] = "Subscription to #{@subscription.publication.name} for #{@subscription.user.name} is now active"
+    redirect_to search_admin_subscriptions_path
   end
 
   def cancel

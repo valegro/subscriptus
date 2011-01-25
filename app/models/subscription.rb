@@ -46,7 +46,7 @@ class Subscription < ActiveRecord::Base
   enum_attr :pending, %w(payment concession)
   
   # Subscription States
-  has_states :trial, :squatter, :active, :pending, :renewal_due, :payment_failed, :init => :trial do
+  has_states :trial, :squatter, :active, :suspended, :pending, :renewal_due, :payment_failed, :init => :trial do
     on :activate do
       transition :active => :active # when the subscriber extends their subscription while its still active
       transition :trial => :active
@@ -79,12 +79,18 @@ class Subscription < ActiveRecord::Base
       transition :active => :squatter
       transition :pending => :squatter
     end
+    on :suspend do
+      transition :active => :suspended
+    end
+    on :unsuspend do
+      transition :suspended => :active
+    end
+    
     # Expiries
     expires :pending => :squatter, :after => 14.days
     expires :trial => :squatter, :after => 21.days
 
   end
-
   
   # TODO: Also alias verify
   def verify_with_params!(object = nil)
@@ -99,9 +105,19 @@ class Subscription < ActiveRecord::Base
   end
   
   alias_method_chain :verify!, :params
-  # Hide the chained methods
   private :verify_with_params!, :verify_without_params!
   
+  def suspend_with_period!(time_period = nil)
+    if time_period
+      # TODO: do something to extend the time until this state expires?
+      self.state_expires_at = Time.now.utc + time_period.days
+    else
+      raise "Cannot suspend a subscription without a time period"
+    end
+    suspend_without_period!
+  end
+  alias_method_chain :suspend!, :period
+  private :suspend_with_period!, :suspend_without_period!
 
   def use_offer(offer, term)
     raise "Offer Term not valid for Offer" if term.offer_id != offer.id # TODO: Spec this
@@ -113,7 +129,11 @@ class Subscription < ActiveRecord::Base
     # TODO: Move this to the observer for on_enter_active
     increment_expires_at(term) 
   end
-
+  
+  def state_expiry_period_in_days
+    (self.state_expires_at - DateTime.now) if self.state_expires_at
+  end
+  
   def self.per_page
     20
   end
