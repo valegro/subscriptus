@@ -4,8 +4,8 @@ Factory.define :subscription do |s|
   s.association :publication, :factory => :publication
   # s.association :publication, :factory => :publication
   # s.association :source, :factory => :source
-  s.expires_at Time.parse('2010-12-05')
-  s.created_at Time.parse('2010-10-05')
-  s.state            { "trial" }
+  s.expires_at      Date.today.advance(:days => 30).to_datetime
+  s.created_at      Date.today.to_datetime
+  s.state           { "trial" }
   s.price           30
 end

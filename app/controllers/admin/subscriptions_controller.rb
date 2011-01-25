@@ -43,7 +43,7 @@ class Admin::SubscriptionsController < AdminController
   def suspend
     if request.post?
       if period = params[:subscription][:state_expiry_period_in_days]
-        @subscription.suspend!(period.to_i.days)
+        @subscription.suspend!(period.to_i)
         flash[:notice] = "Subscription to #{@subscription.publication.name} for #{@subscription.user.name} suspended for #{period} days"
         redirect_to search_admin_subscriptions_path
       end

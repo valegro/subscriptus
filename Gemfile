@@ -1,5 +1,6 @@
 source 'http://rubygems.org'
 gem "rails", "2.3.9"
+gem "ruby-debug"
 
 # Postgres support
 gem 'pg'
