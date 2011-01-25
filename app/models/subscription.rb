@@ -92,6 +92,21 @@ class Subscription < ActiveRecord::Base
 
   end
 
+  after_exit_suspended :restore_subscription_expiry
+  
+  def restore_subscription_expiry
+    if self.state_expires_at
+      
+      days_to_restore = (Date.yesterday - self.state_expires_at.to_date).to_i
+      # debugger
+      if (days_to_restore < 0)
+        self.expires_at = self.expires_at.advance(:days => days_to_restore).to_datetime
+      end
+      self.state_expires_at = nil
+      self.save
+    end
+  end
+
   alias_method :state_verify!, :verify!
   # TODO: Also alias verify
 
@@ -106,16 +121,16 @@ class Subscription < ActiveRecord::Base
     self.state_verify!
   end
   
-  def suspend_with_period!(time_period = nil)
-    if time_period
-      # TODO: do something to extend the time until this state expires?
-      self.state_expires_at = Time.now.utc + time_period.days
+  def suspend_with_number_of_days!(number_of_days = nil)
+    if number_of_days
+      self.state_expires_at = Date.today.advance(:days => number_of_days).to_datetime
+      self.expires_at = self.expires_at.advance(:days => number_of_days).to_datetime
     else
       raise "Cannot suspend a subscription without a time period"
     end
-    suspend_without_period!
+    suspend_without_number_of_days!
   end
-  alias_method_chain :suspend!, :period
+  alias_method_chain :suspend!, :number_of_days
 
   def use_offer(offer, term)
     raise "Offer Term not valid for Offer" if term.offer_id != offer.id # TODO: Spec this
@@ -129,7 +144,7 @@ class Subscription < ActiveRecord::Base
   end
   
   def state_expiry_period_in_days
-    (self.state_expires_at - DateTime.now) if self.state_expires_at
+    (self.state_expires_at.to_date - Date.today) if self.state_expires_at
   end
   
   def self.per_page
