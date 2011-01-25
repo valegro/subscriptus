@@ -22,7 +22,7 @@ Feature: Suspend a subscription
   Scenario: An admin can suspend a subscription
     Then I should see the following table rows:
     | Name    | State     | Renewal Due   |
-    | f01 l01 | active    | 30 days       |
+    | f01 l01 | active    | 29 days       |
     | f02 l02 | suspended | 2 months      |
     When I follow "Suspend"
      And I fill in "Number of days to suspend subscription" with "31"
@@ -42,8 +42,8 @@ Feature: Suspend a subscription
    And I should not see "suspended"
    And I should see the following table rows:
    | Name    | State  | Renewal Due |
-   | f01 l01 | active | 30 days     |
-   | f02 l02 | active | 30 days     |
+   | f01 l01 | active | 29 days     |
+   | f02 l02 | active | 29 days     |
 
   
   

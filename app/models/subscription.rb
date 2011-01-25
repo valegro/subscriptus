@@ -95,9 +95,7 @@ class Subscription < ActiveRecord::Base
   
   def restore_subscription_expiry
     if self.state_expires_at
-      
       days_to_restore = (Date.yesterday - self.state_expires_at.to_date).to_i
-      # debugger
       if (days_to_restore < 0)
         self.expires_at = self.expires_at.advance(:days => days_to_restore).to_datetime
       end
@@ -117,32 +115,22 @@ class Subscription < ActiveRecord::Base
     end
     verify_without_params!
   end
-  
-<<<<<<< HEAD
+
   alias_method_chain :verify!, :params
   private :verify_with_params!, :verify_without_params!
   
-  def suspend_with_period!(time_period = nil)
-    if time_period
-      # TODO: do something to extend the time until this state expires?
-      self.state_expires_at = Time.now.utc + time_period.days
-=======
   def suspend_with_number_of_days!(number_of_days = nil)
     if number_of_days
       self.state_expires_at = Date.today.advance(:days => number_of_days).to_datetime
       self.expires_at = self.expires_at.advance(:days => number_of_days).to_datetime
->>>>>>> Correct date manipulation for suspend/unsuspend of the subscription.
     else
       raise "Cannot suspend a subscription without a time period"
     end
     suspend_without_number_of_days!
   end
-<<<<<<< HEAD
-  alias_method_chain :suspend!, :period
-  private :suspend_with_period!, :suspend_without_period!
-=======
+
   alias_method_chain :suspend!, :number_of_days
->>>>>>> Correct date manipulation for suspend/unsuspend of the subscription.
+  private :suspend_with_number_of_days!, :suspend_without_number_of_days!
 
   def use_offer(offer, term)
     raise "Offer Term not valid for Offer" if term.offer_id != offer.id # TODO: Spec this
