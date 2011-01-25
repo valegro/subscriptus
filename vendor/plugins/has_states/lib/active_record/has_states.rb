@@ -130,7 +130,7 @@ module ActiveRecord
           @named_scope_name = "with_expired_#{@from}_#{column_name}".to_sym
           unless @model.respond_to?(@named_scope_name)
             @model.class_eval %Q(named_scope :#{@named_scope_name}, lambda { { 
-              :conditions => [ " ( #{column_name}_updated_at < ? AND #{column_name} = ? ) ", Time.now.utc - #{@expiry}, "#{from.to_s}" ] } 
+              :conditions => [ " ( (#{column_name}_updated_at < ? OR #{column_name}_expires_at < ?) AND #{column_name} = ? ) ", Time.now.utc - #{@expiry}, Time.now.utc, "#{from.to_s}" ] } 
             }), __FILE__, __LINE__
           end
         end
@@ -238,7 +238,16 @@ module ActiveRecord
 
         def state_machine_expired?(column_name, expiry)
           updated_at = self.send("#{column_name}_updated_at")
-          (updated_at + expiry).utc < Time.now
+          expires_at = self.send("#{column_name}_expires_at")
+          result = false
+          if expiry
+            result ||= (updated_at + expiry).utc < Time.now.utc
+          end  
+
+          if expires_at
+            result ||= expires_at.utc < Time.now.utc
+          end
+          result
         end
 
         def state_machine_expire_state!(column_name, from, save_method)
