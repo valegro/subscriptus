@@ -59,6 +59,7 @@ protected
         t.column :type, :string
         t.column :state, :string, :default => 'open'
         t.column :state_updated_at, :timestamp
+        t.column :state_expires_at, :timestamp
         t.column :other_state, :string
         t.column :other_state_updated_at, :timestamp
         t.column :problem, :string
@@ -222,6 +223,19 @@ protected
 end
 
 class TicketWithStateExpiration < Ticket
+  has_states :open, :active, :stale, :abandoned do
+    expires :open => :stale, :after => 30.days
+    expires :stale => :abandoned, :after => 10.days
+    on :activate do
+      transition :open => :active
+    end
+    on :stale do
+      transition :active => :stale
+    end
+  end
+end
+
+class TicketWithStateExpirationField < Ticket
   has_states :open, :active, :stale, :abandoned do
     expires :open => :stale, :after => 30.days
     expires :stale => :abandoned, :after => 10.days
@@ -583,5 +597,32 @@ class ExpiredStatesTest < Test::Unit::TestCase
     ticket.reload
     assert_equal "stale", ticket.state
   end
+  
+  def test_should_automatically_expire_states_with_field
+    ticket = create(TicketWithStateExpiration)
+    ticket.update_attribute :state_expires_at, 2.days.ago
+    assert ticket.open_state_expired?
+    TicketWithStateExpiration.expire_states
+    ticket.reload
+    assert_equal "stale", ticket.state
+  end
+  
+  def test_should_not_automatically_expire_states_with_field
+    ticket = create(TicketWithStateExpiration)
+    ticket.update_attribute :state_expires_at, 2.days.from_now
+    assert !ticket.open_state_expired?
+    TicketWithStateExpiration.expire_states
+    ticket.reload
+    assert_equal "open", ticket.state
+  end
+  
+  def test_should_not_automatically_expire_states_with_field_when_nil
+    ticket = create(TicketWithStateExpiration)
+    ticket.update_attribute :state_expires_at, nil
+    assert !ticket.open_state_expired?
+    TicketWithStateExpiration.expire_states
+    ticket.reload
+    assert_equal "open", ticket.state
+  end  
 
 end
