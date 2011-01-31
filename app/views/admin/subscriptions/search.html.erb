@@ -53,7 +53,7 @@
       row.actions do
         case 
         when result.active?
-          link_to 'Suspend', suspend_admin_subscription_path(result)
+          link_to_remote 'Suspend', :url => suspend_admin_subscription_path(result), :method => :get
         when result.suspended?
           link_to 'Unsuspend', unsuspend_admin_subscription_path(result), :method => :post
         end
@@ -133,5 +133,5 @@
     <strong>gift field</strong>
     <%= link_to_function '[X]', "remove_field($(this).parent()); enable_option('gift')", :id => 'remove_gift_link' %>
   </div>
-  <div id="end_of_fields"/>
+  <div id="end_of_fields"></div>
 </div>

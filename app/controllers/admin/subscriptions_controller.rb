@@ -41,19 +41,30 @@ class Admin::SubscriptionsController < AdminController
   end
   
   def suspend
-    if request.post?
-      if period = params[:subscription][:state_expiry_period_in_days]
-        @subscription.suspend!(period.to_i)
-        flash[:notice] = "Subscription to #{@subscription.publication.name} for #{@subscription.user.name} suspended for #{period} days"
-        redirect_to search_admin_subscriptions_path
-      end
+    respond_to do |format|
+      format.js {
+        render :update do |page|
+          page.insert_html :bottom, 'content', :partial => 'suspend_dialog'
+          page['suspend-dialog'].dialog('open')
+        end
+      }
+      
+      format.html {
+        if request.post?
+          if period = params[:subscription][:state_expiry_period_in_days]
+            @subscription.suspend!(period.to_i)
+            flash[:notice] = "Subscription to #{@subscription.publication.name} for #{@subscription.user.name} suspended for #{period} days"
+            redirect_to :back
+          end
+        end
+      }
     end
   end
   
   def unsuspend
     @subscription.unsuspend!
     flash[:notice] = "Subscription to #{@subscription.publication.name} for #{@subscription.user.name} is now active"
-    redirect_to search_admin_subscriptions_path
+    redirect_to :back
   end
 
   def cancel

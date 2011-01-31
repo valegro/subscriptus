@@ -1,0 +1,26 @@
+<div id='suspend-dialog'>
+  <% form_for :subscription, :url => suspend_admin_subscription_path(@subscription), :builder => Reform::Builder, :html => { :id => "suspend-form", :class => "form" } do |f| %>
+    <%= f.text_field :state_expiry_period_in_days, :label => 'Number of days to suspend subscription', :size => 4 %>
+  <% end %>
+</div>
+<script>
+  $('#suspend-dialog').dialog({
+    title: "Suspend Subscription", 
+    autoOpen: false,
+    modal: true,
+    width: 350,
+    buttons: {
+      "Suspend": function() {
+        // Submit form
+        $(this).find('#suspend-form').submit();
+        $(this).dialog('close');
+      },
+      "Cancel": function() { 
+        $(this).dialog('close'); 
+      }
+    },
+    close: function() {
+      $(this).remove();
+    }
+  });
+</script>

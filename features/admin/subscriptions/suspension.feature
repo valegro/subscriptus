@@ -19,10 +19,11 @@ Feature: Suspend a subscription
     When I log in as admin "Homer"
     Given I am on admin subscription search page
   
+  @javascript
   Scenario: An admin can suspend a subscription
     Then I should see the following table rows:
     | Name    | State     | Renewal Due   |
-    | f01 l01 | active    | 29 days       |
+    | f01 l01 | active    | 30 days       |
     | f02 l02 | suspended | 2 months      |
     When I follow "Suspend"
      And I fill in "Number of days to suspend subscription" with "31"
@@ -30,6 +31,7 @@ Feature: Suspend a subscription
     Then I should see "Subscription to publication 01 for f01 l01 suspended for 31 days"
      And I should be on admin subscription search page
      And I should not see "active"
+
      And I should see the following table rows:
      | Name    | State     | Renewal Due |
      | f02 l02 | suspended | 2 months    |
@@ -42,8 +44,8 @@ Feature: Suspend a subscription
    And I should not see "suspended"
    And I should see the following table rows:
    | Name    | State  | Renewal Due |
-   | f01 l01 | active | 29 days     |
-   | f02 l02 | active | 29 days     |
+   | f01 l01 | active | 30 days     |
+   | f02 l02 | active | 30 days     |
 
   
   
