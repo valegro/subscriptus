@@ -16,6 +16,7 @@ module ActiveRecord
     class StateMachine
       # TODO: add to list of reserved words to eliminate trouble-making state names
       RESERVED_WORDS = %w(new)
+      attr_accessor :state_names
 
       def initialize(model, column_name, state_names, &block)
         @model = model

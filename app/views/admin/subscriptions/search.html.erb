@@ -13,7 +13,7 @@
       <label for="filter_name">Filters</label>
     </div>
     <div class="field-inner">
-      <%= select_tag('filter_name', options_for_select([ ['',''], ['Name','name'], ['Email','email'], ['Reference', 'id'],['Publication','publication'] ])) %>
+      <%= select_tag('filter_name', options_for_select([ ['',''], ['Name','name'], ['Email','email'], ['Reference', 'id'],['State','state'],['Publication','publication'] ])) %>
       <%= link_to_function('Add', 'add_selected_field(); disable_current_option()') %><br/>
     </div>
   </div>
@@ -111,8 +111,15 @@
     </div>
   </div>
   <div id="state_field">
-    <strong>state field</strong>
-    <%= link_to_function '[X]', "remove_field($('#state_field')); enable_option('state')", :id => 'remove_state_link' %>
+    <div class="field field-text">
+      <div class="field-label">
+        <%= label :search, :state %>
+      </div>
+      <div class="field-inner">
+        <%= collection_select :search, :state, Subscription.state_machines['state'].state_names, :to_s, :titleize %>
+        <%= link_to_function '[X]', "remove_field($('#state_field')); enable_option('state')", :id => 'remove_state_link' %>
+      </div>
+    </div>
   </div>
   <div id="renewal_field">
     <strong>renewal field</strong>

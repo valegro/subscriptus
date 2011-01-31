@@ -28,6 +28,7 @@ function filter_element_for(name) {
     case 'name':
     case 'email':
     case 'status':
+    case 'state':
     case 'renewal':
     case 'publication':
     case 'gift':
