@@ -13,7 +13,7 @@
       <label for="filter_name">Filters</label>
     </div>
     <div class="field-inner">
-      <%= select_tag('filter_name', options_for_select([ ['',''], ['Name','name'], ['Email','email'], ['Reference', 'id'],['State','state'],['Publication','publication'] ])) %>
+      <%= select_tag('filter_name', options_for_select([ ['',''], ['Name','name'], ['Email','email'], ['Reference', 'id'],['State','state'],['Publication','publication'], ['Gift','gift'] ])) %>
       <%= link_to_function('Add', 'add_selected_field(); disable_current_option()') %><br/>
     </div>
   </div>
@@ -70,7 +70,7 @@
       <% if @search.user_email_like %> add_field(filter_element_for('email')); disable_option('email'); <% end -%>
       <% if @search.state %> add_field(filter_element_for('state')); disable_option('state'); <% end -%>
       <% if @search.renewal %> add_field(filter_element_for('renewal')); disable_option('renewal'); <% end -%>
-      <% if @search.gift %> add_field(filter_element_for('gift')); disable_option('gift'); <% end -%>
+      <% if @search.gifts_id_is %> add_field(filter_element_for('gift')); disable_option('gift'); <% end -%>
     }
   );
 --></script>
@@ -137,8 +137,16 @@
     </div>
   </div>
   <div id="gift_field">
-    <strong>gift field</strong>
-    <%= link_to_function '[X]', "remove_field($(this).parent()); enable_option('gift')", :id => 'remove_gift_link' %>
+    <div class="field field-text">
+      <div class="field-label">
+
+        <%= label :search, :gift %>
+      </div>
+      <div class="field-inner">
+        <%= collection_select :search, :gifts_id_is, Gift.all, :id, :name %>
+        <%= link_to_function '[X]', "remove_field($('#gift_field')); enable_option('gift')", :id => 'remove_gift_link' %>
+      </div>
+    </div>
   </div>
   <div id="end_of_fields"></div>
 </div>
