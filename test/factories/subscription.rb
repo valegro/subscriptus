@@ -7,5 +7,5 @@ Factory.define :subscription do |s|
   s.created_at      Date.today.to_datetime
   s.state           { "trial" }
   s.price           30
-  s.gifts {|ap| [ap.association(:gift, :on_hand => 1)]}
+  s.gifts {|ap| [ap.association(:gift, :on_hand => 2)]}
 end

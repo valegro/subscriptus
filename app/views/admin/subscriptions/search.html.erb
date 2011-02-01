@@ -56,7 +56,7 @@
       row.email        result.user.try(:email)
       row.publication  result.publication.try(:name)
       row.state        result.state
-      row.renewal_due  result.expires_at ? [time_ago_in_words(result.expires_at), (Time.now.utc - result.expires_at ? 'ago' : 'from now')].join(' ')  : ''
+      row.renewal_due  result.expires_at ? [time_ago_in_words(result.expires_at), ((Time.now.utc - result.expires_at) < 0 ? 'ago' : 'from now')].join(' ')  : ''
       row.signed_up    result.created_at.try(:strftime, "%d/%m/%Y")
       row.actions do
         case 

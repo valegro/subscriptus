@@ -38,14 +38,18 @@ Feature: Suspend a subscription
      | f01 l01 | suspended | 2 months    |
   
   Scenario: An admin can un-suspend a subscription
-  When I follow "Unsuspend"
-  Then I should see "Subscription to publication 02 for f02 l02 is now active"
-   And I should be on admin subscription search page
-   And I should not see "suspended"
-   And I should see the following table rows:
-   | Name    | State  | Renewal Due |
-   | f01 l01 | active | 30 days     |
-   | f02 l02 | active | 30 days     |
+    Then subscription: "sub2" should have 1 gifts
+     And an order should exist with user: user "u01"
+    When I follow "Unsuspend"
+    Then I should see "Subscription to publication 02 for f02 l02 is now active"
+     And subscription: "sub2" should have 1 gifts
+     And 1 orders should exist with user: user "u01"
+     And I should be on admin subscription search page
+     And I should not see "suspended"
+     And I should see the following table rows:
+     | Name    | State  | Renewal Due |
+     | f01 l01 | active | 30 days     |
+     | f02 l02 | active | 30 days     |
 
   
   

@@ -12,8 +12,8 @@ Feature: Subscription search
       And an offer: "o02" exists with publication: publication "p02"
       And a user: "u01" exists with firstname: "f01", lastname: "l01", email: "u01@example.com", email_confirmation: "u01@example.com"
       And a user: "u02" exists with firstname: "f02", lastname: "l02", email: "u02@example.com", email_confirmation: "u02@example.com"
-      And a subscription: "s01" exists with publication: publication "p01", user: user "u01", state: "trial", created_at: "2011-01-01"
-      And a subscription exists with publication: publication "p02", user: user "u02", state: "active"
+      And a subscription: "s01" exists with publication: publication "p01", user: user "u01", state: "trial", created_at: "2011-01-01", expires_at: "2011-12-05"
+      And a subscription exists with publication: publication "p02", user: user "u02", state: "active", expires_at: "2011-12-05"
       And a subscription_gift exists with subscription: subscription "s01", gift: gift "g01"
      When I log in as admin "Homer"
 
@@ -102,8 +102,8 @@ Feature: Subscription search
     Given I am on admin subscription search page
     When I select "Renewal Due" from "filter_name"
       And I follow "Add"
-      And I select "2010-12-05" as the "From" date
-      And I select "2010-12-06" as the "until" date
+      And I select "2011-12-05" as the "From" date
+      And I select "2011-12-06" as the "until" date
       And I press "Search"
      Then I should see "u01@example.com"
       And I should see "u02@example.com"
@@ -114,7 +114,7 @@ Feature: Subscription search
     Given I am on admin subscription search page
      When I select "Renewal Due" from "filter_name"
       And I follow "Add"
-      And I select "2010-12-05" as the "From" date
+      And I select "2011-12-05" as the "From" date
       And I press "Search"
      Then I should see "u01@example.com"
       And I should see "u02@example.com"
@@ -125,7 +125,7 @@ Feature: Subscription search
     Given I am on admin subscription search page
      When I select "Renewal Due" from "filter_name"
       And I follow "Add"
-      And I select "2010-12-05" as the "until" date
+      And I select "2011-12-05" as the "until" date
       And I press "Search"
      Then I should see "u01@example.com"
       And I should see "u02@example.com"
@@ -136,8 +136,8 @@ Feature: Subscription search
     Given I am on admin subscription search page
     When I select "Renewal Due" from "filter_name"
       And I follow "Add"
-      And I select "2010-12-06" as the "From" date
-      And I select "2010-12-06" as the "until" date
+      And I select "2011-12-06" as the "From" date
+      And I select "2011-12-06" as the "until" date
       And I press "Search"
       Then I should not see "u01@example.com"
        And I should not see "u02@example.com"
@@ -151,22 +151,19 @@ Feature: Subscription search
       And I select "2011-01-01" as the "From" date
       And I select "2011-01-02" as the "until" date
       And I press "Search"
-    Then I should see "trial"
-      And I should see "u01@example.com"
-      And I should not see "active"
+     Then I should see "u01@example.com"
       And I should see "Displaying 1 subscription"
 
   @javascript
   Scenario: An admin searches with a signup date filter the before date set
     Given I am on admin subscription search page
-    When I select "Signup Date" from "filter_name"
+     When I select "Signup Date" from "filter_name"
       And I follow "Add"
       And I select "2011-01-01" as the "From" date
       And I press "Search"
-    Then I should see "trial"
-      And I should see "u01@example.com"
-      And I should not see "active"
-      And I should see "Displaying 1 subscription"
+     Then I should see "u01@example.com"
+      And I should see "u02@example.com"
+      And I should see "Displaying all 2 subscriptions"
 
   @javascript
   Scenario: An admin searches with a signup date filter the until date set
@@ -175,9 +172,8 @@ Feature: Subscription search
       And I follow "Add"
       And I select "2011-01-02" as the "until" date
       And I press "Search"
-     Then I should see "u01@example.com"
-      And I should see "u02@example.com"
-      And I should see "Displaying all 2 subscriptions"
+      Then I should see "u01@example.com"
+       And I should see "Displaying 1 subscription"
 
   @javascript
   Scenario: An admin searches with a signup date filter with both dates set and no results
@@ -317,9 +313,9 @@ Feature: Subscription search
     And I follow "Publication"
     #TODO: We have to specify what time zone we use to display time.
     Then I should see the following "search_results" table:
-      | Name    | Email           | ▲ Publication  | State  | Renewal Due |
-      | f01 l01 | u01@example.com | publication 01 | trial  | 30 days     |
-      | f02 l02 | u02@example.com | publication 02 | active | 30 days     |
+      | Name    | Email           | ▲ Publication  | State  |
+      | f01 l01 | u01@example.com | publication 01 | trial  |
+      | f02 l02 | u02@example.com | publication 02 | active |
 
   Scenario: An admin sorts search results by publication desc
     Given I am on admin subscription search page
