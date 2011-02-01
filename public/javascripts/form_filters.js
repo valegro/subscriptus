@@ -32,6 +32,7 @@ function filter_element_for(name) {
     case 'renewal':
     case 'publication':
     case 'gift':
+    case 'created_at':
       return $('#' + name + '_field');
     case '':
       return $('');

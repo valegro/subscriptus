@@ -12,24 +12,24 @@ Feature: Subscription search
       And an offer: "o02" exists with publication: publication "p02"
       And a user: "u01" exists with firstname: "f01", lastname: "l01", email: "u01@example.com", email_confirmation: "u01@example.com"
       And a user: "u02" exists with firstname: "f02", lastname: "l02", email: "u02@example.com", email_confirmation: "u02@example.com"
-      And a subscription: "s01" exists with publication: publication "p01", user: user "u01", state: "trial"
+      And a subscription: "s01" exists with publication: publication "p01", user: user "u01", state: "trial", created_at: "2011-01-01"
       And a subscription exists with publication: publication "p02", user: user "u02", state: "active"
       And a subscription_gift exists with subscription: subscription "s01", gift: gift "g01"
-    When I log in as admin "Homer"
+     When I log in as admin "Homer"
 
   @javascript
   Scenario: An admin adds publication field to search form
     Given I am on admin subscription search page
-      When I select "Publication" from "filter_name"
+     When I select "Publication" from "filter_name"
       And I follow "Add"
-    Then I should see "Publication" within "form div label"
+     Then I should see "Publication" within "form div label"
 
   @javascript
   Scenario: An admin adds name field to search form
     Given I am on admin subscription search page
-      When I select "Name" from "filter_name"
+     When I select "Name" from "filter_name"
       And I follow "Add"
-    Then I should see "Name" within "form div label"
+     Then I should see "Name" within "form div label"
 
   @javascript
   Scenario: An admin adds email field to search form
@@ -60,6 +60,20 @@ Feature: Subscription search
      Then I should see "State" within "form div label"
 
   @javascript
+  Scenario: An admin adds signup date fields to search form
+  Given I am on admin subscription search page
+   When I select "Signup Date" from "filter_name"
+    And I follow "Add"
+   Then I should see "Signup Date" within "form div label"
+
+  @javascript
+  Scenario: An admin adds renewal date fields to search form
+   Given I am on admin subscription search page
+    When I select "Renewal Due" from "filter_name"
+     And I follow "Add"
+    Then I should see "Renewal Due" within "form div label"
+
+  @javascript
   Scenario: An admin searches with a publication filter
     Given I am on admin subscription search page
     When I select "Publication" from "filter_name"
@@ -74,14 +88,108 @@ Feature: Subscription search
   @javascript
   Scenario: An admin searches with a gift filter
     Given I am on admin subscription search page
-    When I select "Gift" from "filter_name"
+     When I select "Gift" from "filter_name"
       And I follow "Add"
       And I select "gift 01" from "search_gifts_id_is"
+      And I press "Search"
+     Then I should see "trial"
+      And I should see "u01@example.com"
+      And I should not see "active"
+      And I should see "Displaying 1 subscription"
+
+  @javascript
+  Scenario: An admin searches with a renewal date filter with both dates set
+    Given I am on admin subscription search page
+    When I select "Renewal Due" from "filter_name"
+      And I follow "Add"
+      And I select "2010-12-05" as the "From" date
+      And I select "2010-12-06" as the "until" date
+      And I press "Search"
+     Then I should see "u01@example.com"
+      And I should see "u02@example.com"
+      And I should see "Displaying all 2 subscriptions"
+       
+  @javascript
+  Scenario: An admin searches with a renewal date filter the before date set
+    Given I am on admin subscription search page
+     When I select "Renewal Due" from "filter_name"
+      And I follow "Add"
+      And I select "2010-12-05" as the "From" date
+      And I press "Search"
+     Then I should see "u01@example.com"
+      And I should see "u02@example.com"
+      And I should see "Displaying all 2 subscriptions"
+       
+  @javascript
+  Scenario: An admin searches with a renewal date filter the until date set
+    Given I am on admin subscription search page
+     When I select "Renewal Due" from "filter_name"
+      And I follow "Add"
+      And I select "2010-12-05" as the "until" date
+      And I press "Search"
+     Then I should see "u01@example.com"
+      And I should see "u02@example.com"
+      And I should see "Displaying all 2 subscriptions"
+
+  @javascript
+  Scenario: An admin searches with a renewal date filter with both dates set and no results
+    Given I am on admin subscription search page
+    When I select "Renewal Due" from "filter_name"
+      And I follow "Add"
+      And I select "2010-12-06" as the "From" date
+      And I select "2010-12-06" as the "until" date
+      And I press "Search"
+      Then I should not see "u01@example.com"
+       And I should not see "u02@example.com"
+       And I should see "No entries found"
+
+  @javascript
+  Scenario: An admin searches with a signup date filter with both dates set
+    Given I am on admin subscription search page
+    When I select "Signup Date" from "filter_name"
+      And I follow "Add"
+      And I select "2011-01-01" as the "From" date
+      And I select "2011-01-02" as the "until" date
       And I press "Search"
     Then I should see "trial"
       And I should see "u01@example.com"
       And I should not see "active"
       And I should see "Displaying 1 subscription"
+
+  @javascript
+  Scenario: An admin searches with a signup date filter the before date set
+    Given I am on admin subscription search page
+    When I select "Signup Date" from "filter_name"
+      And I follow "Add"
+      And I select "2011-01-01" as the "From" date
+      And I press "Search"
+    Then I should see "trial"
+      And I should see "u01@example.com"
+      And I should not see "active"
+      And I should see "Displaying 1 subscription"
+
+  @javascript
+  Scenario: An admin searches with a signup date filter the until date set
+    Given I am on admin subscription search page
+    When I select "Signup Date" from "filter_name"
+      And I follow "Add"
+      And I select "2011-01-02" as the "until" date
+      And I press "Search"
+     Then I should see "u01@example.com"
+      And I should see "u02@example.com"
+      And I should see "Displaying all 2 subscriptions"
+
+  @javascript
+  Scenario: An admin searches with a signup date filter with both dates set and no results
+    Given I am on admin subscription search page
+    When I select "Signup Date" from "filter_name"
+      And I follow "Add"
+      And I select "2011-01-02" as the "From" date
+      And I select "2011-01-02" as the "until" date
+      And I press "Search"
+    Then I should not see "trial"
+      And I should not see "u01@example.com"
+      And I should see "No entries found"
 
   @javascript
   Scenario: An admin searches with a name filter

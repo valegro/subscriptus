@@ -19,4 +19,5 @@ module Admin::SubscriptionsHelper
       link_to(event.humanize, send("#{event}_admin_subscription_path", subscription), :confirm => "Are you sure you want to #{event} this subscription?")
     end
   end
+
 end

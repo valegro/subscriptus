@@ -6,14 +6,22 @@
 
 <h2>Filters</h2>
 <% form_for @search, :html => { :id => 'searchform', :class => 'form' }, :builder => Reform::Builder do |f| %>
-  <% # TODO: add ['State','state'], ['Renewal Due','renewal'], ['Gift','gift']
-  %>
   <div class="field field-text" id="filter_block">
     <div class="field-label">
       <label for="filter_name">Filters</label>
     </div>
     <div class="field-inner">
-      <%= select_tag('filter_name', options_for_select([ ['',''], ['Name','name'], ['Email','email'], ['Reference', 'id'],['State','state'],['Publication','publication'], ['Gift','gift'] ])) %>
+      <%= select_tag('filter_name', options_for_select([ 
+        ['',''], 
+        ["Email", "email"], 
+        ["Gift", "gift"], 
+        ["Name", "name"], 
+        ["Publication", "publication"], 
+        ["Reference", "id"],
+        ["Renewal Due", "renewal"],
+        ["Signup Date", "created_at"],
+        ["State", "state"]
+        ])) %>
       <%= link_to_function('Add', 'add_selected_field(); disable_current_option()') %><br/>
     </div>
   </div>
@@ -48,7 +56,7 @@
       row.email        result.user.try(:email)
       row.publication  result.publication.try(:name)
       row.state        result.state
-      row.renewal_due  result.expires_at ? time_ago_in_words(result.expires_at) : ''
+      row.renewal_due  result.expires_at ? [time_ago_in_words(result.expires_at), (Time.now.utc - result.expires_at ? 'ago' : 'from now')].join(' ')  : ''
       row.signed_up    result.created_at.try(:strftime, "%d/%m/%Y")
       row.actions do
         case 
@@ -69,8 +77,9 @@
       <% if @search.user_firstname_or_user_lastname_like %> add_field(filter_element_for('name')); disable_option('name'); <% end -%>
       <% if @search.user_email_like %> add_field(filter_element_for('email')); disable_option('email'); <% end -%>
       <% if @search.state %> add_field(filter_element_for('state')); disable_option('state'); <% end -%>
-      <% if @search.renewal %> add_field(filter_element_for('renewal')); disable_option('renewal'); <% end -%>
+      <% if @search.expires_at_gte || @search.expires_at_lte %> add_field(filter_element_for('renewal')); disable_option('renewal'); <% end -%>
       <% if @search.gifts_id_is %> add_field(filter_element_for('gift')); disable_option('gift'); <% end -%>
+      <% if @search.created_at_gte || @search.created_at_lte %> add_field(filter_element_for('created_at')); disable_option('created_at'); <% end -%>
     }
   );
 --></script>
@@ -83,7 +92,7 @@
       </div>
       <div class="field-inner">
         <%= text_field :search, :id, :value => Subscription.format_reference(@search.id) %>
-        <%= link_to_function '[X]', "remove_field($('#id_field')); enable_option('id')", :id => 'remove_name_link' %>
+        <%= link_to_function '[X]', "remove_field($('#id_field')); enable_option('id')", :id => 'remove_id_link' %>
       </div>
     </div>
   </div>
@@ -122,8 +131,19 @@
     </div>
   </div>
   <div id="renewal_field">
-    <strong>renewal field</strong>
-    <%= link_to_function '[X]', "remove_field($('#renewal_field')); enable_option('renewal')", :id => 'remove_renewal_link' %>
+    <div class="field field-text">
+      <div class="field-label">
+
+        <%= label :search, :expires_at_gte, 'Renewal Due' %>
+      </div>
+      <div class="field-inner">
+        <%= label :search, :expires_at_gte, 'From' %>
+        <%= date_select :search, :expires_at_gte, :include_blank => true %>
+        <%= label :search, :expires_at_lte, 'until' %>
+        <%= date_select :search, :expires_at_lte, :include_blank => true %>
+        <%= link_to_function '[X]', "remove_field($('#renewal_field')); enable_option('renewal')", :id => 'remove_renewal_link' %>
+      </div>
+    </div>
   </div>
   <div id="publication_field">
     <div class="field field-text">
@@ -148,5 +168,22 @@
       </div>
     </div>
   </div>
-  <div id="end_of_fields"></div>
+  <div id="created_at_field">
+    <div class="field field-text">
+      <div class="field-label">
+
+        <%= label :search, :created_at, 'Signup Date' %>
+      </div>
+      <div class="field-inner">
+
+        <%= label :search, :created_at_gte, 'From' %>
+        <%= date_select :search, :created_at_gte, :include_blank => true %>
+        <%= label :search, :created_at_lte, 'until' %> 
+        <%= date_select :search, :created_at_lte, :include_blank => true %>
+
+        <%= link_to_function '[X]', "remove_field($('#created_at_field')); enable_option('created_at')", :id => 'remove_created_at_link' %>
+      </div>
+    </div>
+  </div>
+  <div id="end_of_fields"/>
 </div>
