@@ -140,7 +140,7 @@
     <div class="field field-text">
       <div class="field-label">
 
-        <%= label :search, :gift %>
+        <%= label :search, :gifts_id_is, 'Gift' %>
       </div>
       <div class="field-inner">
         <%= collection_select :search, :gifts_id_is, Gift.all, :id, :name %>
