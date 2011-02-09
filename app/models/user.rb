@@ -40,6 +40,11 @@ class User < ActiveRecord::Base
     # Default to subscriber role
     self.role ||= 'subscriber'
   end
+  
+  # Allow authlogic to find a user by login or email
+  def self.find_by_login_or_email(login)
+     find_by_login(login) || find_by_email(login)
+  end
 
   # Used by the Unbounce Webhook
   def self.find_or_create_with_trial(publication, trial_period_in_days, referrer, user_attributes)

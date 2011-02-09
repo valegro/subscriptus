@@ -10,7 +10,6 @@ module ApplicationHelper
 
   def paginate(object, opts={})
     opts[:position] = :top unless opts.has_key?(:position)
-    # opts[:renderer] ||= "PaginatorCustomRenderer"
     opts[:renderer] ||= "WillPaginate::LinkRenderer"
     page_entries_opts = {}
     page_entries_opts[:entry_name] = opts.delete(:entry_name) if opts.has_key?(:entry_name)
