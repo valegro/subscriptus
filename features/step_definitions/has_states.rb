@@ -7,3 +7,11 @@ Given(/^cancel #{capture_model} existing(?: with #{capture_fields})?$/) do |name
   s.state = "cancelled"
   s.save!
 end
+
+Then(/^#{capture_model} state should be "([^"]*)"$/) do |name, state|
+  model!(name).send("#{state}?".to_sym).should == true
+end
+
+Given(/^#{capture_model} has state: "([^"]*)"$/) do |name, state|
+  model!(name).update_attributes(:state => state)
+end
