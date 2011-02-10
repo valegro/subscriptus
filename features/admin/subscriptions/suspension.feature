@@ -22,9 +22,10 @@ Feature: Suspend a subscription
   @javascript
   Scenario: An admin can suspend a subscription
     Then I should see the following table rows:
-    | Name    | State     | Renewal Due   |
-    | f01 l01 | active    | 30 days       |
-    | f02 l02 | suspended | 2 months      |
+    | Name    | State     | Renewal Due       |
+    | f01 l01 | active    | 30 days from now  |
+    | f02 l02 | suspended | 2 months from now |
+
     When I follow "Suspend"
      And I fill in "Number of days to suspend subscription" with "31"
      And I press "Suspend"
@@ -33,9 +34,10 @@ Feature: Suspend a subscription
      And I should not see "active"
 
      And I should see the following table rows:
-     | Name    | State     | Renewal Due |
-     | f02 l02 | suspended | 2 months    |
-     | f01 l01 | suspended | 2 months    |
+     | Name    | State     | Renewal Due       |
+     | f02 l02 | suspended | 2 months from now |
+     | f01 l01 | suspended | 2 months from now |
+
   
   Scenario: An admin can un-suspend a subscription
     Then subscription: "sub2" should have 1 gifts
@@ -47,9 +49,10 @@ Feature: Suspend a subscription
      And I should be on admin subscription search page
      And I should not see "suspended"
      And I should see the following table rows:
-     | Name    | State  | Renewal Due |
-     | f01 l01 | active | 30 days     |
-     | f02 l02 | active | 30 days     |
+     | Name    | State  | Renewal Due      |
+     | f01 l01 | active | 30 days from now |
+     | f02 l02 | active | 30 days from now |
+
 
   
   
