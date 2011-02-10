@@ -1,5 +1,7 @@
 class Order < ActiveRecord::Base
   belongs_to :user
+  belongs_to :subscription
+  
   has_many :order_items
   has_many :gifts, :through => :order_items, :before_add => :check_gift_on_hand, :after_add => :decrement_gift_on_hand
 

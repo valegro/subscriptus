@@ -12,4 +12,11 @@ class Admin::OrdersController < AdminController
   def delayed
     @orders = Order.delayed.oldest_first.paginate(:page => params[:page] || 1, :include => :gifts)
   end
+  
+  def show
+    @order = Order.find(params[:id])
+    # TODO: Raise error on missing user?
+    @user = @order.user || User.build(:name => 'Missing User')
+  end
+  
 end

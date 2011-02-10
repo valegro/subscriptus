@@ -10,6 +10,7 @@ class Subscription < ActiveRecord::Base
   has_many :log_entries, :class_name => "SubscriptionLogEntry"
   has_many :subscription_gifts, :dependent => :destroy
   has_many :payments, :autosave => true
+  has_many :orders
   
   has_many :gifts, :through => :subscription_gifts do
     # add an array of gifts
