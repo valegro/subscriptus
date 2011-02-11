@@ -6,6 +6,7 @@ Feature: Orders
   Background:
     Given an admin: "Homer" exists
       And a user "Marge" exists with firstname: "Marge", lastname: "Simpson"
+
       And a gift "the gift" exists with name: "A case of Duff Beer"
       And an offer "the offer" exists with name: "Springfield Weekly (12 Month Subscription)"
       And a gift offer exists with gift: gift "the gift", offer: offer "the offer"
@@ -32,13 +33,14 @@ Feature: Orders
 
   @javascript
   Scenario: An admin can mark a delayed gift order as fulfilled
-   Given an order exists with state: "delayed", user: user "Marge"
+    Given a user "Bart" exists with firstname: "Bart", lastname: "Simpson"
+    And an order: "Bart's order" exists with state: "delayed", user: user "Bart"
     When I go to the delayed admin orders page
     When I follow "Fulfill" and click OK
-    Then the order state should be "completed"
+    Then the order "Bart's order" state should be "completed"
      And I should see "There are currently no records."
     When I follow "Completed"
-    Then I should see "Marge Simpson"
+    Then I should see "Bart Simpson"
 
   
   
