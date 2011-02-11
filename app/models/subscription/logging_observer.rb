@@ -21,7 +21,11 @@ class Subscription::LoggingObserver < ActiveRecord::Observer
       end
     end
     if subscription.expires_at_changed?
-      attributes[:description] = "Expiry Date set to #{subscription.changes['expires_at'].last.strftime("%d/%m/%y")}"
+      if subscription.expires_at
+        attributes[:description] = "Expiry Date set to #{subscription.changes['expires_at'].last.strftime("%d/%m/%y")}"
+      else
+        attributes[:description] = "Expiry Date set to nil!"
+      end
     end
     subscription.log_entries.create(attributes) unless attributes.empty?
   end

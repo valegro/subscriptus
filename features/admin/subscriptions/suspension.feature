@@ -13,15 +13,16 @@ Feature: Suspend a subscription
       And a user: "u02" exists with firstname: "f02", lastname: "l02", email: "u02@example.com", email_confirmation: "u02@example.com"
       And a subscription: "sub1" exists with publication: publication "p01", user: user "u01", state: "active"
       And a subscription: "sub2" exists with publication: publication "p02", user: user "u02", state: "suspended"
-      And subscription "sub1" expires in "30" days
+
       And subscription "sub2" expires in "61" days
       And subscription "sub2"'s current state expires in "30" days
-    When I log in as admin "Homer"
-    Given I am on admin subscription search page
+     When I log in as admin "Homer"
   
   @javascript
   Scenario: An admin can suspend a subscription
-    Then I should see the following table rows:
+    Given subscription "sub1" expires in "30" days
+    When I go to admin subscription search page
+    Then I should see the following table rows in any order:
     | Name    | State     | Renewal Due       |
     | f01 l01 | active    | 30 days from now  |
     | f02 l02 | suspended | 2 months from now |
@@ -38,11 +39,16 @@ Feature: Suspend a subscription
      | f02 l02 | suspended | 2 months from now |
      | f01 l01 | suspended | 2 months from now |
 
+  Scenario: An admin cannot suspend a subscription without an expiry date
+     When I go to admin subscription search page
+     Then I should not see "Suspend" within "a"
   
   Scenario: An admin can un-suspend a subscription
+    Given subscription "sub1" expires in "30" days  
     Then subscription: "sub2" should have 1 gifts
      And an order should exist with user: user "u01"
-    When I follow "Unsuspend"
+    When I go to admin subscription search page 
+     And I follow "Unsuspend"
     Then I should see "Subscription to publication 02 for f02 l02 is now active"
      And subscription: "sub2" should have 1 gifts
      And 1 orders should exist with user: user "u01"

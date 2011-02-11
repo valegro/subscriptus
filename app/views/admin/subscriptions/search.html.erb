@@ -60,7 +60,7 @@
       row.signed_up    result.created_at.try(:strftime, "%d/%m/%Y")
       row.actions do
         case 
-        when result.active?
+        when result.active?  && result.expires_at
           link_to_remote 'Suspend', :url => suspend_admin_subscription_path(result), :method => :get
         when result.suspended?
           link_to 'Unsuspend', unsuspend_admin_subscription_path(result), :method => :post

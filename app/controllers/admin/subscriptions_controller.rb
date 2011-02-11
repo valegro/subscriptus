@@ -9,6 +9,7 @@ class Admin::SubscriptionsController < AdminController
   end
 
   def search
+
     if params[:search] && params[:search].has_key?(:id)
       params[:search][:id] = Subscription.id_from_reference(params[:search][:id])
     end
@@ -41,22 +42,22 @@ class Admin::SubscriptionsController < AdminController
   
   def suspend
     respond_to do |format|
-      format.js {
-        render :update do |page|
-          page.insert_html :bottom, 'content', :partial => 'suspend_dialog'
-          page['suspend-dialog'].dialog('open')
-        end
-      }
-      
-      format.html {
-        if request.post?
-          if period = params[:subscription][:state_expiry_period_in_days]
-            @subscription.suspend!(period.to_i)
-            flash[:notice] = "Subscription to #{@subscription.publication.name} for #{@subscription.user.name} suspended for #{period} days"
-            redirect_to :back
+      unless request.post?
+        format.js {
+          render :update do |page|
+            page.insert_html :bottom, 'content', :partial => 'suspend_dialog'
+            page['suspend-dialog'].dialog('open')
           end
+        }
+      else
+        format.html {
+        if period = params[:subscription][:state_expiry_period_in_days]
+          @subscription.suspend!(period.to_i)
+          flash[:notice] = "Subscription to #{@subscription.publication.name} for #{@subscription.user.name} suspended for #{period} days"
+          redirect_to :back
         end
-      }
+        }
+      end
     end
   end
   
