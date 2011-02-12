@@ -10,7 +10,7 @@ task :to_production do
   set :user, "root"
   set :password, "zxnm9014"
   set :prod_db, "subscriptus"
-  set :db_hostname, "zebra.crikey.com.au"
+  set :db_hostname, "localhost"
   set :db_port, 3306
 
   role :app, "deploy@zebra.crikey.com.au"
