@@ -7,28 +7,16 @@ set :shared_dir, "shared"
 set :use_sudo, false
 set :git_enable_submodules, 1
 
-task :to_staging do 
-  set :user, "subscriptus"
-  set :password, "12qwaszx"
-  set :prod_db, "subscriptus_staging"
-  set :db_hostname, "db01.mel.blox.net.au"
-  set :db_port, 5441
-
-  role :app, "deploy@subscriptus.staging.blox.net.au"
-  role :web, "deploy@subscriptus.staging.blox.net.au"
-  role :db,  "deploy@subscriptus.staging.blox.net.au", :primary => true
-end
-
 task :to_production do 
-  set :user, "subscriptus"
-  set :password, "12qwaszx"
-  set :prod_db, "subscriptus_production"
-  set :db_hostname, "db01.mel.blox.net.au"
-  set :db_port, 5441
+  set :user, "root"
+  set :password, "zxnm9014"
+  set :prod_db, "subscriptus"
+  set :db_hostname, "zebra.crikey.com.au"
+  set :db_port, 3306
 
-  role :app, "deploy@subscriptus"
-  role :web, "deploy@subscriptus"
-  role :db,  "deploy@subscriptus", :primary => true
+  role :app, "deploy@zebra.crikey.com.au"
+  role :web, "deploy@zebra.crikey.com.au"
+  role :db,  "deploy@zebra.crikey.com.au", :primary => true
 end
 
 namespace :bundler do

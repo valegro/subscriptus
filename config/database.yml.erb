@@ -16,15 +16,7 @@ test:
 
 production:
   database: <%= prod_db %>
-  adapter: postgresql
-  host: <%= db_hostname %>
-  username: <%= user %>
-  password: <%= password %>
-  port: <%= db_port %>
-
-aps:
-  database: <%= prod_db %>
-  adapter: postgresql
+  adapter: mysql
   host: <%= db_hostname %>
   username: <%= user %>
   password: <%= password %>
