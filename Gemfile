@@ -3,7 +3,9 @@ gem "rails", "2.3.9"
 gem "ruby-debug"
 
 # Postgres support
-gem 'pg'
+group :postgres do
+  gem 'pg'
+end
 
 # These are "core" gems we always use
 gem 'authlogic'
