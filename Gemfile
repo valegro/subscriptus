@@ -7,6 +7,10 @@ group :postgres do
   gem 'pg'
 end
 
+group :mysql do
+  gem 'mysql'
+end
+
 # These are "core" gems we always use
 gem 'authlogic'
 gem 'searchlogic'

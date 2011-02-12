@@ -27,7 +27,7 @@ namespace :bundler do
   
   task :bundle_new_release, :roles => :app do
     bundler.create_symlink
-    #run "cd #{release_path} && bundle install --without test cucumber"
+    run "cd #{release_path} && bundle install --without test cucumber postgres --path ~/apps/subscriptus/shared/bundle/"
   end
 end
 
@@ -41,9 +41,6 @@ task :after_setup do
 end
 
 after "deploy:symlink" do
-
-  # Install any required gems
-  # run "#{sudo} /usr/bin/rake gems:install RAILS_ENV=production"
 
   template = File.read("config/database.yml.erb")
   database_configuration = ERB.new(template).result(binding)
