@@ -24,6 +24,11 @@ class ApplicationController < ActionController::Base
       redirect_to login_url
     end
   end
+  
+  def csv_response_headers(filename=nil)
+    response.headers['Content-type'] = 'text/csv' 
+    response.headers['Content-disposition'] = "attachment"
+  end
  
   protected
     def current_user_session

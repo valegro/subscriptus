@@ -1,0 +1,6 @@
+<%
+  csv << table_headers.map { |header| header[:label]}
+  rows.each do |row|
+    csv << table_headers.map { |header| row[header[:sym]] }
+  end
+%>

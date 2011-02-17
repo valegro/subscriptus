@@ -1,0 +1,9 @@
+<%= FasterCSV.generate(csv_opts) do |csv| 
+  if groups.empty? 
+    render :partial => 'shared/tables/default_inner', :locals => { :csv => csv, :table_headers => table_headers, :rows => rows }
+  else
+    groups.each do |group|
+      render :partial => 'shared/tables/default_inner', :locals => { :csv => csv, :table_headers => group[:table_headers], :rows => group[:rows] }
+    end
+  end
+end %>

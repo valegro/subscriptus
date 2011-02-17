@@ -1,0 +1,30 @@
+<%= render_table(orders, :csv_opts => {:col_sep => ",", :row_sep => "\r\n"}) do |t|
+  t.header :email
+  t.header :first_name
+  t.header :last_name
+  t.header :subscription
+  t.header :date_processed
+  t.header :company
+  t.header :address_1
+  t.header :address_2
+  t.header :city
+  t.header :state
+  t.header :postal_code
+  t.header :country
+  t.header :gift
+  
+  t.rows do |row, order, idx|
+    row.email         order.user.email
+    row.first_name    order.user.firstname
+    row.last_name     order.user.lastname
+    row.subscription  order.try(:subscription).try(:publication).try(:name)
+    
+    row.date_processed  l(order.created_at, :format => "%d/%m/%Y %H:%m")
+    %w(company address_1 address_2 city state country).each do |column_name|
+      row.send(column_name, order.user.send(column_name))
+    end
+    row.state         order.user.state.to_s.upcase
+    row.postal_code   order.user.postcode
+    row.gift          order.gifts.map(&:name).join(';')
+  end
+end -%>

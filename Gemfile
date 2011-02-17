@@ -11,6 +11,8 @@ group :mysql do
   gem 'mysql'
 end
 
+gem 'fastercsv'
+
 # These are "core" gems we always use
 gem 'authlogic'
 gem 'searchlogic'

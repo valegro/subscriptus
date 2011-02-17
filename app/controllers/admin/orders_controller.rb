@@ -5,6 +5,14 @@ class Admin::OrdersController < AdminController
   
   def index
     find_orders(:pending)
+    respond_to do |wants|
+      wants.html
+      wants.csv {
+        csv_response_headers('pending_orders.csv')
+        @orders = Order.pending.newest_first
+        render :partial => "orders", :locals => {:orders => @orders}
+      }
+    end
   end
 
   def completed
