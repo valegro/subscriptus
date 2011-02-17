@@ -8,15 +8,23 @@ Feature: Orders
       And a user "Marge" exists with firstname: "Marge", lastname: "Simpson"
 
       And a gift "the gift" exists with name: "A case of Duff Beer"
-      And an offer "the offer" exists with name: "Springfield Weekly (12 Month Subscription)"
+      And a publication "the pub" exists with name: "Springfield Weekly"
+      And an offer "the offer" exists with name: "Springfield Weekly (12 Month Subscription)", publication: publication "the pub"
       And a gift offer exists with gift: gift "the gift", offer: offer "the offer"
-      And a subscription "the sub" exists with offer: offer "the offer", user: user "Marge"
+      And a subscription "the sub" exists with offer: offer "the offer", user: user "Marge", publication: publication "the pub"
       And a subscription gift exists with gift: gift "the gift", subscription: subscription "the sub"
       And the subscription is activated
      Then an order: "the order" should exist
      When I log in as admin "Homer"
       And I go to the admin orders page
-        
+  
+  Scenario: An admin can download a CSV of pending orders
+    When I follow "Export as CSV"
+    Then I should see "Marge"
+     And I should see "Simpson"
+     And I should see "Springfield Weekly"
+     And I should see "A case of Duff Beer"
+  
   Scenario: An admin can view a gift order
     When I follow "View"
     Then I should see "Marge Simpson"

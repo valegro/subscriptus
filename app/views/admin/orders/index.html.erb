@@ -1,6 +1,7 @@
 <div class="title">
   <%= content_tag :h2, "Pending Orders" %>
   <div class="actions">
+    <%= link_to "Export as CSV", admin_orders_path(:format => :csv), :class => "download" %>
   </div>
 </div>
 

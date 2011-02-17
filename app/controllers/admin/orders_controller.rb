@@ -47,7 +47,6 @@ class Admin::OrdersController < AdminController
   def delay
     @order.delay!
     find_orders(params[:order_scope])
-    
     respond_to do |wants|
       wants.html {
         redirect_to admin_order_path(@order)
