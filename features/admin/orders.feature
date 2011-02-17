@@ -23,10 +23,20 @@ Feature: Orders
      And I should see "Springfield Weekly (12 Month Subscription)"
      And I should see "A case of Duff Beer"
   
+  Scenario: An admin can view and then fulfill a gift order
+    When I follow "View"
+     And I follow "Fulfill" and click OK
+    Then the order state should be "completed"
+      
+  Scenario: An admin can view and then delay a gift order
+    When I follow "View"
+     And I follow "Delay" and click OK
+    Then the order state should be "delayed"
+  
   @javascript
   Scenario: An admin can mark a pending gift order as fulfilled
     When I follow "Fulfill" and click OK
-     And the order state should be "completed"
+    Then the order state should be "completed"
      And I should see "There are currently no records."
     When I follow "Completed"
     Then I should see "Marge Simpson"
@@ -41,7 +51,13 @@ Feature: Orders
      And I should see "There are currently no records."
     When I follow "Completed"
     Then I should see "Bart Simpson"
-
+    
+  Scenario: An admin can mark a pending gift order as delayed
+    When I follow "Delay" and click OK
+    Then the order state should be "completed"
+     And I should see "There are currently no records."
+    When I follow "Delayed"
+    Then I should see "Marge Simpson"
   
   
   
