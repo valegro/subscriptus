@@ -81,6 +81,7 @@ GEM
     mocha (0.9.10)
       rake
     mover (0.3.6)
+    mysql (2.8.1)
     navigasmic (0.5.5)
     net-scp (1.0.4)
       net-ssh (>= 1.99.1)
@@ -163,6 +164,7 @@ DEPENDENCIES
   launchy
   mechanize
   mocha (~> 0.9.8)
+  mysql
   navigasmic
   pg
   pickle

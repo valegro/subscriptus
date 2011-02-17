@@ -9,7 +9,7 @@ Given(/^cancel #{capture_model} existing(?: with #{capture_fields})?$/) do |name
 end
 
 Then(/^#{capture_model} state should be "([^"]*)"$/) do |name, state|
-  model!(name).send("#{state}?".to_sym).should == true
+  model!(name).state.should == state
 end
 
 Given(/^#{capture_model} has state: "([^"]*)"$/) do |name, state|

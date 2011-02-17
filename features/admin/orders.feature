@@ -13,7 +13,7 @@ Feature: Orders
       And a subscription "the sub" exists with offer: offer "the offer", user: user "Marge"
       And a subscription gift exists with gift: gift "the gift", subscription: subscription "the sub"
       And the subscription is activated
-     Then an order should exist
+     Then an order: "the order" should exist
      When I log in as admin "Homer"
       And I go to the admin orders page
         
@@ -25,36 +25,37 @@ Feature: Orders
   
   Scenario: An admin can view and then fulfill a gift order
     When I follow "View"
-     And I follow "Fulfill" and click OK
-    Then the order state should be "completed"
-      
+     And I follow "Fulfill"
+    Then the order: "the order" state should be "completed"
+  
   Scenario: An admin can view and then delay a gift order
     When I follow "View"
-     And I follow "Delay" and click OK
-    Then the order state should be "delayed"
+     And I follow "Delay"
+    Then the order: "the order" state should be "delayed"
   
   @javascript
   Scenario: An admin can mark a pending gift order as fulfilled
     When I follow "Fulfill" and click OK
-    Then the order state should be "completed"
+    Then the order: "the order" state should be "completed"
      And I should see "There are currently no records."
     When I follow "Completed"
     Then I should see "Marge Simpson"
 
   @javascript
   Scenario: An admin can mark a delayed gift order as fulfilled
-    Given a user "Bart" exists with firstname: "Bart", lastname: "Simpson"
-    And an order: "Bart's order" exists with state: "delayed", user: user "Bart"
+   Given a user "Bart" exists with firstname: "Bart", lastname: "Simpson"
+     And an order: "Bart's order" exists with state: "delayed", user: user "Bart"
     When I go to the delayed admin orders page
     When I follow "Fulfill" and click OK
     Then the order "Bart's order" state should be "completed"
      And I should see "There are currently no records."
     When I follow "Completed"
     Then I should see "Bart Simpson"
-    
+
+  @javascript
   Scenario: An admin can mark a pending gift order as delayed
     When I follow "Delay" and click OK
-    Then the order state should be "completed"
+    Then the order: "the order" state should be "delayed"
      And I should see "There are currently no records."
     When I follow "Delayed"
     Then I should see "Marge Simpson"

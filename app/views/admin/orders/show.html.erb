@@ -32,3 +32,5 @@
   <dt>Gift(s)</dt>
   <dd><%= @order.gifts.map(&:name).join(', ') %></dd>
 </dl>
+
+<%= order_event_links(@order, false).join('&nbsp;') %>

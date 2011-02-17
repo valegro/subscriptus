@@ -2,20 +2,17 @@ class Admin::OrdersController < AdminController
   layout 'admin/orders'
   
   before_filter :find_order, :only => [:show, :fulfill, :delay]
-
+  
   def index
-    @orders = Order.pending.oldest_first.paginate(:page => params[:page] || 1, :include => :gifts)
-    @order_scope = :pending
+    find_orders(:pending)
   end
 
   def completed
-    @orders = Order.completed.newest_first.paginate(:page => params[:page] || 1, :include => :gifts)
-    @order_scope = :completed
+    find_orders(:completed)
   end
 
   def delayed
-    @orders = Order.delayed.oldest_first.paginate(:page => params[:page] || 1, :include => :gifts)
-    @order_scope = :delayed
+    find_orders(:delayed)
   end
   
   def show
@@ -25,10 +22,28 @@ class Admin::OrdersController < AdminController
   
   def fulfill
     @order.fulfill!
-    order_scope = params[:order_scope]
-    order_scope = :pending unless %w(pending completed delayed).include?(order_scope)
-    @orders = Order.send(order_scope).oldest_first.paginate(:page => params[:page] || 1, :include => :gifts)
+    find_orders(params[:order_scope])
+    
     respond_to do |wants|
+      wants.html {
+        redirect_to admin_order_path(@order)
+      }
+      wants.js {
+        render :update do |page|
+          page.replace :orders_table, :partial => 'orders', :locals => {:orders => @orders}
+        end
+      }
+    end
+  end
+  
+  def delay
+    @order.delay!
+    find_orders(params[:order_scope])
+    
+    respond_to do |wants|
+      wants.html {
+        redirect_to admin_order_path(@order)
+      }
       wants.js {
         render :update do |page|
           page.replace :orders_table, :partial => 'orders', :locals => {:orders => @orders}
@@ -40,5 +55,13 @@ class Admin::OrdersController < AdminController
   private
   def find_order
     @order = Order.find(params[:id])
+  end
+  
+  def find_orders(order_scope)
+    @order_scope = order_scope.to_s
+    @order_scope = 'pending' unless %w(pending completed delayed).include?(@order_scope)
+    
+    ordering = @order_scope == 'completed' ? :newest_first : :oldest_first
+    @orders = Order.send(@order_scope).send(ordering).paginate(:page => params[:page] || 1, :include => :gifts)
   end
 end
