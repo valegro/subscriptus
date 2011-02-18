@@ -24,8 +24,8 @@ gem 'capistrano'
 # soft delete- Hiding records instead of deleting-- acts_as_paranoid doesnt work correctly with new activerecord
 gem 'acts_as_archive'
 
-# State machine support
-#gem 'aasm'
+# Crontab support
+gem 'whenever', :require => false
 
 # jQuery
 gem 'jrails'

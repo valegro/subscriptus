@@ -2,6 +2,7 @@ GEM
   remote: http://rubygems.org/
   specs:
     RedCloth (4.2.3)
+    aaronh-chronic (0.3.9)
     actionmailer (2.3.9)
       actionpack (= 2.3.9)
     actionpack (2.3.9)
@@ -136,6 +137,9 @@ GEM
     term-ansicolor (1.0.5)
     timecop (0.3.5)
     trollop (1.16.2)
+    whenever (0.6.2)
+      aaronh-chronic (>= 0.3.9)
+      activesupport (>= 2.3.4)
     will_paginate (2.3.15)
     wizardly (0.1.8.9)
     xml-simple (1.0.13)
@@ -181,5 +185,6 @@ DEPENDENCIES
   soap4r
   spork
   timecop
+  whenever
   will_paginate
   wizardly
