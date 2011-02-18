@@ -17,7 +17,12 @@
     row.login admin.login
     row.name admin.name
     row.email admin.email
-    row.last_login (admin.last_login_at ? "#{time_ago_in_words(admin.last_login_at)} ago" : "Never")
-    row.actions link_to("Edit", edit_admin_system_user_path(admin), :class => "edit") 
+    row.last_login admin.last_login_at ? "#{time_ago_in_words(admin.last_login_at)} ago" : "Never"
+    row.actions do
+      actions = ""
+      actions << link_to("Edit", edit_admin_system_user_path(admin), :class => "edit")
+      actions << link_to("Delete", admin_system_user_path(admin), :class => "delete", :method => :delete) unless admin == current_user
+      actions
+    end
   end
 end %>
