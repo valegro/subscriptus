@@ -12,6 +12,14 @@ Then(/^#{capture_model} state should be "([^"]*)"$/) do |name, state|
   model!(name).state.should == state
 end
 
+Then(/^#{capture_model} state should not be "([^"]*)"$/) do |name, state|
+  model!(name).state.should_not == state
+end
+
 Given(/^#{capture_model} has state: "([^"]*)"$/) do |name, state|
   model!(name).update_attributes(:state => state)
+end
+
+When(/^#{capture_model} states are expired$/) do |name|
+  model!(name).class.expire_states
 end
