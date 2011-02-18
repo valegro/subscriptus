@@ -5,6 +5,7 @@ Feature: Suspend a subscription
 
   Background:
     Given an admin: "Homer" exists
+      And the time is "12:00pm"
       And a publication: "p01" exists with name: "publication 01"
       And a publication: "p02" exists with name: "publication 02"
       And an offer: "o01" exists with publication: publication "p01"

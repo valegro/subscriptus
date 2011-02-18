@@ -1,24 +1,26 @@
-<dl>
-  <dt>Name</dt>
-  <dd><%= [@user.title, @user.name].join('&nbsp;') %></dd>
-  <dt>Email address</dt>
-  <dd><%= @user.email %></dd>
-</dl>
+<% if @user %>
+  <dl>
+    <dt>Name</dt>
+    <dd><%= [@user.title, @user.name].join('&nbsp;') %></dd>
+    <dt>Email address</dt>
+    <dd><%= @user.email %></dd>
+  </dl>
 
-<dl>
-<% if @user.company %>
-  <dt>Company</dt>
-  <dd><%= @user.company %></dd>
+  <dl>
+  <% if @user.company %>
+    <dt>Company</dt>
+    <dd><%= @user.company %></dd>
+  <% end %>
+    <dt>Address</dt>
+    <dd>
+      <%= @user.address_1 %><br/>
+      <%= @user.address_2 %><br/>
+      <%= @user.city %><br/>
+      <%= @user.state.to_s.upcase %>&nbsp;<%= @user.postcode %><br/>
+      <%= @user.country %>
+    </dd>
+  </dl>
 <% end %>
-  <dt>Address</dt>
-  <dd>
-    <%= @user.address_1 %><br/>
-    <%= @user.address_2 %><br/>
-    <%= @user.city %><br/>
-    <%= @user.state.to_s.upcase %>&nbsp;<%= @user.postcode %><br/>
-    <%= @user.country %>
-  </dd>
-</dl>
 
 <dl>
   <dt>Subscription</dt>

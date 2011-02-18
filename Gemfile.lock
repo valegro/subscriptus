@@ -134,6 +134,7 @@ GEM
       httpclient (>= 2.1.1)
     spork (0.8.4)
     term-ansicolor (1.0.5)
+    timecop (0.3.5)
     trollop (1.16.2)
     will_paginate (2.3.15)
     wizardly (0.1.8.9)
@@ -179,5 +180,6 @@ DEPENDENCIES
   shoulda
   soap4r
   spork
+  timecop
   will_paginate
   wizardly

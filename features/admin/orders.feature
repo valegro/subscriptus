@@ -68,6 +68,14 @@ Feature: Orders
     When I follow "Delayed"
     Then I should see "Marge Simpson"
   
+  Scenario: An admin will be alerted if the user account is missing
+    Given the user: "Marge" has been deleted
+    When I go to the admin orders page
+     And I follow "View"
+    Then I should see "The user associated with this order could not be found"
+  
+  
+  
   
   
 

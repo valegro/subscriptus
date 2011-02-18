@@ -7,7 +7,7 @@
 
   t.rows do |row, order, index|
     row.order_id order.id
-    row.recipient order.user.name
+    row.recipient order.user.try(:name)
     row.items order.gifts.count
     row.submitted "#{time_ago_in_words(order.created_at)} ago"
     row.actions link_to("View", admin_order_path(order), :class => "edit") + order_event_links(order, true, {:page => orders.current_page, :order_scope => @order_scope}).join('&nbsp;') 

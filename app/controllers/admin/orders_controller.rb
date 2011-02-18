@@ -25,7 +25,8 @@ class Admin::OrdersController < AdminController
   
   def show
     # TODO: Raise error on missing user?
-    @user = @order.user || User.build(:name => 'Missing User')
+    @user = @order.user
+    flash[:error] = 'The user associated with this order could not be found' unless @user
   end
   
   def fulfill

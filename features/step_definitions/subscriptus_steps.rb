@@ -23,3 +23,7 @@ def find_id(field)
   find(:xpath, "//label[contains(.,'#{field}')]").try(:[],:for) || field
 end
 
+
+Given(/^#{capture_model} has been deleted$/) do |name|
+  model!(name).destroy
+end

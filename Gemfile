@@ -68,6 +68,7 @@ group :test, :cucumber, :development do
   gem 'rspec', '1.3.1'
   gem 'rspec-rails', '1.3.3'
   gem 'mocha', '~> 0.9.8'
+  gem 'timecop'
 #  gem 'ZenTest'
 #  gem 'autotest-rails'
 end
