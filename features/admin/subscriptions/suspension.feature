@@ -5,7 +5,7 @@ Feature: Suspend a subscription
 
   Background:
     Given an admin: "Homer" exists
-      And the time is "12:00pm"
+      And the date is "2011-01-1 12:00pm"
       And a publication: "p01" exists with name: "publication 01"
       And a publication: "p02" exists with name: "publication 02"
       And an offer: "o01" exists with publication: publication "p01"
@@ -24,9 +24,9 @@ Feature: Suspend a subscription
     Given subscription "sub1" expires in "30" days
     When I go to admin subscription search page
     Then I should see the following table rows in any order:
-    | Name    | State     | Renewal Due       |
-    | f01 l01 | active    | 30 days from now  |
-    | f02 l02 | suspended | 2 months from now |
+    | Name    | State     | Renewal Due |
+    | f01 l01 | active    | 31/01/2011  |
+    | f02 l02 | suspended | 3/03/2011   |
 
     When I follow "Suspend"
      And I fill in "Number of days to suspend subscription" with "31"
@@ -36,9 +36,10 @@ Feature: Suspend a subscription
      And I should not see "active"
 
      And I should see the following table rows:
-     | Name    | State     | Renewal Due       |
-     | f02 l02 | suspended | 2 months from now |
-     | f01 l01 | suspended | 2 months from now |
+     | Name    | State     | Renewal Due |
+     | f02 l02 | suspended | 3/03/2011   |
+     | f01 l01 | suspended | 3/03/2011   |
+
 
   Scenario: An admin cannot suspend a subscription without an expiry date
      When I go to admin subscription search page
@@ -56,9 +57,10 @@ Feature: Suspend a subscription
      And I should be on admin subscription search page
      And I should not see "suspended"
      And I should see the following table rows:
-     | Name    | State  | Renewal Due      |
-     | f01 l01 | active | 30 days from now |
-     | f02 l02 | active | 30 days from now |
+     | Name    | State  | Renewal Due |
+     | f01 l01 | active | 31/01/2011  |
+     | f02 l02 | active | 31/01/2011  |
+
 
 
   
