@@ -52,8 +52,12 @@ class Admin::SubscriptionsController < AdminController
       else
         format.html {
         if period = params[:subscription][:state_expiry_period_in_days]
-          @subscription.suspend!(period.to_i)
-          flash[:notice] = "Subscription to #{@subscription.publication.name} for #{@subscription.user.name} suspended for #{period} days"
+          unless @subscription.suspended?
+            @subscription.suspend!(period.to_i)
+            flash[:notice] = "Subscription to #{@subscription.publication.name} for #{@subscription.user.name} suspended for #{period} days"
+          else
+            flash[:error] = "Subscription to #{@subscription.publication.name} for #{@subscription.user.name} is already suspended!"
+          end
           redirect_to :back
         end
         }
@@ -62,8 +66,12 @@ class Admin::SubscriptionsController < AdminController
   end
   
   def unsuspend
-    @subscription.unsuspend!
-    flash[:notice] = "Subscription to #{@subscription.publication.name} for #{@subscription.user.name} is now active"
+    if @subscription.suspended?
+      @subscription.unsuspend!
+      flash[:notice] = "Subscription to #{@subscription.publication.name} for #{@subscription.user.name} is now active"
+    else
+      flash[:error] = "Subscription to #{@subscription.publication.name} for #{@subscription.user.name} is already active!"
+    end
     redirect_to :back
   end
 
