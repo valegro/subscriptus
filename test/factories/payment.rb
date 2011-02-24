@@ -13,3 +13,8 @@ Factory.define :direct_debit_payment, :class => 'Payment' do |f|
   f.amount { 100 }
   f.payment_type { 'direct_debit' }
 end
+
+Factory.define :cheque_payment, :class => 'Payment' do |f|
+  f.amount { 100 }
+  f.payment_type { 'cheque' }
+end

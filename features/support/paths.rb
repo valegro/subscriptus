@@ -37,8 +37,24 @@ module NavigationHelpers
     when /s subscription payment page for (.*)/ then payment_s_subscription_path($1)
     when /s subscription direct debit page for (.*)/ then direct_debit_s_subscription_path($1)
     when /s subscriptions/ then s_subscriptions_path
+      
+    when /^admin #{capture_model}(?:'s)? subscriber page$/ then admin_subscriber_path(model!($1))
 
+    when /^#{capture_model}(?:'s)? page$/                           # eg. the forum's page
+      path_to_pickle $1
 
+    when /^#{capture_model}(?:'s)? #{capture_model}(?:'s)? page$/   # eg. the forum's post's page
+      path_to_pickle $1, $2
+
+    when /^#{capture_model}(?:'s)? #{capture_model}(?:'s)? #{capture_model}(?:'s)? page$/   # eg. we're going three levels
+      path_to_pickle $1, $2, $3
+
+    when /^#{capture_model}(?:'s)? #{capture_model}'s (.+?) page$/  # eg. the forum's post's comments page
+      path_to_pickle $1, $2, :extra => $3                           #  or the forum's post's edit page
+
+    when /^#{capture_model}(?:'s)? (.+?) page$/                     # eg. the forum's posts page
+      path_to_pickle $1, :extra => $2                               #  or the forum's edit page
+      
     # Add more mappings here.
     # Here is an example that pulls values out of the Regexp:
     #

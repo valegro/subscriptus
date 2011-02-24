@@ -33,9 +33,9 @@ Then /^I should see the following table rows( in any order)?:?$/ do |unordered, 
 end
 
 Then(/^I should see the following "([^"]*)" table:$/) do |table_id, table|
-  # table.diff!(tableish("table tr", "th,td"))
-  #with_scope("##{table_id}") do
+  with_scope("##{table_id}") do
+    # table.diff!(tableish("table tr", "th,td"))
     Then "I should see the following table rows:", table
-  #end
+  end
 end
 
