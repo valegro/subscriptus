@@ -2,23 +2,25 @@
 
 <h2>Payment History</h2>
 
-<%= render_table @subscriber.payments do |t| 
-  t.header :payment_date
-  t.header :subscription
+<%= render_table @payments, :name => 'payment_history' do |t| 
+  t.header :payment_date, :sort_by => :created_at
+  t.header :subscription, :sort_by => :subscription_id
   t.header :amount
   t.header :card_number
   t.header :expiry_date
-  t.header :payment_type
+  t.header :payment_type, :sort_by => :payment_type
   t.header :reference
   
   t.rows do |row, payment, index|
-    t.payment_date  l(payment.created_at, :format => :format => "%d/%m/%Y %H:%m")
-    t.subscription  payment.subscription.name
-    t.amount        number_to_currency(payment.amount) # is this in cents?
-    t.card_number   payment.card_number
-    t.expiry_date   payment.expiry_date
-    t.payment_type  payment.payment_type
-    t.reference     payment.reference
+    row.payment_date  l(payment.created_at, :format => "%d/%m/%Y")
+    row.subscription  payment.subscription.publication.name
+    row.amount        number_to_currency(payment.amount/100.0) # in cents
+    if payment.payment_type == :credit_card
+      row.card_number   payment.card_number
+      row.expiry_date   l(payment.card_expiry_date, :format => "%m/%y")
+    end
+    row.payment_type  payment.payment_type.to_s.titleize
+    row.reference     payment.reference
   end
 end %>
 
