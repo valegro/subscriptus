@@ -74,9 +74,11 @@ Feature: Orders
      And I follow "View"
     Then I should see "The user associated with this order could not be found"
   
-  
-  
-  
-  
-
+  Scenario: An order will still be viewable if the subscription isn't present
+   Given subscription: "the sub" has been deleted
+    When I follow "View"
+    Then I should see "Marge Simpson"
+     And I should see "'Subscription offer could not be found."
+     And I should see "A case of Duff Beer"
+   
   
