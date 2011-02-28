@@ -17,6 +17,11 @@ Feature: Subscription search
       And a subscription_gift exists with subscription: subscription "s01", gift: gift "g01"
      When I log in as admin "Homer"
 
+  Scenario: An admin can search results even if one of the users has been deleted
+    Given user "u01" has been deleted
+     When I go to admin subscription search page
+     Then I should see "User does not exist"
+
   @javascript
   Scenario: An admin adds publication field to search form
     Given I am on admin subscription search page

@@ -52,7 +52,11 @@
     t.header :state, :renewal_due, :signed_up, :actions
     t.rows do |row, result, index|
       row.reference    result.reference
-      row.name         link_to(result.user.try(:fullname) || 'No name', admin_subscriber_path(result.user))
+      if result.user
+        row.name         link_to(result.user.try(:fullname) || 'No name', admin_subscriber_path(result.user))
+      else
+        row.name       'User does not exist'
+      end
       row.email        result.user.try(:email)
       row.publication  result.publication.try(:name)
       row.state        result.state
