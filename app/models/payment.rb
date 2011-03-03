@@ -11,7 +11,7 @@ class Payment < ActiveRecord::Base
 
   attr_accessor :card_verification
   enum_attr :card_type, %w(visa master american_express diners_club jcb)
-  enum_attr :payment_type, %w(credit_card direct_debit cheque)
+  enum_attr :payment_type, %w(credit_card direct_debit cheque), :init => :credit_card
 
   def validate_on_create
     if credit_card? && !credit_card.valid?
