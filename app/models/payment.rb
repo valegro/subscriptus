@@ -20,7 +20,7 @@ class Payment < ActiveRecord::Base
   end
 
   before_save do |payment|
-    if payment.credit_card?
+    if payment.credit_card? || payment.payment_type.nil?
       # Charge the card
       response = GATEWAY.purchase((payment.amount * 100).to_i, payment.credit_card,
         :order_id => "123", # FIXME
