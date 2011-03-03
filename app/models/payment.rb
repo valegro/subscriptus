@@ -28,11 +28,11 @@ class Payment < ActiveRecord::Base
         :description => 'Crikey Subscription Payment',
         :email => payment.subscription.try(:user).try(:email)
       )
+      # Save a reference
+      payment.card_number = "XXXX-XXXX-XXXX-#{payment.card_number[-4..-1]}"
       unless response.success?
         raise PaymentFailedException.new(response.message)
       end
-      # Save a reference
-      payment.card_number = "XXXX-XXXX-XXXX-#{payment.card_number[-4..-1]}"
     end
   end
 
