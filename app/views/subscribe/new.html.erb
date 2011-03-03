@@ -7,6 +7,7 @@
 
       <h2>Subscribe to Crikey</h2>
 
+      <h3><%= h(@offer.publication.try(:name)) %></h3>
       <p class='subscription-description'><%= h(@offer.publication.description) %></p>
 
       <!-- Error Messages -->
