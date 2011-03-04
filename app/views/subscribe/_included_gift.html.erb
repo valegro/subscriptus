@@ -1,4 +1,5 @@
-<tr>
-  <td><%= image_tag(included_gift.gift_image.url(:thumb)) %></td>
-  <td><%= h(included_gift.name) %></td>
-</tr>
+<div class='gift-option'>
+  <label>
+    <%= gift_label(included_gift) %>
+  </label>
+</div>

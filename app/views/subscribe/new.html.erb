@@ -1,91 +1,165 @@
-<h1>Subscribe to Crikey</h1>
 
-<h2><%= @offer.publication.name %></h2>
-<p><%= @offer.publication.description %></p>
+<% form_for @subscription, :url => subscribe_path(:offer_id => @offer.id), :builder => SubscribeFormBuilder do |f| %>
 
-<% form_for @subscription, :url => subscribe_path(:offer_id => @offer.id), :builder => Reform::Builder, :html => { :class => "form" } do |f| %>
-  <%= f.error_messages %>
+  <div class='section' id='step1'>
+    <img src="/images/step1.png" class='step' alt='step 1' />
+    <div class='content'>
 
-  <h4>Subscription</h4>
-  <% if @offer.offer_terms.size > 1 %>
-    <table>
-      <% @offer.offer_terms.each_with_index do |ot, i| %>
-        <tr>
-          <td>
-            <%= radio_button_tag "offer_term", ot.id, (i == 0) %>
-            <label for="">Offer <%= i + 1 %>: <%= pluralize(ot.months, 'month') %></label>
-          </td>
-          <td><%= number_to_currency(ot.price) %></td>
-        </tr>
-      <% end %>
-    </table>
-  <% else %>
-    <p><%= describe_offer_term(@offer.try(:offer_terms).try(:first)) %></p>
-  <% end %>
+      <h2>Subscribe to Crikey</h2>
 
-  <!-- Gifts -->
+      <h3><%= h(@offer.publication.try(:name)) %></h3>
+      <p class='subscription-description'><%= h(@offer.publication.description) %></p>
 
-  <% f.fields_for :subscription_gifts do |sg| %>
-    <% unless @offer.gifts.included.blank? %>
-      <h4>Subscribe and Receive</h4>
-      <table>
-        <%= render :partial => "included_gift", :collection => @included_gifts, :locals => { :f => sg } %>
-      </table>
-    <% end %>
-    <% if @optional_gifts.size == 1 %>
-      <table>
-        <%= render :partial => "included_gift", :object => @optional_gifts.first, :locals => { :f => sg } %>
-      </table>
-    <% end %>
-    <% if @offer.gifts.optional.size > 1 %>
-      <% if @offer.gifts.included.empty? %>
-        <h4>Choose a free gift!</h4>
-      <% else %>
-        <h4>Plus, choose one of the following:</h4>
-      <% end %>
-      <table>
-        <% @optional_gifts.each_with_index do |o_gift, i| %>
-          <%= render :partial => "optional_gift", :object => o_gift, :locals => { :f => sg, :checked => (i == 0) } %>
+      <!-- Error Messages -->
+      <%= f.error_messages %>
+      <div id='subscription-options' class='form-section'>
+        
+        <div class='subscription-header'>
+          <p id='subscription-header1'>Choose your Subscription</p>
+          <p id='subscription-header2'>Cost</p>
+          <div class='clear'></div>
+        </div>
+
+        <% if @offer.offer_terms.size > 1 %>
+          <% @offer.offer_terms.each_with_index do |ot, i| %>
+            <div class='subscription-option'>
+              <%= radio_button_tag "offer_term", ot.id, (i == 0), :id => "offer_term_#{ot.id}" %>
+              <label for="offer_term_<%= ot.id %>">
+                <span>Offer <%= i + 1 %>: <%= pluralize(ot.months, 'month') %></span>
+                <span class="cost"><%= number_to_currency(ot.price) %></span>
+              </label>
+            </div>
+          <% end %>
+        <% else %>
+          <div class='subscription-option'>
+            <span><%= pluralize(@offer.offer_terms.first.try(:months), 'month') %></span>
+            <span class="cost"><%= number_to_currency_with_free(@offer.offer_terms.first.try(:price)) %></span>
+          </div>
         <% end %>
-      </table>
-    <% end %>
-  <% end %>
+      </div>
 
-  <hr/>
+      <!-- Gifts -->
 
-  <% if @user.new_record? %>
-    <span><em>Enter your details</em></span>
-    <% f.fields_for :user do |u| %>
-      <%= u.enum_select :title %>
-      <%= u.text_field :firstname, :required => true %>
-      <%= u.text_field :lastname, :required => true %>
-      <%= u.select :hear_about, [ "The web", "Someone else" ], :required => true %>
-      <%= u.text_field :email, :help => "This is the email address Crikey will be sent to", :required => true %>
-      <%= u.text_field :email_confirmation, :required => true %>
-      <%= u.password_field :password %>
-      <%= u.password_field :password_confirmation %>
-      <%= u.text_field :phone_number, :help => "If there are problems with email delivery this is how we contact you", :required => true %>
-      <%= u.text_field :company %>
-      <%= u.text_field :address_1, :label => "Street Address Line 1", :required => true %>
-      <%= u.text_field :address_2, :label => "Street Address Line 2" %>
-      <%= u.text_field :city, :required => true %>
-      <%= u.enum_select :state, :required => true %>
-      <%= u.text_field :postcode, :required => true %>
-      <%= u.country_select :country, ['Australia'], :required => true %>
-    <% end %>
-  <% end %>
+      <div id='gift-options' class='form-section'>
+        <% f.fields_for :subscription_gifts do |sg| %>
+          <% unless @offer.gifts.included.blank? %>
+            <h3>Subscribe and Receive</h3>
+            <%= render :partial => "included_gift", :collection => @included_gifts, :locals => { :f => sg } %>
+          <% end %>
+          <% if @optional_gifts.size == 1 %>
+            <h3>Subscribe and Receive</h3>
+            <%= render :partial => "included_gift", :object => @optional_gifts.first, :locals => { :f => sg } %>
+          <% end %>
+          <% if @offer.gifts.optional.size > 1 %>
+            <% if @offer.gifts.included.empty? %>
+              <h3>Choose a gift!</h3>
+            <% else %>
+              <h3>Plus, choose one of the following:</h3>
+            <% end %>
+            <% @optional_gifts.each_with_index do |o_gift, i| %>
+              <%= render :partial => "optional_gift", :object => o_gift, :locals => { :f => sg, :checked => (i == 0) } %>
+            <% end %>
+          <% end %>
+        <% end %>
+      </div>
 
-  <% f.fields_for :payments do |p| %>
-    <%= p.enum_select :card_type, :required => true %>
-    <% p.row("Name on Card", :required => true) do %>
-      <%= p.text_field :first_name, :required => true %>
-      <%= p.text_field :last_name, :required => true %>
-    <% end %>
-    <%= p.text_field :card_number, :required => true %>
-    <%= p.date_select :card_expiry_date, :discard_day => true, :start_year => Time.now.year, :label => "Expiry", :required => true %>
-    <%= p.text_field :card_verification, :size => 3, :required => true %>
-  <% end %>
+    </div>
+    <div class='clear'></div>
+  </div> <!-- Step 1 -->
 
-  <%= f.check_box :terms, :label => "I agree to the Crikey terms and conditions" %>
-  <%= f.submit 'Subscribe', :disable_with => "Processing..." %>
+  <div class='section' id='step2'>
+    <img src="/images/step2.png" class='step' alt='step 2'   />
+    <div class='content'>	
+      <h2>Your Details</h2>
+
+      <div id='login-choice'>
+        <input type='radio' id='rdoLogin' name='login' /><label for='rdoLogin'>Existing User Login</label>
+        <input type='radio' id='rdoNew' name='login' /><label for='rdoNew'>New User Sign-Up</label>
+      </div>
+
+      <div id='section-ne'>
+        <% if @user.new_record? %>
+          <% f.fields_for :user do |u| %>
+            <%= u.enum_select :title %>
+            <%= u.text_field :firstname, :required => true, :label => "First Name" %>
+            <%= u.text_field :lastname, :required => true, :label => "Last Name" %>
+            <%= u.select :hear_about, [ "The web", "Someone else" ], :required => true, :label => "How did you hear about Crikey?" %>
+            <%= u.text_field :email, :help => "This is the email address Crikey will be sent to", :required => true %>
+            <%= u.text_field :email_confirmation, :required => true %>
+            <%= u.text_field :phone_number, :help => "If there are problems with email delivery this is how we contact you", :required => true %>
+            <%= u.text_field :company %>
+            <%= u.text_field :address_1, :label => "Street Address Line 1", :required => true %>
+            <%= u.text_field :address_2, :label => "Street Address Line 2" %>
+            <%= u.text_field :city, :required => true %>
+            <%= u.enum_select :state, :required => true %>
+            <%= u.text_field :postcode, :required => true %>
+            <%= u.country_select :country, ['Australia'], :required => true %>
+            <%= u.password_field :password %>
+            <%= u.password_field :password_confirmation %>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+    <div class='clear'></div>
+  </div> <!-- Step 2 -->
+
+  <div class='section' id='step3'>
+    <img src="/images/step3.png"  class='step' alt='step 3' />
+    <div class='content'>			
+  		<div id='payment' class='form-section'>
+			  <h2>Choose your Payment method</h2>
+
+			  <img id='securepay' src="/images/securepay.png" alt="Powered by Secure Pay" />
+				<div id='payment-options'>
+    			<input type='radio' name='rdoPaymentOptions' id='rdoPaymentOptions1' />
+          <label for='rdoPaymentOptions1' >
+            Credit Card
+          </label>
+          
+        
+          <input type='radio' name='rdoPaymentOptions' id='rdoPaymentOptions2' />
+          <label for='rdoPaymentOptions2' >
+            Direct Debit
+          </label>									
+          
+          <label for='rdoPaymentOptions1' >
+            <img src='/images/cc.png' alt='Credit Cards' />		
+          </label>
+
+        </div>
+
+
+        <div id='payment-details'>
+          <h4>Credit Card Details</h4>
+          
+          <% f.fields_for :payments do |p| %>
+            <%= p.enum_select :card_type, :required => true %>
+              <%= p.text_field :first_name, :required => true %>
+              <%= p.text_field :last_name, :required => true %>
+              <%= p.text_field :card_number, :required => true, :help => "e.g. 0000123455677675" %>
+            <%= p.date_select :card_expiry_date, :discard_day => true, :start_year => Time.now.year, :label => "Expiry", :required => true %>
+            <%= p.text_field :card_verification, :class => "smallText", :required => true %>
+          <% end %>
+
+					<div id='terms'>
+            <%= f.check_box :terms, :label => "I agree to the Crikey " %>
+            <%= link_to('Terms and Conditions', "http://www.crikey.com.au/about/terms-conditions/", :target => '_blank') %>
+          </div>
+
+        	<div id='bottom-right'>
+            <p class='phone'>
+              1800 985 502
+            </p>
+          </div>
+							
+          <%= image_submit_tag "/images/finish.png", :disable_with => "Processing...", :id => "btnSubmit" %>
+				  <div class='clear'></div>
+        </div>
+
+      </div>
+    </div>
+    <div class='clear'></div>
+  </div> <!-- Step 3 -->
+  
+
 <% end %>

@@ -20,6 +20,8 @@ describe Payment do
     assert payment.valid?
   end
 
+
+
   describe "process a payment" do
     it "raise an exception on fail" do
       message = "Insufficient Funds"
@@ -38,6 +40,18 @@ describe Payment do
       response = stub(:success? => true)
       GATEWAY.expects(:purchase).returns(response)
       payment = Factory.build(:payment)
+      payment.subscription = @subscription
+      assert payment.valid?
+      payment.save
+      assert_equal Payment.count, count + 1
+      assert_equal payment.card_number, "XXXX-XXXX-XXXX-1111"
+    end
+
+    it "should not save the full CC number even if we don't set the payment type" do
+      count = Payment.count
+      response = stub(:success? => true)
+      GATEWAY.expects(:purchase).returns(response)
+      payment = Factory.build(:payment, :payment_type => nil)
       payment.subscription = @subscription
       assert payment.valid?
       payment.save

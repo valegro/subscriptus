@@ -4,7 +4,8 @@ gem "ruby-debug"
 
 # Postgres support
 group :postgres do
-  gem 'pg'
+  #gem 'pg'
+  gem 'postgres-pr'
 end
 
 group :mysql do

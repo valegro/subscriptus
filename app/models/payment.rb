@@ -11,7 +11,7 @@ class Payment < ActiveRecord::Base
 
   attr_accessor :card_verification
   enum_attr :card_type, %w(visa master american_express diners_club jcb)
-  enum_attr :payment_type, %w(credit_card direct_debit cheque)
+  enum_attr :payment_type, %w(credit_card direct_debit cheque), :init => :credit_card
 
   def validate_on_create
     if credit_card? && !credit_card.valid?
@@ -20,7 +20,7 @@ class Payment < ActiveRecord::Base
   end
 
   before_save do |payment|
-    if payment.credit_card?
+    if payment.credit_card? || payment.payment_type.nil?
       # Charge the card
       response = GATEWAY.purchase((payment.amount * 100).to_i, payment.credit_card,
         :order_id => "123", # FIXME
@@ -28,11 +28,11 @@ class Payment < ActiveRecord::Base
         :description => 'Crikey Subscription Payment',
         :email => payment.subscription.try(:user).try(:email)
       )
+      # Save a reference
+      payment.card_number = "XXXX-XXXX-XXXX-#{payment.card_number[-4..-1]}"
       unless response.success?
         raise PaymentFailedException.new(response.message)
       end
-      # Save a reference
-      payment.card_number = "XXXX-XXXX-XXXX-#{payment.card_number[-4..-1]}"
     end
   end
 
