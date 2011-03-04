@@ -7,6 +7,7 @@ describe Subscription do
     today = Date.new(2010, 9, 27) # today is "Mon, 27 Sep 2010"
     Date.stubs(:today).returns(today)
 
+
     cm_return = stub(:success? => true)
     CM::Recipient.stubs(:exists?).returns(true)
     CM::Recipient.stubs(:find_all).returns(cm_return)
@@ -98,7 +99,7 @@ describe Subscription do
     sub_primary_size = Subscription.all.size
     archive_primary_size = Subscription::Archive.all.size
     
-    s = Factory(:subscription) # create a new subscription and save in database
+    s = Factory.create(:subscription) # create a new subscription and save in database
     Subscription.all.size.should == sub_primary_size + 1
     Subscription::Archive.all.size.should == archive_primary_size
 

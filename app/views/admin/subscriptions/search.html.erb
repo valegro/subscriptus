@@ -35,7 +35,7 @@
 
 <h2>Results</h2>
 
-<%= render_table @results do |t|
+<%= render_table @results, :name => 'search_results' do |t|
     t.header :reference do
       order @search, :by => :id, :as => 'Reference'
     end

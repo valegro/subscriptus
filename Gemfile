@@ -22,7 +22,10 @@ gem 'json_pure'
 gem 'capistrano'
 
 # soft delete- Hiding records instead of deleting-- acts_as_paranoid doesnt work correctly with new activerecord
-gem 'acts_as_archive'
+# Use this fork because the mover gem doesn't work with Postgres :(
+gem 'mover', :git => 'git://github.com/codefire/mover.git'
+# Use this fork because of https://github.com/winton/acts_as_archive/pull/18
+gem 'acts_as_archive', :git => 'git://github.com/comboy/acts_as_archive.git'
 
 # Crontab support
 gem 'whenever', :require => false

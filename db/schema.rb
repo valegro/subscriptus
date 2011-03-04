@@ -35,6 +35,8 @@ ActiveRecord::Schema.define(:version => 20110210025503) do
     t.datetime "state_expires_at"
   end
 
+  add_index "archived_subscriptions", ["id"], :name => "index_archived_subscriptions_on_id"
+
   create_table "audit_log_entries", :force => true do |t|
     t.integer  "user_id"
     t.datetime "created_at"

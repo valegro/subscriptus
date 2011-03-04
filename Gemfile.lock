@@ -1,3 +1,17 @@
+GIT
+  remote: git://github.com/codefire/mover.git
+  revision: 1642d086a772743afdf22c9d9fb67059cd42cd6d
+  specs:
+    mover (0.3.6)
+
+GIT
+  remote: git://github.com/comboy/acts_as_archive.git
+  revision: 206d255512b1fc5d89d2738160dd576a6f7d657d
+  specs:
+    acts_as_archive (0.4.0)
+      also_migrate (= 0.3.5)
+      mover (= 0.3.6)
+
 GEM
   remote: http://rubygems.org/
   specs:
@@ -13,10 +27,7 @@ GEM
     activeresource (2.3.9)
       activesupport (= 2.3.9)
     activesupport (2.3.9)
-    acts_as_archive (0.3.4)
-      also_migrate (= 0.3.4)
-      mover (= 0.3.6)
-    also_migrate (0.3.4)
+    also_migrate (0.3.5)
     authlogic (2.1.6)
       activesupport
     aws-s3 (0.6.2)
@@ -82,7 +93,6 @@ GEM
     mime-types (1.16)
     mocha (0.9.10)
       rake
-    mover (0.3.6)
     mysql (2.8.1)
     navigasmic (0.5.5)
     net-scp (1.0.4)
@@ -150,7 +160,7 @@ PLATFORMS
 
 DEPENDENCIES
   RedCloth
-  acts_as_archive
+  acts_as_archive!
   authlogic
   aws-s3
   capistrano
@@ -171,6 +181,7 @@ DEPENDENCIES
   launchy
   mechanize
   mocha (~> 0.9.8)
+  mover!
   mysql
   navigasmic
   pg

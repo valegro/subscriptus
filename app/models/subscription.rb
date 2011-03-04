@@ -1,6 +1,6 @@
 class Subscription < ActiveRecord::Base
 
-  acts_as_archive  # so that the records are not actually deleted from database. makes it possible to keep track of used <sources> and <publications>
+  acts_as_archive # so that the records are not actually deleted from database. makes it possible to keep track of used <sources> and <publications>
 
   belongs_to :user, :autosave => true
   belongs_to :offer
