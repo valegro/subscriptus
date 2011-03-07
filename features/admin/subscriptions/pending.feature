@@ -54,4 +54,14 @@ Feature: Subscription List
         And I follow "Cancel"
         And I am on the admin pending subscriptions page
         And I should not see "Publication 2"
+    
+    Scenario: An admin cannot verify a pending subscription twice
+      Given a subscription: "Pending Payment Subscription" exists with publication: publication "Publication 2", user: subscriber "Alice", state: "pending", pending: "payment", id: 4, price: 50
+        And I am on the admin verify subscription page for 4
+        And the subscription "Pending Payment Subscription" has state: "active"
+        And I select "Direct debit" from "Payment type"
+        And I fill in "Reference" with "12345"
+        And I press "Verify"
+       Then I should not see "Verified Subscription"
+        And I should see "Subscription has already been verified"
 
