@@ -1,0 +1,3 @@
+Subscription:
+  - class: Subscription::Archive
+    table: archived_subscriptions

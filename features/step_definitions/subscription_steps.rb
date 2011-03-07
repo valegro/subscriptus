@@ -20,3 +20,13 @@ Given(/^#{capture_model} is activated$/) do |name|
   subscription = model!(name)
   subscription.activate!
 end
+
+Given(/^#{capture_model} is suspended for "([^"]*)" days$/) do |name, days|
+  subscription = model!(name)
+  subscription.suspend!(days.to_i)
+end
+
+Given(/^#{capture_model} is unsuspended$/) do |name|
+  subscription = model!(name)
+  subscription.unsuspend!
+end

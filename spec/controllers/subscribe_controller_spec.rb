@@ -5,6 +5,7 @@ describe SubscribeController do
   integrate_views
   
   before(:each) do
+    Timecop.freeze('2011-01-01 0:00')
     @source = Factory(:source)
 
     @offer = Factory(:offer)

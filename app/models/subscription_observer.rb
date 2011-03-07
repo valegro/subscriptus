@@ -6,7 +6,7 @@ class SubscriptionObserver < ActiveRecord::Observer
   end
 
   def after_enter_active(subscription)
-    unless subscription.gifts.empty? || subscription.state_was == "suspended"
+    unless subscription.gifts.empty? || %w(active suspended).include?(subscription.state_was)
       Order.transaction do
         order = subscription.orders.create(:user => subscription.user)
         subscription.gifts.each do |gift|

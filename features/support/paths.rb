@@ -39,7 +39,7 @@ module NavigationHelpers
     when /s subscriptions/ then s_subscriptions_path
       
     when /^admin #{capture_model}(?:'s)? subscriber page$/ then admin_subscriber_path(model!($1))
-      
+
     # Add more mappings here.
     # Here is an example that pulls values out of the Regexp:
     #
