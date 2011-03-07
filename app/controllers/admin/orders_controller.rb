@@ -31,6 +31,7 @@ class Admin::OrdersController < AdminController
   
   def fulfill
     @order.fulfill!
+    
     find_orders(params[:order_scope])
     
     respond_to do |wants|

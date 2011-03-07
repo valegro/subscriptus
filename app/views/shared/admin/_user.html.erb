@@ -1,0 +1,18 @@
+<% if user %>
+  <dl>
+    <dt>Name</dt>
+    <dd><%= [user.title, user.name].join('&nbsp;') %></dd>
+    <dt>Email address</dt>
+    <dd><%= user.email %></dd>
+  <% if user.company %>
+    <dt>Company</dt>
+    <dd><%= user.company %></dd>
+  <% end %>
+    <dt>Address</dt>
+    <dd>
+      <%= %w(address_1 address_2 city).map{|m|user.send(m)}.compact.join('<br/>') %>
+      <%= user.state.to_s.upcase %>&nbsp;<%= user.postcode %><br/>
+      <%= user.country %>
+    </dd>
+  </dl>
+<% end %>
