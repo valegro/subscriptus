@@ -85,7 +85,7 @@ Feature: Orders
    Given subscription: "the sub" has been destroyed
     When I follow "View"
     Then I should see "Marge Simpson"
-     And I should see "'Subscription offer could not be found."
+     And I should see "Subscription offer could not be found."
      And I should see "A case of Duff Beer"
    
   
