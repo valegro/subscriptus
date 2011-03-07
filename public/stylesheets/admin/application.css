@@ -433,3 +433,11 @@ a.button.first {
   background-color: #EEE;
   border-color: #DDD;
 }
+
+dt {
+  font-weight: bold;
+}
+
+dd {
+  margin-bottom: 12px;
+}

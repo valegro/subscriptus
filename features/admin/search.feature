@@ -11,8 +11,8 @@ Feature: Subscription search
       And an offer: "o02" exists with publication: publication "p02"
       And a user: "u01" exists with firstname: "f01", lastname: "l01", email: "u01@example.com", email_confirmation: "u01@example.com"
       And a user: "u02" exists with firstname: "f02", lastname: "l02", email: "u02@example.com", email_confirmation: "u02@example.com"
-      And a subscription exists with publication: publication "p01", user: user "u01", state: "trial"
-      And a subscription exists with publication: publication "p02", user: user "u02", state: "active"
+      And a subscription exists with publication: publication "p01", user: user "u01", state: "trial", created_at: "2010-10-04", expires_at: "2010-12-04"
+      And a subscription exists with publication: publication "p02", user: user "u02", state: "active", created_at: "2010-10-04", expires_at: "2010-12-04"
     When I log in as admin "Homer"
 
   @javascript
@@ -132,7 +132,7 @@ Feature: Subscription search
     When I press "Search"
     And I follow "Publication"
     And I follow "▲ Publication"
-    Then the following subscriptions should exists:
+    Then I should see the following "search_results" table:
       | Name    | Email           | ▼ Publication  | State  |
       | f02 l02 | u02@example.com | publication 02 | active |
       | f01 l01 | u01@example.com | publication 01 | trial  |
