@@ -2,7 +2,7 @@
 
 <dl>
   <dt>Subscription</dt>
-  <dd><%= @order.try(:subscription).try(:offer).try(:name) || 'Subscription offer could not be found.' %></dd>
+  <dd><%= @offer.try(:name) || 'Subscription offer could not be found.' %></dd>
   <dt>Date Placed</dt>
   <dd><%= format_timestamp(@order.created_at)%></dd>
 <% unless @order.pending? %>

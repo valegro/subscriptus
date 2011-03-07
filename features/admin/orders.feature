@@ -73,9 +73,16 @@ Feature: Orders
     When I go to the admin orders page
      And I follow "View"
     Then I should see "The user associated with this order could not be found"
+
+  Scenario: An order will still be viewable if the subscription has been soft deleted
+   Given subscription: "the sub" has been deleted
+    When I follow "View"
+    Then I should see "Marge Simpson"
+     And I should see "Springfield Weekly"
+     And I should see "A case of Duff Beer"
   
   Scenario: An order will still be viewable if the subscription isn't present
-   Given subscription: "the sub" has been deleted
+   Given subscription: "the sub" has been destroyed
     When I follow "View"
     Then I should see "Marge Simpson"
      And I should see "'Subscription offer could not be found."

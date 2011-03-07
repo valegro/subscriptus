@@ -25,5 +25,9 @@ end
 
 
 Given(/^#{capture_model} has been deleted$/) do |name|
-  model!(name).destroy
+  model!(name).delete
+end
+
+Given(/^#{capture_model} has been destroyed$/) do |name|
+  model!(name).destroy!
 end
