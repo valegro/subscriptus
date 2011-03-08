@@ -9,7 +9,22 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110210025503) do
+ActiveRecord::Schema.define(:version => 20110308002204) do
+
+  create_table "archived_publications", :id => false, :force => true do |t|
+    t.integer  "id"
+    t.string   "name"
+    t.text     "description"
+    t.string   "publication_image_file_name"
+    t.string   "publication_image_content_type"
+    t.integer  "publication_image_file_size"
+    t.datetime "publication_image_updated_at"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.datetime "deleted_at"
+  end
+
+  add_index "archived_publications", ["id"], :name => "index_archived_publications_on_id"
 
   create_table "archived_subscriptions", :id => false, :force => true do |t|
     t.integer  "id"
@@ -26,12 +41,11 @@ ActiveRecord::Schema.define(:version => 20110210025503) do
     t.datetime "expires_at"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "order_num"
+    t.datetime "deleted_at"
     t.integer  "source_id"
     t.text     "referrer"
-    t.boolean  "solus"
-    t.boolean  "weekender"
-    t.datetime "deleted_at"
+    t.boolean  "solus",            :default => false
+    t.boolean  "weekender",        :default => true
     t.string   "pending"
     t.datetime "state_expires_at"
   end
@@ -209,7 +223,6 @@ ActiveRecord::Schema.define(:version => 20110210025503) do
     t.datetime "expires_at"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "order_num"
     t.integer  "source_id"
     t.text     "referrer"
     t.boolean  "solus",            :default => false
@@ -257,7 +270,6 @@ ActiveRecord::Schema.define(:version => 20110210025503) do
     t.datetime "updated_at"
     t.string   "role"
     t.boolean  "admin"
-    t.string   "recurrent_id"
     t.boolean  "auto_created"
     t.string   "hear_about"
     t.string   "company"

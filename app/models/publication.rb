@@ -1,4 +1,5 @@
 class Publication < ActiveRecord::Base
+  acts_as_archive :indexes => :id
   has_many :subscriptions
   has_many :offers
   has_many :subscription_log_entries
