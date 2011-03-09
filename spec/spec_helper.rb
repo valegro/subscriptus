@@ -7,6 +7,7 @@ require 'spec/rails'
 require 'shoulda'
 require 'faker'
 require 'factory_girl'
+require 'webmock/rspec'
 factories = Dir.glob('*/factories.rb') + Dir.glob('*/factories/*.rb')
 factories.each { |f|
   begin

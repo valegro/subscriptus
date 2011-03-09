@@ -13,6 +13,7 @@ group :mysql do
 end
 
 gem 'fastercsv'
+gem 'rest-client'
 
 # These are "core" gems we always use
 gem 'authlogic'
@@ -57,6 +58,7 @@ gem 'enumerated_attribute'
 gem 'ruby-debug'
 
 group :test, :cucumber, :development do
+  gem 'webmock'
   gem 'capybara', "0.3.9"
   gem 'database_cleaner'
   gem 'spork'
