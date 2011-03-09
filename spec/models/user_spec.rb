@@ -52,6 +52,11 @@ describe User do
       User.create_trial_user(:first_name => 'Daniel', :last_name => 'Draper', :email => 'daniel@netfox.com')
     }.should raise_exception(ActiveRecord::RecordInvalid)
   end
+  
+  it "should create a user in Wordpress" do
+    Wordpress.expects(:create).with(:login => 'daniel', :pword => 'password', :email => 'daniel@netfox.com',:firstname => 'Daniel', :lastname => 'Draper').returns('daniel')
+    Factory.create(:user, :firstname => 'Daniel', :lastname => 'Draper', :email => 'daniel@netfox.com', :login => 'daniel', :password => 'password',:password_confirmation => 'password')
+  end
 
   it "should only allow one trial per publication" do
     publication = Factory.build(:publication)
