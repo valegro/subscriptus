@@ -5,7 +5,7 @@ module Wordpress
     @@config ||= YAML.load_file(File.join(RAILS_ROOT, 'config', 'wordpress.yml'))[RAILS_ENV].symbolize_keys
   end
   
-  def self.exists(opts={})
+  def self.exists?(opts={})
     check_any_required(opts, :login, :email)
     return !make_request(opts.merge(:func => 'exists')).blank?
   end

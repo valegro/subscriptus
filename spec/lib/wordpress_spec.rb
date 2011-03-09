@@ -2,34 +2,30 @@ require 'wordpress'
 require 'spec_helper'
 
 describe Wordpress do
-  before(:each) do
-    WebMock.disable_net_connect!(:allow_localhost => true)
-    
-  end
   
   context "#exists" do
     it "should raise an error if login or email are not passed" do
-      lambda {Wordpress.exists}.should raise_error
+      lambda {Wordpress.exists?}.should raise_error
     end
     
     it "should return true if the user exists by login" do
       stub_request(:get, Wordpress.config[:endpoint]).with(:query => {:func => 'exists', :login => 'joebloggs'}).to_return(:body => 'joebloggs')
-      Wordpress.exists(:login => 'joebloggs').should == true
+      Wordpress.exists?(:login => 'joebloggs').should == true
     end
   
     it "should return true if the user exists by email" do
       stub_request(:get, Wordpress.config[:endpoint]).with(:query => {:func => 'exists', :email => 'joebloggs@example.com'}).to_return(:body => 'joebloggs')
-      Wordpress.exists(:email => 'joebloggs@example.com').should == true
+      Wordpress.exists?(:email => 'joebloggs@example.com').should == true
     end
   
     it "should return false if the user does not exist by login" do
       stub_request(:get, Wordpress.config[:endpoint]).with(:query => {:func => 'exists', :login => 'janebloggs'}).to_return(:body => '')
-      Wordpress.exists(:login => 'janebloggs').should == false
+      Wordpress.exists?(:login => 'janebloggs').should == false
     end
 
     it "should return false if the user does not exist by email" do
       stub_request(:get, Wordpress.config[:endpoint]).with(:query => {:func => 'exists', :email => 'janebloggs@example.com'}).to_return(:body => '')
-      Wordpress.exists(:email => 'janebloggs@example.com').should == false
+      Wordpress.exists?(:email => 'janebloggs@example.com').should == false
     end
   end
   
