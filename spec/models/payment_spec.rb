@@ -72,7 +72,7 @@ describe Payment do
 
   describe "payment description" do
     it "should be correct for credit card" do
-      @payment = Factory.create(:payment, :payment_type => 'credit_card')
+      @payment = Factory.create(:payment, :payment_type => 'credit_card', :reference => nil)
       @payment.description.should == '$100.00 by Credit card'
     end
 
@@ -82,12 +82,12 @@ describe Payment do
     end
 
     it "should be correct for direct debit" do
-      @payment = Factory.create(:payment, :payment_type => 'direct_debit')
+      @payment = Factory.create(:payment, :payment_type => 'direct_debit', :reference => nil)
       @payment.description.should == '$100.00 by Direct debit'
     end
 
     it "should be correct for cheque" do
-      @payment = Factory.create(:payment, :payment_type => 'cheque')
+      @payment = Factory.create(:payment, :payment_type => 'cheque', :reference => nil)
       @payment.description.should == '$100.00 by Cheque'
     end
   end

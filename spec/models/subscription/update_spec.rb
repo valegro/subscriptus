@@ -5,6 +5,7 @@ describe Subscription do
   before(:each) do
     today = Date.new(2010, 9, 27) # today is "Mon, 27 Sep 2010"
     Date.stubs(:today).returns(today)
+    stub_wordpress
   end
 
   describe "upon save" do

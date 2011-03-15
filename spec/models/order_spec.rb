@@ -2,6 +2,7 @@ require 'spec_helper'
 
 describe Order do
   before(:each) do
+    stub_wordpress
     @user = Factory(:user)
   end
 
