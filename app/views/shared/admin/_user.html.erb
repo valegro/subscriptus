@@ -6,7 +6,7 @@
     <dd><%= user.email %></dd>
   <% if user.company %>
     <dt>Company</dt>
-    <dd><%= user.company %></dd>
+    <dd><%= user.company.blank? ? "None Provided" : user.company %></dd>
   <% end %>
     <dt>Address</dt>
     <dd>

@@ -34,6 +34,7 @@ ActionController::Routing::Routes.draw do |map|
     end
     admin.resources :sources
     admin.resources :payments
+    admin.resources :reports
     admin.namespace :system do |system|
       system.resources :users
     end

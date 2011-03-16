@@ -1,0 +1,23 @@
+<div class="title">
+  <%= content_tag :h2, @subscription.reference %>
+  <div class="actions">
+  </div>
+</div>
+
+<div class="grid">
+  <div class="frame span_3">
+    <dl>
+      <dt>Current State</dt><dd><%= @subscription.state %></dd>
+      <dt>Started</dt><dd><%= format_timestamp(@subscription.created_at) %></dd>
+      <dt>Expires</dt><dd><%= format_timestamp(@subscription.state_expires_at) %></dd>
+      <dt>Subscriber</dt><dd><%= link_to(@subscription.user.name, admin_subscriber_url(@subscription.user)) %></dd>
+      <dt>Publication</dt><dd><%= link_to(@subscription.publication.name, admin_catalogue_publication_url(@subscription.publication)) %></dd>
+      <dt>Offer</dt><dd><%= link_to(@subscription.offer.name, admin_catalogue_offer_url(@subscription.offer)) %></dd>
+      <dt>Source</dt><dd><%= @subscription.source ? link_to(@subscription.source.name, admin_source_url(@subscription.source)) : '-' %></dd>
+    </dl>
+  </div>
+  <div class="frame span_10">
+    <h2>Activity</h2>
+    <%= render :partial => "admin/subscriptions/activity", :object => @log_entries %>
+  </div>
+</div>

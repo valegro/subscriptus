@@ -1,12 +1,15 @@
 <%= render_table subscriptions do |t|
-  t.header :ref, :publication, :subscriber, :from, :to, :status, :actions
+  t.header :ref
+  t.header :publication if @publication.blank?
+  t.header :subscriber if @subscriber.blank?
+  t.header :from, :to, :status, :actions
 
   t.rows do |row, subscription, index|
-    row.ref subscription.reference
+    row.ref link_to(subscription.reference, admin_subscription_path(subscription))
     row.publication link_to(subscription.publication.name, admin_catalogue_publication_path(subscription.publication))
     row.subscriber link_to(subscription.user.try(:fullname), admin_subscriber_path(subscription.user))
-    row.from subscription.created_at
-    row.to subscription.expires_at
+    row.from format_timestamp(subscription.created_at)
+    row.to format_timestamp(subscription.expires_at)
     row.status subscription.state
     row.actions subscription_event_links(subscription).join('&nbsp;')
   end

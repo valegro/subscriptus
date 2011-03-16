@@ -11,6 +11,7 @@ class Admin::Catalogue::PublicationsController < Admin::CatalogueController
 
   def show
     @request_host = request.host
+    @subscriptions = @publication.subscriptions.recent.paginate(:page => params[:page] || 1)
   end
 
   def create
