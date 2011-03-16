@@ -114,4 +114,27 @@ describe Subscription do
     Subscription.all.size.should == sub_primary_size
     Subscription::Archive.all.size.should == archive_primary_size + 1
   end
+  
+  it "should deliver email when the subscription enters pending" do
+    @s = Factory.create(:subscription, :pending => :concession)
+    SubscriptionMailer.expects(:deliver_pending).with(@s)
+    @s.pay_later!
+  end
+  
+  describe "with a pending subscription" do 
+    before(:each) do
+      SubscriptionMailer.stubs(:deliver_pending)
+      @s = Factory.create(:subscription, :pending => :concession)
+      @s.pay_later!
+    end
+    it "should deliver email when the subscription is verified" do
+      SubscriptionMailer.expects(:deliver_verified).with(@s)
+      @s.verify!
+    end
+  
+    it "should deliver email when the subscription pending" do
+      SubscriptionMailer.expects(:deliver_pending_expired).with(@s)
+      @s.expire!
+    end
+  end
 end

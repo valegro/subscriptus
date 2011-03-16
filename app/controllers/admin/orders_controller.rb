@@ -27,7 +27,7 @@ class Admin::OrdersController < AdminController
     # TODO: Raise error on missing user?
     @user = @order.user
     @subscription = @order.subscription || Subscription::Archive.find_by_id(@order.subscription_id)
-    @offer = @subscription ? Offer.find(@subscription.offer_id) : nil
+    @offer = @subscription.try(:offer)
     flash[:error] = 'The user associated with this order could not be found' unless @user
   end
   
