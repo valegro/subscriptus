@@ -41,7 +41,7 @@ gem 'RedCloth'
 # Paperclip for attachments, plus DJ for async resizes
 # http://jstorimer.com/ruby/2010/01/30/delayed-paperclip.html
 #gem 'paperclip'
-gem 'delayed_job', '2.0.3'
+#gem 'delayed_job', '2.0.3' # Using plugin now
 gem 'delayed_paperclip'
 
 gem 'mechanize'

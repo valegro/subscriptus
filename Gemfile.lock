@@ -63,10 +63,7 @@ GEM
     cucumber-rails (0.3.2)
       cucumber (>= 0.8.0)
     culerity (0.2.15)
-    daemons (1.1.0)
     database_cleaner (0.6.0)
-    delayed_job (2.0.3)
-      daemons
     delayed_paperclip (0.6.5)
       paperclip (>= 2.3.0)
     diff-lcs (1.1.2)
@@ -175,7 +172,6 @@ DEPENDENCIES
   cucumber (= 0.8.5)
   cucumber-rails
   database_cleaner
-  delayed_job (= 2.0.3)
   delayed_paperclip
   enumerated_attribute
   factory_girl
