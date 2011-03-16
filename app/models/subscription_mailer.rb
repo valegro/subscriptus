@@ -42,7 +42,7 @@ class SubscriptionMailer < ActionMailer::Base
     content_type 'text/html'
   end
 
-  def pending_exipred(subscription)
+  def pending_expired(subscription)
     recipients subscription.user.email
     subject "Your pending subscription has expired"
     from NO_REPLY

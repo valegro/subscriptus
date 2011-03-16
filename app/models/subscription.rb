@@ -1,7 +1,10 @@
 class Subscription < ActiveRecord::Base
 
   acts_as_archive :indexes => :id # so that the records are not actually deleted from database. makes it possible to keep track of used <sources> and <publications>
-
+  class Archive
+    belongs_to :offer
+  end
+  
   belongs_to :user, :autosave => true
   belongs_to :offer
   belongs_to :publication
