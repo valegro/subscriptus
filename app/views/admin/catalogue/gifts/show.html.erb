@@ -11,16 +11,15 @@
   <div class="frame span_3">
     <%= image_tag(@gift.gift_image.url(:medium)) %> 
   </div>
-  <div class="frame span_4">
-    <h4><%= h(@gift.name) %></h4>
-    <p><%= h(@gift.description) %></p>
-  </div>
-  <div class="frame span_3 last">
-    <h4>Stock on Hand</h4>
-    <p><%= @gift.on_hand %></p>
+  <div class="frame span_7 last">
+    <dl>
+      <dt>Name</dt><dd><%= h(@gift.name) %></dd>
+      <dt>Stock on hand</dt><dd><%= @gift.on_hand %></dd>
+      <dt>Description</dt><dd><%= h(@gift.description) %></dd>
+    </dl>
   </div>
   <div class="frame span_10">
-    <h2>History</h2>
-    TODO
+    <h2>Subscriptions</h2>
+    <%= render :partial => "admin/subscriptions/subscriptions", :object => @subscriptions %>
   </div>
 </div>

@@ -11,13 +11,12 @@
 <div class="grid">
   <div class="frame span_3">
     <h2>Offer Details</h2>
-    <ul>
-      <li><strong>Name</strong>: <%= h(@offer.name) %></h2>
-      <li><strong>Publication</strong>: <%= @offer.publication.name %></li>
-      <li><strong>Expires</strong>: <%= @offer.expires %></li>
-      <li><strong>Auto-renews</strong>: <%= @offer.auto_renews %></li>
-      <li><strong>Trial</strong>: <%= @offer.trial %></li>
-    </ul>
+    <dl>
+      <dt>Name</dt><dd><%= h(@offer.name) %></dd>
+      <dt>Publication</dt><dd> <%= @offer.publication.name %></dd>
+      <dt>Expires</dt><dd> <%= @offer.expires %></dd>
+      <dt>Auto-renews</dt><dd> <%= @offer.auto_renews %></dd>
+    </dl>
   </div>
   <div class="frame span_3">
     <h2>Term Options</h2>
