@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110308002204) do
+ActiveRecord::Schema.define(:version => 20110321230215) do
 
   create_table "archived_publications", :id => false, :force => true do |t|
     t.integer  "id"
@@ -125,6 +125,17 @@ ActiveRecord::Schema.define(:version => 20110308002204) do
     t.datetime "state_updated_at"
     t.string   "state"
     t.integer  "subscription_id"
+    t.boolean  "has_delivery_address", :default => false, :null => false
+    t.string   "firstname"
+    t.string   "lastname"
+    t.string   "email"
+    t.string   "phone_number"
+    t.string   "address_1"
+    t.string   "address_2"
+    t.string   "city"
+    t.string   "address_state"
+    t.string   "postcode"
+    t.string   "country"
   end
 
   create_table "payments", :force => true do |t|
