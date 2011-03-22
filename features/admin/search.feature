@@ -132,6 +132,7 @@ Feature: Subscription search
     When I press "Search"
     And I follow "Publication"
     And I follow "▲ Publication"
+    Then show me the page
     Then the following subscriptions should exists:
       | Name    | Email           | ▼ Publication  | State  |
       | f02 l02 | u02@example.com | publication 02 | active |

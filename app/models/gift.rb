@@ -24,4 +24,8 @@ class Gift < ActiveRecord::Base
     # TODO: Admin Audit Log
     # TODO: Remove gift from all offers (or does this happen anyway?)
   end
+
+  def in_stock?
+    on_hand > 0
+  end
 end

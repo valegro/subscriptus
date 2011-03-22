@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110210025503) do
+ActiveRecord::Schema.define(:version => 20110305041949) do
 
   create_table "archived_subscriptions", :id => false, :force => true do |t|
     t.integer  "id"
@@ -35,8 +35,6 @@ ActiveRecord::Schema.define(:version => 20110210025503) do
     t.string   "pending"
     t.datetime "state_expires_at"
   end
-
-  add_index "archived_subscriptions", ["id"], :name => "index_archived_subscriptions_on_id"
 
   create_table "audit_log_entries", :force => true do |t|
     t.integer  "user_id"
@@ -160,6 +158,7 @@ ActiveRecord::Schema.define(:version => 20110210025503) do
     t.integer  "gift_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.boolean  "included"
   end
 
   create_table "subscription_invoices", :force => true do |t|

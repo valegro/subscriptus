@@ -40,6 +40,9 @@ module NavigationHelpers
       
     when /^admin #{capture_model}(?:'s)? subscriber page$/ then admin_subscriber_path(model!($1))
 
+    # Subscribe
+    when /subscribe page for (.*)/ then new_subscribe_path(:offer_id => $1)
+
     # Add more mappings here.
     # Here is an example that pulls values out of the Regexp:
     #

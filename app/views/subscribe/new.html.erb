@@ -40,17 +40,14 @@
 
       <!-- Gifts -->
 
+      <!-- TODO: Choose which gifts are optional and included in the controller - that way we only have one section here -->
       <div id='gift-options' class='form-section'>
         <% f.fields_for :subscription_gifts do |sg| %>
-          <% unless @offer.gifts.included.blank? %>
+          <% unless @included_gifts.blank? %>
             <h3>Subscribe and Receive</h3>
             <%= render :partial => "included_gift", :collection => @included_gifts, :locals => { :f => sg } %>
           <% end %>
-          <% if @optional_gifts.size == 1 %>
-            <h3>Subscribe and Receive</h3>
-            <%= render :partial => "included_gift", :object => @optional_gifts.first, :locals => { :f => sg } %>
-          <% end %>
-          <% if @offer.gifts.optional.size > 1 %>
+          <% if @optional_gifts.size > 1 %>
             <% if @offer.gifts.included.empty? %>
               <h3>Choose a gift!</h3>
             <% else %>

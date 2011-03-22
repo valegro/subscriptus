@@ -8,11 +8,9 @@ class SubscribeController < ApplicationController
     @subscription = Subscription.new
     @subscription.offer = @offer
     @subscription.source = source
-    @subscription.subscription_gifts.build(:gift => @optional_gifts.first)
     if params[:delivered_to]
       # TODO: Spec
       @user = User.find_by_email(params[:delivered_to])
-      puts "USER = #{@user.inspect}"
       if @user && @user.has_active_subscriptions?
         @subscription.user = @user
       end
@@ -21,9 +19,23 @@ class SubscribeController < ApplicationController
     @subscription.payments.build
   end
 
+
+    # TODO: We should be doing something like this
+    # @subscription = Subscription.new_from_offer(offer, term, optional_gift, included_gifts(ids), params...)
+    # But need to specify term chosen, optional gift chosen and the list of included gifts that were offered
+    # Then the form doesn't need to worry about fields_for for the gifts just optional_gifts and included_gifts as arrays
+    # Get rid of accepts_nested for subscription_gifts
+  # TODO: Use the factory
+  # TODO: Handle any of the exceptions that the factory might raise
+  #
   def create
-    @term = params[:offer_term] ? OfferTerm.find(params[:offer_term]) : @offer.offer_terms.first
     @subscription = Subscription.new(params[:subscription])
+    @subscription = Subscription.from_offer(@offer, {
+      :term_id => params[:offer_term],
+      :optional_gift => 1,
+      :included_gifts => @included_gifts,
+      :attributes => params[:subscription]
+    })
     @user = @subscription.user
 
     # Set to active because we are taking payment
@@ -43,7 +55,12 @@ class SubscribeController < ApplicationController
     end
 
     def load_gifts
-      @optional_gifts = @offer.gifts.in_stock.optional
       @included_gifts = @offer.gifts.in_stock.included
+      if @offer.gifts.in_stock.optional.size == 1
+        @included_gifts.concat(@offer.gifts.in_stock.optional)
+        @optional_gifts = []
+      else
+        @optional_gifts = @offer.gifts.in_stock.optional
+      end
     end
 end
