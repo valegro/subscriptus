@@ -1,6 +1,7 @@
 require 'spec_helper'
 describe User do
   before(:each) do
+    stub_wordpress
     @user = Factory.build(:subscriber)
     @user.stubs(
                      :address_1 => 'a1',
@@ -17,6 +18,7 @@ describe User do
                      :password_confirmation => 'password'
                )
     cm_return = stub(:success? => true)
+    
   end
 
   it "should create a trial user" do
@@ -36,6 +38,24 @@ describe User do
     User.count.should == cnt + 2
     # Check different passwords
     user.password.should_not == user2.password
+  end
+  
+  it "should not be valid if the login exists in Wordpress" do
+    Wordpress.stubs(:exists?).returns(true)
+    user = Factory.build(:user)
+    user.valid?.should == false
+  end
+  
+  it "should not create a user if the login exists in Wordpress" do
+    Wordpress.stubs(:exists?).returns(true)
+    lambda {
+      User.create_trial_user(:first_name => 'Daniel', :last_name => 'Draper', :email => 'daniel@netfox.com')
+    }.should raise_exception(ActiveRecord::RecordInvalid)
+  end
+  
+  it "should create a user in Wordpress" do
+    Wordpress.expects(:create).with(:login => 'daniel', :pword => 'password', :email => 'daniel@netfox.com',:firstname => 'Daniel', :lastname => 'Draper').returns('daniel')
+    Factory.create(:user, :firstname => 'Daniel', :lastname => 'Draper', :email => 'daniel@netfox.com', :login => 'daniel', :password => 'password',:password_confirmation => 'password')
   end
 
   it "should only allow one trial per publication" do

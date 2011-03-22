@@ -2,6 +2,7 @@ require File.dirname(__FILE__) + '/../../spec_helper'
 
 describe Admin::SubscriptionsController, "as admin" do
   before(:each) do
+    stub_wordpress
     admin_login
   end
   it "should have subscriptions layout"
@@ -52,6 +53,7 @@ end
 
 describe Admin::SubscriptionsController, "as user" do
   before(:each) do
+    stub_wordpress
     user_login
   end
   it "should not show index" do

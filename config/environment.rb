@@ -49,6 +49,8 @@ end
 STANDARD_TIME_FORMAT = '%H:%M %d/%m/%y %Z'
 APP_TIMEZONE = 'Melbourne'
 
+require 'delayed_job'
+
 __END__
 gem 'httpclient' 
 gem 'soap4r' 

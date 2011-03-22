@@ -1,0 +1,9 @@
+common: &common
+  endpoint: 'http://www.crikey.com.au/loginConnector.php'
+  
+development:
+  <<: *common
+test:
+  <<: *common
+production:
+  <<: *common  

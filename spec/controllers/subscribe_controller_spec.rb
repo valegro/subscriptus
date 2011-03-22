@@ -16,6 +16,7 @@ describe SubscribeController do
     CM::Recipient.stubs(:find_all).returns(cm_return)
     CM::Recipient.stubs(:update)
     CM::Recipient.stubs(:create!)
+    stub_wordpress
   end
 
   # --------------------------------------------- OFFER SENARIOs #

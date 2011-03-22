@@ -8,6 +8,13 @@ class UserObserver < ActiveRecord::Observer
   # TODO: Delayed Job
   def after_create(user)
     UserMailer.deliver_new_user(user)
+    Wordpress.create({
+        :login => user.login,
+        :firstname => user.firstname,
+        :lastname => user.lastname,
+        :email => user.email,
+        :pword => user.password
+    })
   end
 
   def after_save(user)

@@ -1,26 +1,42 @@
-<h1><%= @subscriber.name %></h1>
 
-<h2>Payment History</h2>
+<div class="title">
+  <%= content_tag :h2, "Subscriber" %>
+  <div class="actions">
+  </div>
+</div>
 
-<%= render_table @payments, :name => 'payment_history' do |t| 
-  t.header :payment_date, :sort_by => :created_at
-  t.header :subscription, :sort_by => :subscription_id
-  t.header :amount
-  t.header :card_number
-  t.header :expiry_date
-  t.header :payment_type, :sort_by => :payment_type
-  t.header :reference
-  
-  t.rows do |row, payment, index|
-    row.payment_date  l(payment.created_at, :format => "%d/%m/%Y")
-    row.subscription  payment.subscription.publication.name
-    row.amount        number_to_currency(payment.amount/100.0) # in cents
-    if payment.payment_type == :credit_card
-      row.card_number   payment.card_number
-      row.expiry_date   l(payment.card_expiry_date, :format => "%m/%y")
-    end
-    row.payment_type  payment.payment_type.to_s.titleize
-    row.reference     payment.reference
-  end
-end %>
+<div class="grid">
+  <div class="frame span_7">
+    <%= render :partial => "admin/subscriptions/subscriptions", :object => @subscriptions %>
+  </div>
+  <div class="frame span_3 last">
+    <%= render :partial => "shared/admin/user", :locals => {:user => @subscriber}%>
+  </div>
+  <div class="frame span_10">
+    <h2>Payment History</h2>
+    <%= render_table @payments, :name => 'payment_history' do |t| 
+      t.header :payment_date, :sort_by => :created_at
+      t.header :publication, :sort_by => :subscription_id
+      t.header :cardholder_name
+      t.header :amount
+      t.header :card_number
+      t.header :expiry_date
+      t.header :payment_type, :sort_by => :payment_type
+      t.header :reference
+      
+      t.rows do |row, payment, index|
+        row.payment_date  format_timestamp(payment.created_at)
+        row.publication  payment.subscription.publication.name
+        row.cardholder_name "#{payment.first_name} #{payment.last_name}"
+        row.amount        number_to_currency(payment.amount/100.0) # in cents
+        if payment.payment_type == :credit_card
+          row.card_number   payment.card_number
+          row.expiry_date   l(payment.card_expiry_date, :format => "%m/%y")
+        end
+        row.payment_type  payment.payment_type.to_s.titleize
+        row.reference     payment.reference
+      end
+    end %>
+  </div>
+</div>
 

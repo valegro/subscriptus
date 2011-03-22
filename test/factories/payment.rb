@@ -7,6 +7,8 @@ Factory.define :payment do |f|
   f.card_verification { '123' }
   f.card_type { 'visa' }
   f.payment_type { 'credit_card' }
+  f.reference { 'Reference #12345678'}
+  # f.association :subscription, :factory => :subscription
 end
 
 Factory.define :direct_debit_payment, :class => 'Payment' do |f|
