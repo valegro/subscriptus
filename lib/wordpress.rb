@@ -22,7 +22,7 @@ module Wordpress
 
 private
   def self.make_request(opts)
-    RestClient.get(Wordpress.config[:endpoint], :params => opts, :accept => :text).to_str
+    RestClient.get(Wordpress.config[:endpoint], :params => opts.merge(:key => Wordpress.config[:key]), :accept => :text).to_str
   end
   
   def self.make_request_and_raise_error(opts)

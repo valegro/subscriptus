@@ -1,9 +1,11 @@
 common: &common
   endpoint: 'http://www.crikey.com.au/loginConnector.php'
+  key: '$P$B2CNRpY/MCdmoNenQKrtdRyD8H8LG9.'
   
 development:
   <<: *common
 test:
   <<: *common
+  key: 'testkey'
 production:
   <<: *common  
