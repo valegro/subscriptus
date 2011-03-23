@@ -2,6 +2,9 @@ class Gift < ActiveRecord::Base
   has_many :gift_offers, :dependent => :destroy
   has_many :offers, :through => :gift_offers
   has_many :orders
+  has_many :subscription_gifts
+  has_many :subscriptions, :through => :subscription_gifts
+
   has_attached_file :gift_image,
     :styles => { :medium => "350x350>", :thumb => "100x100>" },
     :storage => :s3,
@@ -23,5 +26,9 @@ class Gift < ActiveRecord::Base
   after_destroy do |gi55|
     # TODO: Admin Audit Log
     # TODO: Remove gift from all offers (or does this happen anyway?)
+  end
+
+  def in_stock?
+    on_hand > 0
   end
 end

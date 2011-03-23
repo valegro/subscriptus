@@ -7,6 +7,10 @@ require 'spec/rails'
 require 'shoulda'
 require 'faker'
 require 'factory_girl'
+require 'webmock/rspec'
+
+WebMock.disable_net_connect!(:allow_localhost => true, :allow => 'https://www.securepay.com.au/test/payment')
+
 factories = Dir.glob('*/factories.rb') + Dir.glob('*/factories/*.rb')
 factories.each { |f|
   begin
@@ -74,6 +78,19 @@ end
 
 def admin_login
   login_as( Factory.create(:admin) )
+end
+
+def stub_wordpress
+  Wordpress.stubs(:exists?).returns(false)
+  
+  stub_request(:get, /.*crikey.*/).to_return { |request|
+    case request.uri.query_values['func']
+    when 'exists' then {:body => ''}
+    when 'create','update' then {:body =>request.uri.query_values['login']}
+    else
+      {:body =>'Unknown function'}
+    end
+    }
 end
 
 

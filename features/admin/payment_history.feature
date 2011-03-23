@@ -5,21 +5,25 @@ Feature: An admin can view a subscriber's payment history
   
   Background:
     Given an admin: "Homer" exists
-      And a subscriber "Marge" exists with firstname: "Marge", lastname: "Simpson" 
+      And a subscriber "Marge" exists with firstname: "Marge", lastname: "Simpson", email: "marge@springfield.com"
       And a subscription "The First Sub" exists with user: subscriber "Marge"
       And a subscription "The Second Sub" exists with user: subscriber "Marge"      
-      And a direct debit payment exists with subscription: subscription "The First Sub", created_at: "2011-02-01"
+      And a direct debit payment exists with subscription: subscription "The First Sub", created_at: "2011-02-01", reference: "foo"
       And a payment exists with subscription: subscription "The Second Sub", created_at: "2011-01-01", card_expiry_date: "2013-01-01"
       And a cheque payment exists with subscription: subscription "The First Sub", created_at: "2011-03-01"
      When I log in as admin "Homer"
       And I go to admin subscriber: "Marge"'s subscriber page
   
+  Scenario: An admin can see the subscriber's email address
+    Then I should see "Email address"
+     And I should see "marge@springfield.com"
+    
   Scenario: An admin can view a subscriber's payment history
      Then I should see the following "payment_history" table:
-     | Payment Date | Card Number         | Expiry Date | Payment Type |
-     | 01/02/2011   |                     |             | Direct Debit |
-     | 01/01/2011   | XXXX-XXXX-XXXX-1111 | 01/13       | Credit Card  |
-     | 01/03/2011   |                     |             | Cheque       |
+     | Payment Date | Card Number         | Expiry Date | Payment Type | Reference |
+     | 01/02/2011   |                     |             | Direct Debit | foo       |
+     | 01/01/2011   | XXXX-XXXX-XXXX-1111 | 01/13       | Credit Card  |           |
+     | 01/03/2011   |                     |             | Cheque       |           |
 
   Scenario: An admin can sort a subscriber's payment history by date
      When I follow "Payment Date"

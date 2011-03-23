@@ -44,8 +44,8 @@ Feature: Orders
   @javascript
   Scenario: An admin can mark a pending gift order as fulfilled
     When I follow "Fulfill" and click OK
-    Then the order: "the order" state should be "completed"
-     And I should see "There are currently no records."
+    Then I should see "There are currently no records."
+     And the order: "the order" state should be "completed"
     When I follow "Completed"
     Then I should see "Marge Simpson"
 
@@ -55,16 +55,16 @@ Feature: Orders
      And an order: "Bart's order" exists with state: "delayed", user: user "Bart"
     When I go to the delayed admin orders page
     When I follow "Fulfill" and click OK
-    Then the order "Bart's order" state should be "completed"
-     And I should see "There are currently no records."
+    Then I should see "There are currently no records."
+     And the order "Bart's order" state should be "completed"
     When I follow "Completed"
     Then I should see "Bart Simpson"
 
   @javascript
   Scenario: An admin can mark a pending gift order as delayed
     When I follow "Delay" and click OK
-    Then the order: "the order" state should be "delayed"
-     And I should see "There are currently no records."
+    Then I should see "There are currently no records."
+     And the order: "the order" state should be "delayed"
     When I follow "Delayed"
     Then I should see "Marge Simpson"
   
@@ -73,12 +73,19 @@ Feature: Orders
     When I go to the admin orders page
      And I follow "View"
     Then I should see "The user associated with this order could not be found"
-  
-  Scenario: An order will still be viewable if the subscription isn't present
+
+  Scenario: An order will still be viewable if the subscription has been soft deleted
    Given subscription: "the sub" has been deleted
     When I follow "View"
     Then I should see "Marge Simpson"
-     And I should see "'Subscription offer could not be found."
+     And I should see "Springfield Weekly"
+     And I should see "A case of Duff Beer"
+  
+  Scenario: An order will still be viewable if the subscription isn't present
+   Given subscription: "the sub" has been destroyed
+    When I follow "View"
+    Then I should see "Marge Simpson"
+     And I should see "Subscription offer could not be found."
      And I should see "A case of Duff Beer"
    
   

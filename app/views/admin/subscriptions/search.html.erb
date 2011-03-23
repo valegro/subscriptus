@@ -51,17 +51,17 @@
     end
     t.header :state, :renewal_due, :signed_up, :actions
     t.rows do |row, result, index|
-      row.reference    result.reference
+      row.reference    link_to(result.reference, admin_subscription_path(result))
       if result.user
         row.name         link_to(result.user.try(:fullname) || 'No name', admin_subscriber_path(result.user))
       else
         row.name       'User does not exist'
       end
       row.email        result.user.try(:email)
-      row.publication  result.publication.try(:name)
+      row.publication  result.publication ? link_to(result.publication.try(:name), admin_catalogue_publication_url(result.publication)) : '-'
       row.state        result.state
-      row.renewal_due  result.expires_at ? l(result.expires_at, :format => "%d/%m/%Y")  : ''
-      row.signed_up    result.created_at.try(:strftime, "%d/%m/%Y")
+      row.renewal_due  format_timestamp(result.expires_at)
+      row.signed_up    format_timestamp(result.created_at)
       row.actions do
         case 
         when result.active?  && result.expires_at

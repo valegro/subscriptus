@@ -1,6 +1,7 @@
 class SubscriptionMailer < ActionMailer::Base
   
   SEND_TO = nil
+  NO_REPLY = "noreply@crikey.com.au"
   
   # Note: Payment Method is written as Credit Card at the moment. FIXME if needed in the future.
   def activation(subscription)
@@ -28,8 +29,33 @@ class SubscriptionMailer < ActionMailer::Base
   def new_trial(subscription)
     recipients subscription.user.email
     subject "New Trial Subscription"
-    from "noreply@crikey.com.au"
+    from NO_REPLY
     body :user => subscription.user
     content_type 'text/html'
   end
+  
+  def pending(subscription)
+    recipients subscription.user.email
+    subject "Your subscription is pending verification"
+    from NO_REPLY
+    body :subscription => subscription
+    content_type 'text/html'
+  end
+
+  def pending_expired(subscription)
+    recipients subscription.user.email
+    subject "Your pending subscription has expired"
+    from NO_REPLY
+    body :subscription => subscription
+    content_type 'text/html'
+  end  
+
+  def verified(subscription)
+    recipients subscription.user.email
+    subject "Your pending subscription has been verified"
+    from NO_REPLY
+    body :subscription => subscription
+    content_type 'text/html'
+  end
+  
 end

@@ -1,7 +1,10 @@
 class Subscription < ActiveRecord::Base
 
-  acts_as_archive # so that the records are not actually deleted from database. makes it possible to keep track of used <sources> and <publications>
-
+  acts_as_archive :indexes => :id # so that the records are not actually deleted from database. makes it possible to keep track of used <sources> and <publications>
+  class Archive
+    belongs_to :offer
+  end
+  
   belongs_to :user, :autosave => true
   belongs_to :offer
   belongs_to :publication
@@ -12,23 +15,13 @@ class Subscription < ActiveRecord::Base
   has_many :payments, :autosave => true
   has_many :orders
   
-  has_many :gifts, :through => :subscription_gifts do
-    # add an array of gifts
-    def add_uniquely(gifts)
-      gifts.each do |gift|
-        self << gift unless self.include?(gift)
-      end
-    end
-    # add one gift
-    def add_uniquely_one(gift)
-      self << gift unless self.include?(gift)
-    end
-  end
+  # TODO: Test this
+  has_many :gifts, :through => :subscription_gifts, :uniq => true, :before_add => Proc.new { |a, gift| raise "Gift is out of stock" unless gift.in_stock? }
   
   attr_accessor :note # Used to save notes to the subscription
   attr_accessor :terms
   attr_accessor :starts_at # the start date of the newest subscription #TODO: Is this used anywhere?
-  accepts_nested_attributes_for :subscription_gifts, :payments, :user
+  accepts_nested_attributes_for :payments, :user
 
   named_scope :ascend_by_name, :include => 'user', :order => "users.lastname ASC, users.firstname ASC"
   named_scope :descend_by_name, :include => 'user', :order => "users.lastname DESC, users.firstname DESC"
@@ -127,11 +120,15 @@ class Subscription < ActiveRecord::Base
   alias_method_chain :suspend!, :number_of_days
   private :suspend_with_number_of_days!, :suspend_without_number_of_days!
 
+
+  # TODO: Don't use this anymore
   def use_offer(offer, term)
-    raise "Offer Term not valid for Offer" if term.offer_id != offer.id # TODO: Spec this
+    raise "Offer Term not valid for Offer" if term.try(:offer_id) != offer.id # TODO: Spec this
     self.offer = offer
     self.publication = offer.publication
     self.price = term.price
+    # Add any Included gifts
+    self.gifts << offer.available_included_gifts
     # Set the payment price
     payments.last.try(:amount=, self.price)
     # TODO: Move this to the observer for on_enter_active

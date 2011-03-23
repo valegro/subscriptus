@@ -12,18 +12,18 @@
   <div class="frame span_3">
     <%= image_tag(@publication.publication_image.url(:medium)) %> 
   </div>
-  <div class="frame span_4">
-    <h4><%= h(@publication.name) %></h4>
-    <p><%= h(@publication.description) %></p>
+  <div class="frame span_4 last">
+    <dl>
+      <dt>Name</dt><dd><%= h(@publication.name) %></dd>
+      <dt>Description</dt><dd><%= h(@publication.description) %></dd>
+      <dt>Active</dt><dd><%= @publication.subscriptions.active.count %></p></dd>
+      <dt>Trial</dt><dd><%= @publication.subscriptions.trial.count %></p></dd>
+      <dt>Squatters</dt><dd><%= @publication.subscriptions.squatter.count %></p></dd>
+    </dl>
   </div>
-  <div class="frame span_3 last">
-    <h4>Subscribers</h4>
-    TODO: Active/Inactive(?): counter cache
-    <p><%= @publication.subscriptions.count %></p>
-  </div>
-  <div class="frame span_10">
-    <h2>History</h2>
-    TODO
+  <div class="frame span_10 last">
+    <h2>Subscriptions</h2>
+    <%= render :partial => "admin/subscriptions/subscriptions", :object => @subscriptions %>
   </div>
 </div>
 

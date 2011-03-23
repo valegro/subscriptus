@@ -16,6 +16,7 @@ Rails::Initializer.run do |config|
   
   # Add additional load paths for your own custom dirs
   # config.load_paths += %W( #{RAILS_ROOT}/extras )
+  config.load_paths += %W( #{RAILS_ROOT}/app/factories )
 
   # Specify gems that this application depends on and have them installed with rake gems:install
   # config.gem "bj"
@@ -47,6 +48,8 @@ end
 # TODO: Make confir options
 STANDARD_TIME_FORMAT = '%H:%M %d/%m/%y %Z'
 APP_TIMEZONE = 'Melbourne'
+
+require 'delayed_job'
 
 __END__
 gem 'httpclient' 

@@ -2,20 +2,4 @@
   <%= content_tag :h2, "Recent Activity" %>
 </div>
 
-<%= render_table @log_entries, :pagination_options => { :entry_name => "Activity" } do |t|
-    t.header :user
-    t.header :publication
-    t.header :state
-    t.header :activity
-    t.header :at
-
-    t.rows do |row, log_entry, index|
-      row.user         link_to(log_entry.try(:subscription).try(:user).try(:name), admin_subscriber_path(log_entry.subscription.try(:user)))
-      row.publication  link_to(log_entry.try(:subscription).try(:publication).try(:name), admin_catalogue_publication_path(log_entry.subscription.try(:publication)))
-      row.state        state_change(log_entry.old_state, log_entry.new_state, log_entry.subscription)
-      row.activity     log_entry.description
-      row.at           format_timestamp(log_entry.created_at)
-    end
-  end
-%>  
-
+<%= render :partial => "activity", :object => @log_entries %>

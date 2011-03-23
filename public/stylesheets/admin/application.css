@@ -433,3 +433,26 @@ a.button.first {
   background-color: #EEE;
   border-color: #DDD;
 }
+
+dl {
+  border: solid #ccc 1px;
+  padding:5px;
+  background:#eee;
+  margin:0;
+  margin-right:2px;
+}
+
+dt {
+  font-weight: bold;
+  float:left;
+  clear:left;
+}
+
+dt:after {
+  content:":";
+}
+
+dd {
+  margin: 0 0 0 120px;
+  padding: 0 0 0.5em 0;
+}

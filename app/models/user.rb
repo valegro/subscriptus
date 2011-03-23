@@ -32,6 +32,10 @@ class User < ActiveRecord::Base
   validates_uniqueness_of :login, :unless => Proc.new { |user| user.auto_created? }
   validates_confirmation_of :email, :on => :create, :unless => Proc.new { |user| user.admin? }
 
+  validate_on_create do |user|
+    user.errors.add(:login, "is already taken") if Wordpress.exists?(:login => user.login)
+  end
+
   # Used for search controller
   named_scope :firstname_or_lastname_like, lambda { |arg| { :conditions => ["lower(firstname) || ' ' || lower(lastname) LIKE ?", "%#{arg.try(:downcase)}%"]} }
 

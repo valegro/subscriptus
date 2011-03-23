@@ -3,6 +3,7 @@ require 'spec_helper'
 describe SubscriptionMailer do
 
   before(:each) do
+    stub_wordpress
     @offer = Factory(:offer)
     @offer_term = Factory.create(:offer_term, :months => 3, :offer_id => @offer.id)
     @user = Factory(:subscriber)

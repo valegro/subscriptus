@@ -2,14 +2,17 @@ class Admin::SubscriptionsController < AdminController
   layout 'admin/subscriptions'
   include Admin::SubscriptionsHelper
   
-  before_filter :find_subscription, :only => [ :verify, :cancel, :suspend, :unsuspend ]
+  before_filter :find_subscription, :only => [ :verify, :cancel, :suspend, :unsuspend, :show ]
 
   def index
     @log_entries = SubscriptionLogEntry.recent.paginate(:page => params[:page] || 1)
   end
 
-  def search
+  def show
+    @log_entries = @subscription.log_entries.recent.paginate(:page => params[:page] || 1)
+  end
 
+  def search
     if params[:search] && params[:search].has_key?(:id)
       params[:search][:id] = Subscription.id_from_reference(params[:search][:id])
     end
@@ -26,16 +29,20 @@ class Admin::SubscriptionsController < AdminController
   def verify
     @payment = Payment.new(:amount => @subscription.price, :payment_type => 'direct_debit')
     if request.post?
-      if params[:payment]
-        @payment = Payment.new(params[:payment])
-        @payment.amount = @subscription.price
-        @subscription.verify!(@payment)
-        # TODO: Validations? Exceptions?
+      unless @subscription.active?
+        if params[:payment]
+          @payment = Payment.new(params[:payment])
+          @payment.amount = @subscription.price
+          @subscription.verify!(@payment)
+          # TODO: Validations? Exceptions?
+        else
+          @subscription.update_attributes(params[:subscription])
+          @subscription.verify!
+        end
+        flash[:notice] = "Verified Subscription"
       else
-        @subscription.update_attributes(params[:subscription])
-        @subscription.verify!
+        flash[:notice] = "Subscription has already been verified"
       end
-      flash[:notice] = "Verified Subscription"
       redirect_to :action => :pending
     end
   end
