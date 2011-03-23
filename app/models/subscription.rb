@@ -21,7 +21,7 @@ class Subscription < ActiveRecord::Base
   attr_accessor :note # Used to save notes to the subscription
   attr_accessor :terms
   attr_accessor :starts_at # the start date of the newest subscription #TODO: Is this used anywhere?
-  accepts_nested_attributes_for :payments, :user, :subscription_gifts
+  accepts_nested_attributes_for :payments, :user
 
   named_scope :ascend_by_name, :include => 'user', :order => "users.lastname ASC, users.firstname ASC"
   named_scope :descend_by_name, :include => 'user', :order => "users.lastname DESC, users.firstname DESC"
