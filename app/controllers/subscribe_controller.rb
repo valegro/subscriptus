@@ -30,12 +30,12 @@ class SubscribeController < ApplicationController
   #
   def create
     @subscription = Subscription.new(params[:subscription])
-    @subscription = Subscription.from_offer(@offer, {
-      :term_id => params[:offer_term],
-      :optional_gift => 1,
-      :included_gifts => @included_gifts,
-      :attributes => params[:subscription]
-    })
+    #@subscription = Subscription.from_offer(@offer, {
+    #  :term_id => params[:offer_term],
+    #  :optional_gift => 1,
+    #  :included_gifts => @included_gifts,
+    #  :attributes => params[:subscription]
+    #})
     @user = @subscription.user
 
     # Set to active because we are taking payment
