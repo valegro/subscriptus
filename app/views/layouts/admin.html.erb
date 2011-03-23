@@ -19,7 +19,7 @@
       <div id="navigation">
         <% semantic_navigation :main, :html => { :class => "upper" } do |n| %>
           <%= n.item 'Subscriptions', :link => admin_subscriptions_path, :highlights_on => [{:controller => "admin/subscriptions"}, {:controller => "admin/subscribers"}] %>
-          <%= n.item 'Reports', :link => admin_reports_path %>
+          <% #n.item 'Reports', :link => admin_reports_path %>
           <%= n.item 'Orders', :link => admin_orders_path, :highlights_on => {:controller => "admin/orders"} %>
           <%= n.item 'Catalogue', :link => admin_catalogue_publications_path, :highlights_on => [proc { params[:controller] =~ /^admin\/catalogue/ ? true : false }] %>
           <%= n.item 'Sources', :link => admin_sources_path %>
