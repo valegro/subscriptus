@@ -137,4 +137,8 @@ describe Subscription do
       @s.expire!
     end
   end
+
+  # TODO: Payments - save_in_transaction
+  #
+  #
 end

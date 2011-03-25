@@ -1,4 +1,3 @@
-class PaymentFailedException < StandardError; end
 
 class Payment < ActiveRecord::Base
   include ActionView::Helpers::NumberHelper
@@ -31,7 +30,7 @@ class Payment < ActiveRecord::Base
       # Save a reference
       payment.card_number = "XXXX-XXXX-XXXX-#{payment.card_number[-4..-1]}"
       unless response.success?
-        raise PaymentFailedException.new(response.message)
+        raise Exceptions::PaymentFailedException.new(response.message)
       end
     end
   end

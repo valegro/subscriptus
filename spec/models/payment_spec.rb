@@ -32,7 +32,7 @@ describe Payment do
       assert payment.valid?
       lambda {
         payment.save
-      }.should raise_exception(PaymentFailedException, message)
+      }.should raise_exception(Exceptions::PaymentFailedException, message)
     end
 
     it "should not raise on success" do

@@ -40,12 +40,10 @@
 
       <!-- Gifts -->
 
-      <!-- TODO: Choose which gifts are optional and included in the controller - that way we only have one section here -->
       <div id='gift-options' class='form-section'>
-        <% f.fields_for :subscription_gifts do |sg| %>
           <% unless @included_gifts.blank? %>
             <h3>Subscribe and Receive</h3>
-            <%= render :partial => "included_gift", :collection => @included_gifts, :locals => { :f => sg } %>
+            <%= render :partial => "included_gift", :collection => @included_gifts %>
           <% end %>
           <% if @optional_gifts.size > 1 %>
             <% if @offer.gifts.included.empty? %>
@@ -54,10 +52,9 @@
               <h3>Plus, choose one of the following:</h3>
             <% end %>
             <% @optional_gifts.each_with_index do |o_gift, i| %>
-              <%= render :partial => "optional_gift", :object => o_gift, :locals => { :f => sg, :checked => (i == 0) } %>
+              <%= render :partial => "optional_gift", :object => o_gift, :locals => { :checked => (i == 0) } %>
             <% end %>
           <% end %>
-        <% end %>
       </div>
 
     </div>
@@ -75,7 +72,7 @@
       </div>
 
       <div id='section-ne'>
-        <% if @user.new_record? %>
+        <% if @subscription.user.new_record? %>
           <% f.fields_for :user do |u| %>
             <%= u.enum_select :title %>
             <%= u.text_field :firstname, :required => true, :label => "First Name" %>

@@ -15,6 +15,20 @@ describe SubscriptionFactory do
     @offer.offer_terms << @term2
   end
 
+  it "should create a subscription with attributes" do
+    @offer.gifts.add(@gift1)
+    @offer.gifts.add(@gift2)
+    expect {
+      subscription = SubscriptionFactory.build(
+        @offer,
+        :attributes => {
+        'user_attributes' => Factory.attributes_for(:user),
+        'payments_attributes' => { "0" => Factory.attributes_for(:payment) }
+      })
+      subscription.save!
+    }.to change { Subscription.count }.by(1)
+  end
+
   describe "offer basics" do
     it "should set term to first term if none set" do
       t = Time.local(2011, 1, 1, 0, 0, 0)
@@ -73,7 +87,7 @@ describe SubscriptionFactory do
     it "should have select just one optional gift from the offer" do
       @offer.gifts.add(@gift1, true)
       @offer.gifts.add(@gift2, true)
-      subscription = SubscriptionFactory.build(@offer, :optional_gift_id => @gift2.id)
+      subscription = SubscriptionFactory.build(@offer, :optional_gift => @gift2.id)
       subscription.gifts.size.should == 1
       subscription.gifts.first.name.should == 'Gift 2'
     end
@@ -88,8 +102,8 @@ describe SubscriptionFactory do
     it "should raise if you select an optional gift that is not available on the offer" do
       @offer.gifts.add(@gift1, true)
       lambda {
-        SubscriptionFactory.build(@offer, :optional_gift_id => @gift2.id)
-      }.should raise_exception
+        SubscriptionFactory.build(@offer, :optional_gift => @gift2.id)
+      }.should raise_error(Exceptions::GiftNotAvailable, "The Gift \"#{@gift2.name}\" is no longer available")
     end
 
     it "should treat one optional gift as an included gift" do
@@ -104,7 +118,7 @@ describe SubscriptionFactory do
       @offer.gifts.add(@gift2)
       @offer.gifts.add(@gift3, true)
       @offer.gifts.add(@gift4, true)
-      subscription = SubscriptionFactory.build(@offer, :optional_gift_id => @gift4.id)
+      subscription = SubscriptionFactory.build(@offer, :optional_gift => @gift4.id)
       subscription.gifts.size.should == 3
     end
 
@@ -113,8 +127,8 @@ describe SubscriptionFactory do
       @offer.gifts.add(@gift2, true)
       @gift2.update_attributes(:on_hand => 0)
       lambda {
-        SubscriptionFactory.build(@offer, :optional_gift_id => @gift2.id)
-      }.should raise_exception
+        SubscriptionFactory.build(@offer, :optional_gift => @gift2.id)
+      }.should raise_error(Exceptions::GiftNotAvailable, "The Gift \"#{@gift2.name}\" is no longer available")
     end
 
     it "should accept a list of included gift ids as validation" do
@@ -130,7 +144,39 @@ describe SubscriptionFactory do
       @gift1.update_attributes(:on_hand => 0)
       lambda {
         SubscriptionFactory.build(@offer, :included_gift_ids => [@gift1, @gift2].map(&:id))
-      }.should raise_exception
+      }.should raise_error(Exceptions::GiftNotAvailable, "The Gift \"#{@gift1.name}\" is no longer available")
+    end
+
+    it "should raise if an included gift does not exist" do
+      lambda {
+        SubscriptionFactory.build(@offer, :included_gift_ids => [-1])
+      }.should raise_error(Exceptions::GiftNotAvailable, "The Gift is no longer available")
+    end
+
+    it "should raise if an optional gift does not exist" do
+      lambda {
+        SubscriptionFactory.build(@offer, :optional_gift => [-1])
+      }.should raise_error(Exceptions::GiftNotAvailable, "The Gift is no longer available")
+    end
+  end
+
+  describe "Initial State" do
+    it "should set to active by default" do
+      subscription = SubscriptionFactory.build(@offer)
+      subscription.state.should == 'active'
+    end
+
+    it "should allow me to specify the initial state" do
+      subscription = SubscriptionFactory.build(@offer, :init_state => 'trial')
+      subscription.state.should == 'trial'
+    end
+  end
+
+  describe "Source" do
+    it "should set the source if provided" do
+      source = Factory.create(:source)
+      subscription = SubscriptionFactory.build(@offer, :source => source)
+      subscription.source.name == source.name
     end
   end
 end

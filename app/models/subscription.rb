@@ -120,21 +120,6 @@ class Subscription < ActiveRecord::Base
   alias_method_chain :suspend!, :number_of_days
   private :suspend_with_number_of_days!, :suspend_without_number_of_days!
 
-
-  # TODO: Don't use this anymore
-  def use_offer(offer, term)
-    raise "Offer Term not valid for Offer" if term.try(:offer_id) != offer.id # TODO: Spec this
-    self.offer = offer
-    self.publication = offer.publication
-    self.price = term.price
-    # Add any Included gifts
-    self.gifts << offer.available_included_gifts
-    # Set the payment price
-    payments.last.try(:amount=, self.price)
-    # TODO: Move this to the observer for on_enter_active
-    increment_expires_at(term) 
-  end
-  
   def state_expiry_period_in_days
     (self.state_expires_at.to_date - Date.today) if self.state_expires_at
   end
@@ -187,21 +172,7 @@ class Subscription < ActiveRecord::Base
     CM::Proxy.log_cm_error(ex)
   end
 
-  def save_in_transaction
-    Subscription.transaction do
-      begin
-        save!
-      rescue PaymentFailedException => e
-        payment.errors.add_to_base("Unable to charge card: #{e.message}")
-        return false
-      rescue ActiveRecord::RecordInvalid => e
-        return false
-      end
-    end
-    true
-  end
-
-  # if the sibscription is new or expired, start it from now
+  # if the subscription is new or expired, start it from now
   # otherwise start it after the expiration time
   def increment_expires_at(offer_term)
     self.expires_at = nil && return unless offer_term.expires?
