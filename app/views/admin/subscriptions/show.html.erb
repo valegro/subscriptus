@@ -7,12 +7,15 @@
 <div class="grid">
   <div class="frame span_3">
     <dl>
+      <dt>Subscriber</dt><dd><%= link_to(@subscription.user.name, admin_subscriber_url(@subscription.user)) %></dd>
       <dt>Current State</dt><dd><%= @subscription.state %></dd>
       <dt>Started</dt><dd><%= format_timestamp(@subscription.created_at) %></dd>
-      <dt>Expires</dt><dd><%= format_timestamp(@subscription.state_expires_at) %></dd>
-      <dt>Subscriber</dt><dd><%= link_to(@subscription.user.name, admin_subscriber_url(@subscription.user)) %></dd>
-      <dt>Publication</dt><dd><%= link_to(@subscription.publication.name, admin_catalogue_publication_url(@subscription.publication)) %></dd>
       <dt>Offer</dt><dd><%= @subscription.offer ? link_to(@subscription.offer.name, admin_catalogue_offer_url(@subscription.offer)) : '-' %></dd>
+      <dt>Term Chosen</dt><dd><%= pluralize(@subscription.term_length, 'month') %></dd>
+      <dt>Expires</dt><dd><%= format_timestamp(@subscription.state_expires_at) %></dd>
+      <dt>Publication</dt><dd><%= link_to(@subscription.publication.name, admin_catalogue_publication_url(@subscription.publication)) %></dd>
+      <dt>Price</dt><dd><%= number_to_currency(@subscription.price) %></dd>
+      <dt>Concession</dt><dd><%= @subscription.concession ? 'Yes' : 'No' %></dd>
       <dt>Source</dt><dd><%= @subscription.source ? link_to(@subscription.source.name, admin_source_url(@subscription.source)) : '-' %></dd>
     </dl>
   </div>

@@ -13,8 +13,8 @@ describe SubscriptionMailer do
   # tests on activation method ----------------
   describe "if the subscription, offer an user are valid and available" do
     it "should successfully deliver the email containing the correct subscription details to the activated user" do
-      subscription = Factory.stub(:subscription, :id => 1)
-      subscription.use_offer(@offer, @offer_term)
+      subscription = Factory.stub(:subscription, :id => 1, :offer => @offer)
+      subscription.apply_term(@offer_term)
       res = SubscriptionMailer.deliver_activation(subscription)
 
       res.should_not      be_nil
@@ -23,8 +23,7 @@ describe SubscriptionMailer do
       res.from.should     == SubscriptionMailer::SEND_TO
       res.body.should     include_text(subscription.user.firstname)
       res.body.should     include_text(subscription.user.lastname)
-      res.body.should     include_text(@offer.publication.name)
-      #FIXME add more body.should include
+      # TODO: More body includes checks -> eg; gifts, end date etc
       res.content_type.should == 'text/html'
     end
   end

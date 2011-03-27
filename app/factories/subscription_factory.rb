@@ -12,7 +12,6 @@ class SubscriptionFactory
       subscription.state        = options[:init_state] || 'active'
       subscription.offer        = offer
       subscription.publication  = offer.publication
-      subscription.price        = term.price
       subscription.source       = source
 
       # Check that there aren't any in included_gift_ids that aren't in available_included_gifts
@@ -34,9 +33,8 @@ class SubscriptionFactory
         subscription.gifts << Gift.find(optional_gift_id) if optional_gift_id
       end
 
-      # Set the payment price
-      subscription.payments.last.try(:amount=, subscription.price)
-      subscription.increment_expires_at(term)
+      # Set the offer term
+      subscription.apply_term(term)
     end
   end
 end
