@@ -3,6 +3,16 @@ class SubscribeController < ApplicationController
   before_filter :load_offer
   before_filter :load_gifts
 
+  rescue_from(Exceptions::PaymentFailedException, Exceptions::GiftNotAvailable) do |exception|
+    @subscription ||= @factory.try(:subscription) # Ensure that the subscription instance is set
+    flash[:error] = exception.message
+    render :action => :new
+  end
+
+  rescue_from(ActiveRecord::RecordInvalid) do |exception|
+    render :action => :new
+  end
+
   def new
     source = (params[:source_id] && params[:source_id] != 'null') ? Source.find(params[:source_id]) : nil
     @subscription = Subscription.new
@@ -19,33 +29,17 @@ class SubscribeController < ApplicationController
     @subscription.payments.build
   end
 
-
-    # TODO: We should be doing something like this
-    # @subscription = Subscription.new_from_offer(offer, term, optional_gift, included_gifts(ids), params...)
-    # But need to specify term chosen, optional gift chosen and the list of included gifts that were offered
-    # Then the form doesn't need to worry about fields_for for the gifts just optional_gifts and included_gifts as arrays
-    # Get rid of accepts_nested for subscription_gifts
-  # TODO: Use the factory
-  # TODO: Handle any of the exceptions that the factory might raise
-  #
   def create
-    @subscription = Subscription.new(params[:subscription])
-    @subscription = Subscription.from_offer(@offer, {
-      :term_id => params[:offer_term],
-      :optional_gift => 1,
-      :included_gifts => @included_gifts,
-      :attributes => params[:subscription]
-    })
-    @user = @subscription.user
-
-    # Set to active because we are taking payment
-    @subscription.state = 'active'
-    @subscription.use_offer(@offer, @term)
-
-    if @subscription.save_in_transaction
+    Subscription.transaction do
+      @factory = SubscriptionFactory.new(@offer, {
+        :term_id            => params[:offer_term],
+        :optional_gift      => params[:optional_gift],
+        :included_gift_ids  => params[:included_gifts].try(:map, &:to_i),
+        :attributes         => params[:subscription]
+      })
+      @subscription = @factory.build
+      @subscription.save!
       redirect_to :action => :thanks
-    else
-      render :action => :new
     end
   end
 

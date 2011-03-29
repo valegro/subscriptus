@@ -7,7 +7,6 @@ describe Subscription do
     today = Date.new(2010, 9, 27) # today is "Mon, 27 Sep 2010"
     Date.stubs(:today).returns(today)
 
-
     cm_return = stub(:success? => true)
     CM::Recipient.stubs(:exists?).returns(true)
     CM::Recipient.stubs(:find_all).returns(cm_return)
@@ -32,8 +31,23 @@ describe Subscription do
 
   describe "offer term" do
     before(:each) do
-      months = 3
-      @offer_term = Factory.create(:offer_term, :months => months)
+      @offer = Factory.create(:offer)
+      @subscription.offer = @offer
+      @offer_term = Factory.create(:offer_term, :months => 3, :offer => @offer)
+    end
+
+    it "should copy the offer term details onto the subscription" do
+      @subscription.expects(:increment_expires_at).with(@offer_term)
+      @subscription.apply_term(@offer_term)
+      @subscription.term_length.should == 3
+      @subscription.concession.should == false
+    end
+
+    it "should raise if the offer term does not match the offer" do
+      @offer_term = Factory.create(:offer_term, :months => 3, :offer => Factory.create(:offer))
+      lambda {
+        @subscription.apply_term(@offer_term)
+      }.should raise_error
     end
 
     it "should set expiry_date to 3 months from now if the expiry date has aleady been passed" do

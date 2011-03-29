@@ -2,6 +2,9 @@ require 'wordpress'
 require 'spec_helper'
 
 describe Wordpress do
+  before(:each) do
+    Wordpress.enabled = true
+  end
   
   context "#exists" do
     it "should raise an error if login or email are not passed" do

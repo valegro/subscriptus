@@ -35,7 +35,7 @@ class Admin::Catalogue::PublicationsController < Admin::CatalogueController
   end
 
   def destroy
-    @publication.destroy
+    @publication.delete
     flash[:notice] = "Deleted Publication"
     redirect_to :action => :index
   end

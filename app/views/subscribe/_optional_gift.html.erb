@@ -1,6 +1,5 @@
 <div class='gift-option'>
-  <%= f.hidden_field :included %>
-  <%= f.radio_button :gift_id, optional_gift.id, :checked => checked %>
-  <%= f.label :gift_id, gift_label(optional_gift) %>
+  <%= radio_button_tag :optional_gift, optional_gift.id, checked %>
+  <%= label_tag "optional_gift_#{optional_gift.id}", gift_label(optional_gift) %>
 </div>
 

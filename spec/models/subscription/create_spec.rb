@@ -49,5 +49,14 @@ describe Subscription do
       s.expects(:send_later).with(:sync_to_campaign_master)
       s.save!
     end
+
+    it "should create and process a payment if one is provided" do
+      s = Factory.build(:subscription, :payments_attributes => { "0" =>  Factory.attributes_for(:payment) })
+      gw_response = stub(:success? => true)
+      GATEWAY.expects(:purchase).returns(gw_response)
+      expect {
+        s.save!
+      }.to change { s.payments.count }.by(1)
+    end
   end
 end

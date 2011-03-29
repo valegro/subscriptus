@@ -10,7 +10,6 @@ class SubscriptionObserver < ActiveRecord::Observer
     when 'squatter' then SubscriptionMailer.deliver_pending_expired(subscription)
     end
   end
-  
 
   def before_enter_active(subscription)
     # TODO: Set expires_at here
@@ -27,5 +26,4 @@ class SubscriptionObserver < ActiveRecord::Observer
       end
     end
   end
-
 end

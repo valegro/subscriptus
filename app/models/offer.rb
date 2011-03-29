@@ -1,6 +1,6 @@
 class Offer < ActiveRecord::Base
   belongs_to :publication
-  has_many :subscriptions
+  has_many :subscriptions, :after_add => Proc.new { |o, s| puts "Adding #{s.inspect} to offer" }
   has_many :gift_offers, :dependent => :destroy
   has_many :gifts, :through => :gift_offers do
     def add(gift, optional = false)

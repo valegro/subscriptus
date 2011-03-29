@@ -4,8 +4,8 @@ describe Payment do
   before(:each) do
     @offer = Factory(:offer)
     @offer_term = Factory.create(:offer_term, :months => 3, :offer_id => @offer.id)
-    @subscription = Factory.stub(:subscription)
-    @subscription.use_offer(@offer, @offer_term)
+    @subscription = Factory.stub(:subscription, :offer => @offer)
+    @subscription.apply_term(@offer_term)
   end
 
   it "should be invalid with an invalid credit card" do
@@ -20,8 +20,6 @@ describe Payment do
     assert payment.valid?
   end
 
-
-
   describe "process a payment" do
     it "raise an exception on fail" do
       message = "Insufficient Funds"
@@ -32,7 +30,7 @@ describe Payment do
       assert payment.valid?
       lambda {
         payment.save
-      }.should raise_exception(PaymentFailedException, message)
+      }.should raise_exception(Exceptions::PaymentFailedException, message)
     end
 
     it "should not raise on success" do

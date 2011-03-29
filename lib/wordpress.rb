@@ -1,5 +1,9 @@
 module Wordpress
   class Error < StandardError; end
+
+  class << self
+    attr_accessor :enabled
+  end
   
   def self.config
     @@config ||= YAML.load_file(File.join(RAILS_ROOT, 'config', 'wordpress.yml'))[RAILS_ENV].symbolize_keys
@@ -26,8 +30,10 @@ private
   end
   
   def self.make_request_and_raise_error(opts)
-    make_request(opts).tap do |result|
-      raise Error.new(result) unless opts[:login] == result
+    if self.enabled
+      make_request(opts).tap do |result|
+        raise Error.new(result) unless opts[:login] == result
+      end
     end
   end
   

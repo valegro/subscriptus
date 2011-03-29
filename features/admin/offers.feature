@@ -54,7 +54,7 @@ Feature: An admin can CRUD an Offer
         And I follow "Back to Offers"
     Then I should be on the admin catalogue offers page
 
-  @active
+  @javascript @pending
   Scenario: An admin can promote an offer
     Given an offer: "An Offer" exists with name: "An Offer", id: 1
       And a source: "Email" exists with code: "Email", id: 10
@@ -66,21 +66,21 @@ Feature: An admin can CRUD an Offer
     When I select "Email" from "Source"
       Then the "Link" field should contain "http://offers.crikey.com.au/subscribe?offer_id=1&source=10"
 
-  @pending
+  @javascript
   Scenario: An admin fails to add a term option
     Given an offer: "An Offer" exists with name: "An Offer", id: 1
     When I am on the admin catalogue offer page for 1
+      Then I should see "Add term option"
       And I follow "Add term option"
-      Then I should see "Add Offer Term Option"
     When I press "Create"
-      Then I should see "Add Offer Term Option"
+      Then I should see "Add term option"
 
-  @pending
+  @javascript
   Scenario: An admin can add a term option
     Given an offer: "An Offer" exists with name: "An Offer", id: 1
     When I am on the admin catalogue offer page for 1
       And I follow "Add term option"
-      Then I should see "Add Offer Term Option"
+      Then I should see "Add term option"
     When I fill in "offer_term[price]" with "100"
       And I select "3 months" from "offer_term[months]"
       And I press "Create"

@@ -1,4 +1,3 @@
-
 <% form_for @subscription, :url => subscribe_path(:offer_id => @offer.id), :builder => SubscribeFormBuilder do |f| %>
 
   <div class='section' id='step1'>
@@ -11,6 +10,7 @@
       <p class='subscription-description'><%= h(@offer.publication.description) %></p>
 
       <!-- Error Messages -->
+      <%= flash[:error] %>
       <%= f.error_messages %>
       <div id='subscription-options' class='form-section'>
         
@@ -40,12 +40,10 @@
 
       <!-- Gifts -->
 
-      <!-- TODO: Choose which gifts are optional and included in the controller - that way we only have one section here -->
       <div id='gift-options' class='form-section'>
-        <% f.fields_for :subscription_gifts do |sg| %>
           <% unless @included_gifts.blank? %>
             <h3>Subscribe and Receive</h3>
-            <%= render :partial => "included_gift", :collection => @included_gifts, :locals => { :f => sg } %>
+            <%= render :partial => "included_gift", :collection => @included_gifts %>
           <% end %>
           <% if @optional_gifts.size > 1 %>
             <% if @offer.gifts.included.empty? %>
@@ -54,10 +52,9 @@
               <h3>Plus, choose one of the following:</h3>
             <% end %>
             <% @optional_gifts.each_with_index do |o_gift, i| %>
-              <%= render :partial => "optional_gift", :object => o_gift, :locals => { :f => sg, :checked => (i == 0) } %>
+              <%= render :partial => "optional_gift", :object => o_gift, :locals => { :checked => (i == 0) } %>
             <% end %>
           <% end %>
-        <% end %>
       </div>
 
     </div>
@@ -75,25 +72,23 @@
       </div>
 
       <div id='section-ne'>
-        <% if @user.new_record? %>
-          <% f.fields_for :user do |u| %>
-            <%= u.enum_select :title %>
-            <%= u.text_field :firstname, :required => true, :label => "First Name" %>
-            <%= u.text_field :lastname, :required => true, :label => "Last Name" %>
-            <%= u.select :hear_about, [ "The web", "Someone else" ], :required => true, :label => "How did you hear about Crikey?" %>
-            <%= u.text_field :email, :help => "This is the email address Crikey will be sent to", :required => true %>
-            <%= u.text_field :email_confirmation, :required => true %>
-            <%= u.text_field :phone_number, :help => "If there are problems with email delivery this is how we contact you", :required => true %>
-            <%= u.text_field :company %>
-            <%= u.text_field :address_1, :label => "Street Address Line 1", :required => true %>
-            <%= u.text_field :address_2, :label => "Street Address Line 2" %>
-            <%= u.text_field :city, :required => true %>
-            <%= u.enum_select :state, :required => true %>
-            <%= u.text_field :postcode, :required => true %>
-            <%= u.country_select :country, ['Australia'], :required => true %>
-            <%= u.password_field :password %>
-            <%= u.password_field :password_confirmation %>
-          <% end %>
+        <% f.fields_for :user do |u| %>
+          <%= u.enum_select :title %>
+          <%= u.text_field :firstname, :required => true, :label => "First Name" %>
+          <%= u.text_field :lastname, :required => true, :label => "Last Name" %>
+          <%= u.select :hear_about, [ "The web", "Someone else" ], :required => true, :label => "How did you hear about Crikey?" %>
+          <%= u.text_field :email, :help => "This is the email address Crikey will be sent to", :required => true %>
+          <%= u.text_field :email_confirmation, :required => true %>
+          <%= u.text_field :phone_number, :help => "If there are problems with email delivery this is how we contact you", :required => true %>
+          <%= u.text_field :company %>
+          <%= u.text_field :address_1, :label => "Street Address Line 1", :required => true %>
+          <%= u.text_field :address_2, :label => "Street Address Line 2" %>
+          <%= u.text_field :city, :required => true %>
+          <%= u.enum_select :state, :required => true %>
+          <%= u.text_field :postcode, :required => true %>
+          <%= u.country_select :country, ['Australia'], :required => true %>
+          <%= u.password_field :password, :required => true %>
+          <%= u.password_field :password_confirmation, :required => true %>
         <% end %>
       </div>
     </div>
