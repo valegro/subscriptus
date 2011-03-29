@@ -26,9 +26,7 @@ module Wordpress
 
 private
   def self.make_request(opts)
-    if self.enabled
-      RestClient.get(Wordpress.config[:endpoint], :params => opts, :accept => :text).to_str
-    end
+    RestClient.get(Wordpress.config[:endpoint], :params => opts.merge(:key => Wordpress.config[:key]), :accept => :text).to_str
   end
   
   def self.make_request_and_raise_error(opts)
