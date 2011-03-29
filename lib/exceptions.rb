@@ -19,7 +19,7 @@ module  Exceptions
 
     def message
       gift = Gift.find(@gift_id)
-      "The Gift \"#{gift.name}\" is no longer available"
+      "The Gift #{gift.name} is no longer available"
     rescue
       "The Gift is no longer available"
     end

@@ -82,7 +82,7 @@ class Subscription < ActiveRecord::Base
   after_exit_suspended :restore_subscription_expiry
 
   def apply_term(offer_term)
-    if offer_term.offer.blank? || offer_term.offer != self.offer
+    if offer_term.blank? || offer_term.offer.blank? || offer_term.offer != self.offer
       raise Exceptions::InvalidOfferTerm
     end
     self.price = offer_term.price

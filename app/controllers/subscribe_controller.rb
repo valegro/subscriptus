@@ -4,6 +4,7 @@ class SubscribeController < ApplicationController
   before_filter :load_gifts
 
   rescue_from(Exceptions::PaymentFailedException, Exceptions::GiftNotAvailable) do |exception|
+    @subscription ||= @factory.try(:subscription) # Ensure that the subscription instance is set
     flash[:error] = exception.message
     render :action => :new
   end
@@ -30,12 +31,13 @@ class SubscribeController < ApplicationController
 
   def create
     Subscription.transaction do
-      @subscription = SubscriptionFactory.build(@offer, {
-        :term_id          => params[:offer_term],
-        :optional_gift    => params[:optional_gift],
-        :included_gifts   => params[:included_gifts].try(:map, &:to_i),
-        :attributes       => params[:subscription]
+      @factory = SubscriptionFactory.new(@offer, {
+        :term_id            => params[:offer_term],
+        :optional_gift      => params[:optional_gift],
+        :included_gift_ids  => params[:included_gifts].try(:map, &:to_i),
+        :attributes         => params[:subscription]
       })
+      @subscription = @factory.build
       @subscription.save!
       redirect_to :action => :thanks
     end
