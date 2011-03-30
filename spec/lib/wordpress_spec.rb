@@ -79,4 +79,19 @@ describe Wordpress do
       lambda {Wordpress.update(:login => 'janebloggs', :firstname => 'Jane')}.should raise_error
     end
   end
+  
+  context "#authenticate" do
+    it "should raise an error if no options are present" do
+      lambda {Wordpress.authenticate}.should raise_error
+    end
+    
+    it "should raise an error if the password is not present" do
+      lambda {Wordpress.authenticate(:login => 'joebloggs')}.should raise_error
+      lambda {Wordpress.authenticate(:email => 'joebloggs@example.com')}.should raise_error
+    end
+    
+    it "should raise an error if login or email are not passed" do
+      lambda {Wordpress.authenticate(:pword => 'password')}.should raise_error
+    end
+  end
 end

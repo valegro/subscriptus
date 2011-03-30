@@ -23,6 +23,12 @@ module Wordpress
     check_required(opts, :login)
     make_request_and_raise_error(opts.merge(:func => 'update'))
   end
+  
+  def self.authenticate(opts={})
+    check_any_required(opts, :login, :email)
+    check_required(opts, :pword)
+    make_request_and_raise_error(opts.merge(:func => 'authenticate'))
+  end
 
 private
   def self.make_request(opts)

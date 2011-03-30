@@ -1,7 +1,6 @@
 # Hackitty-Hackity!
 # AlsoMigrate doesn't keep up with the latest Postgres Syntax
 
-puts "AAAA"
 module ActiveRecord
   class Migrator
     class AlsoMigrate
