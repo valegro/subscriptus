@@ -27,7 +27,7 @@ module Wordpress
   def self.authenticate(opts={})
     check_any_required(opts, :login, :email)
     check_required(opts, :pword)
-    make_request_and_raise_error(opts.merge(:func => 'authenticate'))
+    return make_request(opts.merge(:func => 'authenticate')) == 'true'
   end
 
 private
@@ -39,11 +39,14 @@ private
     end
   end
   
-  def self.make_request_and_raise_error(opts)
+  def self.make_request_and_raise_error(opts, expected_result = nil)
+    expected_result ||= opts[:login] 
     if self.enabled
       make_request(opts).tap do |result|
-        raise Error.new(result) unless opts[:login] == result
+        raise Error.new(result) unless result == expected_result
       end
+    else
+      opts[:login]
     end
   end
   
