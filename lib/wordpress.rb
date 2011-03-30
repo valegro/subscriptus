@@ -29,7 +29,7 @@ private
     if self.enabled
       RestClient.get(Wordpress.config[:endpoint], :params => opts.merge(:key => Wordpress.config[:key]), :accept => :text).to_str
     else
-      opts.first.value
+      ''
     end
   end
   
