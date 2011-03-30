@@ -4,6 +4,8 @@ module Wordpress
   class << self
     attr_accessor :enabled
   end
+
+  Wordpress.enabled = false
   
   def self.config
     @@config ||= YAML.load_file(File.join(RAILS_ROOT, 'config', 'wordpress.yml'))[RAILS_ENV].symbolize_keys
