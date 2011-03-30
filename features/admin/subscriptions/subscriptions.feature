@@ -26,7 +26,7 @@ Feature: Subscription List
    Given publication "Publication 1" has been deleted
     When I go to the admin subscriptions page
     Then I should see the following table rows in any order:
-      | User             | Publication   | State     | Activity | At |
-      | Bob Subscriber   | Publication 1 | New Trial |          | 10:30 01/01/2011 EST   |
-      | Alice Subscriber | Publication 2 | Active    |          | 10:30 01/01/2011 EST   |
+      | User             | Publication   | State     |
+      | Bob Subscriber   | Publication 1 | New Trial |
+      | Alice Subscriber | Publication 2 | Active    |
   
