@@ -4,8 +4,6 @@ module Wordpress
   class << self
     attr_accessor :enabled
   end
-
-  Wordpress.enabled = false
   
   def self.config
     @@config ||= YAML.load_file(File.join(RAILS_ROOT, 'config', 'wordpress.yml'))[RAILS_ENV].symbolize_keys
@@ -28,7 +26,11 @@ module Wordpress
 
 private
   def self.make_request(opts)
-    RestClient.get(Wordpress.config[:endpoint], :params => opts.merge(:key => Wordpress.config[:key]), :accept => :text).to_str
+    if self.enabled
+      RestClient.get(Wordpress.config[:endpoint], :params => opts.merge(:key => Wordpress.config[:key]), :accept => :text).to_str
+    else
+      opts.first.value
+    end
   end
   
   def self.make_request_and_raise_error(opts)
