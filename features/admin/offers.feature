@@ -79,11 +79,11 @@ Feature: An admin can CRUD an Offer
   Scenario: An admin can add a term option
     Given an offer: "An Offer" exists with name: "An Offer", id: 1
     When I am on the admin catalogue offer page for 1
-      And I follow "Add term option"
-      Then I should see "Add term option"
+    And I follow "Add term option"
+    Then I should see "Add term option"
     When I fill in "offer_term[price]" with "100"
-      And I select "3 months" from "offer_term[months]"
-      And I press "Create"
+    When I fill in "offer_term[months]" with "3"
+    And I press "Create"
     Then I should see "3 months for $100.00"
 
   @active
