@@ -14,5 +14,5 @@ class Publication < ActiveRecord::Base
   validates_uniqueness_of :name
   default_scope :order => "name"
 
-  DEFAULT_TRIAL_EXPIRY = 30 #days
+  DEFAULT_TRIAL_EXPIRY = 21 #days
 end

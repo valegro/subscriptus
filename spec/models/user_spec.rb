@@ -54,7 +54,7 @@ describe User do
   end
   
   it "should create a user in Wordpress" do
-    Wordpress.expects(:create).with(:login => 'daniel', :pword => 'password', :email => 'daniel@netfox.com',:firstname => 'Daniel', :lastname => 'Draper').returns('daniel')
+    Wordpress.expects(:send_later).with(:create, { :login => 'daniel', :pword => 'password', :email => 'daniel@netfox.com',:firstname => 'Daniel', :lastname => 'Draper' })
     Factory.create(:user, :firstname => 'Daniel', :lastname => 'Draper', :email => 'daniel@netfox.com', :login => 'daniel', :password => 'password',:password_confirmation => 'password')
   end
 
@@ -120,7 +120,6 @@ describe User do
 
   describe "upon creation" do
     it "should call update_cm with :create" do
-      UserMailer.expects(:deliver_new_user)
       @user.expects(:send_later).with(:sync_to_campaign_master)
       @user.save!
     end

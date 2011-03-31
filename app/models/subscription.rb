@@ -76,7 +76,7 @@ class Subscription < ActiveRecord::Base
     
     # Expiries
     expires :pending => :squatter, :after => 14.days
-    expires :trial => :squatter, :after => 21.days
+    expires :trial => :squatter, :after => Publication::DEFAULT_TRIAL_EXPIRY.days
 
   end
   after_exit_suspended :restore_subscription_expiry
