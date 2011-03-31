@@ -4,7 +4,6 @@ class SubscribeController < ApplicationController
   before_filter :load_gifts
 
   rescue_from(Exceptions::PaymentFailedException, Exceptions::GiftNotAvailable) do |exception|
-      debugger
     flash[:error] = exception.message
     render :action => :new
   end

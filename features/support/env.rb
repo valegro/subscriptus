@@ -24,7 +24,7 @@ Spork.prefork do
   
   require 'webmock/cucumber'
   WebMock.disable_net_connect!(:allow_localhost => true, :allow => ['www.securepay.com.au'])
-  stub_request(:any, /.*amazonaws.*/)
+  #stub_request(:any, /.*amazonaws.*/)
   
   # require 'selenium/client'
   require 'cucumber/rails/capybara_javascript_emulation' # Lets you click links with onclick javascript handlers without using @culerity or @javascript
