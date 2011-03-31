@@ -23,19 +23,30 @@ module Wordpress
     check_required(opts, :login)
     make_request_and_raise_error(opts.merge(:func => 'update'))
   end
+  
+  def self.authenticate(opts={})
+    check_any_required(opts, :login, :email)
+    check_required(opts, :pword)
+    return make_request(opts.merge(:func => 'authenticate')) == 'true'
+  end
 
 private
   def self.make_request(opts)
     if self.enabled
-      RestClient.get(Wordpress.config[:endpoint], :params => opts, :accept => :text).to_str
+      RestClient.get(Wordpress.config[:endpoint], :params => opts.merge(:key => Wordpress.config[:key]), :accept => :text).to_str
+    else
+      ''
     end
   end
   
-  def self.make_request_and_raise_error(opts)
+  def self.make_request_and_raise_error(opts, expected_result = nil)
+    expected_result ||= opts[:login] 
     if self.enabled
       make_request(opts).tap do |result|
-        raise Error.new(result) unless opts[:login] == result
+        raise Error.new(result) unless result == expected_result
       end
+    else
+      opts[:login]
     end
   end
   

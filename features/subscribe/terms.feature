@@ -7,7 +7,7 @@ Feature: A user can subscribe to an offer with a term option
 
   Scenario: I can subscribe to an offer with one term option
     Given an offer_term exists with months: 3, offer: offer "An Offer", price: 30
-      And I am on the subscribe page for 1
+      And I am on the subscribe new page for 1
     Then I should see "Choose your Subscription"
       And I should see "3 months"
       And I should see "$30.00"
@@ -15,7 +15,7 @@ Feature: A user can subscribe to an offer with a term option
   Scenario: I can subscribe to an offer with two term options
     Given an offer_term exists with months: 3, offer: offer "An Offer", price: 30
       And an offer_term exists with months: 6, offer: offer "An Offer", price: 55
-      And I am on the subscribe page for 1
+      And I am on the subscribe new page for 1
     Then I should see "Choose your Subscription"
       And I should see "3 months"
       And I should see "$30.00"

@@ -16,7 +16,7 @@ Rails::Initializer.run do |config|
   
   # Add additional load paths for your own custom dirs
   # config.load_paths += %W( #{RAILS_ROOT}/extras )
-  config.load_paths += %W( #{RAILS_ROOT}/app/factories )
+  config.autoload_paths += %W( #{RAILS_ROOT}/app/factories )
 
   # Specify gems that this application depends on and have them installed with rake gems:install
   # config.gem "bj"
@@ -46,32 +46,9 @@ Rails::Initializer.run do |config|
 end
 
 # TODO: Make confir options
-STANDARD_TIME_FORMAT = '%H:%M %d/%m/%y %Z'
+STANDARD_TIME_FORMAT = '%H:%M %d/%m/%Y %Z'
 APP_TIMEZONE = 'Melbourne'
 
 require 'delayed_job'
+require 'also_migrate_hack'
 
-__END__
-gem 'httpclient' 
-gem 'soap4r' 
-gem 'mechanize'
-
-require 'soap/wsdlDriver' 
-require 'cm/CampaignMasterService'
-
-require 'cm/recipient'
-
-      def self.validate_certificate(is_ok, ctx)
-        true
-      end
-
-puts "Calling factory in ENV"
-fact = SOAP::WSDLDriverFactory.new(CM::Base::V1_URI)
-puts "end calling factory in ENV"
-driver = fact.create_rpc_driver
-driver.generate_explicit_type = true
-driver.options['protocol.http.ssl_config.verify_callback'] = method(:validate_certificate)
-driver.options["protocol.http.connect_timeout"] = 60 # XXX should defaults be settable somewhere?
-driver.options["protocol.http.receive_timeout"] = 60
-
-CM::Base.driver = driver

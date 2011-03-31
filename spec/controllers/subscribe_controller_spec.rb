@@ -35,6 +35,8 @@ describe SubscribeController do
         'user_attributes' => @user_attributes,
         'payments_attributes' => { "0" => @payment_attributes }
       }
+      gw_response = stub(:success? => true)
+      #GATEWAY.expects(:purchase).returns(gw_response)
     end
 
     it "should create a subscription" do
@@ -46,6 +48,7 @@ describe SubscribeController do
           :subscription => @attributes
         })
       }.to change { Subscription.count }.by(1)
+      Subscription.last.payments.size.should == 1
       response.should redirect_to(:action => 'thanks')
     end
 
@@ -77,15 +80,16 @@ describe SubscribeController do
 
     it "should build a subscription when no gifts are selected" do
       subscription = stub(:user => Factory.stub(:user))
-      subscription.expects(:save!).returns(true)
-      SubscriptionFactory.expects(:build).with(
+      factory = stub(:build => subscription)
+      SubscriptionFactory.expects(:new).with(
         instance_of(Offer), {
           :term_id => @ot1.id.to_s,
           :optional_gift => nil,
-          :included_gifts => nil,
+          :included_gift_ids => nil,
           :attributes => @attributes
         }
-      ).returns(subscription)
+      ).returns(factory)
+      subscription.expects(:save!).returns(true)
       post('create', {
         :offer_id => @offer.id,
         :source_id => @source.id,
@@ -98,15 +102,16 @@ describe SubscribeController do
     it "should build a subscription with included and an optional gift" do
       subscription = stub(:user => Factory.stub(:user))
       subscription.expects(:save!).returns(true)
-      SubscriptionFactory.expects(:build).with(
+      factory = stub(:build => subscription)
+      SubscriptionFactory.expects(:new).with(
         instance_of(Offer), {
           :term_id => @ot1.id.to_s,
           :optional_gift => nil,
-          :included_gifts => [@g1.id, @g2.id],
+          :included_gift_ids => [@g1.id, @g2.id],
           :optional_gift => @g4.id.to_s,
           :attributes => @attributes
         }
-      ).returns(subscription)
+      ).returns(factory)
       post 'create', {
         :offer_id => @offer.id,
         :source_id => @source.id,
@@ -131,9 +136,8 @@ describe SubscribeController do
         })
       }.to_not change { Subscription.count }.by(1)
       response.should render_template("new")
-      flash[:error].should == "The Gift \"#{@g4.name}\" is no longer available"
+      flash[:error].should == "The Gift #{@g4.name} is no longer available"
     end
-
 
     # TODO
     # Invalid gift

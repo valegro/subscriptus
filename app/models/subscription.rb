@@ -76,10 +76,21 @@ class Subscription < ActiveRecord::Base
     
     # Expiries
     expires :pending => :squatter, :after => 14.days
-    expires :trial => :squatter, :after => 21.days
+    expires :trial => :squatter, :after => Publication::DEFAULT_TRIAL_EXPIRY.days
 
   end
   after_exit_suspended :restore_subscription_expiry
+
+  def apply_term(offer_term)
+    if offer_term.blank? || offer_term.offer.blank? || offer_term.offer != self.offer
+      raise Exceptions::InvalidOfferTerm
+    end
+    self.price = offer_term.price
+    self.term_length = offer_term.months
+    # Set the payment price
+    self.payments.last.try(:amount=, offer_term.price)
+    self.increment_expires_at(offer_term)
+  end
   
   def restore_subscription_expiry
     if self.state_expires_at

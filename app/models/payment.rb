@@ -12,6 +12,8 @@ class Payment < ActiveRecord::Base
   enum_attr :card_type, %w(visa master american_express diners_club jcb)
   enum_attr :payment_type, %w(credit_card direct_debit cheque), :init => :credit_card
 
+  default_scope :order => "created_at desc"
+
   def validate_on_create
     if credit_card? && !credit_card.valid?
       errors.add_to_base("Credit Card is not valid - check the details and try again")
@@ -27,11 +29,11 @@ class Payment < ActiveRecord::Base
         :description => 'Crikey Subscription Payment',
         :email => payment.subscription.try(:user).try(:email)
       )
-      # Save a reference
-      payment.card_number = "XXXX-XXXX-XXXX-#{payment.card_number[-4..-1]}"
       unless response.success?
         raise Exceptions::PaymentFailedException.new(response.message)
       end
+      # Save a reference
+      payment.card_number = "XXXX-XXXX-XXXX-#{payment.card_number[-4..-1]}"
     end
   end
 

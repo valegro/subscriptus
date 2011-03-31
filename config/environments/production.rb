@@ -47,6 +47,7 @@ config.after_initialize do
         :login => 'CKR0030',  # <MerchantID> input to Au securePay Gateway.
         :password => "q02nnn8h"
   )
+  Wordpress.enabled = false # TODO: Enable this
 end
 
 CAMPAIGNMASTER_USERNAME = 'ddraper'

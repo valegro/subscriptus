@@ -12,7 +12,7 @@
     <h2>Offer Term</h2>
     <p>The basic term of this offer - you can add more options later.</p>
     <%= term.text_field :price %>
-    <%= term.select :months, OfferTerm::TERM_OPTIONS.map { |t| [ t == 0 ? 'Forever' : pluralize(t, 'month'), t ] }, :label => "Term" %>
+    <%= term.text_field :months, :size => 5 %>
   <% end %>
   <%= form.submit "Create" %>
 <% end %>

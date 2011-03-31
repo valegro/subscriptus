@@ -42,6 +42,7 @@ describe Webhooks::UnbouncesController do
     User.count.should == cnt + 1
   end
 
+  #TODO: Most of these checks belong in the model - we should just check that the right call is being made and that the subscription count increases
   it "should create a new trial subscription with weekender" do
     post 'create', { "data.json"=>"{\"ip_address\":\"150.101.226.181\",\"email\":[\"example@example.com\"],\"last_name\":[\"Draper\"],\"first_name\":[\"Daniel\"],\"options\":[\"Yes - send me Your Weekender\"]}", "page_url"=>"http://unbouncepages.com/bf43f31e-e55b-11df-82d5-12313e003591", "page_id"=>"bf43f31e-e55b-11df-82d5-12313e003591", "variant"=>"a", "publication_id" => @publication.id }
     assigns[:subscription].user.email.should == 'example@example.com'

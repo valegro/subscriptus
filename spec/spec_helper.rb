@@ -126,3 +126,5 @@ module CM
     end
   end
 end
+
+Wordpress.enabled = true

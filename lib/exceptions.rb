@@ -10,6 +10,7 @@ module  Exceptions
   class CanNotBePaidFor                      < StandardError; end
   class CanNotBeCanceled                     < StandardError; end
   class PaymentFailedException               < StandardError; end
+  class InvalidOfferTerm                     < StandardError; end
 
   class GiftNotAvailable                     < StandardError
     def initialize(gift_id)
@@ -18,7 +19,7 @@ module  Exceptions
 
     def message
       gift = Gift.find(@gift_id)
-      "The Gift \"#{gift.name}\" is no longer available"
+      "The Gift #{gift.name} is no longer available"
     rescue
       "The Gift is no longer available"
     end

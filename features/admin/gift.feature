@@ -55,7 +55,7 @@ Feature: An admin can CRUD a gift
       And I follow "My Gift"
     Then I should be on the admin catalogue gift page for 1
       And I should see "My Gift"
-      And I should see "Stock on Hand"
+      And I should see "Stock on hand"
 
   @active
   Scenario: An admin can return to Gifts from show page

@@ -23,8 +23,9 @@ Spork.prefork do
   require 'capybara/session'
   
   require 'webmock/cucumber'
-  WebMock.disable_net_connect!(:allow_localhost => true, :allow => ['www.securepay.com.au'])
-  #stub_request(:any, /.*amazonaws.*/)
+
+  WebMock.disable_net_connect!(:allow_localhost => true, :allow => ['www.securepay.com.au', 's3.amazonaws.com'])
+  WebMock.stub_request(:any, /.*amazonaws.*/)
   
   # require 'selenium/client'
   require 'cucumber/rails/capybara_javascript_emulation' # Lets you click links with onclick javascript handlers without using @culerity or @javascript
@@ -70,6 +71,7 @@ Spork.each_run do
       require 'database_cleaner'
       require 'database_cleaner/cucumber'
       DatabaseCleaner.strategy = :truncation
+      ActiveRecord::Migrator::AlsoMigrate.create_tables(:source => 'publications', :destination => 'archived_publications')
     rescue LoadError => ignore_if_database_cleaner_not_present
     end
   end
