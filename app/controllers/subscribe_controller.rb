@@ -4,10 +4,7 @@ class SubscribeController < ApplicationController
   before_filter :load_gifts
 
   rescue_from(Exceptions::PaymentFailedException, Exceptions::GiftNotAvailable) do |exception|
-<<<<<<< HEAD
-=======
     @subscription ||= @factory.try(:subscription) # Ensure that the subscription instance is set
->>>>>>> a3897e372728d20a23d49056e6fbdc57fd3c3a2a
     flash[:error] = exception.message
     render :action => :new
   end
