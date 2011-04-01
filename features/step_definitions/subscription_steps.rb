@@ -27,3 +27,9 @@ Given(/^#{capture_model} is unsuspended$/) do |name|
   subscription = model!(name)
   subscription.unsuspend!
 end
+
+Given /^I should not be able to select the "([^"]*)" option from "([^"]*)"$/ do |option, select|
+  if page.respond_to? :should
+    lambda { select(option, :from => select) }.should raise_exception(Capybara::OptionNotFound)
+  end
+end

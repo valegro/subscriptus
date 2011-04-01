@@ -10,7 +10,9 @@
       <p class='subscription-description'><%= h(@offer.publication.description) %></p>
 
       <!-- Error Messages -->
-      <%= flash[:error] %>
+      <% unless flash[:error].blank? %>
+        <div id="flash"><%= flash[:error] %></div>
+      <% end %>
       <%= f.error_messages %>
       <div id='subscription-options' class='form-section'>
         
@@ -49,6 +51,7 @@
             <% if @offer.gifts.included.empty? %>
               <h3>Choose a gift!</h3>
             <% else %>
+              <div class="clear"></div>
               <h3>Plus, choose one of the following:</h3>
             <% end %>
             <% @optional_gifts.each_with_index do |o_gift, i| %>
