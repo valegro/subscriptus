@@ -9,7 +9,7 @@
 </div>
 
 <div class="grid">
-  <div class="frame span_3">
+  <div class="frame span_4">
     <h2>Offer Details</h2>
     <dl>
       <dt>Name</dt><dd><%= h(@offer.name) %></dd>
@@ -19,15 +19,23 @@
     </dl>
   </div>
   <div class="frame span_3">
-    <h2>Term Options</h2>
-    <a href="#" id="add_term_option">Add term option</a>
-    <ul id="offer_terms">
-      <%= render :partial => "admin/catalogue/offer_terms/offer_term", :collection => @offer.offer_terms %>
+    <h2>
+      Term Options
+      <a title="Add Term Option" href="#" id="add_term_option"><%= image_tag "admin/icons/plus-circle.png" %></a>
+    </h2>
+    <h4>Full Price</h4>
+    <ul class="options" id="offer_terms">
+      <%= render :partial => "admin/catalogue/offer_terms/offer_term", :collection => @offer.offer_terms.full_price %>
+    </ul>
+    <h4>Concession</h4>
+    <ul class="options" id="offer_terms">
+      <%= render :partial => "admin/catalogue/offer_terms/offer_term", :collection => @offer.offer_terms.concession %>
     </ul>
   </div>
-  <div class="frame span_4 last">
-    <h2>Gift Options</h2>
-    <a href="#" id="add_gift">Add Gift</a>
+  <div class="frame span_3 last">
+    <h2>Gift Options
+      <a title="Add Gift" href="#" id="add_gift"><%= image_tag "admin/icons/plus-circle.png" %></a>
+    </h2>
     <div id="offered_gifts">
       <%= render :partial => "gifts", :object => @offer.gifts %>
     </div>
@@ -56,6 +64,8 @@
   <% form_for [ :admin, :catalogue, @offer, @offer_term ] do |f| %>
     <%= f.text_field :months, :size => 5 %>
     months for $<%= f.text_field :price, :size => 5 %>
+    <%= f.check_box :concession %>
+    <%= f.label :concession, "Concession option" %>
   <% end %>
 </div>
 

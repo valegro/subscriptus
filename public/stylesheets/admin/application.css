@@ -12,6 +12,40 @@ body {
   background: #FFF url(/images/admin/green_bg.png) repeat-x left top;
 }
 
+h4 {
+  color:#555;
+  text-decoration:underline;
+}
+
+ul.options {
+  list-style:none;
+  margin:0;
+  padding:0;
+}
+
+ul.options li {
+  border:solid #ccc 1px;
+  margin-bottom:3px;
+  padding:4px;
+}
+
+ul.options li:hover {
+  background: #eee;
+}
+
+ul.options li span {
+  float:right;
+}
+
+a, a:visited {
+  text-decoration:none;
+  color: #2E479B;
+}
+
+a:hover {
+  color: #FF8800;
+}
+
 .wrapper {
   margin: 0 auto;
   

@@ -3,9 +3,19 @@
 <% if included.empty? %>
   <span>No Included Gifts</span>
 <% else %>
-  <ul>
+  <ul class="options">
     <% included.each do |gift| %>
-      <li><%= link_to(h(gift.name), admin_catalogue_gift_url(gift)) %>&nbsp;(<%= link_to('Remove', remove_gift_admin_catalogue_offer_path(@offer), :class => "gift_remove delete", :gift_id => gift.id) %>)</li>
+      <li>
+        <%= link_to(h(gift.name), admin_catalogue_gift_url(gift)) %>
+        <span><%= link_to(
+                    image_tag("admin/icons/cross-circle.png"),
+                    remove_gift_admin_catalogue_offer_path(@offer),
+                    :title => "Remove Gift from Offer",
+                    :class => "gift_remove delete",
+                    :confirm => "Are you sure you want to remove this gift from the offer?",
+                    :gift_id => gift.id
+        ) %></span>
+      </li>
     <% end %>
   </ul>
 <% end %>
@@ -15,9 +25,19 @@
 <% if optional.empty? %>
   <span>No Optional Gifts</span>
 <% else %>
-  <ul>
+  <ul class="options">
     <% optional.each do |gift| %>
-      <li><%= link_to(h(gift.name), admin_catalogue_gift_url(gift)) %>&nbsp;(<%= link_to('Remove', remove_gift_admin_catalogue_offer_path(@offer), :class => "gift_remove delete", :gift_id => gift.id) %>)</li>
+      <li>
+        <%= link_to(h(gift.name), admin_catalogue_gift_url(gift)) %>
+        <span><%= link_to(
+                    image_tag("admin/icons/cross-circle.png"),
+                    remove_gift_admin_catalogue_offer_path(@offer),
+                    :title => "Remove Gift from Offer",
+                    :class => "gift_remove delete",
+                    :confirm => "Are you sure you want to remove this gift from the offer?",
+                    :gift_id => gift.id
+        ) %></span>
+      </li>
     <% end %>
   </ul>
 <% end %>
