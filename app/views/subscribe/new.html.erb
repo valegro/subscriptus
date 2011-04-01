@@ -10,7 +10,9 @@
       <p class='subscription-description'><%= h(@offer.publication.description) %></p>
 
       <!-- Error Messages -->
-      <%= flash[:error] %>
+      <% unless flash[:error].blank? %>
+        <div id="flash"><%= flash[:error] %></div>
+      <% end %>
       <%= f.error_messages %>
       <div id='subscription-options' class='form-section'>
         

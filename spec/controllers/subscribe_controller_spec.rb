@@ -35,8 +35,6 @@ describe SubscribeController do
         'user_attributes' => @user_attributes,
         'payments_attributes' => { "0" => @payment_attributes }
       }
-      gw_response = stub(:success? => true)
-      #GATEWAY.expects(:purchase).returns(gw_response)
     end
 
     it "should create a subscription" do
@@ -64,6 +62,7 @@ describe SubscribeController do
         })
       }.to_not change { Subscription.count }.by(1)
       response.should render_template("new")
+      flash[:error].should == "Testing Failure"
     end
 
     it "should not create a subscription if record invalid" do
@@ -141,7 +140,6 @@ describe SubscribeController do
 
     # TODO
     # Invalid gift
-    # check flash in new signup
     # check error messages
     # set the source
     # Concession
