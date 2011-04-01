@@ -38,6 +38,7 @@ Feature: Pending Subscription List
   Scenario: An Admin can verify a subscription that is pending payment
     Given a subscription: "Pending Payment Subscription" exists with publication: publication "Publication 2", user: subscriber "Alice", state: "pending", pending: "payment", id: 4, price: 50
       And I am on the admin verify subscription page for 4
+      And I should not be able to select the "Credit card" option from "Payment type"
       And I select "Direct debit" from "Payment type"
       And I fill in "Reference" with "12345"
       And I press "Verify"
