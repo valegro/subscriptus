@@ -6,7 +6,7 @@ class Gift < ActiveRecord::Base
   has_many :subscriptions, :through => :subscription_gifts
 
   has_attached_file :gift_image,
-    :styles => { :medium => "350x350>", :thumb => "100x100>" },
+    :styles => { :medium => "350x350>", :thumb => "100>x100" },
     :storage => :s3,
     :s3_credentials => "#{RAILS_ROOT}/config/s3.yml",
     :path => ":attachment/:id/:style.:extension",
