@@ -54,7 +54,7 @@ Feature: An admin can CRUD an Offer
         And I follow "Back to Offers"
     Then I should be on the admin catalogue offers page
 
-  @javascript @pending
+  @javascript
   Scenario: An admin can promote an offer
     Given an offer: "An Offer" exists with name: "An Offer", id: 1
       And a source: "Email" exists with code: "Email", id: 10
@@ -62,7 +62,7 @@ Feature: An admin can CRUD an Offer
     When I am on the admin catalogue offer page for 1
       And I follow "Promote"
     Then I should see "Generate Link to this Offer"
-      And the "Link" field should contain "http://offers.crikey.com.au/subscribe?offer_id=1&source=20"
+      And the "offer_link" field should contain "http://offers.crikey.com.au/subscribe?offer_id=1&source=20"
     When I select "Email" from "Source"
       Then the "Link" field should contain "http://offers.crikey.com.au/subscribe?offer_id=1&source=10"
 
@@ -70,21 +70,40 @@ Feature: An admin can CRUD an Offer
   Scenario: An admin fails to add a term option
     Given an offer: "An Offer" exists with name: "An Offer", id: 1
     When I am on the admin catalogue offer page for 1
-      Then I should see "Add term option"
-      And I follow "Add term option"
+      And I follow "add_term_option"
     When I press "Create"
-      Then I should see "Add term option"
+      Then I should see "Add Offer Term Option"
 
   @javascript
   Scenario: An admin can add a term option
     Given an offer: "An Offer" exists with name: "An Offer", id: 1
-    When I am on the admin catalogue offer page for 1
-    And I follow "Add term option"
-    Then I should see "Add term option"
-    When I fill in "offer_term[price]" with "100"
-    When I fill in "offer_term[months]" with "3"
-    And I press "Create"
-    Then I should see "3 months for $100.00"
+      When I am on the admin catalogue offer page for 1
+        And I follow "add_term_option"
+        And I fill in "offer_term[price]" with "100"
+        And I fill in "offer_term[months]" with "3"
+        And I press "Create"
+      Then I should see "3 months for $100.00" within "#full_price_terms"
+
+  @javascript
+  Scenario: An admin can add a term option with a concession
+    Given an offer: "An Offer" exists with name: "An Offer", id: 1
+      When I am on the admin catalogue offer page for 1
+        And I follow "add_term_option"
+        And I fill in "offer_term[price]" with "75"
+        And I fill in "offer_term[months]" with "3"
+        And I check "Concession option"
+        And I press "Create"
+      Then I should see "3 months for $75.00" within "#concession_terms"
+
+  @javascript
+  Scenario: An Admin can delete a term option
+    Given an offer: "An Offer" exists with name: "An Offer", id: 1
+      When an offer_term: "OT1" exists with offer: offer "An Offer", id: 10
+        And I am on the admin catalogue offer page for 1
+      Then I should see "3 months for $22.00" within "#full_price_terms"
+      When I follow "delete_term_option" within "#term_option_10"
+        Then I should not see "3 months for $22.00" within "#full_price_terms"
+          And I should see "No Term Options" within "#full_price_terms"
 
   @active
   Scenario: An admin can edit an offer details from the index page

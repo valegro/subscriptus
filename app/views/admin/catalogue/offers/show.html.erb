@@ -24,14 +24,11 @@
       <a title="Add Term Option" href="#" id="add_term_option"><%= image_tag "admin/icons/plus-circle.png" %></a>
     </h2>
     <h4>Full Price</h4>
-    <ul class="options" id="offer_terms">
-      <%= render :partial => "admin/catalogue/offer_terms/offer_term", :collection => @offer.offer_terms.full_price %>
-    </ul>
-    <h4>Concession</h4>
-    <ul class="options" id="offer_terms">
-      <%= render :partial => "admin/catalogue/offer_terms/offer_term", :collection => @offer.offer_terms.concession %>
-    </ul>
+    <div id="offer_terms">
+      <%= render :partial => "admin/catalogue/offer_terms/all_terms", :object => @offer.offer_terms %>
+    </div>
   </div>
+
   <div class="frame span_3 last">
     <h2>Gift Options
       <a title="Add Gift" href="#" id="add_gift"><%= image_tag "admin/icons/plus-circle.png" %></a>
@@ -156,6 +153,12 @@
     $('.gift_remove').live('click', function(e) {
       args = { gift_id: $(this).attr('gift_id') };
       $.post($(this).attr('href'), args);
+      e.preventDefault();
+      return false;
+    });
+
+    $('.term_option_remove').live('click', function(e) {
+      $.post($(this).attr('href'), { _method: 'delete' });
       e.preventDefault();
       return false;
     });

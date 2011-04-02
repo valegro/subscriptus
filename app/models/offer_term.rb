@@ -5,7 +5,7 @@ class OfferTerm < ActiveRecord::Base
 
   validates_presence_of :price, :months
   validates_numericality_of :price, :months
-  validates_uniqueness_of :months, :scope => :offer_id
+  validates_uniqueness_of :months, :scope => [:offer_id, :concession]
   validates_inclusion_of :months, :in => TERM_OPTIONS, :on => :create, :message => "must be between #{TERM_OPTIONS.first} and #{TERM_OPTIONS.last} months."
   default_scope :order => :months
 

@@ -1,1 +1,11 @@
-<li><%= offer_term.expires? ? pluralize(offer_term.months, "month") : "Forever" %> for <%= number_to_currency(offer_term.price) %></li>
+<li id="term_option_<%= offer_term.id %>">
+  <%= offer_term.expires? ? pluralize(offer_term.months, "month") : "Forever" %> for <%= number_to_currency(offer_term.price) %>
+  <span><%= link_to(
+              image_tag("admin/icons/cross-circle.png"),
+              admin_catalogue_offer_offer_term_path(@offer, offer_term),
+              :title => "Delete Term Option",
+              :id => "delete_term_option",
+              :class => "term_option_remove delete",
+              :confirm => "Are you sure you want to remove this term option?"
+  ) %></span>
+</li>
