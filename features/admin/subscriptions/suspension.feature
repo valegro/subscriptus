@@ -53,6 +53,7 @@ Feature: Suspend a subscription
      When I go to admin subscription search page
      Then I should not see "Suspend" within "a"
 
+  @javascript
   Scenario: An admin can un-suspend a subscription
      Then subscription: "sub2" should have 1 gifts
       And an order should exist with user: user "u01"
@@ -68,6 +69,7 @@ Feature: Suspend a subscription
       | f01 l01 | active | 31/01/2011  |
       | f02 l02 | active | 31/01/2011  |
 
+  @javascript
   Scenario: An admin cannot un-suspend an already unsuspended subscription
      When I go to admin subscription search page
     Given subscription "sub2" is unsuspended

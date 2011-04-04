@@ -62,9 +62,11 @@ Feature: An admin can CRUD an Offer
     When I am on the admin catalogue offer page for 1
       And I follow "Promote"
     Then I should see "Generate Link to this Offer"
-      And the "offer_link" field should contain "http://offers.crikey.com.au/subscribe?offer_id=1&source=20"
+      And the "offer_link" field should be a url: "http://offers.crikey.com.au/subscribe?offer_id=1&source=20"
+      And show me the page
     When I select "Email" from "Source"
-      Then the "Link" field should contain "http://offers.crikey.com.au/subscribe?offer_id=1&source=10"
+      And show me the page
+      Then the "Link" field should be a url: "http://offers.crikey.com.au/subscribe?offer_id=1&source=10"
 
   @javascript
   Scenario: An admin fails to add a term option
@@ -138,7 +140,7 @@ Feature: An admin can CRUD an Offer
         And I should see "Another Offer"
         And I should be on the admin catalogue offer page for 1
 
-  @active
+  @javascript
   Scenario: An admin can delete an offer from the gifts page
     Given an offer: "An Offer" exists with name: "An Offer", id: 1
       When I am on the admin catalogue offers page
@@ -146,7 +148,7 @@ Feature: An admin can CRUD an Offer
       Then I should see "Deleted Offer"
         And I should be on the admin catalogue offers page
     
-  @active
+  @javascript
   Scenario: An admin can delete an offer from the show page
     Given an offer: "An Offer" exists with name: "An Offer", id: 1
       When I am on the admin catalogue offer page for 1

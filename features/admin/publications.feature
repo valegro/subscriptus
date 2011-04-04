@@ -97,7 +97,7 @@ Feature: An admin can CRUD a publication
         And I should see "Another Book"
         And I should be on the admin catalogue publication page for 1
 
-  @publication
+  @javascript
   Scenario: An admin can delete a publication from the publications page
     Given a publication: "Daily Mail" exists with name: "Daily Mail", id: 1
       When I am on the admin catalogue publications page
@@ -105,7 +105,7 @@ Feature: An admin can CRUD a publication
       Then I should see "Deleted Publication"
         And I should be on the admin catalogue publications page
     
-  @publications
+  @javascript
   Scenario: An admin can delete a publication from the show page
     Given a publication: "Daily Mail" exists with name: "Daily Mail", id: 1
       When I am on the admin catalogue publication page for 1
@@ -119,6 +119,6 @@ Feature: An admin can CRUD a publication
     When I am on the admin catalogue publication page for 1
       And I follow "Webhook"
     Then I should see "Generate a Webhook URL for this publication."
-      And the "Link" field should be exactly "http://localhost:9887/webhooks/unbounce?publication_id=1"
+      And the "Link" field should be a url with path "/webhooks/unbounce?publication_id=1"
 
 

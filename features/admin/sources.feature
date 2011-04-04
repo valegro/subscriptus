@@ -74,7 +74,7 @@ Feature: An admin can CRUD a source
         And I should see "Affiliate"
         And I should be on the admin sources page
 
-  @active
+  @javascript
   Scenario: An admin can delete a source from the sources page
     Given a source: "Email" exists with name: "Email", id: 1
       When I am on the admin sources page

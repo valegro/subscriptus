@@ -26,7 +26,7 @@ Feature: An admin can manage admins
       And I press "Update"
      Then a user should exist with email: "homer.j.simpson@springfield.example.com"
      
-  
+  @javascript 
   Scenario: An admin can delete another admin
     Given an admin: "Marge" exists with firstname: "Marge", lastname: "Simpson"
       And I am on the admin system users page

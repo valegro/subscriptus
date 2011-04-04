@@ -30,6 +30,8 @@ end
 
 Given /^I should not be able to select the "([^"]*)" option from "([^"]*)"$/ do |option, select|
   if page.respond_to? :should
-    lambda { select(option, :from => select) }.should raise_exception(Capybara::OptionNotFound)
+    lambda {
+      select(option, :from => select)
+    }.should raise_exception(Capybara::ElementNotFound)
   end
 end
