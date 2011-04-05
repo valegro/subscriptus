@@ -1,3 +1,20 @@
+<% content_for :ujs do %>
+  <script language="javascript">
+    $(document).ready(function() {
+      $('.tab-action').click(function() {
+        $(this).trigger('show-type', [$(this).attr('id')]);
+      });
+
+      $(document).bind('show-type', function(e, arg) {
+        $('.subscription-type').hide();
+        $('#' + arg + '-info').show();
+        $('#subscription-tabs li').removeClass('active');
+        $('#' + arg).parent().addClass('active');
+      });
+    });
+  </script>
+<% end %>
+
 <% form_for @subscription, :url => subscribe_path(:offer_id => @offer.id), :builder => SubscribeFormBuilder do |f| %>
 
   <div class='section' id='step1'>
@@ -14,30 +31,36 @@
         <div id="flash"><%= flash[:error] %></div>
       <% end %>
       <%= f.error_messages %>
-      <div id='subscription-options' class='form-section'>
-        
-        <div class='subscription-header'>
-          <p id='subscription-header1'>Choose your Subscription</p>
-          <p id='subscription-header2'>Cost</p>
-          <div class='clear'></div>
-        </div>
 
-        <% if @offer.offer_terms.size > 1 %>
-          <% @offer.offer_terms.each_with_index do |ot, i| %>
-            <div class='subscription-option'>
-              <%= radio_button_tag "offer_term", ot.id, (i == 0), :id => "offer_term_#{ot.id}" %>
-              <label for="offer_term_<%= ot.id %>">
-                <span>Offer <%= i + 1 %>: <%= pluralize(ot.months, 'month') %></span>
-                <span class="cost"><%= number_to_currency(ot.price) %></span>
-              </label>
-            </div>
-          <% end %>
-        <% else %>
-          <div class='subscription-option'>
-            <span><%= pluralize(@offer.offer_terms.first.try(:months), 'month') %></span>
-            <span class="cost"><%= number_to_currency_with_free(@offer.offer_terms.first.try(:price)) %></span>
-          </div>
-        <% end %>
+      <ul id='subscription-tabs'>
+        <li class='active'>
+          <a class="tab-action" href='#' id="type-normal">SUBSCRIPTIONS</a>
+        </li>
+        <li>
+          <a class="tab-action" href='#' id="type-student">STUDENTS</a>
+        </li>
+        <li>	
+          <a class="tab-action" href='#' id="type-senior">SENIOR / CONCESSIONS</a>
+        </li>	
+        <li class='last'>
+          <a class="tab-action" href='#' id="type-group">DISCOUNT GROUP</a>
+        </li>
+      </ul>
+      <div class="clear"></div>
+
+      <div id='subscription-options' class='form-section'>
+        <div id="type-normal-info" class="subscription-type">
+          <%= render :partial => "offer_terms", :object => @offer.offer_terms.full_price %>  
+        </div>
+        <div id="type-student-info" class="subscription-type" style="display:none;">
+          <%= render :partial => "offer_terms", :object => @offer.offer_terms.concession %>  
+        </div>
+        <div id="type-senior-info" class="subscription-type" style="display:none;">
+          Seniors
+        </div>
+        <div id="type-group-info" class="subscription-type" style="display:none;">
+          Groups
+        </div>
       </div>
 
       <!-- Gifts -->

@@ -132,71 +132,8 @@
 
 		</style>
 		
-	<script src="http://code.jquery.com/jquery-latest.pack.js" type="text/javascript"></script>
-
-		<script type="text/javascript">
-		//<![CDATA[
-
-		  $(document).ready(function() {
-			//$('#total').css('display','block');
-			$('.subscription-option').click(function(){
-				$('input', this).attr('checked', true);
-				var cost = $('span.cost',this).html().replace(/[^\d\.]/g, '');
-				$('span#value').html(cost);
-				$('#total').css('display','block');				
-			});
-			
-			/* Switch between new and existing suer login (renew and new subscription) */		
-			$('#rdoNew').click(function(){
-				$('#section-new').show();
-				$('#section-login').hide();
-				$('#section-loggedin').hide();
-			});
-			$('#rdoLogin').click(function(){
-				$('#section-login').show();
-				$('#section-new').hide();			
-			});
-			
-			
-			// set default details section based on QueryString param
-			var user_param = gup( 'show' );
-			if(user_param == 'new'){
-				$('#rdoNew').click();
-			}else{
-				$('#rdoLogin').click();
-			}
-			
-			var ccv = "<a class='tinyClose' href='javascript:TINY.box.hide()'><img src='/images/close.png' alt='close' /></a><img src='/images/ccv.png'  width='289' height='227'  alt='CCV' />";	
-			T$('aCCV').onclick = function(){TINY.box.show(ccv,0,0,0,1); return false;};
-		
-		  });
-		  
-		  
-		  function gup( name )
-			{
-			  name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
-			  var regexS = "[\\?&]"+name+"=([^&#]*)";
-			  var regex = new RegExp( regexS );
-			  var results = regex.exec( window.location.href );
-			  if( results == null )
-				return "";
-			  else
-				return results[1];
-			}
-			
-			 
-		  function simulateLogIn(){
-			// this simulates the log in process. 
-			// If JavaSCript is available it will do an AJAX login, 
-			// otherwise it will submit to the page and reload
-			
-			$('#section-login').slideUp('slow', function(){
-				$('#section-loggedin').slideDown(1000);				
-			});			
-		  }
-		//]]>
-	
-		</script>
+	  <script src="http://code.jquery.com/jquery-1.5.2.min.js" type="text/javascript"></script>
+    <%= yield :ujs %>
 	</head>
 	
 	<body>
