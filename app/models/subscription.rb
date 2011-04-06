@@ -31,7 +31,7 @@ class Subscription < ActiveRecord::Base
   validates_acceptance_of :terms
 
   # Used to specify what the pending state is waiting on
-  enum_attr :pending, %w(payment concession)
+  enum_attr :pending, %w(payment concession_verification student_verification)
   
   # Subscription States
   has_states :trial, :squatter, :active, :suspended, :pending, :renewal_due, :payment_failed, :init => :trial do

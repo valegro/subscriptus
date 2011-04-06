@@ -33,4 +33,9 @@ Feature: A user can subscribe to an offer with a term option
       And I should see that "$20.00" is invisible
     Then I follow "STUDENTS"
       And I should see that "$20.00" is visible
+      And I should see that "Get 32% off the normal price of Crikey Subscriber" is visible
       And I should see that "$30.00" is invisible
+    Then I follow "SENIOR / CONCESSIONS"
+      #And I should see that "$20.00" is visible
+      And I should see that "Get 32% off the normal price of Crikey Subscriber" is visible
+      And I should see that "Crikey offers a discount subscription rate of $100 per year to seniors and concession card holders. All you need to do is fill out the online form below and then fax or mail us a copy of your seniors/concession card." is visible

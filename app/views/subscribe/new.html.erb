@@ -53,10 +53,18 @@
           <%= render :partial => "offer_terms", :object => @offer.offer_terms.full_price %>  
         </div>
         <div id="type-student-info" class="subscription-type" style="display:none;">
+          <div class="promo">
+            <h4>Get 32% off the normal price of Crikey Subscriber</h4>
+            <p>Crikey offers a discount subscription rate of $100 per year to students. All you need to do is fill out the online form below and then fax or mail us a copy of your student card.</p>
+          </div>
           <%= render :partial => "offer_terms", :object => @offer.offer_terms.concession %>  
         </div>
         <div id="type-senior-info" class="subscription-type" style="display:none;">
-          Seniors
+          <div class="promo">
+            <h4>Get 32% off the normal price of Crikey Subscriber</h4>
+            <p>Crikey offers a discount subscription rate of $100 per year to seniors and concession card holders. All you need to do is fill out the online form below and then fax or mail us a copy of your seniors/concession card.</p>
+          </div>
+          <%= render :partial => "offer_terms", :object => @offer.offer_terms.concession %>  
         </div>
         <div id="type-group-info" class="subscription-type" style="display:none;">
           Groups
