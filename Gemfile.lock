@@ -15,7 +15,7 @@ GIT
 GEM
   remote: http://rubygems.org/
   specs:
-    RedCloth (4.2.3)
+    RedCloth (4.2.7)
     aaronh-chronic (0.3.9)
     actionmailer (2.3.9)
       actionpack (= 2.3.9)
@@ -28,6 +28,9 @@ GEM
       activesupport (= 2.3.9)
     activesupport (2.3.9)
     addressable (2.2.4)
+    akephalos (0.2.5)
+      capybara (~> 0.4.0)
+      jruby-jars
     also_migrate (0.3.5)
     authlogic (2.1.6)
       activesupport
@@ -36,21 +39,29 @@ GEM
       mime-types
       xml-simple
     builder (2.1.2)
-    capistrano (2.5.19)
+    capistrano (2.5.20)
       highline
+      highline
+      net-scp
       net-scp (>= 1.0.0)
+      net-sftp
       net-sftp (>= 2.0.0)
       net-ssh (>= 2.0.14)
+      net-ssh
+      net-ssh-gateway
       net-ssh-gateway (>= 1.0.0)
-    capybara (0.3.9)
+    capybara (0.4.0)
+      celerity (>= 0.7.9)
       culerity (>= 0.2.4)
       mime-types (>= 1.16)
       nokogiri (>= 1.3.3)
       rack (>= 1.0.0)
       rack-test (>= 0.5.4)
-      selenium-webdriver (>= 0.0.3)
-    childprocess (0.1.6)
-      ffi (~> 0.6.3)
+      selenium-webdriver (>= 0.0.27)
+      xpath (~> 0.1.2)
+    celerity (0.8.9)
+    childprocess (0.1.8)
+      ffi (~> 1.0.6)
     columnize (0.3.2)
     configuration (1.2.0)
     crack (0.1.8)
@@ -63,8 +74,8 @@ GEM
     cucumber-rails (0.3.2)
       cucumber (>= 0.8.0)
     culerity (0.2.15)
-    daemons (1.1.0)
-    database_cleaner (0.6.0)
+    daemons (1.1.2)
+    database_cleaner (0.6.6)
     delayed_job (2.0.3)
       daemons
     delayed_paperclip (0.6.5)
@@ -73,19 +84,20 @@ GEM
     enumerated_attribute (0.2.16)
       meta_programming (>= 0.2.1)
     factory_girl (1.3.3)
-    faker (0.9.4)
+    faker (0.9.5)
       i18n (~> 0.4)
     fastercsv (1.5.4)
-    ffi (0.6.3)
+    ffi (1.0.7)
       rake (>= 0.8.7)
     gherkin (2.1.5)
       trollop (~> 1.16.2)
     highline (1.6.1)
-    httpclient (2.1.6.1)
+    httpclient (2.1.7.2)
     i18n (0.5.0)
     jrails (0.6.0)
+    jruby-jars (1.6.0)
     json_pure (1.4.6)
-    launchy (0.3.7)
+    launchy (0.4.0)
       configuration (>= 0.0.5)
       rake (>= 0.8.1)
     linecache (0.43)
@@ -93,26 +105,23 @@ GEM
       nokogiri (>= 1.2.1)
     meta_programming (0.2.2)
     mime-types (1.16)
-    mocha (0.9.10)
-      rake
+    mocha (0.9.12)
     mysql (2.8.1)
     navigasmic (0.5.5)
     net-scp (1.0.4)
       net-ssh (>= 1.99.1)
     net-sftp (2.0.5)
       net-ssh (>= 2.0.9)
-    net-ssh (2.1.0)
+    net-ssh (2.1.3)
     net-ssh-gateway (1.0.1)
       net-ssh (>= 1.99.1)
     nokogiri (1.4.4)
     paperclip (2.3.8)
       activerecord
       activesupport
-    pickle (0.4.4)
+    pickle (0.4.7)
       cucumber (>= 0.8)
       rake
-      rspec (>= 1.3)
-      yard
     postgres-pr (0.6.3)
     rack (1.1.0)
     rack-test (0.5.4)
@@ -137,11 +146,11 @@ GEM
     ruby-debug-base (0.10.4)
       linecache (>= 0.3)
     rubyzip (0.9.4)
-    searchlogic (2.4.27)
+    searchlogic (2.4.28)
       activerecord (>= 2.0.0)
-    selenium-webdriver (0.1.2)
-      childprocess (~> 0.1.5)
-      ffi (~> 0.6.3)
+    selenium-webdriver (0.1.4)
+      childprocess (>= 0.1.7)
+      ffi (>= 1.0.7)
       json_pure
       rubyzip
     shoulda (2.11.3)
@@ -154,13 +163,14 @@ GEM
     webmock (1.6.2)
       addressable (>= 2.2.2)
       crack (>= 0.1.7)
-    whenever (0.6.2)
+    whenever (0.6.7)
       aaronh-chronic (>= 0.3.9)
       activesupport (>= 2.3.4)
     will_paginate (2.3.15)
     wizardly (0.1.8.9)
-    xml-simple (1.0.13)
-    yard (0.6.4)
+    xml-simple (1.0.15)
+    xpath (0.1.3)
+      nokogiri (~> 1.3)
 
 PLATFORMS
   ruby
@@ -168,10 +178,11 @@ PLATFORMS
 DEPENDENCIES
   RedCloth
   acts_as_archive!
+  akephalos
   authlogic
   aws-s3
   capistrano
-  capybara (= 0.3.9)
+  capybara (= 0.4.0)
   cucumber (= 0.8.5)
   cucumber-rails
   database_cleaner
@@ -193,6 +204,7 @@ DEPENDENCIES
   navigasmic
   pickle
   postgres-pr
+  rack (= 1.1.0)
   rack-test (= 0.5.4)
   rails (= 2.3.9)
   rest-client

@@ -34,7 +34,7 @@ Feature: Pending Subscription List
      Then I should see "Pending -> Active"
       And I should see "Concession: Subscriber has a valid student concession card"
 
-  @active
+  @javascript
   Scenario: An Admin can verify a subscription that is pending payment
     Given a subscription: "Pending Payment Subscription" exists with publication: publication "Publication 2", user: subscriber "Alice", state: "pending", pending: "payment", id: 4, price: 50
       And I am on the admin verify subscription page for 4

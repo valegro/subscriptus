@@ -239,4 +239,38 @@ describe SubscriptionFactory do
       }.to change { subscription.payments.count }.by(0)
     end
   end
+
+  describe "Concession" do
+    after(:each) do
+      expect {
+        @subscription.save!
+      }.to change { @subscription.payments.count }.by(1)
+    end
+
+    it "should set state to pending" do
+      gw_response = stub(:success? => true)
+      GATEWAY.expects(:purchase).returns(gw_response)
+      factory = SubscriptionFactory.new(@offer, :attributes => @attributes, :concession => :student)
+      @subscription = factory.build
+      @subscription.state.should == 'pending'
+    end
+
+    it "should set the pending value for student" do
+      factory = SubscriptionFactory.new(@offer, :attributes => @attributes, :concession => :student)
+      @subscription = factory.build
+      @subscription.pending.should == :student_verification
+    end
+
+    it "should set the pending value for concession" do
+      factory = SubscriptionFactory.new(@offer, :attributes => @attributes, :concession => :concession)
+      @subscription = factory.build
+      @subscription.pending.should == :concession_verification
+    end
+
+    it "should not set the expiry date" do
+      factory = SubscriptionFactory.new(@offer, :attributes => @attributes, :concession => :concession)
+      @subscription = factory.build
+      @subscription.expires_at.should == nil
+    end
+  end
 end

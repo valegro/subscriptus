@@ -15,6 +15,8 @@ end
 gem 'fastercsv'
 gem 'rest-client'
 
+gem 'rack', '1.1.0'
+
 # These are "core" gems we always use
 gem 'authlogic'
 gem 'searchlogic'
@@ -59,7 +61,7 @@ gem 'ruby-debug'
 
 group :test, :cucumber, :development do
   gem 'webmock', :require => false
-  gem 'capybara', "0.3.9"
+  gem 'capybara', "0.4.0"
   gem 'database_cleaner'
   gem 'spork'
   gem 'launchy'    # So you can do Then show me the page
@@ -75,6 +77,5 @@ group :test, :cucumber, :development do
   gem 'rspec-rails', '1.3.3'
   gem 'mocha', '~> 0.9.8'
   gem 'timecop'
-#  gem 'ZenTest'
-#  gem 'autotest-rails'
+  gem 'akephalos'
 end

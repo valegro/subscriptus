@@ -102,7 +102,7 @@ Feature: An admin can CRUD a gift
         And I should see "Another Book"
         And I should be on the admin catalogue gift page for 1
 
-  @active
+  @javascript
   Scenario: An admin can delete a gift from the gifts page
     Given a gift: "My Gift" exists with name: "My Gift", id: 1
       When I am on the admin catalogue gifts page
@@ -110,7 +110,7 @@ Feature: An admin can CRUD a gift
       Then I should see "Deleted Gift"
         And I should be on the admin catalogue gifts page
     
-  @active
+  @javascript
   Scenario: An admin can delete a gift from the show page
     Given a gift: "My Gift" exists with name: "My Gift", id: 1
       When I am on the admin catalogue gift page for 1

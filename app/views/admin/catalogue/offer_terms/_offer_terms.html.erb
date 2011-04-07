@@ -1,0 +1,6 @@
+<% if offer_terms.empty? %>
+  <li>No Term Options</li>
+<% else %>
+  <%= render :partial => "admin/catalogue/offer_terms/offer_term", :collection => offer_terms %>
+<% end %>
+

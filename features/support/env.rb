@@ -28,13 +28,14 @@ Spork.prefork do
   WebMock.stub_request(:any, /.*amazonaws.*/)
   
   # require 'selenium/client'
-  require 'cucumber/rails/capybara_javascript_emulation' # Lets you click links with onclick javascript handlers without using @culerity or @javascript
+  #require 'cucumber/rails/capybara_javascript_emulation' # Lets you click links with onclick javascript handlers without using @culerity or @javascript
   # Capybara defaults to XPath selectors rather than Webrat's default of CSS3. In
   # order to ease the transition to Capybara we set the default here. If you'd
   # prefer to use XPath just remove this line and adjust any selectors in your
   # steps to use the XPath syntax.
   Capybara.default_selector = :css
-  # Capybara.default_driver = :selenium
+  Capybara.default_driver = :rack_test
+  Capybara.javascript_driver = :akephalos
   
   Capybara.save_and_open_page_path = File.join(Rails.root, 'tmp', 'capybara')
 end

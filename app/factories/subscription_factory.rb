@@ -15,7 +15,8 @@ class SubscriptionFactory
     @included_gift_ids  = options[:included_gift_ids]
     @optional_gift_id   = options[:optional_gift]
     @source             = options[:source]
-    @init_state         = options[:init_state] || 'active'
+    @concession         = options[:concession]
+    @init_state         = options[:init_state]
     @attributes[:user_attributes].try(:delete, :id)
     @subscription       = Subscription.new(@attributes)
   end
@@ -28,7 +29,8 @@ class SubscriptionFactory
   # Build the subscription
   def build
     returning(@subscription) do |subscription|
-      subscription.state        = @init_state
+      subscription.state        = @init_state || (@concession ? 'pending' : 'active')
+      subscription.pending      = pending_what
       subscription.offer        = @offer
       subscription.publication  = @offer.publication
       subscription.source       = @source
@@ -56,4 +58,12 @@ class SubscriptionFactory
       subscription.apply_term(@term)
     end
   end
+
+  private
+    def pending_what
+      case @concession
+        when 'student', :student       then 'student_verification'
+        when 'concession', :concession then 'concession_verification'
+      end
+    end
 end

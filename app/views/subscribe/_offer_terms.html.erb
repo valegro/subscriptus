@@ -1,0 +1,23 @@
+<div class='subscription-header'>
+  <p id='subscription-header1'>Choose your Subscription</p>
+  <p id='subscription-header2'>Cost</p>
+  <div class='clear'></div>
+</div>
+
+<% if offer_terms.size > 1 %>
+  <% offer_terms.each_with_index do |ot, i| %>
+    <div class='subscription-option'>
+      <%= radio_button_tag "offer_term", ot.id, (i == 0), :id => "offer_term_#{ot.id}" %>
+      <label for="offer_term_<%= ot.id %>">
+        <span>Offer <%= i + 1 %>: <%= pluralize(ot.months, 'month') %></span>
+        <span class="cost"><%= number_to_currency(ot.price) %></span>
+      </label>
+    </div>
+  <% end %>
+<% else %>
+  <div class='subscription-option'>
+    <span><%= pluralize(offer_terms.first.try(:months), 'month') %></span>
+    <span class="cost"><%= number_to_currency_with_free(offer_terms.first.try(:price)) %></span>
+  </div>
+<% end %>
+
