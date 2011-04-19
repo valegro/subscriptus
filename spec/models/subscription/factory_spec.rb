@@ -39,12 +39,28 @@ describe SubscriptionFactory do
     }.to change { Subscription.count }.by(1)
   end
 
+  it "should create and set a subscription action" do
+    t = Time.local(2011, 1, 1, 0, 0, 0)
+    Timecop.freeze(t) do
+      factory = SubscriptionFactory.new(@offer, :attributes => @attributes)
+      subscription = factory.build
+      subscription.actions.size.should == 1
+      subscription.actions.first.offer_name.should == @offer.name
+      subscription.actions.first.price.should == @offer.offer_terms.first.price
+      subscription.actions.first.term_length.should == @offer.offer_terms.first.months
+      subscription.actions.first.applied_at.should == t
+      expect {
+        subscription.save!
+      }.to change { SubscriptionAction.count }.by(1)
+    end
+  end
+
   describe "offer basics" do
     it "should set term to first term if none set" do
       t = Time.local(2011, 1, 1, 0, 0, 0)
       Timecop.travel(t) do
         subscription = SubscriptionFactory.build(@offer)
-        subscription.price.should == @term1.price
+        subscription.actions.last.price.should == @term1.price
         subscription.expires_at.should == Time.local(2011, 2, 1, 0, 0, 0).in_time_zone("UTC")
       end
     end
@@ -53,7 +69,7 @@ describe SubscriptionFactory do
       t = Time.local(2011, 1, 1, 0, 0, 0)
       Timecop.travel(t) do
         subscription = SubscriptionFactory.build(@offer, :term_id => @term2.id)
-        subscription.price.should == @term2.price
+        subscription.actions.last.price.should == @term2.price
         subscription.expires_at.should == Time.local(2011, 3, 1, 0, 0, 0).in_time_zone("UTC")
       end
     end
@@ -63,14 +79,20 @@ describe SubscriptionFactory do
       Timecop.travel(t) do
         lambda {
           SubscriptionFactory.build(@offer, :term_id => -1)
-        }.should raise_exception
+        }.should raise_exception(ActiveRecord::RecordNotFound)
       end
     end
 
-    it "should set the publication and offer" do
+    it "should raise if the offer term does not match the offer" do
+      @offer_term = Factory.create(:offer_term, :months => 3, :offer => Factory.create(:offer))
+      lambda {
+        SubscriptionFactory.build(@offer, :term_id => @offer_term.id)
+      }.should raise_exception(Exceptions::InvalidOfferTerm)
+    end
+
+    it "should set the publication" do
       subscription = SubscriptionFactory.build(@offer)
       subscription.publication.should == @offer.publication
-      subscription.offer.should == @offer
     end
   end
 
@@ -84,17 +106,18 @@ describe SubscriptionFactory do
 
     it "should have no gifts if none provided" do
       subscription = SubscriptionFactory.build(@offer)
-      subscription.gifts.empty?.should be(true)
+      subscription.actions.last.gifts.empty?.should be(true)
     end
 
     it "should have the included gifts from the offer" do
       @offer.gifts.add(@gift1)
       @offer.gifts.add(@gift2)
       subscription = SubscriptionFactory.build(@offer, :attributes => @attributes)
-      subscription.gifts.size.should == 2
+      subscription.actions.last.gifts.size.should == 2
       expect {
         subscription.save!
       }.to change { subscription.orders.count }.by(1)
+      subscription.reload
       subscription.orders.last.gifts.size.should == 2
     end
 
@@ -102,11 +125,12 @@ describe SubscriptionFactory do
       @offer.gifts.add(@gift1, true)
       @offer.gifts.add(@gift2, true)
       subscription = SubscriptionFactory.build(@offer, :optional_gift => "#{@gift2.id}", :attributes => @attributes)
-      subscription.gifts.size.should == 1
-      subscription.gifts.first.name.should == 'Gift 2'
+      subscription.actions.last.gifts.size.should == 1
+      subscription.actions.last.gifts.first.name.should == 'Gift 2'
       expect {
         subscription.save!
       }.to change { subscription.orders.count }.by(1)
+      subscription.reload
       subscription.orders.last.gifts.size.should == 1
     end
 
@@ -114,7 +138,7 @@ describe SubscriptionFactory do
       @offer.gifts.add(@gift1, true)
       @offer.gifts.add(@gift2, true)
       subscription = SubscriptionFactory.build(@offer, :attributes => @attributes)
-      subscription.gifts.empty?.should be(true)
+      subscription.actions.last.gifts.empty?.should be(true)
       expect {
         subscription.save!
       }.to_not change { subscription.orders.count }.by(1)
@@ -131,10 +155,11 @@ describe SubscriptionFactory do
       @offer.gifts.add(@gift1)
       @offer.gifts.add(@gift2, true)
       subscription = SubscriptionFactory.build(@offer, :attributes => @attributes)
-      subscription.gifts.size.should == 2
+      subscription.actions.last.gifts.size.should == 2
       expect {
         subscription.save!
       }.to change { subscription.orders.count }.by(1)
+      subscription.reload
       subscription.orders.last.gifts.size.should == 2
     end
 
@@ -144,11 +169,11 @@ describe SubscriptionFactory do
       @offer.gifts.add(@gift3, true)
       @offer.gifts.add(@gift4, true)
       subscription = SubscriptionFactory.build(@offer, :optional_gift => @gift4.id, :attributes => @attributes)
-      subscription.gifts.size.should == 3
+      subscription.actions.last.gifts.size.should == 3
       expect {
         subscription.save!
       }.to change { subscription.orders.count }.by(1)
-      subscription.orders.last.gifts.size.should == 3 
+      subscription.orders(true).last.gifts.size.should == 3 
     end
 
     it "should raise if an optional gift becomes unavailable" do
@@ -164,11 +189,11 @@ describe SubscriptionFactory do
       @offer.gifts.add(@gift1)
       @offer.gifts.add(@gift2)
       subscription = SubscriptionFactory.build(@offer, :included_gift_ids => [@gift1, @gift2].map(&:id), :attributes => @attributes)
-      subscription.gifts.size.should == 2
+      subscription.actions.last.gifts.size.should == 2
       expect {
         subscription.save!
       }.to change { subscription.orders.count }.by(1)
-      subscription.orders.last.gifts.size.should == 2 
+      subscription.orders(true).last.gifts.size.should == 2 
     end
 
     it "should raise if an included gift becomes unavailable" do
@@ -271,6 +296,12 @@ describe SubscriptionFactory do
       factory = SubscriptionFactory.new(@offer, :attributes => @attributes, :concession => :concession)
       @subscription = factory.build
       @subscription.expires_at.should == nil
+    end
+
+    it "should set the action to be applied" do
+      factory = SubscriptionFactory.new(@offer, :attributes => @attributes, :concession => :concession)
+      @subscription = factory.build
+      @subscription.pending_action.should_not be(nil)
     end
   end
 end

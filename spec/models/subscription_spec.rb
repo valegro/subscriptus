@@ -36,20 +36,6 @@ describe Subscription do
       @offer_term = Factory.create(:offer_term, :months => 3, :offer => @offer)
     end
 
-    it "should copy the offer term details onto the subscription" do
-      @subscription.expects(:increment_expires_at).with(@offer_term)
-      @subscription.apply_term(@offer_term)
-      @subscription.term_length.should == 3
-      @subscription.concession.should == false
-    end
-
-    it "should raise if the offer term does not match the offer" do
-      @offer_term = Factory.create(:offer_term, :months => 3, :offer => Factory.create(:offer))
-      lambda {
-        @subscription.apply_term(@offer_term)
-      }.should raise_error
-    end
-
     it "should set expiry_date to 3 months from now if the expiry date has aleady been passed" do
       @subscription.expires_at = Date.new(2010, 1, 1)
       expected = Date.new(2010, 12, 27)
@@ -85,8 +71,6 @@ describe Subscription do
     it { should belong_to :offer }
     it { should belong_to :publication }
     it { should have_many :log_entries }
-    it { should have_many :subscription_gifts }
-    it { should have_many :gifts }
     # could we easily spec accepts_nested_attributes_for?
   end
 
@@ -130,7 +114,7 @@ describe Subscription do
   end
   
   it "should deliver email when the subscription enters pending" do
-    @s = Factory.create(:subscription, :pending => :concession)
+    @s = Factory.create(:subscription, :pending => :concession_verification)
     SubscriptionMailer.expects(:deliver_pending).with(@s)
     @s.pay_later!
   end
@@ -138,7 +122,7 @@ describe Subscription do
   describe "with a pending subscription" do 
     before(:each) do
       SubscriptionMailer.stubs(:deliver_pending)
-      @s = Factory.create(:subscription, :pending => :concession)
+      @s = Factory.create(:subscription, :pending => :concession_verification)
       @s.pay_later!
     end
     it "should deliver email when the subscription is verified" do

@@ -9,14 +9,16 @@ class Subscription < ActiveRecord::Base
   belongs_to :offer
   belongs_to :publication
   belongs_to :source
+  belongs_to :pending_action, :class_name => "SubscriptionAction"
+
+  has_many :actions,
+           :class_name => "SubscriptionAction",
+           :order => "applied_at desc",
+           :before_add => Proc.new { |s, a| a.applied_at = Time.now.utc }
 
   has_many :log_entries, :class_name => "SubscriptionLogEntry"
-  has_many :subscription_gifts, :dependent => :destroy
   has_many :payments, :autosave => true
   has_many :orders
-  
-  # TODO: Test this
-  has_many :gifts, :through => :subscription_gifts, :uniq => true, :before_add => Proc.new { |a, gift| raise "Gift is out of stock" unless gift.in_stock? }
   
   attr_accessor :note # Used to save notes to the subscription
   attr_accessor :terms
@@ -82,14 +84,10 @@ class Subscription < ActiveRecord::Base
   after_exit_suspended :restore_subscription_expiry
 
   def apply_term(offer_term)
-    if offer_term.blank? || offer_term.offer.blank? || offer_term.offer != self.offer
-      raise Exceptions::InvalidOfferTerm
-    end
-    self.price = offer_term.price
-    self.term_length = offer_term.months
+    # TODO: Handle payments better - perhaps not a nested attribute??
     # Set the payment price
     self.payments.last.try(:amount=, offer_term.price)
-    self.increment_expires_at(offer_term)
+    #self.increment_expires_at(offer_term)
   end
   
   def restore_subscription_expiry

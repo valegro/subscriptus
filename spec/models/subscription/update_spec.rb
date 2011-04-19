@@ -18,7 +18,7 @@ describe Subscription do
 
   describe "upon verify!" do
     before(:each) do
-      @subscription = Factory.create(:subscription, :state => 'pending', :pending => :concession)
+      @subscription = Factory.create(:subscription, :state => 'pending', :pending => :concession_verification)
       @verify_note = "Verified student card"
     end
 
@@ -41,6 +41,18 @@ describe Subscription do
       entry.old_state.should == 'pending'
       entry.new_state.should == 'active'
       entry.description.should == 'Concession: A note about the sub'
+    end
+
+    it "should create a log entry when pending student concession" do
+      @subscription = Factory.create(:subscription, :state => 'pending', :pending => :student_verification)
+      @subscription.note = "A note about the sub"
+      @subscription.log_entries.size.should == 1
+      @subscription.verify!
+      @subscription.log_entries.size.should == 2
+      entry = @subscription.log_entries.last
+      entry.old_state.should == 'pending'
+      entry.new_state.should == 'active'
+      entry.description.should == 'Student Discount: A note about the sub'
     end
 
     describe "if pending payment" do

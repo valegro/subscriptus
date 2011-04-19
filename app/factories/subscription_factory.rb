@@ -35,6 +35,18 @@ class SubscriptionFactory
       subscription.publication  = @offer.publication
       subscription.source       = @source
 
+      if @term.blank? || @term.offer.blank? || @term.offer != @offer
+        raise Exceptions::InvalidOfferTerm
+      end
+
+      # Build the Action
+      # TODO: Do we move the action build into a sep method?
+      action = SubscriptionAction.new do |action|
+        action.offer_name   = @offer.name
+        action.price        = @term.price
+        action.term_length  = @term.months
+      end
+
       # Check that there aren't any in included_gift_ids that aren't in available_included_gifts
       unless @included_gift_ids.blank?
         @included_gift_ids.each do |gift_id|
@@ -44,20 +56,31 @@ class SubscriptionFactory
         end
       end
       # Included Gifts
-      subscription.gifts << @offer.available_included_gifts
+      action.gifts << @offer.available_included_gifts
 
       # Optional Gift
       if @optional_gift_id
         unless @offer.gifts.optional.in_stock.map(&:id).include?(@optional_gift_id.to_i)
           raise Exceptions::GiftNotAvailable.new(@optional_gift_id)
         end
-        subscription.gifts << Gift.find(@optional_gift_id) if @optional_gift_id
+        action.gifts << Gift.find(@optional_gift_id) if @optional_gift_id
       end
 
-      # Set the offer term
-      subscription.apply_term(@term)
+      # Apply the action
+      # TODO: Transactions?
+      if subscription.active?
+        subscription.increment_expires_at(@term) # TODO: This is really the action being applied (along with the payment)
+        subscription.actions << action
+      end
+
+      # TODO: Optimise this logic
+      if subscription.pending?
+        subscription.pending_action = action
+      end
     end
   end
+
+  # TODO: Does verify go here? Or is it on the subscription? How is the action applied?
 
   private
     def pending_what

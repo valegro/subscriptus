@@ -13,8 +13,11 @@ class Subscription::LoggingObserver < ActiveRecord::Observer
         if subscription.pending == :payment
           attributes[:description] = subscription.payments.last.try(:description)
         end
-        if subscription.pending == :concession
+        if subscription.pending == :concession_verification
           attributes[:description] = "Concession: #{subscription.note}"
+        end
+        if subscription.pending == :student_verification
+          attributes[:description] = "Student Discount: #{subscription.note}"
         end
         # Set the pending column to nil if we are no longer pending anything
         subscription.pending = nil
