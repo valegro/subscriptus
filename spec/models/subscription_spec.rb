@@ -4,9 +4,6 @@ describe Subscription do
 
   before(:each) do
     @subscription = Subscription.new()
-    today = Date.new(2010, 9, 27) # today is "Mon, 27 Sep 2010"
-    Date.stubs(:today).returns(today)
-
     cm_return = stub(:success? => true)
     CM::Recipient.stubs(:exists?).returns(true)
     CM::Recipient.stubs(:find_all).returns(cm_return)
@@ -29,17 +26,21 @@ describe Subscription do
     end
   end
 
-  describe "offer term" do
+  describe "increment expiry date" do
     before(:each) do
       @offer = Factory.create(:offer)
       @subscription.offer = @offer
-      @offer_term = Factory.create(:offer_term, :months => 3, :offer => @offer)
+      Timecop.freeze(Date.new(2010, 9, 27))
+    end
+
+    after(:each) do
+      Timecop.return
     end
 
     it "should set expiry_date to 3 months from now if the expiry date has aleady been passed" do
       @subscription.expires_at = Date.new(2010, 1, 1)
       expected = Date.new(2010, 12, 27)
-      @subscription.increment_expires_at(@offer_term)
+      @subscription.increment_expires_at(3)
       @subscription.expires_at.localtime.year.should == expected.year
       @subscription.expires_at.localtime.month.should == expected.month
       @subscription.expires_at.localtime.day.should == expected.day
@@ -48,7 +49,7 @@ describe Subscription do
     it "should set expiry_date to 3 months from the end of current expiry date" do
       @subscription.expires_at = Date.new(2010, 10, 4)
       expected = Date.new(2011, 1, 4)
-      @subscription.increment_expires_at(@offer_term)
+      @subscription.increment_expires_at(3)
       @subscription.expires_at.localtime.year.should == expected.year
       @subscription.expires_at.localtime.month.should == expected.month
       @subscription.expires_at.localtime.day.should == expected.day
@@ -56,10 +57,32 @@ describe Subscription do
     
     it "should set expiry_date to 3 months from now if no expiry date has been set yet" do
       expected = Date.new(2010, 12, 27)
-      @subscription.increment_expires_at(@offer_term)
+      @subscription.increment_expires_at(3)
       @subscription.expires_at.localtime.year.should == expected.year
       @subscription.expires_at.localtime.month.should == expected.month
       @subscription.expires_at.localtime.day.should == expected.day
+    end
+
+    it "should set expiry_date to nil if a nil argument is provided" do
+      @subscription.increment_expires_at(nil)
+      @subscription.expires_at.should be(nil)
+    end
+  end
+
+  describe "apply_action" do
+    before(:each) do
+      @action = Factory.create(:subscription_action, :term_length => 5)
+    end
+
+    it "should increment the expiry date" do
+      @subscription.expects(:increment_expires_at).with(5)
+      @subscription.apply_action(@action)
+    end
+
+    it "should add the action to the actions list" do
+      expect {
+        @subscription.apply_action(@action)
+      }.to change { @subscription.actions.size }.by(1)
     end
   end
   
@@ -113,26 +136,30 @@ describe Subscription do
     Subscription::Archive.all.size.should == archive_primary_size + 1
   end
   
-  it "should deliver email when the subscription enters pending" do
-    @s = Factory.create(:subscription, :pending => :concession_verification)
-    SubscriptionMailer.expects(:deliver_pending).with(@s)
-    @s.pay_later!
-  end
-  
-  describe "with a pending subscription" do 
+  #TODO: Test all state transitions
+  describe "a pending subscription" do
     before(:each) do
       SubscriptionMailer.stubs(:deliver_pending)
-      @s = Factory.create(:subscription, :pending => :concession_verification)
-      @s.pay_later!
+      @s = Factory.create(:subscription,
+                          :state => "pending",
+                          :pending => :concession_verification,
+                          :pending_action => Factory.create(:subscription_action)
+                         )
     end
-    it "should deliver email when the subscription is verified" do
-      SubscriptionMailer.expects(:deliver_verified).with(@s)
-      @s.verify!
-    end
-  
-    it "should deliver email when the subscription pending" do
-      SubscriptionMailer.expects(:deliver_pending_expired).with(@s)
-      @s.expire!
+
+    describe "upon verify" do
+      it "should deliver an email" do
+        SubscriptionMailer.expects(:deliver_verified).with(@s)
+        @s.verify!
+      end
+
+      it "should apply an action" do
+        @subscription.expects(:apply_action) #.with?
+        @s.verify!
+      end
+
+      #TODO: Test student verify and concession verify
+      # TODO: Test delayed payments - ie; payment processed at verify time
     end
   end
 

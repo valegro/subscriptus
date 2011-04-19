@@ -265,7 +265,7 @@ describe SubscriptionFactory do
     end
   end
 
-  describe "Concession" do
+  describe "subscribing with a concession should" do
     after(:each) do
       expect {
         @subscription.save!
@@ -301,7 +301,14 @@ describe SubscriptionFactory do
     it "should set the action to be applied" do
       factory = SubscriptionFactory.new(@offer, :attributes => @attributes, :concession => :concession)
       @subscription = factory.build
-      @subscription.pending_action.should_not be(nil)
+      @subscription.pending_action.should be_instance_of(SubscriptionAction)
+    end
+
+    it "should send an email" do
+      @s = Factory.create(:subscription, :pending => :concession_verification)
+      SubscriptionMailer.expects(:deliver_pending).with(@s)
     end
   end
+
+  # TODO: Renewal stories - extension of active sub, reactivation of expired/pending etc
 end

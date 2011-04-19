@@ -69,8 +69,8 @@ class SubscriptionFactory
       # Apply the action
       # TODO: Transactions?
       if subscription.active?
-        subscription.increment_expires_at(@term) # TODO: This is really the action being applied (along with the payment)
-        subscription.actions << action
+        subscription.apply_action(action)
+        # TODO: Payment!
       end
 
       # TODO: Optimise this logic

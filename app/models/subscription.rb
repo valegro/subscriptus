@@ -42,10 +42,6 @@ class Subscription < ActiveRecord::Base
       transition :trial => :active
       transition :squatter => :active
     end
-    on :pay_later do
-      transition :trial => :pending
-      transition :active => :pending # when the subscriber is currently active but is going to pay for the new subscription using Direct Debit
-    end
     on :verify do
       transition :pending => :active
     end
@@ -77,11 +73,15 @@ class Subscription < ActiveRecord::Base
     end
     
     # Expiries
-    expires :pending => :squatter, :after => 14.days
     expires :trial => :squatter, :after => Publication::DEFAULT_TRIAL_EXPIRY.days
-
   end
+  # TODO: Should go into an observer
   after_exit_suspended :restore_subscription_expiry
+
+  def apply_action(action)
+    self.increment_expires_at(action.term_length)
+    self.actions << action
+  end
 
   def apply_term(offer_term)
     # TODO: Handle payments better - perhaps not a nested attribute??
@@ -101,6 +101,7 @@ class Subscription < ActiveRecord::Base
     end
   end
 
+  # TODO: Should this really be a method on the factory/proxy?
   # TODO: Also alias verify
   def verify_with_params!(object = nil)
     # TODO: Transaction?
@@ -181,13 +182,14 @@ class Subscription < ActiveRecord::Base
     CM::Proxy.log_cm_error(ex)
   end
 
-  # if the subscription is new or expired, start it from now
-  # otherwise start it after the expiration time
-  def increment_expires_at(offer_term)
-    self.expires_at = nil && return unless offer_term.expires?
+  def increment_expires_at(term_length)
+    unless term_length
+      self.expires_at = nil
+      return
+    end
     self.expires_at = Date.today if self.expires_at.blank? || self.expires_at < Date.today
     self.starts_at = self.expires_at
-    self.expires_at = self.expires_at.advance(:months => offer_term.months)
+    self.expires_at = self.expires_at.advance(:months => term_length)
   end
 
   def pay_non_first_time(payment)
