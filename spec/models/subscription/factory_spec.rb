@@ -290,6 +290,16 @@ describe SubscriptionFactory do
       factory = SubscriptionFactory.new(@offer, :attributes => @attributes, :concession => :concession)
       @subscription = factory.build
       @subscription.pending.should == :concession_verification
+      @subscription.state.should == 'pending'
+    end
+
+    it "should set the state to active if the user already has a verified concession" do
+      @attributes['user_attributes'] = Factory.attributes_for(:user, :valid_concession_holder => true)
+      factory = SubscriptionFactory.new(@offer, :attributes => @attributes, :concession => :concession)
+      @subscription = factory.build
+      @subscription.pending.should be(nil)
+      @subscription.state.should == 'active'
+      @subscription.expires_at.should_not be(nil)
     end
 
     it "should not set the expiry date" do
@@ -305,8 +315,8 @@ describe SubscriptionFactory do
     end
 
     it "should send an email" do
-      @s = Factory.create(:subscription, :pending => :concession_verification)
-      SubscriptionMailer.expects(:deliver_pending).with(@s)
+      @subscription = Factory.create(:subscription, :pending => :concession_verification)
+      SubscriptionMailer.expects(:deliver_pending).with(@subscription)
     end
   end
 

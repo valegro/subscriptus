@@ -10,7 +10,7 @@ class SubscriptionMailer < ActionMailer::Base
     raise Exceptions::EmailDataError.new("nil user/ email") unless !subscription.user.blank? && !subscription.user.email.blank?
     recipients     "#{subscription.user.email}"
     subject        "Crikey Online Order #{subscription.reference}"
-    from           SEND_TO
+    from           NO_REPLY
     body           :subscription => subscription
     content_type   'text/html'
   end
@@ -21,7 +21,7 @@ class SubscriptionMailer < ActionMailer::Base
     raise Exceptions::EmailDataError.new("nil user/ email") unless !subscription.user.blank? && !subscription.user.email.blank?
     recipients     "#{subscription.user.email}"
     subject        "Crikey Online Cancelation"
-    from           SEND_TO
+    from           NO_REPLY
     body           :subscription => subscription
     content_type   'text/html'
   end
@@ -54,7 +54,7 @@ class SubscriptionMailer < ActionMailer::Base
     recipients subscription.user.email
     subject "Your pending subscription has been verified"
     from NO_REPLY
-    body :subscription => subscription
+    body :subscription => subscription, :user => subscription.user
     content_type 'text/html'
   end
   

@@ -26,13 +26,28 @@ Feature: Pending Subscription List
   Scenario: An Admin can verify a subscription that is pending concession verification
     Given a subscription: "Pending Concession Subscription" exists with publication: publication "Publication 3", user: subscriber "Bob", state: "pending", pending: "concession_verification", id: 3
       And I am on the admin verify subscription page for 3
+      And I fill in "Note" with "Subscriber has a valid concession card"
+      And I press "Verify"
+     Then I should see "Verified Subscription"
+      And I should be on the admin pending subscriptions page
+    Given I am on the admin subscriptions page
+     Then I should see "Pending -> Active"
+      Then show me the page
+      And I should see "Concession: Subscriber has a valid concession card"
+
+  @active
+  Scenario: An Admin can verify a subscription that is pending student verification
+    Given a subscription: "Pending Student Verificattion Subscription" exists with publication: publication "Publication 3", user: subscriber "Bob", state: "pending", pending: "student_verification", id: 3
+      And I am on the admin verify subscription page for 3
+      And show me the page
       And I fill in "Note" with "Subscriber has a valid student concession card"
       And I press "Verify"
      Then I should see "Verified Subscription"
       And I should be on the admin pending subscriptions page
     Given I am on the admin subscriptions page
      Then I should see "Pending -> Active"
-      And I should see "Concession: Subscriber has a valid student concession card"
+      And show me the page
+      And I should see "Student Discount: Subscriber has a valid student concession card"
 
   @javascript
   Scenario: An Admin can verify a subscription that is pending payment

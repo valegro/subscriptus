@@ -29,7 +29,7 @@ class SubscriptionFactory
   # Build the subscription
   def build
     returning(@subscription) do |subscription|
-      subscription.state        = @init_state || (@concession ? 'pending' : 'active')
+      subscription.state        = initial_state
       subscription.pending      = pending_what
       subscription.offer        = @offer
       subscription.publication  = @offer.publication
@@ -84,9 +84,19 @@ class SubscriptionFactory
 
   private
     def pending_what
+      return nil unless initial_state == 'pending'
       case @concession
         when 'student', :student       then 'student_verification'
         when 'concession', :concession then 'concession_verification'
+      end
+    end
+
+    def initial_state
+      return @init_state unless @init_state.blank?
+      if @concession.try(:to_s) == 'concession' && @subscription.user.try(:valid_concession_holder)
+        'active'
+      else
+        (@concession ? 'pending' : 'active')
       end
     end
 end

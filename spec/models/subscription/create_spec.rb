@@ -13,7 +13,6 @@ describe Subscription do
     stub_wordpress
   end
 
-  # TODO: Handle when first state is pending
   describe "upon creation" do
     it "should deliver a trial email for new trials" do
       @subscription = Factory.build(:subscription)
@@ -57,6 +56,26 @@ describe Subscription do
       expect {
         s.save!
       }.to change { s.payments.count }.by(1)
+    end
+
+    describe "in the pending state" do
+      it "should raise if no pending action is provided" do
+        lambda {
+          Factory.create(:subscription, :state => 'pending', :pending => :student_verification)
+        }.should raise_error
+      end
+
+      it "should raise if no pending action is provided" do
+        lambda {
+          Factory.create(:subscription, :state => 'pending', :pending_action => Factory.create(:subscription_action))
+        }.should raise_error
+      end
+
+      it "should not raise if both pending action and pending are provided" do
+        lambda {
+          Factory.create(:subscription, :pending => :student_verification, :state => 'pending', :pending_action => Factory.create(:subscription_action))
+        }.should_not raise_error
+      end
     end
   end
 end

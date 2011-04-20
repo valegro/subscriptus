@@ -11,7 +11,15 @@ describe Subscription do
     CM::Recipient.stubs(:create!)
     stub_wordpress
   end
-  
+
+  describe "upon save" do
+    it "should create a recipient in Campaign Master" do
+      s = Factory.create(:subscription)
+      s.expects(:send_later).with(:sync_to_campaign_master)
+      s.save!
+    end
+  end
+
   describe "reference" do
     before(:each) do
       @subscription = Factory.create(:subscription)
@@ -134,68 +142,5 @@ describe Subscription do
     s.destroy
     Subscription.all.size.should == sub_primary_size
     Subscription::Archive.all.size.should == archive_primary_size + 1
-  end
-  
-  #TODO: Test all state transitions
-  describe "a pending subscription" do
-    before(:each) do
-      SubscriptionMailer.stubs(:deliver_pending)
-      @s = Factory.create(:subscription,
-                          :state => "pending",
-                          :pending => :concession_verification,
-                          :pending_action => Factory.create(:subscription_action)
-                         )
-    end
-
-    describe "upon verify" do
-      it "should deliver an email" do
-        SubscriptionMailer.expects(:deliver_verified).with(@s)
-        @s.verify!
-      end
-
-      it "should apply an action" do
-        @subscription.expects(:apply_action) #.with?
-        @s.verify!
-      end
-
-      #TODO: Test student verify and concession verify
-      # TODO: Test delayed payments - ie; payment processed at verify time
-    end
-  end
-
-  describe "a trial subscription" do
-    before(:each) do
-      @json_hash = { "last_name"=>["Draper"], "first_name"=>["Daniel"], "email"=>["example@example.com"], "ip_address"=>"150.101.226.181" }
-      @referrer = "http://www.example.com/referral"
-      @publication = Factory.create(:publication)
-    end
-
-    it "should be created and setup correctly" do
-      t = "2011-01-01 9:00".to_time(:utc).in_time_zone('UTC')
-      Timecop.travel(t) do
-        # TODO: This a User create but returns a subscription! Eeek! Maybe move to the association? Or return the user? Or rename the method? Or move to subscription?
-        @subscription = User.find_or_create_with_trial(@publication, Publication::DEFAULT_TRIAL_EXPIRY, @referrer, @json_hash)
-        @subscription.user.subscriptions.size.should == 1
-        @subscription.user.lastname.should == 'Draper'
-        @subscription.user.firstname.should == 'Daniel'
-        @subscription.user.email.should == 'example@example.com'
-        # TODO: Should solus be on the user or the subscription?
-        @subscription.solus.should == false
-        @subscription.state.should == 'trial'
-        @subscription.expires_at.to_s.should == (t + Publication::DEFAULT_TRIAL_EXPIRY.days).to_s
-      end
-    end
-
-    it "should expire after 21 days" do
-      t = "2011-01-01 9:00".to_time(:utc).in_time_zone('UTC')
-      Timecop.travel(t) do
-        @subscription = User.find_or_create_with_trial(@publication, Publication::DEFAULT_TRIAL_EXPIRY, @referrer, @json_hash)
-        Timecop.travel(t + Publication::DEFAULT_TRIAL_EXPIRY.days + 1.minute) do
-          Subscription.expire_states
-          @subscription.reload
-          @subscription.state.should == 'squatter'
-        end
-      end
-    end
   end
 end

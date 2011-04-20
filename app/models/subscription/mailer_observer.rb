@@ -10,8 +10,10 @@ class Subscription::MailerObserver < ActiveRecord::Observer
     SubscriptionMailer.send_later(:deliver_activation, subscription)
   end
 
-  def after_enter_canceled(subscription)
-    # send email to the user with their full subscription details
-    SubscriptionMailer.send_later(:deliver_cancelation, subscription)
+  def after_enter_squatter(subscription)
+    if subscription.changes['state'].try(:first) == 'pending'
+      # send email to the user with their full subscription details
+      SubscriptionMailer.send_later(:deliver_cancelation, subscription)
+    end
   end
 end

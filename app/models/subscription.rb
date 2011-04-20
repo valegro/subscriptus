@@ -32,6 +32,17 @@ class Subscription < ActiveRecord::Base
   validates_presence_of :publication, :user, :state
   validates_acceptance_of :terms
 
+  def validate_on_create
+    if state == 'pending'
+      if self.pending_action.blank?
+        errors.add_to_base("A pending action must be provided in the pending state")
+      end
+      if self.pending.blank?
+        errors.add_to_base("The pending column must be set in the pending state")
+      end
+    end
+  end
+
   # Used to specify what the pending state is waiting on
   enum_attr :pending, %w(payment concession_verification student_verification)
   
@@ -48,7 +59,6 @@ class Subscription < ActiveRecord::Base
     on :expire do
       transition :trial => :squatter
       transition :active => :squatter
-      transition :pending => :squatter
     end
     on :enqueue_for_renewal do
       transition :active => :renewal_due
@@ -81,6 +91,7 @@ class Subscription < ActiveRecord::Base
   def apply_action(action)
     self.increment_expires_at(action.term_length)
     self.actions << action
+    true
   end
 
   def apply_term(offer_term)
@@ -102,16 +113,20 @@ class Subscription < ActiveRecord::Base
   end
 
   # TODO: Should this really be a method on the factory/proxy?
-  # TODO: Also alias verify
   def verify_with_params!(object = nil)
-    # TODO: Transaction?
-    case pending.to_sym
-      when :payment
-        raise "Requires Payment to verify" unless object.kind_of?(Payment)
-        payments << object
-      when :concession
+    self.class.transaction do
+      case pending.to_sym
+        when :payment
+          raise "Requires Payment to verify" unless object.kind_of?(Payment)
+          payments << object
+        when :concession_verification
+          self.user.valid_concession_holder = true
+        when :student_verification
+      end
+      self.apply_action(self.pending_action) if self.pending_action
+      self.pending_action = nil
+      verify_without_params!
     end
-    verify_without_params!
   end
 
   alias_method_chain :verify!, :params
