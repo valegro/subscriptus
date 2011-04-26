@@ -30,7 +30,7 @@ class User < ActiveRecord::Base
   validates_presence_of :firstname, :lastname, :email, :phone_number, :address_1, :city, :postcode, :state, :country, :role, :unless => Proc.new { |user| user.auto_created? or user.admin? }
   validates_uniqueness_of :email
   validates_uniqueness_of :login, :unless => Proc.new { |user| user.auto_created? }
-  validates_confirmation_of :email, :on => :create, :unless => Proc.new { |user| user.admin? }
+  validates_confirmation_of :email #, :on => :create, :unless => Proc.new { |user| user.admin? }
 
   validate_on_create do |user|
     user.errors.add(:login, "is already taken") if Wordpress.exists?(:login => user.login)

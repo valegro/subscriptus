@@ -18,6 +18,7 @@ class SubscriptionFactory
     @concession         = options[:concession]
     @init_state         = options[:init_state]
     @attributes[:user_attributes].try(:delete, :id)
+    @payment_attributes = options[:payment_attributes]
     @subscription       = Subscription.new(@attributes)
   end
 
@@ -26,25 +27,28 @@ class SubscriptionFactory
     factory.build
   end
 
+  def update(subscription)
+    @subscription = subscription
+    build
+  end
+
   # Build the subscription
   def build
     returning(@subscription) do |subscription|
-      subscription.state        = initial_state
+      subscription.state        = set_state
       subscription.pending      = pending_what
       subscription.offer        = @offer
       subscription.publication  = @offer.publication
-      subscription.source       = @source
 
       if @term.blank? || @term.offer.blank? || @term.offer != @offer
         raise Exceptions::InvalidOfferTerm
       end
 
       # Build the Action
-      # TODO: Do we move the action build into a sep method?
       action = SubscriptionAction.new do |action|
         action.offer_name   = @offer.name
-        action.price        = @term.price
         action.term_length  = @term.months
+        action.source       = @source
       end
 
       # Check that there aren't any in included_gift_ids that aren't in available_included_gifts
@@ -66,32 +70,39 @@ class SubscriptionFactory
         action.gifts << Gift.find(@optional_gift_id) if @optional_gift_id
       end
 
+      # TODO: Raise if price is >0 and no payment provided
       # Apply the action
       # TODO: Transactions?
       if subscription.active?
+        action.build_payment(@payment_attributes)
+        action.payment.amount = @term.price
         subscription.apply_action(action)
-        # TODO: Payment!
       end
 
       # TODO: Optimise this logic
       if subscription.pending?
+        # TODO: Need to ensure we have a token
+        action.build_payment(@payment_attributes)
+        action.payment.payment_type = :token
         subscription.pending_action = action
       end
     end
+
+    #TODO: Should save be called here? If we don't call save elsewhere then we may have processed a payment for nothing!
   end
 
   # TODO: Does verify go here? Or is it on the subscription? How is the action applied?
 
   private
     def pending_what
-      return nil unless initial_state == 'pending'
+      return nil unless set_state == 'pending'
       case @concession
         when 'student', :student       then 'student_verification'
         when 'concession', :concession then 'concession_verification'
       end
     end
 
-    def initial_state
+    def set_state
       return @init_state unless @init_state.blank?
       if @concession.try(:to_s) == 'concession' && @subscription.user.try(:valid_concession_holder)
         'active'

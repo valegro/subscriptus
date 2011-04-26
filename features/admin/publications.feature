@@ -36,6 +36,7 @@ Feature: An admin can CRUD a publication
       When I fill in "Name" with "The Daily Mail"
         And I attach the file "features/data/file.jpg" to "Publication image"
         And I fill in "Description" with "Crikey's daily shizzle"
+        And I fill in "Forgot password link" with "http://www.crikey.com.au/forgot_password"
         And I press "Create"
       Then I should see "Created Publication"
         And I should be on the admin catalogue publications page

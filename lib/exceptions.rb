@@ -10,7 +10,9 @@ module  Exceptions
   class CanNotBePaidFor                      < StandardError; end
   class CanNotBeCanceled                     < StandardError; end
   class PaymentFailedException               < StandardError; end
+  class PaymentAlreadyProcessed              < StandardError; end
   class InvalidOfferTerm                     < StandardError; end
+  class PaymentTokenMissing                  < StandardError; end
 
   class GiftNotAvailable                     < StandardError
     def initialize(gift_id)

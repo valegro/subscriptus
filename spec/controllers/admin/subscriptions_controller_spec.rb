@@ -5,10 +5,7 @@ describe Admin::SubscriptionsController, "as admin" do
     stub_wordpress
     admin_login
   end
-  it "should have subscriptions layout"
-  it "should have index"
-  it "should have activity"
-  it "should have pending"
+
   it "should have search" do
     get :search
     response.should be_success
@@ -33,7 +30,7 @@ describe Admin::SubscriptionsController, "as admin" do
 
   describe "pending" do
     before(:each) do
-      @subscription = Factory.create(:subscription, :state => 'pending')
+      @subscription = Factory.create(:pending_subscription)
     end
 
     it "should list all pending subscriptions" do

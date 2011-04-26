@@ -79,7 +79,9 @@ describe Subscription do
 
   describe "apply_action" do
     before(:each) do
-      @action = Factory.create(:subscription_action, :term_length => 5)
+      @payment = Factory.build(:payment)
+      @action = Factory.build(:subscription_action, :term_length => 5)
+      @action.payment = @payment
     end
 
     it "should increment the expiry date" do
@@ -92,6 +94,20 @@ describe Subscription do
         @subscription.apply_action(@action)
       }.to change { @subscription.actions.size }.by(1)
     end
+
+    it "should increment the number of payments" do
+      expect {
+        @subscription.apply_action(@action)
+      }.to change { Payment.count }.by(1)
+    end
+
+    it "should process the payment" do
+      @payment.expects(:process!)
+      @subscription.apply_action(@action)
+    end
+
+    it "should raise if no valid payment available"
+    it "should raise if the payment fails"
   end
   
   describe "class definition" do

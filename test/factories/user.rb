@@ -12,6 +12,7 @@ Factory.define :user do |f| # Dont use this factory. Use either an admin or a su
   f.city { Faker::Address.city }
   f.state :sa
   f.country 'Australia'
+  f.role 'subscriber'
 end
 
 Factory.define :admin, :parent => :user do |a|

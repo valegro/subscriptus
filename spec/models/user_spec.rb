@@ -22,22 +22,22 @@ describe User do
   end
 
   it "should create a trial user" do
-    cnt = User.count
-    user = User.create_trial_user(:first_name => 'Daniel', :last_name => 'Draper', :email => 'daniel@netfox.com')
-    user.login.should == 'trial_user'
-    user.auto_created.should == true
-    user.password.length.should == 8
-    User.count.should == cnt + 1
+    expect {
+      user = User.create_trial_user(:first_name => 'Daniel', :last_name => 'Draper', :email => 'daniel@netfox.com')
+      user.login.should == 'trial_user'
+      user.auto_created.should == true
+      user.password.length.should == 8
+    }.to change { User.count }.by(1)
+
     # Attempt a duplicate email
     lambda {
       User.create_trial_user(:first_name => 'Daniel', :last_name => 'Draper', :email => 'daniel@netfox.com')
     }.should raise_exception
-    User.count.should == cnt + 1
+
     # And another with a different email
-    user2 = User.create_trial_user(:first_name => 'Daniel', :last_name => 'Draper', :email => 'daniel2@netfox.com')
-    User.count.should == cnt + 2
-    # Check different passwords
-    user.password.should_not == user2.password
+    expect {
+      user2 = User.create_trial_user(:first_name => 'Daniel', :last_name => 'Draper', :email => 'daniel2@netfox.com')
+    }.to change { User.count }.by(1)
   end
   
   it "should not be valid if the login exists in Wordpress" do
@@ -110,8 +110,19 @@ describe User do
   end
 
   describe "validating" do
-    it "should cause error if email confirmation missing"
-    it "should cause error if email confirmation not matching"
+    it "should cause error if email confirmation missing" do
+      user = Factory.build(:user, :email => 'daniel@netfox.com', :email_confirmation => "")
+      lambda {
+        user.save!
+      }.should raise_error(ActiveRecord::RecordInvalid)
+    end
+
+    it "should cause error if email confirmation not matching" do
+      user = Factory.build(:user, :email => 'daniel@netfox.com', :email_confirmation => "foo@bar.com")
+      lambda {
+        user.save!
+      }.should raise_error(ActiveRecord::RecordInvalid)
+    end
   end
 
   it "should return full name" do

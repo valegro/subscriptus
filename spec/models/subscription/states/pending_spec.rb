@@ -8,7 +8,7 @@ describe Subscription do
     CM::Recipient.stubs(:update)
     CM::Recipient.stubs(:create!)
     stub_wordpress
-    Timecop.freeze("2011-01-10".to_time(:utc))
+    Timecop.freeze("2011-01-10".to_time(:local))
   end
 
   after(:each) do
@@ -34,13 +34,15 @@ describe Subscription do
       end
 
       it "should deliver an email" do
-        SubscriptionMailer.expects(:send_later).with(:deliver_cancelation, @subscription)
+        SubscriptionMailer.expects(:send_later).with(:deliver_pending_expired, @subscription)
         @subscription.cancel!
       end
     end
 
     describe "upon verify" do
-      # TODO: Test delayed payments - ie; payment processed at verify time
+      before(:each) do
+        SubscriptionMailer.stubs(:deliver_verified).returns(true)
+      end
 
       it "should be active" do
         @subscription.verify!
@@ -49,7 +51,7 @@ describe Subscription do
 
       it "should should set the expiry date appropriately" do
         @subscription.verify!
-        @subscription.expires_at.utc.should == @subscription_action.term_length.months.from_now.utc
+        @subscription.expires_at.utc.should == Time.now.utc.advance(:months => @subscription_action.term_length)
       end
 
       it "should should set the state_updated_at to now" do
@@ -63,9 +65,7 @@ describe Subscription do
       end
 
       it "should deliver an email" do
-        # TODO: Which?? Looks like we are sending both atm but that can't be right!?
-        SubscriptionMailer.expects(:deliver_verified).with(@subscription)
-        SubscriptionMailer.expects(:send_later).with(:deliver_activation, @subscription)
+        SubscriptionMailer.expects(:send_later).with(:deliver_verified, @subscription)
         @subscription.verify!
       end
 
@@ -83,6 +83,13 @@ describe Subscription do
           @subscription.pending_action.should be(nil)
         end
 
+        it "should trigger a payment" do
+          # TODO: Where do we get @amount and @token from??
+          GATEWAY.expects(:trigger_recurrent).with(@amount, @token).returns(success)
+          @subscription.pending = :student_verification
+          @subscription.verify!
+        end
+
         it "should create a log entry" do
           @subscription = Factory.create(
             :subscription,
@@ -97,7 +104,7 @@ describe Subscription do
           entry = @subscription.log_entries.last
           entry.old_state.should == 'pending'
           entry.new_state.should == 'active'
-          entry.description.should == 'Student Discount: A note about the sub'
+          entry.description.should == 'Student Discount: A note about the sub; Expiry Date set to 09/04/11'
         end
       end
 

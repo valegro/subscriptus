@@ -83,13 +83,13 @@ module ActiveMerchant #:nodoc:
       end                       
     
       # options must include customer unique id
-      def setup_recurrent(money, credit_card, options = {})
-        commit :add, build_add_request(test? ? TEST_AMOUNT : money, credit_card, options)
+      def setup_recurrent(money, credit_card, token, options = {})
+        commit :add, build_add_request(test? ? TEST_AMOUNT : money, credit_card, { :customer => token }.merge(options))
       end                       
 
       # options must include customer unique id
-      def trigger_recurrent(money, options = {})
-        commit :trigger, build_trigger_request(test? ? TEST_AMOUNT : money, options)
+      def trigger_recurrent(money, token, options = {})
+        commit :trigger, build_trigger_request(test? ? TEST_AMOUNT : money, { :customer => token }.merge(options))
       end                       
 
       # options must include customer unique id

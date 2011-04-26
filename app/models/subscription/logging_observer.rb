@@ -1,6 +1,7 @@
 class Subscription::LoggingObserver < ActiveRecord::Observer
   observe :subscription
 
+  # TODO: Look at refactoring this to use on(from, to) - Maybe??
   def after_save(subscription)
     attributes = {}
     description = []

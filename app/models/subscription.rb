@@ -8,7 +8,6 @@ class Subscription < ActiveRecord::Base
   belongs_to :user, :autosave => true
   belongs_to :offer
   belongs_to :publication
-  belongs_to :source
   belongs_to :pending_action, :class_name => "SubscriptionAction"
 
   has_many :actions,
@@ -17,13 +16,13 @@ class Subscription < ActiveRecord::Base
            :before_add => Proc.new { |s, a| a.applied_at = Time.now.utc }
 
   has_many :log_entries, :class_name => "SubscriptionLogEntry"
-  has_many :payments, :autosave => true
+  #has_many :payments, :autosave => true
   has_many :orders
   
   attr_accessor :note # Used to save notes to the subscription
   attr_accessor :terms
   attr_accessor :starts_at # the start date of the newest subscription #TODO: Is this used anywhere?
-  accepts_nested_attributes_for :payments, :user
+  accepts_nested_attributes_for :user
 
   named_scope :ascend_by_name, :include => 'user', :order => "users.lastname ASC, users.firstname ASC"
   named_scope :descend_by_name, :include => 'user', :order => "users.lastname DESC, users.firstname DESC"
@@ -89,18 +88,14 @@ class Subscription < ActiveRecord::Base
   after_exit_suspended :restore_subscription_expiry
 
   def apply_action(action)
-    self.increment_expires_at(action.term_length)
-    self.actions << action
-    true
+    self.class.transaction do
+      self.increment_expires_at(action.term_length)
+      action.payment.process!
+      self.actions << action
+      true
+    end
   end
 
-  def apply_term(offer_term)
-    # TODO: Handle payments better - perhaps not a nested attribute??
-    # Set the payment price
-    self.payments.last.try(:amount=, offer_term.price)
-    #self.increment_expires_at(offer_term)
-  end
-  
   def restore_subscription_expiry
     if self.state_expires_at
       days_to_restore = (Date.yesterday - self.state_expires_at.to_date).to_i
@@ -202,41 +197,9 @@ class Subscription < ActiveRecord::Base
       self.expires_at = nil
       return
     end
-    self.expires_at = Date.today if self.expires_at.blank? || self.expires_at < Date.today
+    self.expires_at = Time.now if self.expires_at.blank? || self.expires_at < Time.now
     self.starts_at = self.expires_at
     self.expires_at = self.expires_at.advance(:months => term_length)
-  end
-
-  def pay_non_first_time(payment)
-    returning self do
-      payment.money = price # setting the money of payment object
-      payment.customer_id = self.user.recurrent_id
-      payment.call_recurrent_profile # make the payment through secure pay
-      # change the state of subscription from trial to active
-      self.activate
-    end
-  end
-  
-  def pay_first_time(payment)
-    returning self do
-      payment.money = self.price # setting the money of payment object
-      payment.customer_id = self.user.generate_recurrent_profile_id # customer_id is used to create recurrent_profile in secure pay
-      payment.create_recurrent_profile
-      # recurrent setup successul, so now the customer_id should be saved as a reference to later transactions
-      self.user.recurrent_id = payment.customer_id
-      payment.order_num = self.generate_and_set_order_number # order_num is sent to the user as a reference number of their subscriptions
-      payment.call_recurrent_profile # make the payment through secure pay
-      # change the state of subscription from trial to active
-      self.activate
-    end
-  end
-  
-  private
-
-  # If the current account is expired, and the subscription now has a
-  # gateway token, activate the account.
-  def update_from_expired
-    self.activate! if gateway_token_changed? && !gateway_token.blank? && self.expired?
   end
 
   def default_payment_method

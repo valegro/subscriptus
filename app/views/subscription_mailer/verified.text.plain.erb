@@ -7,7 +7,7 @@ You should now have full access to Crikey's subscriber-only content online, and 
 
 Here are your website login details:
 Email address: <%= @user.email %>
-Password: the password you entered when you subscribed
+Forgot Password Link: <%= @subscription.publication.forgot_password_link %>
 
 
 Your Subscription details: 
@@ -23,4 +23,4 @@ Cheers,
 The Crikey Crew.
 
 
-Your email address is registered as [insert email address] - you can unsubscribe here.  [link to unsubscribe form]
+Your email address is registered as <%= @user.email %> - you can unsubscribe here: <%= unsubscribe_url(:user_id => @user.id) %>

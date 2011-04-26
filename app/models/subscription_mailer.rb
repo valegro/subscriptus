@@ -11,7 +11,7 @@ class SubscriptionMailer < ActionMailer::Base
     recipients     "#{subscription.user.email}"
     subject        "Crikey Online Order #{subscription.reference}"
     from           NO_REPLY
-    body           :subscription => subscription
+    body           :subscription => subscription, :user => subscription.user
     content_type   'text/html'
   end
 
@@ -22,7 +22,7 @@ class SubscriptionMailer < ActionMailer::Base
     recipients     "#{subscription.user.email}"
     subject        "Crikey Online Cancelation"
     from           NO_REPLY
-    body           :subscription => subscription
+    body           :subscription => subscription, :user => subscription.user
     content_type   'text/html'
   end
 
@@ -57,5 +57,28 @@ class SubscriptionMailer < ActionMailer::Base
     body :subscription => subscription, :user => subscription.user
     content_type 'text/html'
   end
+
+  def expired(subscription)
+    recipients subscription.user.email
+    subject "Your subscription has expired"
+    from NO_REPLY
+    body :subscription => subscription, :user => subscription.user
+    content_type 'text/html'
+  end
   
+  def suspended(subscription)
+    recipients subscription.user.email
+    subject "Your subscription has been suspended"
+    from NO_REPLY
+    body :subscription => subscription, :user => subscription.user
+    content_type 'text/html'
+  end
+
+  def unsuspended(subscription)
+    recipients subscription.user.email
+    subject "Your subscription has been reactivated"
+    from NO_REPLY
+    body :subscription => subscription, :user => subscription.user
+    content_type 'text/html'
+  end
 end

@@ -3,5 +3,5 @@ Factory.define :subscription_action do |s|
   s.applied_at  Date.today.to_datetime
   s.term_length 3
   s.association :subscription, :factory => :subscription
-  s.price       30
+  s.association :payment, :factory => :payment
 end

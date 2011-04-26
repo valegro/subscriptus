@@ -34,6 +34,7 @@ config.action_mailer.smtp_settings = {
   :password => ENV['SENDGRID_PASSWORD'],
   :domain => ENV['SENDGRID_DOMAIN'],
 }
+ActionMailer::Base.default_url_options[:host] = "offers.crikey.com.au"
 
 # Enable threaded mode
 # config.threadsafe!

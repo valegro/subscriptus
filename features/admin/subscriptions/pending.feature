@@ -14,7 +14,7 @@ Feature: Pending Subscription List
 
   @active
   Scenario: An Admin can view all pending subscriptions
-    Given a subscription: "Pending Concession Subscription" exists with publication: publication "Publication 3", user: subscriber "Bob", state: "pending", pending: "concession_verification", id: 3
+    Given a pending_subscription: "Pending Concession Subscription" exists with publication: publication "Publication 3", user: subscriber "Bob", state: "pending", pending: "concession_verification", id: 3
       And I am on the admin pending subscriptions page
      Then I should see "Pending Subscriptions"
       And I should see "Publication 3"
@@ -24,7 +24,7 @@ Feature: Pending Subscription List
 
   @active
   Scenario: An Admin can verify a subscription that is pending concession verification
-    Given a subscription: "Pending Concession Subscription" exists with publication: publication "Publication 3", user: subscriber "Bob", state: "pending", pending: "concession_verification", id: 3
+    Given a pending_subscription: "Pending Concession Subscription" exists with publication: publication "Publication 3", user: subscriber "Bob", state: "pending", pending: "concession_verification", id: 3
       And I am on the admin verify subscription page for 3
       And I fill in "Note" with "Subscriber has a valid concession card"
       And I press "Verify"
@@ -37,7 +37,7 @@ Feature: Pending Subscription List
 
   @active
   Scenario: An Admin can verify a subscription that is pending student verification
-    Given a subscription: "Pending Student Verificattion Subscription" exists with publication: publication "Publication 3", user: subscriber "Bob", state: "pending", pending: "student_verification", id: 3
+    Given a pending_subscription: "Pending Student Verificattion Subscription" exists with publication: publication "Publication 3", user: subscriber "Bob", state: "pending", pending: "student_verification", id: 3
       And I am on the admin verify subscription page for 3
       And show me the page
       And I fill in "Note" with "Subscriber has a valid student concession card"
@@ -51,7 +51,7 @@ Feature: Pending Subscription List
 
   @javascript
   Scenario: An Admin can verify a subscription that is pending payment
-    Given a subscription: "Pending Payment Subscription" exists with publication: publication "Publication 2", user: subscriber "Alice", state: "pending", pending: "payment", id: 4, price: 50
+    Given a pending_subscription: "Pending Payment Subscription" exists with publication: publication "Publication 2", user: subscriber "Alice", state: "pending", pending: "payment", id: 4, price: 50
       And I am on the admin verify subscription page for 4
       And I should not be able to select the "Credit card" option from "Payment type"
       And I select "Direct debit" from "Payment type"
@@ -65,14 +65,14 @@ Feature: Pending Subscription List
 
   @active
   Scenario: An Admin can cancel a subscription that is pending
-    Given a subscription: "Pending Payment Subscription" exists with publication: publication "Publication 2", user: subscriber "Alice", state: "pending", pending: "payment", id: 4, price: 50
+    Given a pending_subscription: "Pending Payment Subscription" exists with publication: publication "Publication 2", user: subscriber "Alice", state: "pending", pending: "payment", id: 4, price: 50
       And I am on the admin pending subscriptions page
       And I follow "Cancel"
       And I am on the admin pending subscriptions page
       And I should not see "Publication 2"
     
   Scenario: An admin cannot verify a pending subscription twice
-    Given a subscription: "Pending Payment Subscription" exists with publication: publication "Publication 2", user: subscriber "Alice", state: "pending", pending: "payment", id: 4, price: 50
+    Given a pending_subscription: "Pending Payment Subscription" exists with publication: publication "Publication 2", user: subscriber "Alice", state: "pending", pending: "payment", id: 4, price: 50
       And I am on the admin verify subscription page for 4
       And the subscription "Pending Payment Subscription" has state: "active"
       And I select "Direct debit" from "Payment type"
