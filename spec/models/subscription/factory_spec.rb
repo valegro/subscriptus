@@ -44,14 +44,12 @@ describe SubscriptionFactory do
     Timecop.freeze(t) do
       factory = SubscriptionFactory.new(@offer, :attributes => @attributes, :payment_attributes => @payment_attrs)
       subscription = factory.build
-      subscription.actions.size.should == 1
+      subscription.save!
+      subscription.actions.count.should == 1
       subscription.actions.first.offer_name.should == @offer.name
       subscription.actions.first.payment.amount.should == @offer.offer_terms.first.price
       subscription.actions.first.term_length.should == @offer.offer_terms.first.months
       subscription.actions.first.applied_at.should == t
-      expect {
-        subscription.save!
-      }.to change { SubscriptionAction.count }.by(1)
     end
   end
 
@@ -61,7 +59,7 @@ describe SubscriptionFactory do
     it "should set term to first term if none set" do
       t = Time.local(2011, 1, 1, 0, 0, 0)
       Timecop.freeze(t) do
-        subscription = SubscriptionFactory.build(@offer, :payment_attributes => @payment_attrs)
+        subscription = SubscriptionFactory.build(@offer, :payment_attributes => @payment_attrs, :attributes => @attributes)
         subscription.actions.last.payment.amount.should == @term1.price
         subscription.expires_at.should == Time.local(2011, 2, 1, 0, 0, 0).in_time_zone("UTC")
       end
@@ -70,7 +68,7 @@ describe SubscriptionFactory do
     it "should set a specific term" do
       t = Time.local(2011, 1, 1, 0, 0, 0)
       Timecop.freeze(t) do
-        subscription = SubscriptionFactory.build(@offer, :term_id => @term2.id, :payment_attributes => @payment_attrs)
+        subscription = SubscriptionFactory.build(@offer, :term_id => @term2.id, :payment_attributes => @payment_attrs, :attributes => @attributes)
         subscription.actions.last.payment.amount.should == @term2.price
         subscription.expires_at.should == Time.local(2011, 3, 1, 0, 0, 0).in_time_zone("UTC")
       end
@@ -80,7 +78,7 @@ describe SubscriptionFactory do
       t = Time.local(2011, 1, 1, 0, 0, 0)
       Timecop.travel(t) do
         lambda {
-          SubscriptionFactory.build(@offer, :term_id => -1, :payment_attributes => @payment_attrs)
+          SubscriptionFactory.build(@offer, :term_id => -1, :payment_attributes => @payment_attrs, :attributes => @attributes)
         }.should raise_exception(ActiveRecord::RecordNotFound)
       end
     end
@@ -88,12 +86,12 @@ describe SubscriptionFactory do
     it "should raise if the offer term does not match the offer" do
       @offer_term = Factory.create(:offer_term, :months => 3, :offer => Factory.create(:offer))
       lambda {
-        SubscriptionFactory.build(@offer, :term_id => @offer_term.id, :payment_attributes => @payment_attrs)
+        SubscriptionFactory.build(@offer, :term_id => @offer_term.id, :payment_attributes => @payment_attrs, :attributes => @attributes)
       }.should raise_exception(Exceptions::InvalidOfferTerm)
     end
 
     it "should set the publication" do
-      subscription = SubscriptionFactory.build(@offer, :payment_attributes => @payment_attrs)
+      subscription = SubscriptionFactory.build(@offer, :payment_attributes => @payment_attrs, :attributes => @attributes)
       subscription.publication.should == @offer.publication
     end
   end
@@ -107,7 +105,7 @@ describe SubscriptionFactory do
     end
 
     it "should have no gifts if none provided" do
-      subscription = SubscriptionFactory.build(@offer, :payment_attributes => @payment_attrs)
+      subscription = SubscriptionFactory.build(@offer, :payment_attributes => @payment_attrs, :attributes => @attributes)
       subscription.actions.last.gifts.empty?.should be(true)
     end
 
@@ -116,10 +114,9 @@ describe SubscriptionFactory do
       @offer.gifts.add(@gift2)
       subscription = SubscriptionFactory.build(@offer, :attributes => @attributes, :payment_attributes => @payment_attrs)
       subscription.actions.last.gifts.size.should == 2
-      expect {
-        subscription.save!
-      }.to change { subscription.orders.count }.by(1)
+      subscription.save!
       subscription.reload
+      subscription.orders.count.should == 1
       subscription.orders.last.gifts.size.should == 2
     end
 
@@ -129,9 +126,8 @@ describe SubscriptionFactory do
       subscription = SubscriptionFactory.build(@offer, :optional_gift => "#{@gift2.id}", :attributes => @attributes, :payment_attributes => @payment_attrs)
       subscription.actions.last.gifts.size.should == 1
       subscription.actions.last.gifts.first.name.should == 'Gift 2'
-      expect {
-        subscription.save!
-      }.to change { subscription.orders.count }.by(1)
+      subscription.save!
+      subscription.orders.count.should == 1
       subscription.reload
       subscription.orders.last.gifts.size.should == 1
     end
@@ -141,15 +137,15 @@ describe SubscriptionFactory do
       @offer.gifts.add(@gift2, true)
       subscription = SubscriptionFactory.build(@offer, :attributes => @attributes, :payment_attributes => @payment_attrs)
       subscription.actions.last.gifts.empty?.should be(true)
-      expect {
-        subscription.save!
-      }.to_not change { subscription.orders.count }.by(1)
+      subscription.save!
+      subscription.reload
+      subscription.orders.count.should == 0
     end
 
     it "should raise if you select an optional gift that is not available on the offer" do
       @offer.gifts.add(@gift1, true)
       lambda {
-        SubscriptionFactory.build(@offer, :optional_gift => @gift2.id, :payment_attributes => @payment_attrs)
+        SubscriptionFactory.build(@offer, :optional_gift => @gift2.id, :payment_attributes => @payment_attrs, :attributes => @attributes)
       }.should raise_error(Exceptions::GiftNotAvailable, "The Gift #{@gift2.name} is no longer available")
     end
 
@@ -158,9 +154,8 @@ describe SubscriptionFactory do
       @offer.gifts.add(@gift2, true)
       subscription = SubscriptionFactory.build(@offer, :attributes => @attributes, :payment_attributes => @payment_attrs)
       subscription.actions.last.gifts.size.should == 2
-      expect {
-        subscription.save!
-      }.to change { subscription.orders.count }.by(1)
+      subscription.save!
+      subscription.orders.count.should == 1
       subscription.reload
       subscription.orders.last.gifts.size.should == 2
     end
@@ -171,10 +166,9 @@ describe SubscriptionFactory do
       @offer.gifts.add(@gift3, true)
       @offer.gifts.add(@gift4, true)
       subscription = SubscriptionFactory.build(@offer, :optional_gift => @gift4.id, :attributes => @attributes, :payment_attributes => @payment_attrs)
+      subscription.save!
       subscription.actions.last.gifts.size.should == 3
-      expect {
-        subscription.save!
-      }.to change { subscription.orders.count }.by(1)
+      subscription.orders.count.should == 1
       subscription.orders(true).last.gifts.size.should == 3 
     end
 
@@ -183,19 +177,19 @@ describe SubscriptionFactory do
       @offer.gifts.add(@gift2, true)
       @gift2.update_attributes(:on_hand => 0)
       lambda {
-        SubscriptionFactory.build(@offer, :optional_gift => @gift2.id, :payment_attributes => @payment_attrs)
+        SubscriptionFactory.build(@offer, :optional_gift => @gift2.id, :payment_attributes => @payment_attrs, :attributes => @attributes)
       }.should raise_error(Exceptions::GiftNotAvailable, "The Gift #{@gift2.name} is no longer available")
     end
 
     it "should accept a list of included gift ids as validation" do
       @offer.gifts.add(@gift1)
       @offer.gifts.add(@gift2)
-      subscription = SubscriptionFactory.build(@offer, :included_gift_ids => [@gift1, @gift2].map(&:id), :attributes => @attributes, :payment_attributes => @payment_attrs)
-      subscription.actions.last.gifts.size.should == 2
-      expect {
-        subscription.save!
-      }.to change { subscription.orders.count }.by(1)
-      subscription.orders(true).last.gifts.size.should == 2 
+      @subscription = SubscriptionFactory.build(@offer, :included_gift_ids => [@gift1, @gift2].map(&:id), :attributes => @attributes, :payment_attributes => @payment_attrs)
+      @subscription.actions.last.gifts.size.should == 2
+      # TODO: Remove call to save here
+      @subscription.save!
+      @subscription.orders(true).last.gifts.size.should == 2 
+      @subscription.orders.count.should == 1
     end
 
     it "should raise if an included gift becomes unavailable" do
@@ -203,31 +197,33 @@ describe SubscriptionFactory do
       @offer.gifts.add(@gift2)
       @gift1.update_attributes(:on_hand => 0)
       lambda {
-        SubscriptionFactory.build(@offer, :included_gift_ids => [@gift1, @gift2].map(&:id).map(&:to_s), :payment_attributes => @payment_attrs)
+        SubscriptionFactory.build(@offer, :included_gift_ids => [@gift1, @gift2].map(&:id).map(&:to_s), :payment_attributes => @payment_attrs, :attributes => @attributes)
       }.should raise_error(Exceptions::GiftNotAvailable, "The Gift #{@gift1.name} is no longer available")
     end
 
     it "should raise if an included gift does not exist" do
       lambda {
-        SubscriptionFactory.build(@offer, :included_gift_ids => [-1], :payment_attributes => @payment_attrs)
+        SubscriptionFactory.build(@offer, :included_gift_ids => [-1], :payment_attributes => @payment_attrs, :attributes => @attributes)
       }.should raise_error(Exceptions::GiftNotAvailable, "The Gift is no longer available")
     end
 
     it "should raise if an optional gift does not exist" do
       lambda {
-        SubscriptionFactory.build(@offer, :optional_gift => -1, :payment_attributes => @payment_attrs)
+        SubscriptionFactory.build(@offer, :optional_gift => -1, :payment_attributes => @payment_attrs, :attributes => @attributes)
       }.should raise_error(Exceptions::GiftNotAvailable, "The Gift is no longer available")
     end
   end
 
   describe "Initial State" do
+    it "should raise if not valid"
+
     it "should set to active by default" do
-      subscription = SubscriptionFactory.build(@offer, :payment_attributes => @payment_attrs)
+      subscription = SubscriptionFactory.build(@offer, :payment_attributes => @payment_attrs, :attributes => @attributes)
       subscription.state.should == 'active'
     end
 
     it "should allow me to specify the initial state" do
-      subscription = SubscriptionFactory.build(@offer, :init_state => 'trial', :payment_attributes => @payment_attrs)
+      subscription = SubscriptionFactory.build(@offer, :init_state => 'trial', :payment_attributes => @payment_attrs, :attributes => @attributes)
       subscription.state.should == 'trial'
     end
   end
@@ -235,7 +231,7 @@ describe SubscriptionFactory do
   describe "Source" do
     it "should set the source if provided" do
       source = Factory.create(:source)
-      subscription = SubscriptionFactory.build(@offer, :source => source, :payment_attributes => @payment_attrs)
+      subscription = SubscriptionFactory.build(@offer, :source => source, :payment_attributes => @payment_attrs, :attributes => @attributes)
       subscription.actions.last.source.name == source.name
     end
   end
@@ -272,9 +268,9 @@ describe SubscriptionFactory do
       @payment = Factory.create(:payment, :payment_type => :token)
     end
 
+    it "should store the payment details on the gateway and set the user's gateway payment token"
+
     it "should set state to pending" do
-      #gw_response = stub(:success? => true)
-      #GATEWAY.expects(:purchase).returns(gw_response)
       factory = SubscriptionFactory.new(@offer, :attributes => @attributes, :concession => :student, :payment_attributes => @payment_attrs)
       @subscription = factory.build
       @subscription.state.should == 'pending'
@@ -314,13 +310,7 @@ describe SubscriptionFactory do
       @subscription.pending_action.should be_instance_of(SubscriptionAction)
       @subscription.pending_action.payment.payment_type.should == :token
     end
-
-    it "should send an email" do
-      puts "AAA"
-      # TODO: This belongs in subscription/states/pending_spec.rb
-      @subscription = Factory.create(:subscription, :pending => :concession_verification, :state => "pending")
-      SubscriptionMailer.expects(:send_later).with(:deliver_pending, @subscription)
-      @subscription.save!
-    end
   end
+
+  it "should call save! on the subscription"
 end

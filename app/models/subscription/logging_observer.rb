@@ -13,7 +13,7 @@ class Subscription::LoggingObserver < ActiveRecord::Observer
       )
       if state_changes.first == 'pending' && state_changes.last == 'active'
         if subscription.pending == :payment
-          description << subscription.payments.last.try(:description)
+          description << subscription.actions.last.try(:payment).try(:description)
         end
         if subscription.pending == :concession_verification
           description << "Concession: #{subscription.note}"

@@ -11,6 +11,10 @@ Factory.define :payment do |f|
   # f.association :subscription, :factory => :subscription
 end
 
+Factory.define :token_payment, :parent => :payment do |f|
+  f.payment_type { 'token' }
+end
+
 Factory.define :direct_debit_payment, :class => 'Payment' do |f|
   f.amount { 100 }
   f.payment_type { 'direct_debit' }

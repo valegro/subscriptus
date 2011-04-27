@@ -13,7 +13,8 @@ class Subscription < ActiveRecord::Base
   has_many :actions,
            :class_name => "SubscriptionAction",
            :order => "applied_at desc",
-           :before_add => Proc.new { |s, a| a.applied_at = Time.now.utc }
+           :before_add => Proc.new { |s, a| a.applied_at = Time.now.utc },
+           :autosave => true
 
   has_many :log_entries, :class_name => "SubscriptionLogEntry"
   #has_many :payments, :autosave => true
@@ -87,12 +88,13 @@ class Subscription < ActiveRecord::Base
   # TODO: Should go into an observer
   after_exit_suspended :restore_subscription_expiry
 
+  # TODO: Rename to apply_action! (maybe even move to the association? And disable <<)
   def apply_action(action)
     self.class.transaction do
       self.increment_expires_at(action.term_length)
-      action.payment.process!
+      action.payment.process!(:token => self.user.try(:payment_gateway_token))
       self.actions << action
-      true
+      save!
     end
   end
 
@@ -113,7 +115,7 @@ class Subscription < ActiveRecord::Base
       case pending.to_sym
         when :payment
           raise "Requires Payment to verify" unless object.kind_of?(Payment)
-          payments << object
+          self.pending_action.payment = object
         when :concession_verification
           self.user.valid_concession_holder = true
         when :student_verification

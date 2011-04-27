@@ -15,15 +15,18 @@ describe Subscription do
     Timecop.return
   end
  
-  # TODO: Reminders for pending emails at regular intervals - how??
   describe "in the pending state" do
     before(:each) do
+      success = stub(:success? => true)
+      GATEWAY.stubs(:trigger_recurrent).returns(success)
       SubscriptionMailer.stubs(:deliver_pending)
-      @subscription_action = Factory.create(:subscription_action)
+      @user = Factory.create(:user_with_token)
+      @subscription_action = Factory.create(:subscription_action, :payment => Factory.create(:token_payment))
       @subscription = Factory.create(:subscription,
         :state => "pending",
         :pending => :concession_verification,
-        :pending_action => @subscription_action
+        :pending_action => @subscription_action,
+        :user => @user
       )
     end
 
@@ -84,8 +87,9 @@ describe Subscription do
         end
 
         it "should trigger a payment" do
-          # TODO: Where do we get @amount and @token from??
-          GATEWAY.expects(:trigger_recurrent).with(@amount, @token).returns(success)
+          GATEWAY.unstub(:trigger_recurrent)
+          success = stub(:success? => true)
+          GATEWAY.expects(:trigger_recurrent).with(@subscription_action.payment.amount.to_i * 100, @user.payment_gateway_token).returns(success)
           @subscription.pending = :student_verification
           @subscription.verify!
         end
@@ -95,16 +99,18 @@ describe Subscription do
             :subscription,
             :state => 'pending',
             :pending => :student_verification,
-            :pending_action => Factory.create(:subscription_action)
+            :pending_action => Factory.create(:subscription_action, :payment => Factory.create(:token_payment)),
+            :user => @user
           )
           @subscription.note = "A note about the sub"
           expect {
             @subscription.verify!
-          }.to change { @subscription.log_entries.size }.by(1)
+          }.to change { @subscription.log_entries.size }.by(2)
           entry = @subscription.log_entries.last
           entry.old_state.should == 'pending'
           entry.new_state.should == 'active'
-          entry.description.should == 'Student Discount: A note about the sub; Expiry Date set to 09/04/11'
+          entry.description.should == 'Student Discount: A note about the sub'
+          @subscription.log_entries[-2].description.should == 'Expiry Date set to 09/04/11'
         end
       end
 
@@ -122,17 +128,23 @@ describe Subscription do
           @subscription.log_entries.size.should == 1
           expect {
             @subscription.verify!
-          }.to change { @subscription.log_entries.size }.by(1)
+          }.to change { @subscription.log_entries.size }.by(2)
           entry = @subscription.log_entries.last
           entry.old_state.should == 'pending'
           entry.new_state.should == 'active'
-          entry.description.should == 'Concession: A note about the sub; Expiry Date set to 09/04/11'
+          entry.description.should == 'Concession: A note about the sub'
+          @subscription.log_entries[-2].description.should == 'Expiry Date set to 09/04/11'
         end
       end
 
       describe "if pending payment" do
         before(:each) do
-          @subscription.pending = 'payment'
+          @subscription_action = Factory.create(:subscription_action, :payment => nil)
+          @subscription = Factory.create(:subscription,
+            :state => "pending",
+            :pending => :payment,
+            :pending_action => @subscription_action
+          )
         end
 
         it "should require a payment if pending payment" do
@@ -143,18 +155,22 @@ describe Subscription do
         end
 
         it "should create a log entry if pending payment when verified" do
-          le_count = @subscription.log_entries.count
-          @subscription.verify!(Payment.new(:payment_type => 'direct_debit', :amount => 100))
-          @subscription.log_entries.count.should == (le_count + 1)
+          expect {
+            @subscription.verify!(Payment.new(:payment_type => 'direct_debit', :amount => 100))
+          }.to change { @subscription.reload; @subscription.log_entries.count }.by(2)
           @subscription.log_entries.last.old_state.should == 'pending'
           @subscription.log_entries.last.new_state.should == 'active'
-          @subscription.log_entries.last.description.should == '$100.00 by Direct debit; Expiry Date set to 09/04/11'
+          @subscription.log_entries[-1].description.should == '$100.00 by Direct debit'
+          @subscription.log_entries[-2].description.should == 'Expiry Date set to 09/04/11'
         end
 
         it "should create a paymemt if pending payment" do
-          payment_count = @subscription.payments.count
-          @subscription.verify!(Payment.new(:payment_type => 'direct_debit', :amount => 100))
-          @subscription.payments.count.should == (payment_count + 1)
+          expect {
+            @subscription.verify!(Payment.new(:payment_type => 'direct_debit', :amount => 100))
+          }.to change { @subscription.reload; @subscription.actions(true).count }.by(1)
+          @subscription.actions.last.payment.should_not be(nil)
+          @subscription.actions.last.payment.payment_type.should == :direct_debit
+          @subscription.actions.last.payment.amount.should == 100
         end
 
         it "should be active" do

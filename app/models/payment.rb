@@ -9,7 +9,6 @@ class Payment < ActiveRecord::Base
   validates_numericality_of :amount, :greater_than_or_equal_to => 0
 
   attr_accessor :card_verification
-  attr_accessor :token
 
   enum_attr :card_type, %w(visa master american_express diners_club jcb)
   enum_attr :payment_type, %w(credit_card token direct_debit cheque), :init => :credit_card
@@ -30,7 +29,8 @@ class Payment < ActiveRecord::Base
   end
 
   # Process and save the payment
-  def process!
+  # Only valid option is :token (to be used for token payments)
+  def process!(options = {})
     raise ActiveRecord::RecordInvalid.new(self) unless self.valid?
     if (self.credit_card? || self.payment_type.nil?) && !new_record?
       raise Exceptions::PaymentAlreadyProcessed.new("You are trying to process a Credit Card payment that has already been saved - consider using a token payment")
@@ -49,8 +49,8 @@ class Payment < ActiveRecord::Base
       end
     end
     if self.token?
-      raise Exceptions::PaymentTokenMissing if token.blank?
-      response = GATEWAY.trigger_recurrent((amount * 100).to_i, token)
+      raise Exceptions::PaymentTokenMissing if options[:token].blank?
+      response = GATEWAY.trigger_recurrent((amount * 100).to_i, options[:token])
       # TODO: Not DRY
       unless response.success?
         raise Exceptions::PaymentFailedException.new(response.message)

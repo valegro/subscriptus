@@ -22,3 +22,7 @@ end
 Factory.define :subscriber, :parent => :user do |a|
   a.role { 'subscriber' }
 end
+
+Factory.define :user_with_token, :parent => :user do |a|
+  a.payment_gateway_token { '1234567' }
+end

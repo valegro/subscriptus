@@ -82,6 +82,8 @@ describe Subscription do
       @payment = Factory.build(:payment)
       @action = Factory.build(:subscription_action, :term_length => 5)
       @action.payment = @payment
+      @subscription.user = Factory.build(:user)
+      @subscription.publication = Factory.build(:publication)
     end
 
     it "should increment the expiry date" do

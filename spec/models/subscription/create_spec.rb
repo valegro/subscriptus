@@ -28,6 +28,12 @@ describe Subscription do
       @user.subscriptions << sub
     end
 
+    it "should deliver a pending email for new pending subscriptions" do
+      @subscription = Factory.build(:pending_subscription)
+      SubscriptionMailer.expects(:send_later).with(:deliver_pending, @subscription)
+      @subscription.save!
+    end
+
     it "should create a log entry" do
       @subscription = Factory.create(:subscription)
       @subscription.log_entries.size.should == 1
@@ -47,15 +53,6 @@ describe Subscription do
       s = Factory.build(:subscription)
       s.expects(:send_later).with(:sync_to_campaign_master)
       s.save!
-    end
-
-    it "should create and process a payment if one is provided" do
-      s = Factory.build(:subscription, :payments_attributes => { "0" =>  Factory.attributes_for(:payment) })
-      gw_response = stub(:success? => true)
-      GATEWAY.expects(:purchase).returns(gw_response)
-      expect {
-        s.save!
-      }.to change { s.payments.count }.by(1)
     end
 
     describe "in the pending state" do

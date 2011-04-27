@@ -84,9 +84,9 @@ describe Payment do
     it "should succeed when token provided and funds available" do
       response = stub(:success? => true)
       GATEWAY.expects(:trigger_recurrent).with(10000, "123456").returns(response)
-      payment = Factory.build(:payment, :payment_type => :token, :token => "123456", :amount => 100)
+      payment = Factory.build(:payment, :payment_type => :token, :amount => 100)
       expect {
-        payment.process!
+        payment.process!(:token => "123456")
       }.to change { Payment.count }.by(1)     
     end
 
