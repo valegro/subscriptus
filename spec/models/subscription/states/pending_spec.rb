@@ -78,6 +78,11 @@ describe Subscription do
         @subscription.pending_action.should be(nil)
       end
 
+      describe "and the payment is declined" do
+        it "should raise an exception"
+        # TODO: And the controller should handle it!
+      end
+
       describe "if pending student verification" do
         it "should apply an action" do
           @subscription.pending = :student_verification

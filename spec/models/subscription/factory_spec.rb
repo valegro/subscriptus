@@ -53,7 +53,11 @@ describe SubscriptionFactory do
     end
   end
 
-  it "should raise if payment attributes are not provided and offer term price is > 0"
+  it "should raise if payment attributes are not provided and offer term price is > 0" do
+    lambda {
+      SubscriptionFactory.build(@offer, :payment_attributes => nil, :attributes => @attributes)
+    }.should raise_exception(Exceptions::Factory::InvalidException)
+  end
 
   describe "offer basics" do
     it "should set term to first term if none set" do
@@ -215,7 +219,11 @@ describe SubscriptionFactory do
   end
 
   describe "Initial State" do
-    it "should raise if not valid"
+    it "should raise if not valid" do
+      lambda {
+        SubscriptionFactory.build(@offer, :payment_attributes => @payment_attrs, :attributes => {})
+      }.should raise_exception(Exceptions::Factory::InvalidException)
+    end
 
     it "should set to active by default" do
       subscription = SubscriptionFactory.build(@offer, :payment_attributes => @payment_attrs, :attributes => @attributes)
@@ -268,7 +276,13 @@ describe SubscriptionFactory do
       @payment = Factory.create(:payment, :payment_type => :token)
     end
 
-    it "should store the payment details on the gateway and set the user's gateway payment token"
+    it "should store the payment details on the gateway and set the user's gateway payment token" do
+      @user = Factory.create(:subscriber)
+      @user.expects(:store_credit_card_on_gateway) # TODO. with?
+      @subscription = SubscriptionFactory.build(@offer, :attributes => { :user => @user }, :concession => :student, :payment_attributes => @payment_attrs)
+    end
+
+    it "should not store the payment details on the gateway if the user already has a valid token"
 
     it "should set state to pending" do
       factory = SubscriptionFactory.new(@offer, :attributes => @attributes, :concession => :student, :payment_attributes => @payment_attrs)
@@ -312,5 +326,8 @@ describe SubscriptionFactory do
     end
   end
 
-  it "should call save! on the subscription"
+  it "should call save! on the subscription" do
+    Subscription.any_instance.expects(:save!)
+    SubscriptionFactory.build(@offer, :attributes => @attributes, :concession => :concession, :payment_attributes => @payment_attrs)
+  end
 end

@@ -15,7 +15,7 @@
   </script>
 <% end %>
 
-<% form_for @subscription, :url => subscribe_path(:offer_id => @offer.id), :builder => SubscribeFormBuilder do |f| %>
+<% form_for @subscription, :url => subscribe_path(:offer_id => (@offer || 1)), :builder => SubscribeFormBuilder do |f| %>
 
   <div class='section' id='step1'>
     <img src="/images/step1.png" class='step' alt='step 1' />
@@ -158,7 +158,7 @@
         <div id='payment-details'>
           <h4>Credit Card Details</h4>
           
-          <% f.fields_for :payments do |p| %>
+          <% f.fields_for :payment, @payment do |p| %>
             <%= p.enum_select :card_type, :required => true %>
               <%= p.text_field :first_name, :required => true %>
               <%= p.text_field :last_name, :required => true %>

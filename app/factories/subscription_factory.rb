@@ -35,60 +35,67 @@ class SubscriptionFactory
   # Build the subscription
   def build
     returning(@subscription) do |subscription|
-      subscription.state        = set_state
-      subscription.pending      = pending_what
-      subscription.offer        = @offer
-      subscription.publication  = @offer.publication
+      begin
+        subscription.state        = set_state
+        subscription.pending      = pending_what
+        subscription.offer        = @offer
+        subscription.publication  = @offer.publication
 
-      if @term.blank? || @term.offer.blank? || @term.offer != @offer
-        raise Exceptions::InvalidOfferTerm
-      end
+        if @term.blank? || @term.offer.blank? || @term.offer != @offer
+          raise Exceptions::InvalidOfferTerm
+        end
 
-      # Build the Action
-      action = SubscriptionAction.new do |action|
-        action.offer_name   = @offer.name
-        action.term_length  = @term.months
-        action.source       = @source
-      end
+        # Build the Action
+        action = SubscriptionAction.new do |action|
+          action.offer_name   = @offer.name
+          action.term_length  = @term.months
+          action.source       = @source
+        end
 
-      # Check that there aren't any in included_gift_ids that aren't in available_included_gifts
-      unless @included_gift_ids.blank?
-        @included_gift_ids.each do |gift_id|
-          unless @offer.available_included_gifts.map(&:id).include?(gift_id)
-            raise Exceptions::GiftNotAvailable.new(gift_id)
+        # Check that there aren't any in included_gift_ids that aren't in available_included_gifts
+        unless @included_gift_ids.blank?
+          @included_gift_ids.each do |gift_id|
+            unless @offer.available_included_gifts.map(&:id).include?(gift_id)
+              raise Exceptions::GiftNotAvailable.new(gift_id)
+            end
           end
         end
-      end
-      # Included Gifts
-      action.gifts << @offer.available_included_gifts
+        # Included Gifts
+        action.gifts << @offer.available_included_gifts
 
-      # Optional Gift
-      if @optional_gift_id
-        unless @offer.gifts.optional.in_stock.map(&:id).include?(@optional_gift_id.to_i)
-          raise Exceptions::GiftNotAvailable.new(@optional_gift_id)
+        # Optional Gift
+        if @optional_gift_id
+          unless @offer.gifts.optional.in_stock.map(&:id).include?(@optional_gift_id.to_i)
+            raise Exceptions::GiftNotAvailable.new(@optional_gift_id)
+          end
+          action.gifts << Gift.find(@optional_gift_id) if @optional_gift_id
         end
-        action.gifts << Gift.find(@optional_gift_id) if @optional_gift_id
-      end
 
-      # TODO: Raise if price is >0 and no payment provided
-      # Apply the action
-      # TODO: Transactions?
-      if subscription.active?
-        action.build_payment(@payment_attributes)
-        action.payment.amount = @term.price
-        subscription.apply_action(action)
-      end
+        # TODO: Raise if price is >0 and no payment provided
+        # Apply the action
+        # TODO: Transactions?
+        if subscription.active?
+          action.build_payment(@payment_attributes)
+          action.payment.amount = @term.price
+          subscription.apply_action(action)
+        end
 
-      # TODO: Optimise this logic
-      if subscription.pending?
-        # TODO: Need to ensure we have a token
-        action.build_payment(@payment_attributes)
-        action.payment.payment_type = :token
-        subscription.pending_action = action
+        # TODO: Optimise this logic
+        if subscription.pending?
+          # Ensure we have a token
+          credit_card = Payment.new(@payment_attributes).credit_card
+          subscription.user.store_credit_card_on_gateway(credit_card)
+          action.build_payment(@payment_attributes)
+          action.payment.payment_type = :token
+          subscription.pending_action = action
+        end
+
+        subscription.save!
+      rescue ActiveRecord::RecordInvalid => e
+        # Keep the subscription and any errors (they may not actually be for the subscription)
+        raise Exceptions::Factory::InvalidException.new(subscription, e.record.errors)
       end
     end
-
-    #TODO: Should save be called here? If we don't call save elsewhere then we may have processed a payment for nothing!
   end
 
   # TODO: Does verify go here? Or is it on the subscription? How is the action applied?

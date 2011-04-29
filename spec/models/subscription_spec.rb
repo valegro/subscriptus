@@ -84,6 +84,9 @@ describe Subscription do
       @action.payment = @payment
       @subscription.user = Factory.build(:user)
       @subscription.publication = Factory.build(:publication)
+
+      response = stub(:success? => true)
+      GATEWAY.stubs(:purchase).returns(response)
     end
 
     it "should increment the expiry date" do

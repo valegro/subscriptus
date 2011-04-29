@@ -134,11 +134,6 @@ describe User do
       @user.expects(:send_later).with(:sync_to_campaign_master)
       @user.save!
     end
-
-    it "should have a 20 digit gateway_token" do
-      @user.save!
-      @user.gateway_token.length.should == 20
-    end
   end
 
   describe "upon update" do
@@ -157,5 +152,12 @@ describe User do
       @subscription.expects(:sync_to_campaign_master)
       @user.sync_to_campaign_master
     end
+  end
+
+  describe "storing a credit on the gateway" do
+    it "should save a token to the user object"
+    it "should make a call to setup_recurring on the gateway"
+    it "should not make a call to setup_recurring if there is already a token stored"
+    it "should handle errors"
   end
 end

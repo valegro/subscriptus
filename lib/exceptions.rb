@@ -26,4 +26,14 @@ module  Exceptions
       "The Gift is no longer available"
     end
   end
+
+  module Factory
+    class InvalidException < StandardError
+      attr_reader :subscription, :errors
+      def initialize(subscription, errors)
+        @subscription = subscription
+        @errors = errors
+      end
+    end
+  end
 end

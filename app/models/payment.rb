@@ -72,14 +72,6 @@ class Payment < ActiveRecord::Base
     )
   end
 
-  # TODO: We should really extract CC capabilities out into a sep model
-  # and Payment has_one CC when a CC payment is actually involved
-  def store_card_on_gateway(token)
-    if self.credit_card and self.credit_card.valid?
-      GATEWAY.setup_recurrent(0, credit_card, token)
-    end
-  end
-
   def description
     returning str = [ number_to_currency(amount), payment_type.to_s.humanize ].join(" by ") do
       str << " (Ref: #{reference})" if reference
