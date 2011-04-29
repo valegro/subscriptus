@@ -32,8 +32,7 @@ describe SubscribeController do
       @offer.gifts.add(@g4 = Factory(:gift, :on_hand => 10), true)
 
       @attributes = {
-        'user_attributes' => @user_attributes,
-        'payments_attributes' => { "0" => @payment_attributes }
+        'user_attributes' => @user_attributes
       }
     end
 
@@ -85,7 +84,8 @@ describe SubscribeController do
           :term_id => @ot1.id.to_s,
           :optional_gift => nil,
           :included_gift_ids => nil,
-          :attributes => @attributes
+          :attributes => @attributes,
+          :payment_attributes => @payment_attributes
         }
       ).returns(factory)
       subscription.expects(:save!).returns(true)
@@ -93,7 +93,8 @@ describe SubscribeController do
         :offer_id => @offer.id,
         :source_id => @source.id,
         :offer_term => @ot1.id,
-        :subscription => @attributes
+        :subscription => @attributes,
+        :payment => @payment_attributes
       })
       response.should redirect_to(:action => 'thanks')
     end
@@ -108,7 +109,8 @@ describe SubscribeController do
           :optional_gift => nil,
           :included_gift_ids => [@g1.id, @g2.id],
           :optional_gift => @g4.id.to_s,
-          :attributes => @attributes
+          :attributes => @attributes,
+          :payment_attributes => @payment_attributes
         }
       ).returns(factory)
       post 'create', {
@@ -117,7 +119,8 @@ describe SubscribeController do
         :included_gifts => [@g1.id, @g2.id],
         :optional_gift => @g4.id,
         :offer_term => @ot1.id,
-        :subscription => @attributes
+        :subscription => @attributes,
+        :payment => @payment_attributes
       }
       response.should redirect_to(:action => 'thanks')
     end
@@ -131,7 +134,8 @@ describe SubscribeController do
           :source_id => @source.id,
           :offer_term => @ot1.id,
           :optional_gift => @g4.id,
-          :subscription => @attributes
+          :subscription => @attributes,
+          :payment => @payment_attributes
         })
       }.to_not change { Subscription.count }.by(1)
       response.should render_template("new")

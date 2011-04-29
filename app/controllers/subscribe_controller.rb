@@ -35,7 +35,8 @@ class SubscribeController < ApplicationController
         :term_id            => params[:offer_term],
         :optional_gift      => params[:optional_gift],
         :included_gift_ids  => params[:included_gifts].try(:map, &:to_i),
-        :attributes         => params[:subscription]
+        :attributes         => params[:subscription],
+        :payment_attributes => params[:payment]
       })
       @subscription = @factory.build
       @subscription.save!
