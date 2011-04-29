@@ -19,7 +19,16 @@ describe SubscribeController do
     stub_wordpress
   end
 
-  describe "creating a subscription" do
+  describe "on new" do
+    describe "when a wordpress user exists" do
+      it "should not ask me for my details"
+      it "should as me to login"
+    end
+
+    # TODO: More?
+  end
+
+  describe "on create" do
     before(:each) do
       @offer = Factory(:offer)
       @ot1 = Factory(:offer_term, :months => 1)
@@ -33,7 +42,6 @@ describe SubscribeController do
 
       @attributes = {
         'user_attributes' => @user_attributes,
-        'payments_attributes' => { "0" => @payment_attributes }
       }
     end
 
@@ -43,10 +51,12 @@ describe SubscribeController do
           :offer_id => @offer.id,
           :source_id => @source.id,
           :offer_term => @ot1.id,
-          :subscription => @attributes
+          :subscription => @attributes,
+          :payment => @payment_attributes
         })
       }.to change { Subscription.count }.by(1)
-      Subscription.last.payments.size.should == 1
+      Subscription.last.actions.size.should == 1
+      Subscription.last.actions.last.payment.should be_an_instance_of(Payment)
       response.should redirect_to(:action => 'thanks')
     end
 
@@ -58,7 +68,8 @@ describe SubscribeController do
           :offer_id => @offer.id,
           :source_id => @source.id,
           :offer_term => @ot1.id,
-          :subscription => @attributes
+          :subscription => @attributes,
+          :payment => @payment_attributes
         })
       }.to_not change { Subscription.count }.by(1)
       response.should render_template("new")
@@ -85,7 +96,8 @@ describe SubscribeController do
           :term_id => @ot1.id.to_s,
           :optional_gift => nil,
           :included_gift_ids => nil,
-          :attributes => @attributes
+          :attributes => @attributes,
+          :payment_attributes => @payment_attributes
         }
       ).returns(factory)
       subscription.expects(:save!).returns(true)
@@ -93,7 +105,8 @@ describe SubscribeController do
         :offer_id => @offer.id,
         :source_id => @source.id,
         :offer_term => @ot1.id,
-        :subscription => @attributes
+        :subscription => @attributes,
+        :payment => @payment_attributes
       })
       response.should redirect_to(:action => 'thanks')
     end
@@ -108,7 +121,8 @@ describe SubscribeController do
           :optional_gift => nil,
           :included_gift_ids => [@g1.id, @g2.id],
           :optional_gift => @g4.id.to_s,
-          :attributes => @attributes
+          :attributes => @attributes,
+          :payment_attributes => @payment_attributes
         }
       ).returns(factory)
       post 'create', {
@@ -117,7 +131,8 @@ describe SubscribeController do
         :included_gifts => [@g1.id, @g2.id],
         :optional_gift => @g4.id,
         :offer_term => @ot1.id,
-        :subscription => @attributes
+        :subscription => @attributes,
+        :payment => @payment_attributes
       }
       response.should redirect_to(:action => 'thanks')
     end
@@ -136,6 +151,24 @@ describe SubscribeController do
       }.to_not change { Subscription.count }.by(1)
       response.should render_template("new")
       flash[:error].should == "The Gift #{@g4.name} is no longer available"
+    end
+
+    describe "when choosing student concession" do
+      it "should set the subscription to pending"
+      it "should set the pending to :student_verification"
+      it "should ensure the payment gateway token is set"
+      it "should not process a payment"
+    end
+
+    describe "when choosing senior concession" do
+      it "should set the subscription to pending"
+      it "should set the pending to :concession_verification"
+      it "should ensure the payment gateway token is set"
+      it "should not process a payment"
+    end
+
+    describe "when a wordpress user exists" do
+      it "should return to the new page and ask for my username and password"
     end
 
     # TODO
