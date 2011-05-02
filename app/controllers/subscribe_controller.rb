@@ -22,8 +22,7 @@ class SubscribeController < ApplicationController
     #@subscription.source = source
     @payment = Payment.new
     if params[:delivered_to]
-      # TODO: Spec
-      @user = User.find_by_email(params[:delivered_to])
+      @user = User.find_by_email(params[:delivered_to]) # TODO: And Wordpress exists??
       if @user && @user.has_active_subscriptions?
         @subscription.user = @user
       end
@@ -38,7 +37,9 @@ class SubscribeController < ApplicationController
         :optional_gift      => params[:optional_gift],
         :included_gift_ids  => params[:included_gifts].try(:map, &:to_i),
         :attributes         => params[:subscription],
-        :payment_attributes => params[:payment]
+        :payment_attributes => params[:payment],
+        :concession         => params[:concession],
+        :source             => params[:source_id]
       })
       @subscription = @factory.build
       @subscription.save!

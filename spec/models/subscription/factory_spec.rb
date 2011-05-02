@@ -239,7 +239,7 @@ describe SubscriptionFactory do
   describe "Source" do
     it "should set the source if provided" do
       source = Factory.create(:source)
-      subscription = SubscriptionFactory.build(@offer, :source => source, :payment_attributes => @payment_attrs, :attributes => @attributes)
+      subscription = SubscriptionFactory.build(@offer, :source => source.id, :payment_attributes => @payment_attrs, :attributes => @attributes)
       subscription.actions.last.source.name == source.name
     end
   end
@@ -330,6 +330,9 @@ describe SubscriptionFactory do
       @subscription.pending_action.should be_instance_of(SubscriptionAction)
       @subscription.pending_action.payment.payment_type.should == :token
     end
+
+    it "should set the action to be applied but not create an order if gifts are requested"
+    # TODO: Will have to change the subscription_action observer
   end
 
   it "should call save! on the subscription" do

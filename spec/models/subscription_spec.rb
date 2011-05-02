@@ -90,7 +90,7 @@ describe Subscription do
     end
 
     it "should increment the expiry date" do
-      @subscription.expects(:increment_expires_at).with(5)
+      Subscription.any_instance.expects(:increment_expires_at).with(5)
       @subscription.apply_action(@action)
     end
 

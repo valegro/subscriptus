@@ -14,7 +14,7 @@ class SubscriptionFactory
     @term               = options[:term_id] ? OfferTerm.find(options[:term_id]) : offer.offer_terms.first
     @included_gift_ids  = options[:included_gift_ids]
     @optional_gift_id   = options[:optional_gift]
-    @source             = options[:source]
+    @source             = options[:source] ? Source.find(options[:source]) : nil
     @concession         = options[:concession]
     @init_state         = options[:init_state]
     @attributes[:user_attributes].try(:delete, :id)

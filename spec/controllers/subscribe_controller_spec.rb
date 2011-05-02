@@ -4,17 +4,6 @@ describe SubscribeController do
 
   integrate_views
 
-  shared_examples_for "a new pending subscription" do
-    it "should ensure the payment gateway token is set" do
-      success = stub(:success? => true)
-      GATEWAY.expects(:setup_recurrent).returns(success)
-    end
-
-    it "should not process a payment" do
-      GATEWAY.expects(:purchase).never
-    end
-  end
-
   before(:each) do
     Timecop.freeze('2011-01-01 0:00')
     @source = Factory(:source)
@@ -137,7 +126,9 @@ describe SubscribeController do
           :included_gift_ids => nil,
           :attributes => @attributes,
           :source => @source.id,
-          :payment_attributes => @payment_attributes
+          :payment_attributes => @payment_attributes,
+          :concession => nil,
+          :source => @source.id.to_s
         }
       ).returns(factory)
       subscription.expects(:save!).returns(true)
@@ -162,7 +153,9 @@ describe SubscribeController do
           :included_gift_ids => [@g1.id, @g2.id],
           :optional_gift => @g4.id.to_s,
           :attributes => @attributes,
-          :payment_attributes => @payment_attributes
+          :payment_attributes => @payment_attributes,
+          :concession => nil,
+          :source => @source.id.to_s
         }
       ).returns(factory)
       post 'create', {
@@ -195,6 +188,13 @@ describe SubscribeController do
     end
 
     describe "when choosing student concession" do
+      before(:each) do
+        GATEWAY.stubs(:trigger_recurrent)
+        success = stub(:success? => true)
+        GATEWAY.expects(:setup_recurrent).returns(success)
+        GATEWAY.expects(:purchase).never
+      end
+
       after(:each) do
         post('create', {
           :offer_id => @offer.id,
@@ -207,20 +207,30 @@ describe SubscribeController do
       end
 
       it "should set the subscription to pending" do
+        subscription = stub(:save! => true)
+        factory = stub(:build => subscription)
         SubscriptionFactory.expects(:new).with(
           instance_of(Offer), {
             :term_id => @ot1.id.to_s,
             :attributes => @attributes,
             :payment_attributes => @payment_attributes,
-            :concession => 'student'
+            :concession => 'student',
+            :optional_gift => nil,
+            :included_gift_ids => nil,
+            :source => @source.id.to_s
           }
         ).returns(factory)
       end
-
-      it_should_behave_like "a new pending subscription"
     end
 
     describe "when choosing senior concession" do
+      before(:each) do
+        GATEWAY.stubs(:trigger_recurrent)
+        success = stub(:success? => true)
+        GATEWAY.expects(:setup_recurrent).returns(success)
+        GATEWAY.expects(:purchase).never
+      end
+
       after(:each) do
         post('create', {
           :offer_id => @offer.id,
@@ -233,17 +243,20 @@ describe SubscribeController do
       end
 
       it "should set the subscription to pending" do
+        subscription = stub(:save! => true)
+        factory = stub(:build => subscription)
         SubscriptionFactory.expects(:new).with(
           instance_of(Offer), {
             :term_id => @ot1.id.to_s,
             :attributes => @attributes,
             :payment_attributes => @payment_attributes,
-            :concession => 'concession'
+            :concession => 'concession',
+            :optional_gift => nil,
+            :included_gift_ids => nil,
+            :source => @source.id.to_s
           }
         ).returns(factory)
       end
-
-      it_should_behave_like "a new pending subscription"
     end
 
     describe "when a wordpress user exists" do

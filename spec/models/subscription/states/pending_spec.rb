@@ -20,14 +20,9 @@ describe Subscription do
       success = stub(:success? => true)
       GATEWAY.stubs(:trigger_recurrent).returns(success)
       SubscriptionMailer.stubs(:deliver_pending)
-      @user = Factory.create(:user_with_token)
       @subscription_action = Factory.create(:subscription_action, :payment => Factory.create(:token_payment))
-      @subscription = Factory.create(:subscription,
-        :state => "pending",
-        :pending => :concession_verification,
-        :pending_action => @subscription_action,
-        :user => @user
-      )
+      @subscription = Factory.create(:pending_subscription, :pending_action => @subscription_action)
+      @subscription_action.subscription = nil
     end
 
     describe "upon cancel" do
@@ -78,6 +73,8 @@ describe Subscription do
         @subscription.pending_action.should be(nil)
       end
 
+      it "should create a gift order if gifts were present"
+
       describe "and the payment is declined" do
         it "should raise an exception" do
           failure = stub(:success? => false, :message => 'Test Failure')
@@ -106,19 +103,13 @@ describe Subscription do
         it "should trigger a payment" do
           GATEWAY.unstub(:trigger_recurrent)
           success = stub(:success? => true)
-          GATEWAY.expects(:trigger_recurrent).with(@subscription_action.payment.amount.to_i * 100, @user.payment_gateway_token).returns(success)
+          GATEWAY.expects(:trigger_recurrent).with(@subscription_action.payment.amount.to_i * 100, @subscription.user.payment_gateway_token).returns(success)
           @subscription.pending = :student_verification
           @subscription.verify!
         end
 
         it "should create a log entry" do
-          @subscription = Factory.create(
-            :subscription,
-            :state => 'pending',
-            :pending => :student_verification,
-            :pending_action => Factory.create(:subscription_action, :payment => Factory.create(:token_payment)),
-            :user => @user
-          )
+          @subscription = Factory.create(:pending_subscription, :pending => :student_verification)
           @subscription.note = "A note about the sub"
           expect {
             @subscription.verify!
@@ -172,11 +163,12 @@ describe Subscription do
         end
 
         it "should create a log entry if pending payment when verified" do
-          expect {
-            @subscription.verify!(Payment.new(:payment_type => 'direct_debit', :amount => 100))
-          }.to change { @subscription.reload; @subscription.log_entries.count }.by(2)
+          @subscription.verify!(Payment.new(:payment_type => 'direct_debit', :amount => 100))
+          @subscription.reload
+          @subscription.log_entries.count.should == 2
           @subscription.log_entries.last.old_state.should == 'pending'
           @subscription.log_entries.last.new_state.should == 'active'
+          p @subscription.log_entries
           @subscription.log_entries[-1].description.should == '$100.00 by Direct debit'
           @subscription.log_entries[-2].description.should == 'Expiry Date set to 09/04/11'
         end

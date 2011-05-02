@@ -8,4 +8,6 @@ describe SubscriptionAction do
     it { should have_many :gifts }
     it { should have_one :payment }
   end
+
+  it "should raise if apply is called without a subscription"
 end

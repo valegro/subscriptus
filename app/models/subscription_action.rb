@@ -12,4 +12,16 @@ class SubscriptionAction < ActiveRecord::Base
   validates_presence_of :offer_name, :term_length
 
   named_scope :recent, :order => "applied_at desc"
+
+  define_callbacks :after_apply
+
+  def apply
+    # TODO: Raise if no subscription
+    self.class.transaction do
+      self.subscription.increment_expires_at(self.term_length)
+      payment.process!(:token => subscription.user.try(:payment_gateway_token))
+      subscription.save!
+      callback(:after_apply)
+    end
+  end
 end

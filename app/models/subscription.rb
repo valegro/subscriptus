@@ -17,7 +17,6 @@ class Subscription < ActiveRecord::Base
            :autosave => true
 
   has_many :log_entries, :class_name => "SubscriptionLogEntry"
-  #has_many :payments, :autosave => true
   has_many :orders
   
   attr_accessor :note # Used to save notes to the subscription
@@ -91,10 +90,9 @@ class Subscription < ActiveRecord::Base
   # TODO: Rename to apply_action! (maybe even move to the association? And disable <<)
   def apply_action(action)
     self.class.transaction do
-      self.increment_expires_at(action.term_length)
-      action.payment.process!(:token => self.user.try(:payment_gateway_token))
+      action.subscription = self
       self.actions << action
-      save!
+      action.apply
     end
   end
 
