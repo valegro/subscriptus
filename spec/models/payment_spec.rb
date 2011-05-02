@@ -11,7 +11,12 @@ describe Payment do
     assert payment.valid?
   end
 
-  it "should raise if not valid and process! is called"
+  it "should raise if not valid and process! is called" do
+    payment = Payment.new
+    lambda {
+      payment.process!
+    }.should raise_exception
+  end
 
   describe "of type credit_card when processed" do
     it "raise an exception on fail" do
@@ -114,15 +119,6 @@ describe Payment do
     it "should be correct for cheque" do
       @payment = Factory.create(:payment, :payment_type => 'cheque', :reference => nil)
       @payment.description.should == '$100.00 by Cheque'
-    end
-  end
-
-  describe "token saved to the gateway" do
-    it "should return success" do
-      @payment = Factory.build(:payment)
-      response = stub(:success? => true)
-      GATEWAY.expects(:setup_recurrent) #.with(0, ActiveMerchant::Billing::CreditCard.any_instance, '12345').returns(response)
-      @payment.store_card_on_gateway('12345')
     end
   end
 end

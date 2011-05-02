@@ -126,9 +126,14 @@ class User < ActiveRecord::Base
   end
   
   def store_credit_card_on_gateway(credit_card)
-    # TODO: Test this
-    self.payment_gateway_token = Utilities.generate_unique_token(self.id, 10)
-    GATEWAY.setup_recurrent(0, credit_card, self.payment_gateway_token)
-    save!
+    if self.payment_gateway_token.blank?
+      token = Utilities.generate_unique_token(self.id, 10)
+      response = GATEWAY.setup_recurrent(0, credit_card, token)
+      unless response.success?
+        raise Exceptions::CannotStoreCard.new(response.message)
+      end
+      update_attributes!(:payment_gateway_token => token)
+      save!
+    end
   end
 end

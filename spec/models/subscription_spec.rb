@@ -111,8 +111,20 @@ describe Subscription do
       @subscription.apply_action(@action)
     end
 
-    it "should raise if no valid payment available"
-    it "should raise if the payment fails"
+    it "should raise if no valid payment available" do
+      @action.payment = nil
+      lambda {
+        @subscription.apply_action(@action)
+      }.should raise_exception
+    end
+
+    it "should raise if the payment fails" do
+      failure = stub(:success? => false, :message => "Test Failure")
+      GATEWAY.expects(:purchase).returns(failure)
+      lambda {
+        @subscription.apply_action(@action)
+      }.should raise_exception(Exceptions::PaymentFailedException)
+    end
   end
   
   describe "class definition" do

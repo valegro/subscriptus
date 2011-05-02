@@ -155,9 +155,34 @@ describe User do
   end
 
   describe "storing a credit on the gateway" do
-    it "should save a token to the user object"
-    it "should make a call to setup_recurring on the gateway"
-    it "should not make a call to setup_recurring if there is already a token stored"
-    it "should handle errors"
+    before(:each) do
+      @payment = Factory.build(:payment)
+      @card = @payment.credit_card
+      @token = "12345"
+      Utilities.stubs(:generate_unique_token).returns(@token)
+    end
+
+    it "should save a token to the user object" do
+      success = stub(:success? => true)
+      GATEWAY.expects(:setup_recurrent).with(0, @card, @token).returns(success)
+      user = Factory.create(:user)
+      user.store_credit_card_on_gateway(@card)
+    end
+
+    it "should not make a call to setup_recurring if there is already a token stored" do
+      GATEWAY.expects(:setup_recurrent).never
+      user = Factory.create(:user_with_token)
+      user.store_credit_card_on_gateway(@card)
+    end
+
+    it "should handle errors" do
+      failure = stub(:success? => false, :message => "Test Failure")
+      GATEWAY.expects(:setup_recurrent).with(0, @card, "12345").returns(failure)
+      user = Factory.create(:user)
+      lambda {
+        user.store_credit_card_on_gateway(@card)
+      }.should raise_exception(Exceptions::CannotStoreCard)
+      user.payment_gateway_token.should be(nil)
+    end
   end
 end

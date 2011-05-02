@@ -274,6 +274,8 @@ describe SubscriptionFactory do
   describe "subscribing with a concession should" do
     before(:each) do
       @payment = Factory.create(:payment, :payment_type => :token)
+      success = stub(:success? => true)
+      GATEWAY.stubs(:setup_recurrent).returns(success)
     end
 
     it "should store the payment details on the gateway and set the user's gateway payment token" do
@@ -327,7 +329,7 @@ describe SubscriptionFactory do
   end
 
   it "should call save! on the subscription" do
-    Subscription.any_instance.expects(:save!)
-    SubscriptionFactory.build(@offer, :attributes => @attributes, :concession => :concession, :payment_attributes => @payment_attrs)
+    Subscription.any_instance.expects(:save!).at_least_once
+    SubscriptionFactory.build(@offer, :attributes => @attributes, :payment_attributes => @payment_attrs)
   end
 end

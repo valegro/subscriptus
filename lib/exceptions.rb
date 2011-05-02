@@ -13,6 +13,7 @@ module  Exceptions
   class PaymentAlreadyProcessed              < StandardError; end
   class InvalidOfferTerm                     < StandardError; end
   class PaymentTokenMissing                  < StandardError; end
+  class CannotStoreCard                      < StandardError; end
 
   class GiftNotAvailable                     < StandardError
     def initialize(gift_id)
