@@ -19,7 +19,7 @@ class SubscribeController < ApplicationController
     source = (params[:source_id] && params[:source_id] != 'null') ? Source.find(params[:source_id]) : nil
     @subscription = Subscription.new
     @subscription.offer = @offer
-    @subscription.source = source
+    #@subscription.source = source
     @payment = Payment.new
     if params[:delivered_to]
       # TODO: Spec
@@ -29,7 +29,6 @@ class SubscribeController < ApplicationController
       end
     end
     @user ||= @subscription.build_user(:title => 'Mr', :state => :act)
-    @subscription.payments.build
   end
 
   def create

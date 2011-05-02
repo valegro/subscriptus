@@ -56,7 +56,7 @@ class Payment < ActiveRecord::Base
         raise Exceptions::PaymentFailedException.new(response.message)
       end
     end
-    processed_at = Time.now
+    self.processed_at = Time.now
     self.save!
   end
 

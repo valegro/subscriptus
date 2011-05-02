@@ -17,9 +17,10 @@ Factory.define :expiring_subscription, :parent => :subscription do |s|
 end
 
 Factory.define :pending_subscription, :parent => :subscription do |s|
+  s.association :user, :factory => :user_with_token
   s.state { 'pending' }
   s.pending { 'concession_verification' }
-  s.association :pending_action, :factory => :subscription_action
+  s.association :pending_action, :factory => :pending_subscription_action
 end
 
 Factory.define :expired_subscription, :parent => :subscription do |s|

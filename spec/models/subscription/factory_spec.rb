@@ -280,11 +280,15 @@ describe SubscriptionFactory do
 
     it "should store the payment details on the gateway and set the user's gateway payment token" do
       @user = Factory.create(:subscriber)
-      @user.expects(:store_credit_card_on_gateway) # TODO. with?
+      @user.expects(:store_credit_card_on_gateway)
       @subscription = SubscriptionFactory.build(@offer, :attributes => { :user => @user }, :concession => :student, :payment_attributes => @payment_attrs)
     end
 
-    it "should not store the payment details on the gateway if the user already has a valid token"
+    it "should not store the payment details on the gateway if the user already has a valid token" do
+      GATEWAY.expects(:setup_recurrent).never
+      @user = Factory.create(:user_with_token)
+      @subscription = SubscriptionFactory.build(@offer, :attributes => { :user => @user }, :concession => :student, :payment_attributes => @payment_attrs)
+    end
 
     it "should set state to pending" do
       factory = SubscriptionFactory.new(@offer, :attributes => @attributes, :concession => :student, :payment_attributes => @payment_attrs)

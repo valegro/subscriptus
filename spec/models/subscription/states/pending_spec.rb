@@ -79,8 +79,20 @@ describe Subscription do
       end
 
       describe "and the payment is declined" do
-        it "should raise an exception"
-        # TODO: And the controller should handle it!
+        it "should raise an exception" do
+          failure = stub(:success? => false, :message => 'Test Failure')
+          GATEWAY.stubs(:trigger_recurrent).returns(failure)
+          lambda {
+            @subscription.verify!
+          }.should raise_exception(Exceptions::PaymentFailedException)
+        end
+
+        it "should raise because a token is missing" do
+          @subscription.user.update_attributes(:payment_gateway_token => nil)
+          lambda {
+            @subscription.verify!
+          }.should raise_exception(Exceptions::PaymentTokenMissing)
+        end
       end
 
       describe "if pending student verification" do

@@ -4,6 +4,16 @@ class Admin::SubscriptionsController < AdminController
   
   before_filter :find_subscription, :only => [ :verify, :cancel, :suspend, :unsuspend, :show ]
 
+  rescue_from(Exceptions::PaymentTokenMissing) do
+    flash[:error] = "The User has no payment gateway token - the payment will need to processed manually"
+    render :action => action_name
+  end
+
+  rescue_from(Exceptions::PaymentFailedException) do
+    flash[:error] = "The Subscriber's Card was declined. You may need to contact them."
+    render :action => action_name
+  end
+
   def index
     @log_entries = SubscriptionLogEntry.recent.paginate(:page => params[:page] || 1)
   end
@@ -34,14 +44,13 @@ class Admin::SubscriptionsController < AdminController
           @payment = Payment.new(params[:payment])
           @payment.amount = @subscription.price
           @subscription.verify!(@payment)
-          # TODO: Validations? Exceptions?
         else
           @subscription.update_attributes(params[:subscription])
           @subscription.verify!
         end
         flash[:notice] = "Verified Subscription"
       else
-        flash[:notice] = "Subscription has already been verified"
+        flash[:error] = "Subscription has already been verified"
       end
       redirect_to :action => :pending
     end

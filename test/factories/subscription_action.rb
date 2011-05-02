@@ -5,3 +5,9 @@ Factory.define :subscription_action do |s|
   s.association :subscription, :factory => :subscription
   s.association :payment, :factory => :payment
 end
+
+Factory.define :pending_subscription_action, :parent => :subscription_action do |s|
+  s.applied_at { nil }
+  s.subscription { nil }
+  s.association :payment, :factory => :token_payment
+end

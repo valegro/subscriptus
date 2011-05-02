@@ -75,7 +75,14 @@ describe Payment do
       payment.process!
     end
 
-    it "should set processed_at on save"
+    it "should set processed_at on save" do
+      Timecop.freeze(Time.now) do
+        payment = Factory.build(:payment)
+        payment.expects(:save!)
+        payment.process!
+        payment.processed_at.should == Time.now
+      end
+    end
   end
 
   describe "of type token when processed" do
@@ -95,8 +102,19 @@ describe Payment do
       }.to change { Payment.count }.by(1)     
     end
 
-    it "should allow the payment to be processed even if the payment has been saved"
-    it "should not allow the payment to be processed once processed_at has been set"
+    it "should allow the payment to be processed even if the payment has been saved" do
+      response = stub(:success? => true)
+      GATEWAY.expects(:trigger_recurrent).with(10000, "123456").returns(response)
+      payment = Factory.create(:token_payment)
+      payment.process!(:token => "123456")
+    end
+
+    it "should not allow the payment to be processed once processed_at has been set" do
+      payment = Factory.create(:token_payment, :processed_at => Time.now)
+      lambda {
+        payment.process!(:token => "123456")
+      }.should raise_exception(Exceptions::PaymentAlreadyProcessed)
+    end
   end
 
   describe "of type direct debit" do

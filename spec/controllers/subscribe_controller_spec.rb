@@ -3,7 +3,18 @@ require 'spec_helper'
 describe SubscribeController do
 
   integrate_views
-  
+
+  shared_examples_for "a new pending subscription" do
+    it "should ensure the payment gateway token is set" do
+      success = stub(:success? => true)
+      GATEWAY.expects(:setup_recurrent).returns(success)
+    end
+
+    it "should not process a payment" do
+      GATEWAY.expects(:purchase).never
+    end
+  end
+
   before(:each) do
     Timecop.freeze('2011-01-01 0:00')
     @source = Factory(:source)
@@ -19,13 +30,41 @@ describe SubscribeController do
     stub_wordpress
   end
 
+  # Handy link: http://cheat.errtheblog.com/s/assert_select/
   describe "on new" do
-    describe "when a wordpress user exists" do
-      it "should not ask me for my details"
-      it "should as me to login"
+    describe "when a wordpress user exists with an email and I have provided an email address" do
+      before(:each) do
+        @offer = Factory.create(:offer)
+        @source = Factory.create(:source)
+        Wordpress.stubs(:exists?).with({:email => "daniel@codefire.com.au"}).returns(true)
+      end
+
+      it "should not ask me for my details" do
+        get 'new', :email => "daniel@codefire.com.au"
+        response.should_not include_text("New User Sign-Up")
+        response.should_not include_text("Street Address Line 1")
+      end
+
+      it "should ask me to login" do
+        get 'new', :email => "daniel@codefire.com.au"
+        response.should include_text("Login")
+        response.should have_tag("form") do
+          with_tag("input#user[login]", "user[login]")
+        end
+      end
+    end
+
+    describe "when a wordpress user does not exist or if I have not provided an email" do
+      it "should ask me for my details"
+      it "should not ask me to login"
+    end
+
+    it "should set the source for the form action" do
+      response_should have_tag("form[action=/subscribe?offer_id=#{@offer.id}&source=#{@source.id}")
     end
 
     # TODO: More?
+    # TODO: What about if the user exists in WP and there is a subscriber in Sub with that email (or what if there is not?!)
   end
 
   describe "on create" do
@@ -97,6 +136,7 @@ describe SubscribeController do
           :optional_gift => nil,
           :included_gift_ids => nil,
           :attributes => @attributes,
+          :source => @source.id,
           :payment_attributes => @payment_attributes
         }
       ).returns(factory)
@@ -155,28 +195,83 @@ describe SubscribeController do
     end
 
     describe "when choosing student concession" do
-      it "should set the subscription to pending"
-      it "should set the pending to :student_verification"
-      it "should ensure the payment gateway token is set"
-      it "should not process a payment"
+      after(:each) do
+        post('create', {
+          :offer_id => @offer.id,
+          :source_id => @source.id,
+          :offer_term => @ot1.id,
+          :subscription => @attributes,
+          :payment => @payment_attributes,
+          :concession => 'student'
+        })
+      end
+
+      it "should set the subscription to pending" do
+        SubscriptionFactory.expects(:new).with(
+          instance_of(Offer), {
+            :term_id => @ot1.id.to_s,
+            :attributes => @attributes,
+            :payment_attributes => @payment_attributes,
+            :concession => 'student'
+          }
+        ).returns(factory)
+      end
+
+      it_should_behave_like "a new pending subscription"
     end
 
     describe "when choosing senior concession" do
-      it "should set the subscription to pending"
-      it "should set the pending to :concession_verification"
-      it "should ensure the payment gateway token is set"
-      it "should not process a payment"
+      after(:each) do
+        post('create', {
+          :offer_id => @offer.id,
+          :source_id => @source.id,
+          :offer_term => @ot1.id,
+          :subscription => @attributes,
+          :payment => @payment_attributes,
+          :concession => 'concession'
+        })
+      end
+
+      it "should set the subscription to pending" do
+        SubscriptionFactory.expects(:new).with(
+          instance_of(Offer), {
+            :term_id => @ot1.id.to_s,
+            :attributes => @attributes,
+            :payment_attributes => @payment_attributes,
+            :concession => 'concession'
+          }
+        ).returns(factory)
+      end
+
+      it_should_behave_like "a new pending subscription"
     end
 
     describe "when a wordpress user exists" do
-      it "should return to the new page and ask for my username and password"
+      before(:each) do
+        Wordpress.stubs(:exists?).with({:email => "daniel@codefire.com.au"}).returns(true)
+        @attributes['user_attributes']['email'] = 'daniel@codefire.com.au'
+        @attributes['user_attributes']['email_confirmation'] = 'daniel@codefire.com.au'
+      end
+
+      it "should return to the new page and ask for a username and password" do
+        post('create', {
+          :offer_id => @offer.id,
+          :source_id => @source.id,
+          :offer_term => @ot1.id,
+          :optional_gift => @g4.id,
+          :subscription => @attributes,
+          :payment => @payment_attributes
+        })
+        response.should render_template("subscribe/new")
+      end
+
+      # TODO: Once again, should we also check to see if there is a user who has the email address too?
     end
+
 
     # TODO
     # Invalid gift
     # check error messages
-    # set the source
-    # Concession
     # Direct Debit
     # Existing User, wordpress etc
   end
