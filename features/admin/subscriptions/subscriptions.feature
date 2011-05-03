@@ -29,4 +29,7 @@ Feature: Subscription List
       | User             | Publication   | State     |
       | Bob Subscriber   | Publication 1 | New Trial |
       | Alice Subscriber | Publication 2 | Active    |
+
+  Scenario: An Admin can view a subscription
+    When I view a subscription information and actions
   

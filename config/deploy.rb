@@ -13,6 +13,8 @@ task :to_production do
   set :db_hostname, "localhost"
   set :db_port, 3306
 
+  set :branch, "origin/refctoring-mutator"
+
   role :app, "deploy@zebra.crikey.com.au"
   role :web, "deploy@zebra.crikey.com.au"
   role :db,  "deploy@zebra.crikey.com.au", :primary => true
