@@ -32,4 +32,7 @@ Feature: Subscription List
 
   Scenario: An Admin can view a subscription
     When I view a subscription information and actions
+
+  Scenario: An Admin can view a subscriber
+    When I view a subscriber and their action history
   
