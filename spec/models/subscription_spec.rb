@@ -12,8 +12,6 @@ describe Subscription do
     stub_wordpress
   end
 
-  it "should set the current offer"
-
   describe "upon save" do
     it "should create a recipient in Campaign Master" do
       s = Factory.create(:subscription)

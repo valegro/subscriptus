@@ -9,5 +9,10 @@ describe SubscriptionAction do
     it { should have_one :payment }
   end
 
-  it "should raise if apply is called without a subscription"
+  it "should raise if apply is called without a subscription" do
+    action = Factory.create(:subscription_action, :subscription => nil)
+    lambda {
+      action.apply
+    }.should raise_error
+  end
 end

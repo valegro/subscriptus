@@ -21,6 +21,7 @@ describe Subscription do
       GATEWAY.stubs(:trigger_recurrent).returns(success)
       SubscriptionMailer.stubs(:deliver_pending)
       @subscription_action = Factory.create(:subscription_action, :payment => Factory.create(:token_payment))
+      @subscription_action.gifts << Factory.create(:gift)
       @subscription = Factory.create(:pending_subscription, :pending_action => @subscription_action)
       @subscription_action.subscription = nil
     end
@@ -73,7 +74,11 @@ describe Subscription do
         @subscription.pending_action.should be(nil)
       end
 
-      it "should create a gift order if gifts were present"
+      it "should create a gift order if gifts were present" do
+        expect {
+          @subscription.verify!
+        }.to change { Order.count }.by(1)
+      end
 
       describe "and the payment is declined" do
         it "should raise an exception" do
@@ -163,12 +168,12 @@ describe Subscription do
         end
 
         it "should create a log entry if pending payment when verified" do
-          @subscription.verify!(Payment.new(:payment_type => 'direct_debit', :amount => 100))
-          @subscription.reload
-          @subscription.log_entries.count.should == 2
+          expect {
+            @subscription.verify!(Payment.new(:payment_type => 'direct_debit', :amount => 100))
+            @subscription.reload
+          }.to change { @subscription.log_entries.count }.by(2)
           @subscription.log_entries.last.old_state.should == 'pending'
           @subscription.log_entries.last.new_state.should == 'active'
-          p @subscription.log_entries
           @subscription.log_entries[-1].description.should == '$100.00 by Direct debit'
           @subscription.log_entries[-2].description.should == 'Expiry Date set to 09/04/11'
         end

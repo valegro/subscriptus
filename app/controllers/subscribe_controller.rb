@@ -1,6 +1,7 @@
 class SubscribeController < ApplicationController
   layout 'signup'
   before_filter :load_offer
+  before_filter :load_source
   before_filter :load_gifts
 
   rescue_from(Exceptions::PaymentFailedException, Exceptions::GiftNotAvailable) do |exception|
@@ -12,17 +13,16 @@ class SubscribeController < ApplicationController
   rescue_from(Exceptions::Factory::InvalidException) do |exception|
     @subscription = exception.subscription
     @errors = exception.errors
+    @payment = Payment.new(params[:payment])
     render :action => :new
   end
 
   def new
-    source = (params[:source_id] && params[:source_id] != 'null') ? Source.find(params[:source_id]) : nil
     @subscription = Subscription.new
     @subscription.offer = @offer
-    #@subscription.source = source
     @payment = Payment.new
-    if params[:delivered_to]
-      @user = User.find_by_email(params[:delivered_to]) # TODO: And Wordpress exists??
+    if params[:email]
+      @user = User.find_by_email(params[:email]) # TODO: And Wordpress exists??
       if @user && @user.has_active_subscriptions?
         @subscription.user = @user
       end
@@ -42,7 +42,6 @@ class SubscribeController < ApplicationController
         :source             => params[:source_id]
       })
       @subscription = @factory.build
-      @subscription.save!
       redirect_to :action => :thanks
     end
   end
@@ -50,6 +49,10 @@ class SubscribeController < ApplicationController
   private
     def load_offer
       @offer = params[:offer_id] ? Offer.find(params[:offer_id]) : Offer.first
+    end
+
+    def load_source
+      @source = (params[:source_id] && params[:source_id] != 'null') ? Source.find(params[:source_id]) : nil
     end
 
     def load_gifts

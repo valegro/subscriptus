@@ -19,43 +19,6 @@ describe SubscribeController do
     stub_wordpress
   end
 
-  # Handy link: http://cheat.errtheblog.com/s/assert_select/
-  describe "on new" do
-    describe "when a wordpress user exists with an email and I have provided an email address" do
-      before(:each) do
-        @offer = Factory.create(:offer)
-        @source = Factory.create(:source)
-        Wordpress.stubs(:exists?).with({:email => "daniel@codefire.com.au"}).returns(true)
-      end
-
-      it "should not ask me for my details" do
-        get 'new', :email => "daniel@codefire.com.au"
-        response.should_not include_text("New User Sign-Up")
-        response.should_not include_text("Street Address Line 1")
-      end
-
-      it "should ask me to login" do
-        get 'new', :email => "daniel@codefire.com.au"
-        response.should include_text("Login")
-        response.should have_tag("form") do
-          with_tag("input#user[login]", "user[login]")
-        end
-      end
-    end
-
-    describe "when a wordpress user does not exist or if I have not provided an email" do
-      it "should ask me for my details"
-      it "should not ask me to login"
-    end
-
-    it "should set the source for the form action" do
-      response_should have_tag("form[action=/subscribe?offer_id=#{@offer.id}&source=#{@source.id}")
-    end
-
-    # TODO: More?
-    # TODO: What about if the user exists in WP and there is a subscriber in Sub with that email (or what if there is not?!)
-  end
-
   describe "on create" do
     before(:each) do
       @offer = Factory(:offer)
@@ -131,7 +94,6 @@ describe SubscribeController do
           :source => @source.id.to_s
         }
       ).returns(factory)
-      subscription.expects(:save!).returns(true)
       post('create', {
         :offer_id => @offer.id,
         :source_id => @source.id,
@@ -144,7 +106,6 @@ describe SubscribeController do
 
     it "should build a subscription with included and an optional gift" do
       subscription = stub(:user => Factory.stub(:user))
-      subscription.expects(:save!).returns(true)
       factory = stub(:build => subscription)
       SubscriptionFactory.expects(:new).with(
         instance_of(Offer), {
@@ -190,12 +151,13 @@ describe SubscribeController do
     describe "when choosing student concession" do
       before(:each) do
         GATEWAY.stubs(:trigger_recurrent)
-        success = stub(:success? => true)
-        GATEWAY.expects(:setup_recurrent).returns(success)
         GATEWAY.expects(:purchase).never
+        success = stub(:success? => true)
+        GATEWAY.stubs(:setup_recurrent).returns(success)
       end
 
-      after(:each) do
+      it "should store the credit card on the gateway" do
+        User.any_instance.expects(:store_credit_card_on_gateway).with(instance_of(ActiveMerchant::Billing::CreditCard))
         post('create', {
           :offer_id => @offer.id,
           :source_id => @source.id,
@@ -204,6 +166,19 @@ describe SubscribeController do
           :payment => @payment_attributes,
           :concession => 'student'
         })
+      end
+
+      it "should create a pending action with a payment" do
+        post('create', {
+          :offer_id => @offer.id,
+          :source_id => @source.id,
+          :offer_term => @ot1.id,
+          :subscription => @attributes,
+          :payment => @payment_attributes,
+          :concession => 'student'
+        })
+        Subscription.last.pending_action.should be_an_instance_of(SubscriptionAction)
+        Subscription.last.pending_action.payment.should be_an_instance_of(Payment)
       end
 
       it "should set the subscription to pending" do
@@ -220,18 +195,27 @@ describe SubscribeController do
             :source => @source.id.to_s
           }
         ).returns(factory)
+        post('create', {
+          :offer_id => @offer.id,
+          :source_id => @source.id,
+          :offer_term => @ot1.id,
+          :subscription => @attributes,
+          :payment => @payment_attributes,
+          :concession => 'student'
+        })
       end
     end
 
     describe "when choosing senior concession" do
       before(:each) do
         GATEWAY.stubs(:trigger_recurrent)
-        success = stub(:success? => true)
-        GATEWAY.expects(:setup_recurrent).returns(success)
         GATEWAY.expects(:purchase).never
+        success = stub(:success? => true)
+        GATEWAY.stubs(:setup_recurrent).returns(success)
       end
 
-      after(:each) do
+      it "should store the credit card on the gateway" do
+        User.any_instance.expects(:store_credit_card_on_gateway).with(instance_of(ActiveMerchant::Billing::CreditCard))
         post('create', {
           :offer_id => @offer.id,
           :source_id => @source.id,
@@ -240,6 +224,19 @@ describe SubscribeController do
           :payment => @payment_attributes,
           :concession => 'concession'
         })
+      end
+
+      it "should create a pending action with a payment" do
+        post('create', {
+          :offer_id => @offer.id,
+          :source_id => @source.id,
+          :offer_term => @ot1.id,
+          :subscription => @attributes,
+          :payment => @payment_attributes,
+          :concession => 'concession'
+        })
+        Subscription.last.pending_action.should be_an_instance_of(SubscriptionAction)
+        Subscription.last.pending_action.payment.should be_an_instance_of(Payment)
       end
 
       it "should set the subscription to pending" do
@@ -256,9 +253,19 @@ describe SubscribeController do
             :source => @source.id.to_s
           }
         ).returns(factory)
+        post('create', {
+          :offer_id => @offer.id,
+          :source_id => @source.id,
+          :offer_term => @ot1.id,
+          :subscription => @attributes,
+          :payment => @payment_attributes,
+          :concession => 'concession'
+        })
       end
     end
 
+    # This scenario should only occur if for some reason there exists a wordpress user with the given
+    # email but there is no subscriptus user with that email
     describe "when a wordpress user exists with the same email" do
       before(:each) do
         Wordpress.stubs(:exists?).with({:email => "daniel@codefire.com.au"}).returns(true)
@@ -281,15 +288,9 @@ describe SubscribeController do
       # TODO: Once again, should we also check to see if there is a user who has the email address too?
     end
 
-    describe "when a wordpress user exists with the same login" do
-      it "should return to the new page and ask for a username and password"
-    end
-
-
     # TODO
     # Invalid gift
     # check error messages
     # Direct Debit
-    # Existing User, wordpress etc
   end
 end

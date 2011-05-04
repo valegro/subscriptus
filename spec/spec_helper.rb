@@ -9,6 +9,9 @@ require 'faker'
 require 'factory_girl'
 require 'webmock/rspec'
 
+require 'capybara/rails' 
+require 'capybara/dsl'
+
 WebMock.disable_net_connect!(:allow_localhost => true, :allow => 'https://www.securepay.com.au/test/payment')
 
 factories = Dir.glob('*/factories.rb') + Dir.glob('*/factories/*.rb')
@@ -34,6 +37,8 @@ Spec::Runner.configure do |config|
   config.use_transactional_fixtures = true
   config.use_instantiated_fixtures  = false
   config.fixture_path = RAILS_ROOT + '/spec/fixtures/'
+
+  config.include(Capybara, :type => :integration)
 
   # == Fixtures
   #

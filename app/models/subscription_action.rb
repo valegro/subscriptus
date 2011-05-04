@@ -16,7 +16,7 @@ class SubscriptionAction < ActiveRecord::Base
   define_callbacks :after_apply
 
   def apply
-    # TODO: Raise if no subscription
+    raise "No Subscription Set" if self.subscription.blank?
     self.class.transaction do
       self.subscription.increment_expires_at(self.term_length)
       payment.process!(:token => subscription.user.try(:payment_gateway_token))

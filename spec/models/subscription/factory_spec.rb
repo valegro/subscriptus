@@ -23,11 +23,10 @@ describe SubscriptionFactory do
   end
 
   it "should create a subscription with attributes" do
-    @offer.gifts.add(@gift1)
-    @offer.gifts.add(@gift2)
     expect {
       subscription = SubscriptionFactory.build(@offer, :attributes => @attributes, :payment_attributes => @payment_attrs)
       subscription.save!
+      subscription.offer_id.should == @offer.id
     }.to change { Subscription.count }.by(1)
   end
 
@@ -58,6 +57,8 @@ describe SubscriptionFactory do
       SubscriptionFactory.build(@offer, :payment_attributes => nil, :attributes => @attributes)
     }.should raise_exception(Exceptions::Factory::InvalidException)
   end
+
+  it "should raise if concession is false but an offer term of type concession is provided"
 
   describe "offer basics" do
     it "should set term to first term if none set" do
@@ -327,12 +328,22 @@ describe SubscriptionFactory do
     it "should set the action to be applied" do
       factory = SubscriptionFactory.new(@offer, :attributes => @attributes, :concession => :concession, :payment_attributes => @payment_attrs)
       @subscription = factory.build
+      @subscription.reload
       @subscription.pending_action.should be_instance_of(SubscriptionAction)
       @subscription.pending_action.payment.payment_type.should == :token
+      s = Subscription.find(@subscription.id)
+      s.pending_action.should_not be(nil)
+      s.pending_action.payment.should_not be(nil)
     end
 
-    it "should set the action to be applied but not create an order if gifts are requested"
-    # TODO: Will have to change the subscription_action observer
+    it "should set the action to be applied but not create an order if gifts are requested" do
+      @offer.gifts.add(Factory.create(:gift))
+      expect {
+        factory = SubscriptionFactory.new(@offer, :attributes => @attributes, :concession => :concession, :payment_attributes => @payment_attrs)
+        @subscription = factory.build
+        @subscription.pending_action.gifts.size.should == 1
+      }.to_not change { Order.count }.by(1)
+    end
   end
 
   it "should call save! on the subscription" do

@@ -16,7 +16,9 @@ module Wordpress
   
   def self.create(opts={})
     check_required(opts, :login, :pword, :email)
-    make_request_and_raise_error(opts.merge(:func => 'create'))
+    res = make_request_and_raise_error(opts.merge(:func => 'create'))
+    p res
+    res
   end
   
   def self.update(opts={})
