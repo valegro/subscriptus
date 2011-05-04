@@ -35,4 +35,5 @@ Feature: Subscription List
 
   Scenario: An Admin can view a subscriber
     When I view a subscriber and their action history
+      And I should see Male
   

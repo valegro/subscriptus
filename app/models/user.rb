@@ -13,7 +13,12 @@ class User < ActiveRecord::Base
 
   enum_attr :role, %w(admin subscriber)
   #enum_attr :title, %w(Mr Sir Fr Mrs Ms Miss Lady)
-  enum_attr :gender, %w(male female)
+  
+  enum_attr :gender, %w(male female) do
+    labels :male => 'Male'
+    labels :female => 'Female'
+  end
+
   enum_attr :state, %w(act nsw nt qld sa tas vic wa intl) do
     labels :intl => "Outside of Australia"
     labels :act => 'ACT'

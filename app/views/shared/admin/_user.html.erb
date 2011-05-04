@@ -4,6 +4,8 @@
     <dd><%= [user.title, user.name].join('&nbsp;') %></dd>
     <dt>Email address</dt>
     <dd><%= user.email %></dd>
+    <dt>Gender</dt>
+    <dd><%= user.gender.blank? ? 'Unknown' : user.enums(:gender).hash[user.gender] %></dd>
   <% if user.company %>
     <dt>Company</dt>
     <dd><%= user.company.blank? ? "None Provided" : user.company %></dd>

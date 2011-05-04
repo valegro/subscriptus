@@ -22,7 +22,7 @@ class UserObserver < ActiveRecord::Observer
 
   def before_save(user)
     # Set the gender
-    user.gender = case user.title
+    user.gender = case user.title.try(:to_sym)
       when :Mr    then :male
       when :Sir   then :male
       when :Fr    then :male
