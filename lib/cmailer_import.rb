@@ -19,7 +19,7 @@ class CmailerUser < ActiveRecord::Base
   def save_model
     attrs = attributes.symbolize_keys
     attrs[:role] = 'subscriber'
-    attrs[:title].capitalize! # TODO: Handle titles that aren't in the enumeration
+    attrs[:title].process_title!
     attrs[:state].downcase!
     attrs[:password] = attrs[:password_confirmation] = "123456"
     attrs[:email_confirmation] = attrs[:email]
