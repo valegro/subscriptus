@@ -139,4 +139,33 @@ describe Payment do
       @payment.description.should == '$100.00 by Cheque'
     end
   end
+
+  describe "full name" do
+    it "should set firstname and lastname if provided" do
+      payment = Factory.build(:payment, :full_name => "Daniel Draper")
+      payment.save!
+      payment.first_name.should == 'Daniel'
+      payment.last_name.should == 'Draper'
+    end
+
+    it "should not change firstname and lastname if left blank" do
+      attrs = Factory.attributes_for(:payment)
+      payment = Payment.new(attrs)
+      payment.save!
+      payment.first_name.should == attrs[:first_name]
+      payment.last_name.should == attrs[:last_name]
+    end
+
+    it "should not be valid if only a firstname is provided in the full_name field" do
+      payment = Factory.build(:payment, :full_name => "Daniel")
+      payment.valid?.should be(false)
+    end
+
+    it "should handle a middle initial" do
+      payment = Factory.build(:payment, :full_name => "Daniel J Draper")
+      payment.save!
+      payment.first_name.should == 'Daniel'
+      payment.last_name.should == 'J Draper'
+    end
+  end
 end

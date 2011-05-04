@@ -12,7 +12,8 @@ class User < ActiveRecord::Base
   attr_accessor :email_confirmation
 
   enum_attr :role, %w(admin subscriber)
-  enum_attr :title, %w(Mr Mrs Ms Miss)
+  enum_attr :title, %w(Mr Sir Fr Mrs Ms Miss Lady)
+  enum_attr :gender, %w(male female)
   enum_attr :state, %w(act nsw nt qld sa tas vic wa intl) do
     labels :intl => "Outside of Australia"
     labels :act => 'ACT'
@@ -126,6 +127,7 @@ class User < ActiveRecord::Base
   
   def store_credit_card_on_gateway(credit_card)
     if self.payment_gateway_token.blank?
+      # TODO: user module ActiveMerchant::module Utils
       token = Utilities.generate_unique_token(self.id, 10)
       response = GATEWAY.setup_recurrent(0, credit_card, token)
       unless response.success?

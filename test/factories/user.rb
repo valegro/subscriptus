@@ -11,6 +11,7 @@ Factory.define :user do |f| # Dont use this factory. Use either an admin or a su
   f.postcode { Faker::Address.zip_code }
   f.city { Faker::Address.city }
   f.state :sa
+  f.title :Mr
   f.country 'Australia'
   f.role 'subscriber'
 end

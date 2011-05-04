@@ -134,6 +134,49 @@ describe User do
       @user.expects(:send_later).with(:sync_to_campaign_master)
       @user.save!
     end
+
+
+    describe "gender" do
+      it "should be set" do
+        @user = Factory.create(:user)
+        @user.gender.should_not be(nil)
+      end
+
+      it "should be set to male if title is Mr" do
+        @user = Factory.create(:user, :title => 'Mr')
+        @user.gender.should == :male
+      end
+
+      it "should be set to male if title is Sir" do
+        @user = Factory.create(:user, :title => 'Sir')
+        @user.gender.should == :male
+      end
+
+      it "should be set to male if title is Fr" do
+        @user = Factory.create(:user, :title => 'Fr')
+        @user.gender.should == :male
+      end
+
+      it "should be set to female if title is Mrs" do
+        @user = Factory.create(:user, :title => 'Mrs')
+        @user.gender.should == :female
+      end
+
+      it "should be set to female if title is Ms" do
+        @user = Factory.create(:user, :title => 'Ms')
+        @user.gender.should == :female
+      end
+
+      it "should be set to female if title is Miss" do
+        @user = Factory.create(:user, :title => 'Miss')
+        @user.gender.should == :female
+      end
+
+      it "should be set to female if title is Lady" do
+        @user = Factory.create(:user, :title => 'Lady')
+        @user.gender.should == :female
+      end
+    end
   end
 
   describe "upon update" do

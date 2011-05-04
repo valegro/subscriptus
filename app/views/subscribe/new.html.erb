@@ -107,10 +107,9 @@
 
       <div id='section-ne'>
         <% f.fields_for :user do |u| %>
-          <%= u.enum_select :title %>
+          <%= u.select :title, %w(Mr Mrs Ms Miss) %>
           <%= u.text_field :firstname, :required => true, :label => "First Name" %>
           <%= u.text_field :lastname, :required => true, :label => "Last Name" %>
-          <%= u.select :hear_about, [ "The web", "Someone else" ], :required => true, :label => "How did you hear about Crikey?" %>
           <%= u.text_field :email, :help => "This is the email address Crikey will be sent to", :required => true %>
           <%= u.text_field :email_confirmation, :required => true %>
           <%= u.text_field :phone_number, :help => "If there are problems with email delivery this is how we contact you", :required => true %>
@@ -159,10 +158,8 @@
           <h4>Credit Card Details</h4>
           
           <% f.fields_for :payment, @payment do |p| %>
-            <%= p.enum_select :card_type, :required => true %>
-              <%= p.text_field :first_name, :required => true %>
-              <%= p.text_field :last_name, :required => true %>
-              <%= p.text_field :card_number, :required => true, :help => "e.g. 0000123455677675" %>
+            <%= p.text_field :full_name, :required => true, :label => "Name on Card" %>
+            <%= p.text_field :card_number, :required => true, :help => "e.g. 0000123455677675" %>
             <%= p.date_select :card_expiry_date, :discard_day => true, :start_year => Time.now.year, :label => "Expiry", :required => true %>
             <%= p.text_field :card_verification, :class => "smallText", :required => true %>
           <% end %>

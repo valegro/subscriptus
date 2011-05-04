@@ -8,9 +8,9 @@ class Payment < ActiveRecord::Base
   validates_presence_of :amount
   validates_numericality_of :amount, :greater_than_or_equal_to => 0
 
+  attr_accessor :full_name
   attr_accessor :card_verification
 
-  enum_attr :card_type, %w(visa master american_express diners_club jcb)
   enum_attr :payment_type, %w(credit_card token direct_debit cheque), :init => :credit_card
 
   default_scope :order => "created_at desc"
@@ -25,6 +25,14 @@ class Payment < ActiveRecord::Base
     if payment.credit_card? || payment.payment_type.nil?
       # Save a reference
       payment.card_number = "XXXX-XXXX-XXXX-#{payment.card_number[-4..-1]}"
+    end
+  end
+
+  before_validation do |payment|
+    unless payment.full_name.blank?
+      toks = payment.full_name.split(/\s+/)
+      payment.first_name = toks[0]
+      payment.last_name = toks[1..-1].join(" ")
     end
   end
 
@@ -62,7 +70,6 @@ class Payment < ActiveRecord::Base
 
   def credit_card
     ActiveMerchant::Billing::CreditCard.new(
-      :type       => card_type.to_s,
       :number     => self.card_number,
       :month      => self.card_expiry_date.try(:month),
       :year       => self.card_expiry_date.try(:year),

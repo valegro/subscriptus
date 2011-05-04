@@ -259,7 +259,7 @@ describe SubscribeController do
       end
     end
 
-    describe "when a wordpress user exists" do
+    describe "when a wordpress user exists with the same email" do
       before(:each) do
         Wordpress.stubs(:exists?).with({:email => "daniel@codefire.com.au"}).returns(true)
         @attributes['user_attributes']['email'] = 'daniel@codefire.com.au'
@@ -279,6 +279,10 @@ describe SubscribeController do
       end
 
       # TODO: Once again, should we also check to see if there is a user who has the email address too?
+    end
+
+    describe "when a wordpress user exists with the same login" do
+      it "should return to the new page and ask for a username and password"
     end
 
 

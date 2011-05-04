@@ -27,6 +27,12 @@ class CmailerUser < ActiveRecord::Base
     p attrs
     User.create!(attrs)
   end
+
+  def process_title!(title)
+    title.strip!
+    title.capitalize!
+    title.gsub!(/\./, "")
+  end
 end
 
 class CmailerSubscription < CmailerUser
