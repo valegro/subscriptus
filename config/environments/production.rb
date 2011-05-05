@@ -30,7 +30,7 @@ config.action_mailer.smtp_settings = {
   :address => "127.0.0.1",
   :port => "25"
 }
-ActionMailer::Base.default_url_options[:host] = "offers.crikey.com.au"
+ActionMailer::Base.default_url_options[:host] = "subscribe.crikey.com.au"
 
 # Enable threaded mode
 # config.threadsafe!
