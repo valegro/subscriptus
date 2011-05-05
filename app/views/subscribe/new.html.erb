@@ -31,53 +31,8 @@
       </ul>
       <div class="clear"></div>
 
-      <div id='subscription-options' class='form-section'>
-        <%= render :partial => "subscribe/#{@tab}" %>
-        <div id="type-normal-info" class="subscription-type">
-          <%= render :partial => "offer_terms", :object => @offer.offer_terms.full_price %>  
-        </div>
-        <div id="type-student-info" class="subscription-type" style="display:none;">
-          <div class="promo">
-            <h4>Are you a full-time student? Crikey offers a 30% discount on the normal subscription rate for students.</h4>
-          </div>
-          <%= hidden_field_tag "concession", "student" %>
-          <%= render :partial => "offer_terms", :object => @offer.offer_terms.concession %>  
-        </div>
-        <div id="type-senior-info" class="subscription-type" style="display:none;">
-          <div class="promo">
-            <h4>If you have a seniors card or a concession card, you are eligible for a 30%% discount on the normal rate.</h4>
-          </div>
-          <%= hidden_field_tag "concession", "concession" %>
-          <%= render :partial => "offer_terms", :object => @offer.offer_terms.concession %> 
-        </div>
-        <div id="type-group-info" class="subscription-type" style="display:none;">
-          <div class="promo">
-            <h4>Crikey offers great discounts for group subscriptions. Check out the details <%= link_to("here", "http://offers.crikey.com.au/groups/", :target => :new) %>.</h4>
-            <%= render :partial => "offer_terms", :object => @offer.offer_terms.full_price %>  
-          </div>
-        </div>
-      </div>
-
-      <!-- Gifts -->
-
-      <div id='gift-options' class='form-section'>
-          <% unless @included_gifts.blank? %>
-            <h3>Subscribe and Receive</h3>
-            <%= render :partial => "included_gift", :collection => @included_gifts %>
-          <% end %>
-          <% if @optional_gifts.size > 1 %>
-            <% if @offer.gifts.included.empty? %>
-              <h3>Choose a gift!</h3>
-            <% else %>
-              <div class="clear"></div>
-              <h3>Plus, choose one of the following:</h3>
-            <% end %>
-            <% @optional_gifts.each_with_index do |o_gift, i| %>
-              <%= render :partial => "optional_gift", :object => o_gift, :locals => { :checked => (i == 0) } %>
-            <% end %>
-          <% end %>
-      </div>
-
+      <%= render :partial => "subscribe/#{@tab}" %>
+     
     </div>
     <div class='clear'></div>
   </div> <!-- Step 1 -->

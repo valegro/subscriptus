@@ -1,0 +1,10 @@
+<div id='subscription-options' class='form-section'>
+  <div id="type-senior-info" class="subscription-type">
+    <div class="promo">
+      <h4>If you have a seniors card or a concession card, you are eligible for a 30%% discount on the normal rate.</h4>
+    </div>
+    <%= hidden_field_tag "concession", "concession" %>
+    <%= render :partial => "offer_terms", :object => @offer.offer_terms.concession %> 
+  </div>
+</div>
+
