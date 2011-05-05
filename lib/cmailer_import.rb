@@ -1,3 +1,10 @@
+
+# Clear Out Data
+Subscription.delete_all
+SubscriptionAction.delete_all
+SubscriptionLogEntry.delete_all
+User.delete_all("role = 'subscriber'")
+
 class CmailerUser < ActiveRecord::Base
   set_table_name "users"
   set_primary_key "ContactId"
@@ -19,12 +26,11 @@ class CmailerUser < ActiveRecord::Base
   def save_model
     attrs = attributes.symbolize_keys
     attrs[:role] = 'subscriber'
-    attrs[:title].process_title!
+    process_title!(attrs[:title])
     attrs[:state].downcase!
     attrs[:password] = attrs[:password_confirmation] = "123456"
     attrs[:email_confirmation] = attrs[:email]
     attrs[:auto_created] = true
-    p attrs
     User.create!(attrs)
   end
 
@@ -92,8 +98,15 @@ CmailerSubscription.find_each(:batch_size => 100) do |cm_subscription|
     end
   rescue
     puts "\n\nError #{$!}"
+    puts "#{$!.backtrace}"
     puts "--------"
-    puts cm_subscription.inspect
+    begin
+      puts "Subscription attrs = #{cm_subscription.attributes.inspect}"
+    rescue
+      puts "JSON Failed"
+      puts "Raw is: #{cm_subscription.subscriptions}"
+    end
+    #puts "User attrs = #{cm_user.try(:attributes)}"
     puts "--------"
     errors += 1
   end
