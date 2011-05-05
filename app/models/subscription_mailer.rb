@@ -34,11 +34,27 @@ class SubscriptionMailer < ActionMailer::Base
     content_type 'text/html'
   end
   
-  def pending(subscription)
+  def pending_student_verification(subscription)
     recipients subscription.user.email
     subject "Your subscription is pending verification"
     from NO_REPLY
-    body :subscription => subscription
+    body :subscription => subscription, :user => subscription.user
+    content_type 'text/html'
+  end
+
+  def pending_concession_verification(subscription)
+    recipients subscription.user.email
+    subject "Your subscription is pending verification"
+    from NO_REPLY
+    body :subscription => subscription, :user => subscription.user
+    content_type 'text/html'
+  end
+
+  def pending_payment(subscription)
+    recipients subscription.user.email
+    subject "Your subscription is pending payment"
+    from NO_REPLY
+    body :subscription => subscription, :user => subscription.user
     content_type 'text/html'
   end
 

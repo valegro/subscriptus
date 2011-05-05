@@ -24,12 +24,12 @@ class Subscription::MailerObserver < ActiveRecord::Observer
     SubscriptionMailer.send_later(:deliver_suspended, subscription)
   end
 
-  on(:pending, :active) do |subscription|
-    SubscriptionMailer.send_later(:deliver_verified, subscription)
-  end
-
   on(:pending, :squatter) do |subscription|
     SubscriptionMailer.send_later(:deliver_pending_expired, subscription)
+  end
+
+  on(:pending, :active) do |subscription|
+    SubscriptionMailer.send_later(:deliver_verified, subscription)
   end
 
   def after_create(subscription)
@@ -39,7 +39,7 @@ class Subscription::MailerObserver < ActiveRecord::Observer
       when 'trial'
         SubscriptionMailer.send_later(:deliver_new_trial, subscription)
       when 'pending'
-        SubscriptionMailer.send_later(:deliver_pending, subscription)
+        SubscriptionMailer.send_later("deliver_pending_#{subscription.pending}".to_sym, subscription)
     end
   end
 

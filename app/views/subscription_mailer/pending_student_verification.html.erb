@@ -49,17 +49,22 @@
                                                     <TR>
                                                         <!-- LEFT COLUMN -->
                                                         <TD class=content vAlign=top width=455><!-- EDITORIAL INTRODUCTION -->
-                                                        <TABLE style="WIDTH: 687px; HEIGHT: 325px" border=0 cellSpacing=0 cellPadding=0 width=687>
+                                                        <TABLE style="WIDTH: 687px; HEIGHT: 425px" border=0 cellSpacing=0 cellPadding=0 width=687>
                                                             <TBODY>
                                                                 <TR>
                                                                     <TD style="FONT-FAMILY: Georgia, 'Times New Roman', Times, serif; FONT-SIZE: 14px" vAlign=top><BR>
                                                                       Dear <%= @user.fullname %>,<BR>
                                                                     <BR>
-                                                                    <P>This email confirms that your Crikey subscription has been automatically restarted after being suspended from <%= @subscription.state_updated_at.strftime("%d/%m/%Y") %> to <%= @subscription.state_expires_at.strftime("%d/%m/%Y") %>.<BR>
+                                                                    <P>Your subscription to Crikey is nearly complete - you signed up to our discount student rate on <%= @subscription.created_at.strftime("%d/%m/%Y") %> and we need a copy of your student card before we can start your subscription. </P>
+                                                                    <P>There are 3 ways to get a copy of your card to us:</P>
+                                                                    <P><STRONG>EMAIL:</STRONG> scan your student card and email it to <A href="mailto:subs@crikey.com.au">subs@crikey.com.au</A> <BR>
                                                                     <BR>
-                                                                    If you have any queries, don't hesitate to contact us at <A href="mailto:subs@crikey.com.au">subs@crikey.com.au</A> or on 1800 985 502.</P>
-                                                                    <P>We hope you are enjoying your subscription to Crikey! </P>
+                                                                    <STRONG>FAX:</STRONG> Fax a copy to 03 8623 9975<BR>
                                                                     <BR>
+                                                                    <STRONG>MAIL:</STRONG> Crikey, Level 7, 22 William Street, Melbourne VIC 3000</P>
+                                                                    <P>Make sure you include your name and email address so we can match up your card to your subscription.</P>
+                                                                    <P>If you've changed your mind about the type of subscription you've signed up for or how you want to pay for it, don't hesitate to contact us at <A href="mailto:subs@crikey.com.au">subs@crikey.com.au</A> or on 1800 985 502 and we can help sort out the details.</P>
+                                                                    <P>We look forward to having you on board.</P>
                                                                     <P>Cheers,<BR>
                                                                     The Crikey Crew.</P>
                                                                     <P><SPAN style="FONT-SIZE: 10px">Your email address is registered as <%= @user.email %> - you can unsubscribe <%= link_to("here", unsubscribe_url(:user_id => @user.id)) %></SPAN></P>
@@ -96,3 +101,5 @@
         </TABLE>
     </BODY>
 </HTML>
+
+

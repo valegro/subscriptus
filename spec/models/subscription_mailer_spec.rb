@@ -4,7 +4,8 @@ describe SubscriptionMailer do
 
   shared_examples_for "an email with an unsubscribe link" do
     it "should include the unsubscribe link" do
-      @response.body.should include_text("you can unsubscribe here: http://example.com/unsubscribe?user_id=#{@subscription.user.id}")
+      @response.body.should include_text("you can unsubscribe") 
+      @response.body.should include_text("http://example.com/unsubscribe?user_id=#{@subscription.user.id}")
     end
     it "should include the recipients email address" do
       @response.body.should include_text("Your email address is registered as #{@subscription.user.email}")
@@ -46,7 +47,7 @@ describe SubscriptionMailer do
     it_should_behave_like "an email with an unsubscribe link"
   end
 
-  describe "if the user is inavlid" do
+  describe "if the user is invalid" do
     it "should raise an error with the corrent message and not send the email" do
       invalid_params = {:offer_id => @offer.id,
                         :price => 20,
@@ -88,21 +89,127 @@ describe SubscriptionMailer do
 
   describe "deliver suspended" do
     before(:each) do
-      @subscription = Factory.stub(:suspended_subscription, :id => 1)
+      @subscription = Factory.build(:suspended_subscription, :id => 1)
+      @subscription.stubs(:state_updated_at).returns("2011-02-02".to_time)
+      @subscription.stubs(:state_expires_at).returns("2011-02-10".to_time)
       @response = SubscriptionMailer.deliver_suspended(@subscription)
+      @subscription.save!
     end
 
-    # TODO: More
+    it "should include the suspend start and end dates" do
+      @response.body.should     include_text("suspended from 02/02/2011 to 10/02/2011")
+      @response.body.should     include_text("Your subscription will restart automatically on 10/02/2011")
+    end
+
+    it "should contain the users name" do
+      @response.body.should     include_text(@subscription.user.firstname)
+      @response.body.should     include_text(@subscription.user.lastname)
+    end
+
     it_should_behave_like "an email with an unsubscribe link"
   end
 
   describe "deliver unsuspended" do
     before(:each) do
       @subscription = Factory.stub(:subscription, :id => 1)
+      @subscription.stubs(:state_updated_at).returns("2011-02-02".to_time)
+      @subscription.stubs(:state_expires_at).returns("2011-02-10".to_time)
       @response = SubscriptionMailer.deliver_unsuspended(@subscription)
     end
 
-    # TODO: More
+    it "should include the suspend start and end dates" do
+      @response.body.should     include_text("suspended from 02/02/2011 to 10/02/2011")
+    end
+
+    it "should contain the users name" do
+      @response.body.should     include_text(@subscription.user.firstname)
+      @response.body.should     include_text(@subscription.user.lastname)
+    end
+
+    it_should_behave_like "an email with an unsubscribe link"
+  end
+
+  describe "deliver pending student" do
+    before(:each) do
+      Timecop.freeze("2011-02-02".to_time)
+      @user = Factory.create(:user)
+      @subscription = Factory.build(:pending_subscription, :pending => 'student_verification', :user => @user)
+      @subscription.send(:create_without_callbacks)
+      @subscription.stubs(:created_at).returns("2011-02-02".to_time)
+      @response = SubscriptionMailer.deliver_pending_student_verification(@subscription)
+    end
+
+    after(:each) do
+      Timecop.return
+    end
+
+    it "should include the right email and name" do
+      @response.from.should     == [SubscriptionMailer::NO_REPLY]
+      @response.body.should     include_text(@subscription.user.firstname)
+      @response.body.should     include_text(@subscription.user.lastname)
+      @response.body.should     include_text(@subscription.user.email)
+    end
+
+    it "should include the creation date" do
+      @response.body.should     include_text("you signed up to our discount student rate on 02/02/2011")
+    end
+
+    it_should_behave_like "an email with an unsubscribe link"
+  end
+
+  describe "deliver pending concession" do
+    before(:each) do
+      Timecop.freeze("2011-02-02".to_time)
+      @user = Factory.create(:user)
+      @subscription = Factory.build(:pending_subscription, :pending => 'concession_verification', :user => @user)
+      @subscription.send(:create_without_callbacks)
+      @subscription.stubs(:created_at).returns("2011-02-02".to_time)
+      @response = SubscriptionMailer.deliver_pending_concession_verification(@subscription)
+    end
+
+    after(:each) do
+      Timecop.return
+    end
+
+    it "should include the right email and name" do
+      @response.from.should     == [SubscriptionMailer::NO_REPLY]
+      @response.body.should     include_text(@subscription.user.firstname)
+      @response.body.should     include_text(@subscription.user.lastname)
+      @response.body.should     include_text(@subscription.user.email)
+    end
+
+    it "should include the creation date" do
+      @response.body.should     include_text("you signed up to our discount seniors/concession rate on 02/02/2011")
+    end
+
+    it_should_behave_like "an email with an unsubscribe link"
+  end
+
+  describe "deliver pending payment" do
+    before(:each) do
+      Timecop.freeze("2011-02-02".to_time)
+      @user = Factory.create(:user)
+      @subscription = Factory.build(:pending_subscription, :pending => 'payment', :user => @user)
+      @subscription.send(:create_without_callbacks)
+      @subscription.stubs(:created_at).returns("2011-02-02".to_time)
+      @response = SubscriptionMailer.deliver_pending_payment(@subscription)
+    end
+
+    after(:each) do
+      Timecop.return
+    end
+
+    it "should include the right email and name" do
+      @response.from.should     == [SubscriptionMailer::NO_REPLY]
+      @response.body.should     include_text(@subscription.user.firstname)
+      @response.body.should     include_text(@subscription.user.lastname)
+      @response.body.should     include_text(@subscription.user.email)
+    end
+
+    it "should include the creation date" do
+      @response.body.should     include_text("you subscribed to Crikey on&nbsp;on 02/02/2011 and opted to pay by direct debit")
+    end
+
     it_should_behave_like "an email with an unsubscribe link"
   end
 end
