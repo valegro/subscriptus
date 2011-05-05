@@ -2,6 +2,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" dir="ltr">
 	<head profile="http://gmpg.org/xfn/11">
+		
+		<meta http-equiv="X-UA-Compatible" content="IE=8" />
+		
 		<title>Crikey Subscription form</title>
 		
 		<style type='text/css'>
@@ -53,18 +56,18 @@
 			#step3 {padding-top:20px; border-top:1px solid #ccc;}
 			
 			#subscription-tabs {list-style:none; margin:30px 0 0 0; padding:0;}
-			#subscription-tabs li {float: left; color:#d8d6d6;  background-color:#f9f9f9; margin-right:4px; font-size:1.2em; }
+			#subscription-tabs li {float: left; color:#999;  background-color:#f1f1f1; margin-right:4px; font-size:1.2em; }
 			#subscription-tabs li.last {margin-right:0px;}
 			#subscription-tabs li a {color:inherit; background-color:inherit;  text-decoration:none; font-size:inherit; float:left; display:block; height:30px; padding:12px 10px 3px 10px;}
-			#subscription-tabs li.active{color:white; background-color:#999; }
-			#subscription-tabs li.active a{font-size: 1.7em; padding-top:10px; padding-bottom:5px;}
+			#subscription-tabs li.active{color:white; background-color:#444; }
+			#subscription-tabs li.active a{padding-top:10px; padding-bottom:5px;}
 			#subscription-tabs li:hover {background-color:#999; color:white; }
 			#subscription-options {border-top:1px solid #e9eae9;}
 			
 			#subscription-tabs li a {width:103px; text-align:center;}
-			#subscription-tabs li.active a {width:180px; text-align:center;}
+			#subscription-tabs li.active a {text-align:center;}
 			
-			.subscription-header {padding:5px 0; background-color:#f7f8f6}
+			.subscription-header {padding:5px 0; background-color:#f1f1f1;}
 			#subscription-options .subscription-header p {font-weight:bold; margin:0; padding:0 0 5px 0; font-size:1.2em}	
 			#subscription-header1 {float:left; width:480px; left:10px; position:relative;}
 			#subscription-header2 {float:right; width:100px;}
@@ -74,7 +77,7 @@
 			#subscription-options #total {background:#d60505; color:white; font-size:1.2em; font-weight:bold;float:right;margin-right:25px; width:auto; display:none; /*only show with JS*/}
 			#subscription-options p {padding:8px 20px 8px 20px; }
 			/*#subscription-options div.promo {padding:10px; border: solid 1px #444; }*/
-      #subscription-options .subscription-type p { font-size: 95%; padding: 0; }
+      #subscription-options .subscription-type p {padding: 0; }
 			
 			.gift-option label {font-size:1.4em;}
 			.gift-option {clear:both; margin-bottom:15px; }
@@ -136,6 +139,10 @@
 		
 	  <script src="http://code.jquery.com/jquery-1.5.2.min.js" type="text/javascript"></script>
     <%= yield :ujs %>
+
+		<!--[if lt IE 9]>
+		<script src="http://ie7-js.googlecode.com/svn/version/2.1(beta4)/IE9.js"></script>
+		<![endif]-->
 	</head>
 	
 	<body>
