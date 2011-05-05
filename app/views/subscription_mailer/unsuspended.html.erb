@@ -55,7 +55,7 @@
                                                                     <TD style="FONT-FAMILY: Georgia, 'Times New Roman', Times, serif; FONT-SIZE: 14px" vAlign=top><BR>
                                                                       Dear <%= @user.fullname %>,<BR>
                                                                     <BR>
-                                                                    <P>This email confirms that your Crikey subscription has been automatically restarted after being suspended from <%= @subscription.state_updated_at.strftime("%d/%m/%Y") %> to <%= @subscription.state_expires_at.strftime("%d/%m/%Y") %>.<BR>
+                                                                    <P>This email confirms that your Crikey subscription has been automatically restarted after being suspended from <%= @subscription.state_updated_at.try(:strftime, "%d/%m/%Y") %> to <%= @subscription.state_expires_at.try(:strftime, "%d/%m/%Y") %>.<BR>
                                                                     <BR>
                                                                     If you have any queries, don't hesitate to contact us at <A href="mailto:subs@crikey.com.au">subs@crikey.com.au</A> or on 1800 985 502.</P>
                                                                     <P>We hope you are enjoying your subscription to Crikey! </P>
