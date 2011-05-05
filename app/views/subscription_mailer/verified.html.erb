@@ -49,18 +49,22 @@
                                                     <TR>
                                                         <!-- LEFT COLUMN -->
                                                         <TD class=content vAlign=top width=455><!-- EDITORIAL INTRODUCTION -->
-                                                        <TABLE style="WIDTH: 687px; HEIGHT: 325px" border=0 cellSpacing=0 cellPadding=0 width=687>
+                                                        <TABLE style="WIDTH: 687px; HEIGHT: 425px" border=0 cellSpacing=0 cellPadding=0 width=687>
                                                             <TBODY>
                                                                 <TR>
                                                                     <TD style="FONT-FAMILY: Georgia, 'Times New Roman', Times, serif; FONT-SIZE: 14px" vAlign=top><BR>
                                                                       Dear <%= @user.fullname %>,<BR>
                                                                     <BR>
-                                                                    <P>This email confirms that your Crikey subscription has been suspended from <%= @subscription.state_updated_at.strftime("%d/%m/%Y") %> to <%= @subscription.state_expires_at.strftime("%d/%m/%Y") %>.<BR>
-                                                                    <BR>
-                                                                    Your subscription will restart automatically on <%= @subscription.state_expires_at.strftime("%d/%m/%Y") %>.<BR>
-                                                                    <BR>
-                                                                    If you have any queries, don't hesitate to contact us at <A href="mailto:subs@crikey.com.au">subs@crikey.com.au</A> or on 1800 985 502.</P>
-                                                                    <P>We hope you are enjoying your subscription to Crikey! </P>
+                                                                    <P>This email confirms that your Crikey subscription has been activated. </P>
+                                                                    <P>You should now have full access to Crikey's subscriber-only content online, and you'll also receive our lunchtime email edition.</P>
+                                                                    <P><STRONG>Here are your website login details:</STRONG><BR>
+                                                                    Email address: <%= @user.email %><BR>
+                                                                    Forgot Password Link: <%= @subscription.publication.forgot_password_link %></P>
+                                                                    <P><STRONG>Your Subscription details:</STRONG> <BR>
+                                                                    Subscription starts: <%= @subscription.state_updated_at.strftime("%d/%m/%Y") %><BR>
+                                                                    Subscription ends: <%= @subscription.expires_at.strftime("%d/%m/%Y") %></P>
+                                                                    <P>If you have any queries about your subscription, don't hesitate to contact us at <A href="mailto:subs@crikey.com.au">subs@crikey.com.au</A> or on 1800 985 502.</P>
+                                                                    <P>We hope you enjoy your subscription to Crikey! </P>
                                                                     <BR>
                                                                     <P>Cheers,<BR>
                                                                     The Crikey Crew.</P>
@@ -98,4 +102,6 @@
         </TABLE>
     </BODY>
 </HTML>
+
+
 

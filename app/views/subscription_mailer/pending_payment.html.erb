@@ -49,19 +49,34 @@
                                                     <TR>
                                                         <!-- LEFT COLUMN -->
                                                         <TD class=content vAlign=top width=455><!-- EDITORIAL INTRODUCTION -->
-                                                        <TABLE style="WIDTH: 687px; HEIGHT: 325px" border=0 cellSpacing=0 cellPadding=0 width=687>
+                                                        <TABLE style="WIDTH: 687px; HEIGHT: 425px" border=0 cellSpacing=0 cellPadding=0 width=687>
                                                             <TBODY>
                                                                 <TR>
                                                                     <TD style="FONT-FAMILY: Georgia, 'Times New Roman', Times, serif; FONT-SIZE: 14px" vAlign=top><BR>
                                                                       Dear <%= @user.fullname %>,<BR>
                                                                     <BR>
-                                                                    <P>This email confirms that your Crikey subscription has been suspended from <%= @subscription.state_updated_at.strftime("%d/%m/%Y") %> to <%= @subscription.state_expires_at.strftime("%d/%m/%Y") %>.<BR>
+                                                                    <P>Your subscription to Crikey is nearly complete - you subscribed to Crikey on&nbsp;on <%= @subscription.created_at.strftime("%d/%m/%Y") %> and opted to pay by direct debit - so you need to confirm your payment before we can start your subscription.<BR>
                                                                     <BR>
-                                                                    Your subscription will restart automatically on <%= @subscription.state_expires_at.strftime("%d/%m/%Y") %>.<BR>
+                                                                    There are 3 ways to pay for your subscription:<BR>
                                                                     <BR>
-                                                                    If you have any queries, don't hesitate to contact us at <A href="mailto:subs@crikey.com.au">subs@crikey.com.au</A> or on 1800 985 502.</P>
-                                                                    <P>We hope you are enjoying your subscription to Crikey! </P>
+                                                                    <STRONG>CREDIT CARD</STRONG><BR>
+                                                                    Give us a call on 1800 985 502 and we can process your payment over the phone.<BR>
                                                                     <BR>
+                                                                    <STRONG>DIRECT DEPOSIT</STRONG><BR>
+                                                                    Here are our bank details - you can transfer your subscription payment to us:<BR>
+                                                                    (Please make sure you include your name as a reference to help us track the payment)<BR>
+                                                                    <BR>
+                                                                    BSB: 083 026<BR>
+                                                                    Account Number: 58 171 0456<BR>
+                                                                    Account Name: Blimey Holdings<BR>
+                                                                    <BR>
+                                                                    <STRONG>DOWNLOAD SUBSCRIPTION FORM</STRONG><BR>
+                                                                    Download our subscription form and fax it to us on 03 8623 9975 or mail it to us at Crikey, Level 6, 22 William Street, Melbourne VIC 3000<BR>
+                                                                    <BR>
+                                                                    [Insert link to direct debit PDF]<BR>
+                                                                    <BR>
+                                                                    If you've changed your mind about the type of subscription you've signed up for, don't hesitate to contact us at <A href="mailto:subs@crikey.com.au">subs@crikey.com.au</A> or on 1800 985 502 and we can help sort out the details.</P>
+                                                                    <P>We look forward to having you on board.</P>
                                                                     <P>Cheers,<BR>
                                                                     The Crikey Crew.</P>
                                                                     <P><SPAN style="FONT-SIZE: 10px">Your email address is registered as <%= @user.email %> - you can unsubscribe <%= link_to("here", unsubscribe_url(:user_id => @user.id)) %></SPAN></P>

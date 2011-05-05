@@ -28,9 +28,21 @@ describe Subscription do
       @user.subscriptions << sub
     end
 
-    it "should deliver a pending email for new pending subscriptions" do
-      @subscription = Factory.build(:pending_subscription)
-      SubscriptionMailer.expects(:send_later).with(:deliver_pending, @subscription)
+    it "should deliver a pending email for new pending student subscriptions" do
+      @subscription = Factory.build(:pending_subscription, :pending => 'student_verification')
+      SubscriptionMailer.expects(:send_later).with(:deliver_pending_student_verification, @subscription)
+      @subscription.save!
+    end
+
+    it "should deliver a pending email for new pending ceoncession subscriptions" do
+      @subscription = Factory.build(:pending_subscription, :pending => 'concession_verification')
+      SubscriptionMailer.expects(:send_later).with(:deliver_pending_concession_verification, @subscription)
+      @subscription.save!
+    end
+
+    it "should deliver a pending email for new pending payment subscriptions" do
+      @subscription = Factory.build(:pending_subscription, :pending => 'payment')
+      SubscriptionMailer.expects(:send_later).with(:deliver_pending_payment, @subscription)
       @subscription.save!
     end
 
