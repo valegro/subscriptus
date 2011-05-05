@@ -1,5 +1,11 @@
 <% form_for @subscription, :url => subscribe_path(:offer_id => @offer.id, :source_id => @source.try(:id)), :builder => SubscribeFormBuilder do |f| %>
 
+  <% @subscription.errors.each do |e| %>
+    <%= e.message %>
+  <% end %>
+  <%= @subscription.user.errors.full_messages %>
+      <%= f.error_messages %>
+      <h2>HERE?</h2>
   <div class='section' id='step1'>
     <img src="/images/step1.png" class='step' alt='step 1' />
     <div class='content'>
@@ -17,16 +23,16 @@
 
       <ul id='subscription-tabs'>
         <li class='<%= "active" if @tab == 'subscriptions' || @tab.blank? %>'>
-          <%= link_to("SUBSCRIPTIONS", url_for(:tab => 'subscriptions')) %>
+          <%= link_to("SUBSCRIPTIONS", tab_path('subscriptions')) %>
         </li>
         <li class='<%= "active" if @tab == 'students' %>'>
-          <%= link_to("STUDENTS", url_for(:tab => 'students')) %>
+          <%= link_to("STUDENTS", tab_path('students')) %>
         </li>
         <li class='<%= "active" if @tab == 'concessions' %>'>
-          <%= link_to("SENIOR / CONCESSIONS", url_for(:tab => 'concessions')) %>
+          <%= link_to("SENIOR / CONCESSIONS", tab_path('concessions')) %>
         </li>	
         <li class='<%= "active" if @tab == 'groups' %> last'>
-          <%= link_to("DISCOUNT GROUP", url_for(:tab => 'groups')) %>
+          <%= link_to("DISCOUNT GROUP", tab_path('groups')) %>
         </li>
       </ul>
       <div class="clear"></div>

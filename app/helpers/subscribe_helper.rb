@@ -15,4 +15,8 @@ module SubscribeHelper
       str << content_tag(:span, h(gift.description))
     end
   end
+
+  def tab_path(tab)
+    url_for(:tab => tab, :offer_id => @offer.try(:id), :source_id => @source.try(:id))
+  end
 end
