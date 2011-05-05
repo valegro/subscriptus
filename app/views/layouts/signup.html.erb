@@ -2,6 +2,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" dir="ltr">
 	<head profile="http://gmpg.org/xfn/11">
+		
+		<meta http-equiv="X-UA-Compatible" content="IE=8" />
+		
 		<title>Crikey Subscription form</title>
 		
 		<style type='text/css'>
@@ -136,6 +139,10 @@
 		
 	  <script src="http://code.jquery.com/jquery-1.5.2.min.js" type="text/javascript"></script>
     <%= yield :ujs %>
+
+		<!--[if lt IE 9]>
+		<script src="http://ie7-js.googlecode.com/svn/version/2.1(beta4)/IE9.js"></script>
+		<![endif]-->
 	</head>
 	
 	<body>
