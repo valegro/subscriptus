@@ -26,10 +26,17 @@ config.action_mailer.delivery_method = :smtp
 config.action_mailer.perform_deliveries = true
 config.action_mailer.raise_delivery_errors = true
 config.action_mailer.default_charset = "utf-8"
+
+# NetFox Sendgrid (for now)
 config.action_mailer.smtp_settings = {
-  :address => "127.0.0.1",
-  :port => "25"
+  :address        => "smtp.sendgrid.net",
+  :port           => "25",
+  :authentication => :plain,
+  :user_name      => 'daniel@netfox.com',
+  :password       => '12qwaszx',
+  :domain         => 'crikey.com.au'
 }
+
 ActionMailer::Base.default_url_options[:host] = "subscribe.crikey.com.au"
 
 # Enable threaded mode
