@@ -3,6 +3,7 @@ class SubscribeController < ApplicationController
   before_filter :load_offer
   before_filter :load_source
   before_filter :load_gifts
+  before_filter :load_tab
 
   rescue_from(Exceptions::PaymentFailedException, Exceptions::GiftNotAvailable) do |exception|
     @subscription ||= @factory.try(:subscription) # Ensure that the subscription instance is set
@@ -53,6 +54,13 @@ class SubscribeController < ApplicationController
 
     def load_source
       @source = (params[:source_id] && params[:source_id] != 'null') ? Source.find(params[:source_id]) : nil
+    end
+
+    def load_tab
+      @tab = params[:tab] || 'subscriptions'
+      unless %w(subscriptions students groups concessions).include?(@tab)
+        @tab = nil
+      end
     end
 
     def load_gifts

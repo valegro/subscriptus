@@ -1,3 +1,20 @@
+<% content_for :ujs do %>
+  <script language="javascript">
+    $(document).ready(function() {
+      $('.tab-action').click(function() {
+        $(this).trigger('show-type', [$(this).attr('id')]);
+      });
+
+      $(document).bind('show-type', function(e, arg) {
+        $('.subscription-type').hide();
+        $('#' + arg + '-info').show();
+        $('#subscription-tabs li').removeClass('active');
+        $('#' + arg).parent().addClass('active');
+      });
+    });
+  </script>
+<% end %>
+
 <% form_for @subscription, :url => subscribe_path(:offer_id => @offer.id, :source_id => @source.try(:id)), :builder => SubscribeFormBuilder do |f| %>
 
   <div class='section' id='step1'>
@@ -16,23 +33,22 @@
       <%= f.error_messages %>
 
       <ul id='subscription-tabs'>
-        <li class='<%= "active" if @tab == 'subscriptions' || @tab.blank? %>'>
-          <%= link_to("SUBSCRIPTIONS", url_for(:tab => 'subscriptions')) %>
+        <li class='active'>
+          <a class="tab-action" href='#' id="type-normal">SUBSCRIPTIONS</a>
         </li>
-        <li class='<%= "active" if @tab == 'students' %>'>
-          <%= link_to("STUDENTS", url_for(:tab => 'students')) %>
+        <li>
+          <a class="tab-action" href='#' id="type-student">STUDENTS</a>
         </li>
-        <li class='<%= "active" if @tab == 'concessions' %>'>
-          <%= link_to("SENIOR / CONCESSIONS", url_for(:tab => 'concessions')) %>
+        <li>	
+          <a class="tab-action" href='#' id="type-senior">SENIOR / CONCESSIONS</a>
         </li>	
-        <li class='<%= "active" if @tab == 'groups' %> last'>
-          <%= link_to("DISCOUNT GROUP", url_for(:tab => 'groups')) %>
+        <li class='last'>
+          <a class="tab-action" href='#' id="type-group">DISCOUNT GROUP</a>
         </li>
       </ul>
       <div class="clear"></div>
 
       <div id='subscription-options' class='form-section'>
-        <%= render :partial => "subscribe/#{@tab}" %>
         <div id="type-normal-info" class="subscription-type">
           <%= render :partial => "offer_terms", :object => @offer.offer_terms.full_price %>  
         </div>
