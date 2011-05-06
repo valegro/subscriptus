@@ -4,7 +4,8 @@ class Payment < ActiveRecord::Base
 
   belongs_to :subscription_action
 
-  validates_presence_of :card_number, :card_expiry_date, :first_name, :last_name, :if => Proc.new { |payment| payment.credit_card? }
+  validates_presence_of :card_number, :card_expiry_date, :if => Proc.new { |payment| payment.credit_card? }
+  validates_presence_of :first_name, :last_name, :message => "on the credit card needs to be provided", :if => Proc.new { |payment| payment.credit_card? }
   validates_presence_of :amount
   validates_numericality_of :amount, :greater_than_or_equal_to => 0
 

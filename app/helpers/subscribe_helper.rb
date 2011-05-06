@@ -19,4 +19,13 @@ module SubscribeHelper
   def tab_path(tab)
     url_for(:tab => tab, :offer_id => @offer.try(:id), :source_id => @source.try(:id))
   end
+  
+  def error_messages(errors)
+    return nil if errors.blank?
+    content_tag(:ul) do
+      errors.full_messages.map do |message|
+        content_tag(:li, message.inspect)
+      end
+    end
+  end
 end

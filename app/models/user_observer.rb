@@ -6,7 +6,6 @@ class UserObserver < ActiveRecord::Observer
   end
 
   def after_create(user)
-    UserMailer.send_later(:deliver_new_user, user)
     Wordpress.send_later(:create, {
       :login => user.login,
       :firstname => user.firstname,

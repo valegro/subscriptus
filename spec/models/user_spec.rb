@@ -1,4 +1,5 @@
 require 'spec_helper'
+
 describe User do
   before(:each) do
     stub_wordpress
@@ -18,7 +19,6 @@ describe User do
                      :password_confirmation => 'password'
                )
     cm_return = stub(:success? => true)
-    
   end
 
   it "should create a trial user" do

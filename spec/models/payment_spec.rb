@@ -161,6 +161,13 @@ describe Payment do
       payment.valid?.should be(false)
     end
 
+    it "should give custom errors if name is not provided" do
+      payment = Payment.new
+      payment.valid?.should be(false)
+      payment.errors[:first_name].should == 'on the credit card needs to be provided'
+      payment.errors[:last_name].should == 'on the credit card needs to be provided'
+    end
+
     it "should handle a middle initial" do
       payment = Factory.build(:payment, :full_name => "Daniel J Draper")
       payment.save!
