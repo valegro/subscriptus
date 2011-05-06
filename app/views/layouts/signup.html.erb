@@ -43,7 +43,7 @@
 			#top-right p.phone, #bottom-right p.phone {padding:10px 0 5px 20px; margin:0px 0 0 0; background:url('/images/phone.png') no-repeat top left; font-size:24px; font-weight:bold; color:#6b6868;}
 			p.other { font-size:1.4em; text-align:right}
 			p.other a {font-size:1em;}
-			#bottom-right p.phone {float:right; width:150px;}
+			#bottom-right p.phone {float:right; width:150px; position:relative; top:25px;}
 			
 			#page .content {float:left;}
 			#page .section img.step {margin-left:-12px; float:left}
@@ -141,6 +141,19 @@
 
 			form input[type="submit"] {
 				-webkit-appearance:none;
+				
+			}
+			
+			#form-errors ul {
+				background:pink;
+				color:red;
+				font-size:15px;
+				line-height:26px;
+				padding:20px 40px;
+				text-shadow:1px 1px 0 #eee;
+			}
+			
+			#form-errors ul li {
 				
 			}
 			
