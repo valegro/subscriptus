@@ -85,9 +85,9 @@ class SubscriptionFactory
           # Ensure we have a token
           credit_card = Payment.new(@payment_attributes).credit_card
           subscription.user.store_credit_card_on_gateway(credit_card)
-          action.build_payment(@payment_attributes)
-          action.payment.payment_type = :token
+          action.create_payment(@payment_attributes.merge(:payment_type => :token, :amount => @term.price))
           subscription.pending_action = action
+          #subscription.pending_action.payment.save!
         end
 
         subscription.save!

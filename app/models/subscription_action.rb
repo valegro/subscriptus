@@ -3,7 +3,7 @@ class SubscriptionAction < ActiveRecord::Base
   belongs_to :subscription
 
   has_many :subscription_gifts, :dependent => :destroy
-  has_one  :payment
+  has_one  :payment, :autosave => true
   has_many :gifts,
            :through => :subscription_gifts,
            :uniq => true,

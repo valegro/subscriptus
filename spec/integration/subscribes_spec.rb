@@ -155,4 +155,56 @@ describe "Subscribes" do
       it_should_behave_like "a new user signup"
     end
   end
+
+  describe "when I submit the form" do
+    describe "if I don't fill in the data correctly" do
+      it "I should see error messages"
+      it "I should be on the signup page again"
+    end
+  end
+
+  # TODO: Move this to another file
+  describe "when I visit the subscribe page and choose student concession" do
+    before(:each) do
+      @offer = Factory.create(:offer)
+      @term = @offer.offer_terms.create(:price => 10, :months => 3, :concession => true)
+      @source = Factory.create(:source)
+      GATEWAY.expects(:setup_recurrent).returns(stub(:success? => true))
+      GATEWAY.expects(:purchase).never
+      stub_wordpress
+      visit new_subscribe_path(:source_id => @source.id, :offer_id => @offer.id, :tab => 'students')
+    end
+
+    describe "and I fill in the information correctly" do
+      before(:each) do
+        fill_in "First Name",            :with => "Daniel"
+        fill_in "Last Name",             :with => "Draper"
+        fill_in "Email",                 :with => "daniel@codefire.com.au"
+        fill_in "Email confirmation",    :with => "daniel@codefire.com.au"
+        fill_in "Phone number",          :with => "09090909"
+        fill_in "Street Address Line 1", :with => "1 That Pl"
+        fill_in "City",                  :with => "Adelaide"
+        fill_in "Postcode",              :with => "5000"
+        fill_in "Password",              :with => "Password1"
+        fill_in "Password confirmation", :with => "Password1"
+        fill_in "Name on Card",          :with => "Daniel Draper"
+        fill_in "Card number",           :with => "4444333322221111"
+        fill_in "Card Verification (CVV Number)", :with => "123"
+        check "subscription_terms"
+      end
+
+      it "should create a pending subscription with a pending action and token payment" do
+        expect {
+          click "btnSubmit"
+        }.to change { Subscription.count }.by(1)
+        s = Subscription.last
+        s.state.should == 'pending'
+        s.pending_action.should be_an_instance_of(SubscriptionAction)
+        s.pending_action.payment.should be_an_instance_of(Payment)
+        s.pending_action.payment.payment_type.should == :token
+        s.pending_action.payment.amount.should == @term.price
+        s.pending_action.payment.processed_at.should be(nil)
+      end
+    end
+  end
 end
