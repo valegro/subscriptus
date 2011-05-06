@@ -270,6 +270,18 @@ describe SubscriptionFactory do
         }.should raise_error(Exceptions::PaymentFailedException, "Test Failure")
       }.to change { Payment.count }.by(0)
     end
+
+    it "should be created as a direct debit type when the subscription created if direct debit option is passed" do
+      GATEWAY.expects(:purchase).never
+      GATEWAY.expects(:setup_recurrent).never
+      GATEWAY.expects(:trigger_recurrent).never
+      factory = SubscriptionFactory.new(@offer, :attributes => @attributes, :payment_attributes => @payment_attrs, :payment_option => 'direct_debit')
+      subscription = factory.build
+      subscription.actions.size.should == 0
+      subscription.pending_action.should be_an_instance_of(SubscriptionAction)
+      subscription.state.should == 'pending'
+      subscription.pending.should == :payment
+    end
   end
 
   describe "subscribing with a concession should" do

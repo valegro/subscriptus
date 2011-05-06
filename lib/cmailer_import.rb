@@ -1,9 +1,9 @@
 
 # Clear Out Data
-Subscription.delete_all
-SubscriptionAction.delete_all
-SubscriptionLogEntry.delete_all
-User.delete_all("role = 'subscriber'")
+#Subscription.delete_all
+#SubscriptionAction.delete_all
+#SubscriptionLogEntry.delete_all
+#User.delete_all("role = 'subscriber'")
 
 class CmailerUser < ActiveRecord::Base
   set_table_name "users"
@@ -15,8 +15,7 @@ class CmailerUser < ActiveRecord::Base
     :username => "root",
     :password => 'zxnm9014',
     :database => "cmailer",
-    :port     => 3306,
-    :socket   => "/tmp/mysql.sock"
+    :port     => 3306
   )
 
   def attributes
@@ -88,6 +87,7 @@ class CmailerSubscription < CmailerUser
     end
 end
 
+__END__
 errors = 0
 CmailerSubscription.find_each(:batch_size => 100) do |cm_subscription|
   begin

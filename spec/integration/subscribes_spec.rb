@@ -33,6 +33,14 @@ describe "Subscribes" do
       page.should have_xpath("//form[contains(@action,\"/subscribe?offer_id=#{@offer.id}\")]")
     end
 
+    it "should display the direct debit payment option"
+
+    describe "when I click the direct debit option" do
+      it "I should see the right content" do
+        page.should have_content("Click the FINISH button below once you’ve chosen your payment option:")
+      end
+    end
+
     describe "when a wordpress user exists with an email and I have provided an email address" do
       before(:each) do
         Wordpress.stubs(:exists?).with({:email => "daniel@codefire.com.au"}).returns(true)
@@ -78,6 +86,8 @@ describe "Subscribes" do
         page.should have_no_content("Subscribe and Receive")
         page.should have_no_xpath("//div[@class='gift-option']")
       end
+
+      it "should not display the direct debit payment option"
     end
 
     describe "on the concessions tab" do
@@ -103,6 +113,8 @@ describe "Subscribes" do
         page.should have_no_content("Subscribe and Receive")
         page.should have_no_xpath("//div[@class='gift-option']")
       end
+
+      it "should not display the direct debit payment option"
     end
 
     describe "on the groups tab" do
@@ -135,6 +147,8 @@ describe "Subscribes" do
         page.should have_no_content("Choose your Subscription")
         page.should have_no_xpath("//div[@class='subscription-option']")
       end
+
+      it "should not display the direct debit payment option"
     end
 
     it "should show the subscriptions tab if an unknown tab name is given"

@@ -101,33 +101,57 @@
 
 			  <img id='securepay' src="/images/securepay.png" alt="Powered by Secure Pay" />
 				<div id='payment-options'>
-    			<input type='radio' name='rdoPaymentOptions' id='rdoPaymentOptions1' />
-          <label for='rdoPaymentOptions1' >
+          <input class="payment-radio" type='radio' name='payment_option' value="credit_card" id='payment-radio-credit-card' checked="<%= 'true' if (@payment_option || 'credit_card' == 'credit_card') %>" />
+          <label for='payment-radio-credit-card'>
             Credit Card
           </label>
           
         
-          <input type='radio' name='rdoPaymentOptions' id='rdoPaymentOptions2' />
-          <label for='rdoPaymentOptions2' >
+          <input type='radio' class="payment-radio" name='payment_option' value="direct_debit" id='payment-radio-direct-debit' />
+          <label for='payment-radio-direct-debit'>
             Direct Debit
           </label>									
           
-          <label for='rdoPaymentOptions1' >
-            <img src='/images/cc.png' alt='Credit Cards' />		
+          <label for='payment-radio-credit-card'>
+            <img src='/images/cc.png' alt='Credit Cards' />	
           </label>
-
         </div>
 
-
         <div id='payment-details'>
-          <h4>Credit Card Details</h4>
-          
-          <% fields_for :payment, @payment, :builder => SubscribeFormBuilder do |p| %>
-            <%= p.text_field :full_name, :required => true, :label => "Name on Card" %>
-            <%= p.text_field :card_number, :required => true, :help => "e.g. 0000123455677675" %>
-            <%= p.date_select :card_expiry_date, :discard_day => true, :start_year => Time.now.year, :label => "Expiry", :required => true %>
-            <%= p.text_field :card_verification, :class => "smallText", :required => true, :label => "Card Verification (CVV Number)" %>
-          <% end %>
+          <div class="payment-option" id="payment_by_credit_card" style="<%= 'display:none;' unless @payment_option == 'credit_card' || @payment_option.blank? %>">
+            <h4>Credit Card Details</h4>
+            
+            <% fields_for :payment, @payment, :builder => SubscribeFormBuilder do |p| %>
+              <%= p.text_field :full_name, :required => true, :label => "Name on Card" %>
+              <%= p.text_field :card_number, :required => true, :help => "e.g. 0000123455677675" %>
+              <%= p.date_select :card_expiry_date, :discard_day => true, :start_year => Time.now.year, :label => "Expiry", :required => true %>
+              <%= p.text_field :card_verification, :class => "smallText", :required => true, :label => "Card Verification (CVV Number)" %>
+            <% end %>
+          </div>
+
+          <div class="payment-option" id="payment_by_direct_debit" style="<%= 'display:none;' unless @payment_option == 'direct_debit' %>">
+            <h4>Direct Debit</h4>
+            <h4>Click the FINISH button below once you’ve chosen your payment option:</h4>
+            <ol>
+              <li>Download our subscription form and fax it to 03 8623 9975 or mail it to Crikey, Level 6, 22 William Street, Melbourne VIC 3000.</li>
+              <li>Or you can do a direct transfer into our bank account – make sure you include your name in the reference so we can match up your payment:</li>
+            </ol>
+            <p>
+            BSB: 083 026</br>
+            Account Number: 58 171 0456</br>
+            Account Name: Blimey Holdings
+            </p>
+          </div>
+
+          <script language="javascript">
+            $('.payment-option').hide();
+            if ($('#payment-radio-direct-debit').attr('checked')) { $('#payment_by_direct_debit').show(); }
+            if ($('#payment-radio-credit-card').attr('checked')) { $('#payment_by_credit_card').show(); }
+            $(".payment-radio").live('click', function() {
+              $('.payment-option').hide();
+              $('#payment_by_'+$(this).val()).show();
+            });
+          </script>
 
 					<div id='terms'>
             <%= f.check_box :terms, :label => "I agree to the Crikey " %>

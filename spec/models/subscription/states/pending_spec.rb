@@ -65,6 +65,7 @@ describe Subscription do
 
       it "should deliver an email" do
         SubscriptionMailer.expects(:send_later).with(:deliver_verified, @subscription)
+        SubscriptionMailer.expects(:send_later).with(:deliver_activation, @subscription)
         @subscription.verify!
       end
 

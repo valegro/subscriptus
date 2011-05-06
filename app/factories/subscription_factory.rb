@@ -1,5 +1,6 @@
 class SubscriptionFactory
   attr_accessor :subscription
+  attr_accessor :payment_option
 
   # ID in the subscription attributes will always be ignored
   # This is because of a bug in AR
@@ -20,6 +21,7 @@ class SubscriptionFactory
     @attributes[:user_attributes].try(:delete, :id)
     @payment_attributes = options[:payment_attributes]
     @subscription       = Subscription.new(@attributes)
+    @payment_option     = options[:payment_option] || 'credit_card'
   end
 
   def self.build(offer, options = {})
@@ -82,12 +84,13 @@ class SubscriptionFactory
 
         # TODO: Optimise this logic
         if subscription.pending?
-          # Ensure we have a token
-          credit_card = Payment.new(@payment_attributes).credit_card
-          subscription.user.store_credit_card_on_gateway(credit_card)
-          action.create_payment(@payment_attributes.merge(:payment_type => :token, :amount => @term.price))
+          unless subscription.pending == :payment
+            # Ensure we have a token
+            credit_card = Payment.new(@payment_attributes).credit_card
+            subscription.user.store_credit_card_on_gateway(credit_card)
+            action.create_payment(@payment_attributes.merge(:payment_type => :token, :amount => @term.price))
+          end
           subscription.pending_action = action
-          #subscription.pending_action.payment.save!
         end
 
         subscription.save!
@@ -98,11 +101,11 @@ class SubscriptionFactory
     end
   end
 
-  # TODO: Does verify go here? Or is it on the subscription? How is the action applied?
-
   private
+    # TODO: What if we are pending student/concession AND direct debit!?
     def pending_what
       return nil unless set_state == 'pending'
+      return 'payment' if payment_option == 'direct_debit'
       case @concession
         when 'student', :student       then 'student_verification'
         when 'concession', :concession then 'concession_verification'
@@ -114,7 +117,7 @@ class SubscriptionFactory
       if @concession.try(:to_s) == 'concession' && @subscription.user.try(:valid_concession_holder)
         'active'
       else
-        (@concession ? 'pending' : 'active')
+        ((@concession || @payment_option == 'direct_debit') ? 'pending' : 'active')
       end
     end
 end
