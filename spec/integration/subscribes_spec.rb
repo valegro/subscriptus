@@ -55,6 +55,91 @@ describe "Subscribes" do
       end
     end
 
+    describe "on the students tab" do
+      before(:each) do
+        @offer.gifts.add(Factory.create(:gift))
+      end
+
+      it "should highlight the tab if the offer has concession terms" do
+        @offer.offer_terms.create(:price => 10, :months => 3, :concession => true)
+        visit new_subscribe_path(:source_id => @source.id, :offer_id => @offer.id, :tab => 'students')
+        page.should have_xpath("//li[@class='active' and @id='students-tab']")
+      end
+
+      it "should highlight the subscriptions tab if the offer has no concession terms" do
+        visit new_subscribe_path(:source_id => @source.id, :offer_id => @offer.id, :tab => 'students')
+        page.should have_no_xpath("//li[@class='active' and @id='students-tab']")
+        page.should have_xpath("//li[@class='active' and @id='subscriptions-tab']")
+      end
+
+      it "should not show any gift options if there is a concession term option" do
+        @offer.offer_terms.create(:price => 10, :months => 3, :concession => true)
+        visit new_subscribe_path(:source_id => @source.id, :offer_id => @offer.id, :tab => 'students')
+        page.should have_no_content("Subscribe and Receive")
+        page.should have_no_xpath("//div[@class='gift-option']")
+      end
+    end
+
+    describe "on the concessions tab" do
+      before(:each) do
+        @offer.gifts.add(Factory.create(:gift))
+      end
+
+      it "should highlight the tab if the offer has concession terms" do
+        @offer.offer_terms.create(:price => 10, :months => 3, :concession => true)
+        visit new_subscribe_path(:source_id => @source.id, :offer_id => @offer.id, :tab => 'concessions')
+        page.should have_xpath("//li[@class='active' and @id='concessions-tab']")
+      end
+
+      it "should highlight the subscriptions tab if the offer has no concession terms" do
+        visit new_subscribe_path(:source_id => @source.id, :offer_id => @offer.id, :tab => 'concessions')
+        page.should have_no_xpath("//li[@class='active' and @id='concessions-tab']")
+        page.should have_xpath("//li[@class='active' and @id='subscriptions-tab']")
+      end
+
+      it "should not show any gift options if there is a concession term option" do
+        @offer.offer_terms.create(:price => 10, :months => 3, :concession => true)
+        visit new_subscribe_path(:source_id => @source.id, :offer_id => @offer.id, :tab => 'concessions')
+        page.should have_no_content("Subscribe and Receive")
+        page.should have_no_xpath("//div[@class='gift-option']")
+      end
+    end
+
+    describe "on the groups tab" do
+      before(:each) do
+        @offer.gifts.add(Factory.create(:gift))
+      end
+
+      it "should highlight the tab if the offer has concession terms" do
+        @offer.offer_terms.create(:price => 10, :months => 3, :concession => true)
+        visit new_subscribe_path(:source_id => @source.id, :offer_id => @offer.id, :tab => 'groups')
+        page.should have_xpath("//li[@class='active last' and @id='groups-tab']")
+      end
+
+      it "should highlight the subscriptions tab if the offer has no concession terms" do
+        visit new_subscribe_path(:source_id => @source.id, :offer_id => @offer.id, :tab => 'groups')
+        page.should have_no_xpath("//li[@class='active' and @id='groups-tab']")
+        page.should have_xpath("//li[@class='active' and @id='subscriptions-tab']")
+      end
+
+      it "should not show any gift options if there is a concession term option" do
+        @offer.offer_terms.create(:price => 10, :months => 3, :concession => true)
+        visit new_subscribe_path(:source_id => @source.id, :offer_id => @offer.id, :tab => 'groups')
+        page.should have_no_content("Subscribe and Receive")
+        page.should have_no_xpath("//div[@class='gift-option']")
+      end
+
+      it "should not show any offer terms" do
+        @offer.offer_terms.create(:price => 10, :months => 3, :concession => true)
+        visit new_subscribe_path(:source_id => @source.id, :offer_id => @offer.id, :tab => 'groups')
+        page.should have_no_content("Choose your Subscription")
+        page.should have_no_xpath("//div[@class='subscription-option']")
+      end
+    end
+
+    it "should show the subscriptions tab if an unknown tab name is given"
+    it "should redirect to /new if visiting /subscribe without losing data on the form!"
+
     describe "when a wordpress user does not exist" do
       before(:each) do
         Wordpress.stubs(:exists?).with({:email => "daniel@codefire.com.au"}).returns(false)

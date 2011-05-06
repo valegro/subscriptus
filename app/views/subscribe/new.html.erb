@@ -16,17 +16,17 @@
       <% end %>
 
       <ul id='subscription-tabs'>
-        <li class='<%= "active" if @tab == 'subscriptions' || @tab.blank? %>'>
+        <li id="subscriptions-tab" class='<%= "active" if @tab == 'subscriptions' || @tab.blank? %>'>
           <%= link_to("SUBSCRIPTIONS", tab_path('subscriptions')) %>
         </li>
         <% unless @offer.offer_terms.concession.blank? %>
-          <li class='<%= "active" if @tab == 'students' %>'>
+          <li id="students-tab" class='<%= "active" if @tab == 'students' %>'>
             <%= link_to("STUDENTS", tab_path('students')) %>
           </li>
-          <li class='<%= "active" if @tab == 'concessions' %>'>
+          <li id="concessions-tab" class='<%= "active" if @tab == 'concessions' %>'>
             <%= link_to("SENIOR / CONCESSIONS", tab_path('concessions')) %>
           </li>	
-          <li class='<%= "active" if @tab == 'groups' %> last'>
+          <li id="groups-tab" class='<%= "active" if @tab == 'groups' %> last'>
             <%= link_to("DISCOUNT GROUP", tab_path('groups')) %>
           </li>
         <% end %>

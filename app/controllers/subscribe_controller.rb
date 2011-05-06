@@ -58,8 +58,8 @@ class SubscribeController < ApplicationController
 
     def load_tab
       @tab = params[:tab] || 'subscriptions'
-      unless %w(subscriptions students groups concessions).include?(@tab)
-        @tab = nil
+      if !%w(subscriptions students groups concessions).include?(@tab) || @offer.offer_terms.concession.empty?
+        @tab = 'subscriptions'
       end
     end
 
