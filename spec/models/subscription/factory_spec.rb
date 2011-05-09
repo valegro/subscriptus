@@ -281,6 +281,9 @@ describe SubscriptionFactory do
       subscription.pending_action.should be_an_instance_of(SubscriptionAction)
       subscription.state.should == 'pending'
       subscription.pending.should == :payment
+      subscription.pending_action.payment.should be_an_instance_of(Payment)
+      subscription.pending_action.payment.payment_type.should == :direct_debit
+      subscription.pending_action.payment.amount.should == @term1.price
     end
   end
 

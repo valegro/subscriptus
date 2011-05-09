@@ -32,6 +32,7 @@ class SubscribeController < ApplicationController
   end
 
   def create
+    @payment_option = params[:payment_option]
     Subscription.transaction do
       @factory = SubscriptionFactory.new(@offer, {
         :term_id            => params[:offer_term],
@@ -40,7 +41,8 @@ class SubscribeController < ApplicationController
         :attributes         => params[:subscription],
         :payment_attributes => params[:payment],
         :concession         => params[:concession],
-        :source             => params[:source_id]
+        :source             => params[:source_id],
+        :payment_option     => @payment_option
       })
       @subscription = @factory.build
       redirect_to :action => :thanks
@@ -61,6 +63,7 @@ class SubscribeController < ApplicationController
       if !%w(subscriptions students groups concessions).include?(@tab) || @offer.offer_terms.concession.empty?
         @tab = 'subscriptions'
       end
+      @direct_debit_allowed = (@tab == 'subscriptions')
     end
 
     def load_gifts

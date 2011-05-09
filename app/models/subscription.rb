@@ -107,16 +107,11 @@ class Subscription < ActiveRecord::Base
     end
   end
 
-  # TODO: Should this really be a method on the factory/proxy?
+  # TODO: No longer need to have an argument to verify - so can move to an observer
   def verify_with_params!(object = nil)
     self.class.transaction do
-      case pending.to_sym
-        when :payment
-          raise "Requires Payment to verify" unless object.kind_of?(Payment)
-          self.pending_action.payment = object
-        when :concession_verification
-          self.user.valid_concession_holder = true
-        when :student_verification
+      if pending.to_sym == :concession_verification
+        self.user.valid_concession_holder = true
       end
       self.apply_action(self.pending_action) if self.pending_action
       self.pending_action = nil

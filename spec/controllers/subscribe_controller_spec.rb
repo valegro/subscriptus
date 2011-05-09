@@ -91,7 +91,8 @@ describe SubscribeController do
           :source => @source.id,
           :payment_attributes => @payment_attributes,
           :concession => nil,
-          :source => @source.id.to_s
+          :source => @source.id.to_s,
+          :payment_option => 'credit_card'
         }
       ).returns(factory)
       post('create', {
@@ -99,7 +100,8 @@ describe SubscribeController do
         :source_id => @source.id,
         :offer_term => @ot1.id,
         :subscription => @attributes,
-        :payment => @payment_attributes
+        :payment => @payment_attributes,
+        :payment_option => 'credit_card'
       })
       response.should redirect_to(:action => 'thanks')
     end
@@ -116,6 +118,7 @@ describe SubscribeController do
           :attributes => @attributes,
           :payment_attributes => @payment_attributes,
           :concession => nil,
+          :payment_option => 'credit_card',
           :source => @source.id.to_s
         }
       ).returns(factory)
@@ -126,7 +129,8 @@ describe SubscribeController do
         :optional_gift => @g4.id,
         :offer_term => @ot1.id,
         :subscription => @attributes,
-        :payment => @payment_attributes
+        :payment => @payment_attributes,
+        :payment_option => 'credit_card'
       }
       response.should redirect_to(:action => 'thanks')
     end
@@ -192,7 +196,8 @@ describe SubscribeController do
             :concession => 'student',
             :optional_gift => nil,
             :included_gift_ids => nil,
-            :source => @source.id.to_s
+            :source => @source.id.to_s,
+            :payment_option => 'direct_debit'
           }
         ).returns(factory)
         post('create', {
@@ -201,7 +206,8 @@ describe SubscribeController do
           :offer_term => @ot1.id,
           :subscription => @attributes,
           :payment => @payment_attributes,
-          :concession => 'student'
+          :concession => 'student',
+          :payment_option => 'direct_debit'
         })
       end
     end
@@ -250,7 +256,8 @@ describe SubscribeController do
             :concession => 'concession',
             :optional_gift => nil,
             :included_gift_ids => nil,
-            :source => @source.id.to_s
+            :source => @source.id.to_s,
+            :payment_option => 'credit_card'
           }
         ).returns(factory)
         post('create', {
@@ -259,10 +266,59 @@ describe SubscribeController do
           :offer_term => @ot1.id,
           :subscription => @attributes,
           :payment => @payment_attributes,
-          :concession => 'concession'
+          :concession => 'concession',
+          :payment_option => 'credit_card'
         })
       end
     end
+
+    describe "when choosing direct debit" do
+      before(:each) do
+        GATEWAY.expects(:trigger_recurrent).never
+        GATEWAY.expects(:purchase).never
+        GATEWAY.expects(:setup_recurrent).never
+      end
+
+      it "should create a pending action with a payment" do
+        post('create', {
+          :offer_id => @offer.id,
+          :source_id => @source.id,
+          :offer_term => @ot1.id,
+          :subscription => @attributes,
+          :payment => @payment_attributes,
+          :payment_option => 'direct_debit'
+        })
+        Subscription.last.pending_action.should be_an_instance_of(SubscriptionAction)
+        Subscription.last.pending_action.payment.should be_an_instance_of(Payment)
+        Subscription.last.pending_action.payment.payment_type.should == :direct_debit
+      end
+
+      it "should set the subscription to pending" do
+        subscription = stub(:save! => true)
+        factory = stub(:build => subscription)
+        SubscriptionFactory.expects(:new).with(
+          instance_of(Offer), {
+            :term_id => @ot1.id.to_s,
+            :attributes => @attributes,
+            :payment_attributes => @payment_attributes,
+            :payment_option => 'direct_debit',
+            :optional_gift => nil,
+            :included_gift_ids => nil,
+            :source => @source.id.to_s,
+            :concession => nil
+          }
+        ).returns(factory)
+        post('create', {
+          :offer_id => @offer.id,
+          :source_id => @source.id,
+          :offer_term => @ot1.id,
+          :subscription => @attributes,
+          :payment => @payment_attributes,
+          :payment_option => 'direct_debit'
+        })
+      end
+    end
+
 
     # This scenario should only occur if for some reason there exists a wordpress user with the given
     # email but there is no subscriptus user with that email

@@ -11,3 +11,9 @@ Factory.define :pending_subscription_action, :parent => :subscription_action do 
   s.subscription nil
   s.association :payment, :factory => :token_payment
 end
+
+Factory.define :pending_payment_subscription_action, :parent => :pending_subscription_action do |s|
+  s.applied_at { nil }
+  s.subscription nil
+  s.association :payment, :factory => :direct_debit_payment
+end

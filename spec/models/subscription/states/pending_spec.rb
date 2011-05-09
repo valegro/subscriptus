@@ -153,24 +153,12 @@ describe Subscription do
 
       describe "if pending payment" do
         before(:each) do
-          @subscription_action = Factory.create(:subscription_action, :payment => nil)
-          @subscription = Factory.create(:subscription,
-            :state => "pending",
-            :pending => :payment,
-            :pending_action => @subscription_action
-          )
-        end
-
-        it "should require a payment if pending payment" do
-          lambda {
-            @subscription.verify!('bogus str')
-          }.should raise_exception
-          @subscription.verify!(Payment.new(:payment_type => 'direct_debit', :amount => 100))
+          @subscription = Factory.create(:pending_payment_subscription)
         end
 
         it "should create a log entry if pending payment when verified" do
           expect {
-            @subscription.verify!(Payment.new(:payment_type => 'direct_debit', :amount => 100))
+            @subscription.verify!
             @subscription.reload
           }.to change { @subscription.log_entries.count }.by(2)
           @subscription.log_entries.last.old_state.should == 'pending'
@@ -179,17 +167,20 @@ describe Subscription do
           @subscription.log_entries[-2].description.should == 'Expiry Date set to 09/04/11'
         end
 
-        it "should create a paymemt if pending payment" do
-          expect {
-            @subscription.verify!(Payment.new(:payment_type => 'direct_debit', :amount => 100))
-          }.to change { @subscription.reload; @subscription.actions(true).count }.by(1)
-          @subscription.actions.last.payment.should_not be(nil)
-          @subscription.actions.last.payment.payment_type.should == :direct_debit
-          @subscription.actions.last.payment.amount.should == 100
+        it "should process and add the payment" do
+          Timecop.freeze(Time.now) do
+            expect {
+              @subscription.verify!
+            }.to change { @subscription.reload; @subscription.actions(true).count }.by(1)
+            @subscription.actions.last.payment.should_not be(nil)
+            @subscription.actions.last.payment.payment_type.should == :direct_debit
+            @subscription.actions.last.payment.amount.should == 100
+            @subscription.actions.last.payment.processed_at.should == Time.now
+          end
         end
 
         it "should be active" do
-          @subscription.verify!(Payment.new(:payment_type => 'direct_debit', :amount => 100))
+          @subscription.verify!
           @subscription.state.should == 'active'
         end
       end

@@ -82,13 +82,15 @@ class SubscriptionFactory
           subscription.apply_action(action)
         end
 
-        # TODO: Optimise this logic
         if subscription.pending?
-          unless subscription.pending == :payment
-            # Ensure we have a token
-            credit_card = Payment.new(@payment_attributes).credit_card
-            subscription.user.store_credit_card_on_gateway(credit_card)
-            action.create_payment(@payment_attributes.merge(:payment_type => :token, :amount => @term.price))
+          case subscription.pending
+            when :payment
+              action.create_payment(:payment_type => :direct_debit, :amount => @term.price)
+            when :concession_verification, :student_verification
+              # Ensure we have a token
+              credit_card = Payment.new(@payment_attributes).credit_card
+              subscription.user.store_credit_card_on_gateway(credit_card)
+              action.create_payment(@payment_attributes.merge(:payment_type => :token, :amount => @term.price))
           end
           subscription.pending_action = action
         end

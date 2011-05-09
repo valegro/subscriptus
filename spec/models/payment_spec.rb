@@ -122,9 +122,13 @@ describe Payment do
       count = Payment.count
       GATEWAY.expects(:purchase).never
       payment = Factory.build(:direct_debit_payment)
-      assert payment.valid?
       payment.save!
       assert_equal Payment.count, count + 1
+    end
+
+    it "should be valid even of no CC details have been provided" do
+      payment = Factory.build(:direct_debit_payment)
+      payment.valid?.should be(true)
     end
   end
 

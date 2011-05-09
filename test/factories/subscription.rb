@@ -23,6 +23,12 @@ Factory.define :pending_subscription, :parent => :subscription do |s|
   s.association :pending_action, :factory => :pending_subscription_action
 end
 
+Factory.define :pending_payment_subscription, :parent => :subscription do |s|
+  s.state { 'pending' }
+  s.pending { 'payment' }
+  s.association :pending_action, :factory => :pending_payment_subscription_action
+end
+
 Factory.define :expired_subscription, :parent => :subscription do |s|
   s.expires_at { 2.hours.ago }
   s.state 'squatter'

@@ -33,11 +33,19 @@ describe "Subscribes" do
       page.should have_xpath("//form[contains(@action,\"/subscribe?offer_id=#{@offer.id}\")]")
     end
 
-    it "should display the direct debit payment option"
+    it "should display the credit card payment option" do
+      visit new_subscribe_path(:offer_id => @offer.id)
+      page.should have_content("Credit Card Details")
+      page.should have_xpath("//input[@id='payment_full_name']")
+      page.should have_xpath("//input[@id='payment_card_number']")
+      page.should have_xpath("//label[@for='payment_card_expiry_date']")
+      page.should have_xpath("//input[@id='payment_card_verification']")
+    end
 
     describe "when I click the direct debit option" do
       it "I should see the right content" do
         page.should have_content("Click the FINISH button below once you’ve chosen your payment option:")
+        page.should have_content("BSB: 083 026")
       end
     end
 
@@ -87,7 +95,11 @@ describe "Subscribes" do
         page.should have_no_xpath("//div[@class='gift-option']")
       end
 
-      it "should not display the direct debit payment option"
+      it "should not display the direct debit payment option" do
+        page.should have_no_xpath("//input[@id='payment-radio-direct-debit']")
+        page.should have_no_content("Click the FINISH button below once you’ve chosen your payment option:")
+        page.should have_no_content("BSB: 083 026")
+      end
     end
 
     describe "on the concessions tab" do
@@ -114,7 +126,11 @@ describe "Subscribes" do
         page.should have_no_xpath("//div[@class='gift-option']")
       end
 
-      it "should not display the direct debit payment option"
+      it "should not display the direct debit payment option" do
+        page.should have_no_xpath("//input[@id='payment-radio-direct-debit']")
+        page.should have_no_content("Click the FINISH button below once you’ve chosen your payment option:")
+        page.should have_no_content("BSB: 083 026")
+      end
     end
 
     describe "on the groups tab" do
@@ -148,7 +164,11 @@ describe "Subscribes" do
         page.should have_no_xpath("//div[@class='subscription-option']")
       end
 
-      it "should not display the direct debit payment option"
+      it "should not display the direct debit payment option" do
+        page.should have_no_xpath("//input[@id='payment-radio-direct-debit']")
+        page.should have_no_content("Click the FINISH button below once you’ve chosen your payment option:")
+        page.should have_no_content("BSB: 083 026")
+      end
     end
 
     it "should show the subscriptions tab if an unknown tab name is given"
@@ -219,6 +239,34 @@ describe "Subscribes" do
         s.pending_action.payment.amount.should == @term.price
         s.pending_action.payment.processed_at.should be(nil)
       end
+
+      it "should display the thanks page"
+    end
+
+    describe "and I do not provide all data" do
+      it "should take me back to the form"
+    end
+  end
+
+  # TODO: Are these better as cukes?
+  describe "when I visit the subscribe page" do
+    describe "and I fill in the information correctly" do
+      it "should create a subscription"
+      it "should display the thanks page"
+    end
+
+    describe "and I fill in the information correctly and choose direct debit as the payment method" do
+      it "should create a pending subscription with a pending action"
+      it "should display the thanks page"
+    end
+
+    describe "and I do not provide all data and choose direct debit as the payment method" do
+      it "should take me back to the form"
+      it "and I should see the direct debit payment option"
+    end
+
+    describe "and I do not provide all data" do
+      it "should take me back to the form"
     end
   end
 end

@@ -37,13 +37,12 @@ class Admin::SubscriptionsController < AdminController
   end
 
   def verify
-    @payment = Payment.new(:amount => @subscription.price, :payment_type => 'direct_debit')
-    if request.post?
+    @payment = @subscription.pending_action.try(:payment)
+    if request.post? || request.put?
       unless @subscription.active?
-        if params[:payment]
-          @payment = Payment.new(params[:payment])
-          @payment.amount = @subscription.price
-          @subscription.verify!(@payment)
+        if params[:payment] && @payment
+          @payment.update_attributes(params[:payment])
+          @subscription.verify!
         else
           @subscription.update_attributes(params[:subscription])
           @subscription.verify!
