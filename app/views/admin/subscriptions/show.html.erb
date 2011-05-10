@@ -1,6 +1,7 @@
 <div class="title">
   <%= content_tag :h2, @subscription.reference %>
   <div class="actions">
+    <%= link_to_remote 'Set Expiry Date', { :url => set_expiry_admin_subscription_path(@subscription), :method => :get }, { :class => 'set-expiry' } %>
   </div>
 </div>
 
@@ -13,7 +14,6 @@
       <dt>Current Offer</dt><dd><%= @subscription.offer ? link_to(@subscription.offer.name, admin_catalogue_offer_url(@subscription.offer)) : '-' %></dd>
       <dt>Expires</dt><dd><%= format_timestamp(@subscription.expires_at) %></dd>
       <dt>Publication</dt><dd><%= link_to(@subscription.publication.name, admin_catalogue_publication_url(@subscription.publication)) %></dd>
-      <dt>Concession</dt><dd><%= @subscription.concession ? 'Yes' : 'No' %></dd>
     </dl>
   </div>
   <div class="frame span_10">

@@ -1,8 +1,9 @@
 class Admin::SubscriptionsController < AdminController
   layout 'admin/subscriptions'
+  helper 'admin'
   include Admin::SubscriptionsHelper
   
-  before_filter :find_subscription, :only => [ :verify, :cancel, :suspend, :unsuspend, :show ]
+  before_filter :find_subscription, :only => [ :verify, :cancel, :suspend, :unsuspend, :show, :set_expiry ]
 
   rescue_from(Exceptions::PaymentTokenMissing) do
     flash[:error] = "The User has no payment gateway token - the payment will need to processed manually"
@@ -52,6 +53,28 @@ class Admin::SubscriptionsController < AdminController
         flash[:error] = "Subscription has already been verified"
       end
       redirect_to :action => :pending
+    end
+  end
+
+  def set_expiry
+    respond_to do |format|
+      unless request.post?
+        format.js {
+          render :update do |page|
+            page.insert_html :bottom, 'content', :partial => 'set_expiry_dialog'
+            page['set-expiry-dialog'].dialog('open')
+          end
+        }
+      else
+        format.html {
+          if @subscription.update_attributes(params[:subscription])
+            flash[:notice] = "Expiry date to #{@subscription.publication.name} for #{@subscription.user.name} set to #{format_timestamp(@subscription.expires_at)}"
+          else
+            flash[:error] = @subscription.errors.full_messages.join("<br/>")
+          end
+          redirect_to :action => :show
+        }
+      end
     end
   end
   

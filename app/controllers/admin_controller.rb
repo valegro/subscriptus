@@ -2,6 +2,7 @@ class AdminController < ApplicationController
   layout "admin"
   before_filter :require_user
   before_filter :require_admin
+  helper_method :format_timestamp
 
   def index
     redirect_to admin_subscriptions_path
@@ -17,4 +18,10 @@ class AdminController < ApplicationController
     end
     conditions
   end
+
+  protected
+    def format_timestamp(time)
+      return "-" unless time
+      time.in_time_zone(APP_TIMEZONE).strftime(STANDARD_TIME_FORMAT)
+    end
 end
