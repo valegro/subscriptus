@@ -12,7 +12,7 @@ class User < ActiveRecord::Base
   attr_accessor :email_confirmation
 
   enum_attr :role, %w(admin subscriber)
-  #enum_attr :title, %w(Mr Sir Fr Mrs Ms Miss Lady)
+  enum_attr :title, %w(Mr Sir Fr Mrs Ms Miss Lady)
   
   enum_attr :gender, %w(male female) do
     labels :male => 'Male'

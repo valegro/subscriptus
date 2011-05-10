@@ -2,15 +2,16 @@
 <div class="title">
   <%= content_tag :h2, "Subscriber" %>
   <div class="actions">
+    <%= link_to 'Edit', edit_admin_subscriber_path(@subscriber), :class => 'edit' %>
   </div>
 </div>
 
 <div class="grid">
-  <div class="frame span_7">
-    <%= render :partial => "admin/subscriptions/subscriptions", :object => @subscriptions %>
-  </div>
-  <div class="frame span_3 last">
+  <div class="frame span_4">
     <%= render :partial => "shared/admin/user", :locals => {:user => @subscriber}%>
+  </div>
+  <div class="frame span_6 last">
+    <%= render :partial => "admin/subscriptions/subscriptions", :object => @subscriptions %>
   </div>
   <div class="frame span_10">
     <h2>Action History</h2>

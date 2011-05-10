@@ -1,0 +1,32 @@
+<div class="title">
+  <%= content_tag :h2, "Edit Subscriber Details" %>
+  <div class="actions">
+    <%= link_to 'Back to Subscriber', admin_subscriber_path(@subscriber), :class => 'back' %>
+  </div>
+</div>
+
+<div class="grid">
+  <div class="frame span_6">
+    <% form_for [:admin, @subscriber], :url => admin_subscriber_path(@subscriber), :builder => Reform::Builder, :html => { :class => "form" } do |form| %>
+      <%= form.error_messages %>
+      <%= form.enum_select :title %>
+      <%= form.text_field :firstname %>
+      <%= form.text_field :lastname %>
+      <%= form.text_field :email %>
+      <%= form.text_field :company %>
+      <%= form.text_field :phone_number %>
+      <%= form.text_field :address_1 %>
+      <%= form.text_field :address_2 %>
+      <%= form.text_field :city %>
+      <%= form.enum_select :state %>
+      <%= form.text_field :postcode %>
+      <%= form.country_select :country %>
+      <div class="field">
+        <h3>Advanced</h3>
+      </div>
+      <%= form.check_box :valid_concession_holder, :label => "Concession Holder" %>
+      <%= form.text_field :login, :label => "Wordpress ID" %>
+      <%= form.submit "Update" %>
+    <% end %>
+  </div>
+</div>
