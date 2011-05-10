@@ -502,3 +502,10 @@ dd {
   margin: 0 0 0 160px;
   padding: 0 0 0.5em 0;
 }
+
+#footer {
+  border-top:solid 1px #e3e3e3;
+  padding-top:5px;
+  margin-top:20px;
+  text-align:right;
+}
