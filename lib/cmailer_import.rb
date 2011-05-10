@@ -1,100 +1,38 @@
 
+require 'cmailer_records'
+
 # Clear Out Data
 #Subscription.delete_all
 #SubscriptionAction.delete_all
 #SubscriptionLogEntry.delete_all
 #User.delete_all("role = 'subscriber'")
 
-class CmailerUser < ActiveRecord::Base
-  set_table_name "users"
-  set_primary_key "ContactId"
+errors = 0
 
-  establish_connection(
-    :adapter  => "mysql",
-    :host     => "localhost",
-    :username => "root",
-    :password => 'zxnm9014',
-    :database => "cmailer",
-    :port     => 3306
-  )
-
-  def attributes
-    JSON.parse(self.user)
-  end
-
-  def save_model
-    attrs = attributes.symbolize_keys
-    attrs[:role] = 'subscriber'
-    process_title!(attrs[:title])
-    attrs[:state].downcase!
-    attrs[:password] = attrs[:password_confirmation] = "123456"
-    attrs[:email_confirmation] = attrs[:email]
-    attrs[:auto_created] = true
-    User.create!(attrs)
-  end
-
-  def process_title!(title)
-    title.strip!
-    title.capitalize!
-    title.gsub!(/\./, "")
+CmailerUser.find(:all).each do |cm_user|
+  begin
+    cm_user.save_to_subscriptus
+  rescue
+    puts $!
+    puts $!.backtrace
+    p cm_user.attributes
+    errors += 1
   end
 end
 
-class CmailerSubscription < CmailerUser
-  set_table_name "subscriptions"
-  set_primary_key "ContactId"
+puts "\n\n---------------"
+puts "Errors: #{errors}"
 
-  def attributes
-    JSON.parse(self.subscriptions)
-  end
-
-  def save_model(user)
-    attrs = attributes.symbolize_keys
-    offer = find_offer(attrs[:offer])
-    subscription = Subscription.create!(
-      :user          => user,
-      :state         => set_status(attrs[:state]),
-      :price         => attrs[:price],
-      :created_at    => attrs[:created_at],
-      :expires_at    => attrs[:expires_at],
-      :offer         => offer,
-      :publication   => find_publication(attrs[:publication])
-    )
-    SubscriptionAction.create!(
-      :subscription => subscription,
-      :offer_name => offer.name,
-      :term_length => offer.offer_terms.first.months,
-      :applied_at => attrs[:created_at]
-    )
-    # TODO: Payment?
-  end
-
-  private
-    def find_offer(name)
-      Offer.find_by_name(name.strip)
-    end
-
-    def find_publication(name)
-      Publication.find_by_name(name.strip)
-    end
-
-    def set_status(status)
-      case status
-        when 'Active' then 'active'
-        when 'Expired', 'Unsubscribed' then 'squatter'
-        when 'Suspended' then 'suspended'
-      end
-    end
-end
 
 __END__
+
 errors = 0
-CmailerSubscription.find_each(:batch_size => 100) do |cm_subscription|
+CmailerSubscription.find(:all, :limit => 20).each do |cm_subscription|  #find_each(:batch_size => 100) do |cm_subscription|
   begin
     CmailerUser.transaction do
       cm_user = CmailerUser.find(cm_subscription.ContactId)
-      user = cm_user.save_model
-      cm_subscription.save_model(user)
+      user = cm_user.save_to_subscriptus
+      cm_subscription.save_to_subscriptus(user)
     end
   rescue
     puts "\n\nError #{$!}"

@@ -46,7 +46,8 @@ class Subscription < ActiveRecord::Base
   enum_attr :pending, %w(payment concession_verification student_verification)
   
   # Subscription States
-  has_states :trial, :squatter, :active, :suspended, :pending, :renewal_due, :payment_failed, :init => :trial do
+  # TODO: Do something with unsubscribed
+  has_states :trial, :squatter, :active, :suspended, :pending, :renewal_due, :payment_failed, :unsubscribed, :init => :trial do
     on :activate do
       transition :active => :active # when the subscriber extends their subscription while its still active
       transition :trial => :active

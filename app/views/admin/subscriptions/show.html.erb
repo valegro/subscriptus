@@ -8,10 +8,10 @@
   <div class="frame span_3">
     <dl>
       <dt>Subscriber</dt><dd><%= link_to(@subscription.user.name, admin_subscriber_url(@subscription.user)) %></dd>
-      <dt>Current State</dt><dd><%= @subscription.state %></dd>
+      <dt>Current State</dt><dd><%= @subscription.state.capitalize %></dd>
       <dt>Started</dt><dd><%= format_timestamp(@subscription.created_at) %></dd>
       <dt>Current Offer</dt><dd><%= @subscription.offer ? link_to(@subscription.offer.name, admin_catalogue_offer_url(@subscription.offer)) : '-' %></dd>
-      <dt>Expires</dt><dd><%= format_timestamp(@subscription.state_expires_at) %></dd>
+      <dt>Expires</dt><dd><%= format_timestamp(@subscription.expires_at) %></dd>
       <dt>Publication</dt><dd><%= link_to(@subscription.publication.name, admin_catalogue_publication_url(@subscription.publication)) %></dd>
       <dt>Concession</dt><dd><%= @subscription.concession ? 'Yes' : 'No' %></dd>
     </dl>

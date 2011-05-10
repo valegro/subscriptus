@@ -13,12 +13,15 @@ describe Subscription do
     stub_wordpress
   end
 
+  # TODO: Break this up into all of the initial states
   describe "upon creation" do
     it "should deliver a trial email for new trials" do
       @subscription = Factory.build(:subscription)
       SubscriptionMailer.expects(:send_later).with(:deliver_new_trial, @subscription)
       @subscription.save
     end
+
+    it "should set both expires_at and state_expires_at for new trials"
 
     it "should deliver an active email for new active subscriptions" do
       sub = Factory.build(:subscription, :state => 'active')
