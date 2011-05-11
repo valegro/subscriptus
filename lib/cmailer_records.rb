@@ -96,7 +96,9 @@ class CmailerSubscription < CmailerUser
 
   def publication
     name = read_attribute(:publication).try(:strip)
-    return nil if name.blank?
+    if name.blank?
+      name = (list == 'Crikey Weekender') ? list : 'Crikey Daily Mail'
+    end
     Publication.find_by_name(name)
   end
 
@@ -117,12 +119,14 @@ class CmailerSubscription < CmailerUser
     name = "Unknown Offer" if name.blank?
     # TODO: Shouldn't do this - need to prepopulate the DB with offers
     puts "Creating offer with name: #{name}"
+=begin
     returning(Offer.find_or_initialize_by_name(name, :publication => publication)) do |offer|
       offer.save!
       if offer.offer_terms.empty?
         offer.offer_terms.create(:price => 100, :months => 3)
       end
     end
+=end
   end
 
   def list
