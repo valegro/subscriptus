@@ -78,11 +78,10 @@ CmailerUser.find(:all).each do |u|
       user = u.save_to_subscriptus
       u.subscriptions.by_publication.each do |publication, subs|
         if publication.blank?
-          puts "DO we get here?"
           # TODO: Work out what to do here!
           # DO we just ignore things if there is no publication set? Maybe we use a bogus pub
         else
-          logger.warn("Processing #{publication.name}")
+          puts "Processing #{publication.name}"
           process_subs_for_user(user, subs, u)
         end
       end
