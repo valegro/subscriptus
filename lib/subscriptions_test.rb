@@ -30,8 +30,8 @@ def process_subs_for_user(user, subs, cm_user = nil)
         a.expires_at <=> b.expires_at
       end
     end
-    unless order_by_expires_at.empty?
-      most_recent = order_by_expires_at.last
+    unless ordered_by_expires_at.empty?
+      most_recent = ordered_by_expires_at.last
       # Use the most recent state
       state = most_recent.state
       # See if there is an active sub in order to set expires_at and created_at
