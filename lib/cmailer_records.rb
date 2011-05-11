@@ -66,11 +66,12 @@ class CmailerSubscription < CmailerUser
 
   def save_to_subscriptus(user)
     attrs = attributes.symbolize_keys
+    _offer = offer
     pending_action = if state == 'pending'
       # Create a pending action
       SubscriptionAction.new do |act|
-        act.offer_name = offer.name
-        act.term_length = offer.offer_terms.first # TODO: Is this right? Should be getting it from the offer or list name?
+        act.offer_name = _offer.name
+        act.term_length = _offer.offer_terms.first # TODO: Is this right? Should be getting it from the offer or list name?
         act.payment = Payment.new(:payment_type => 'direct_debit', :amount => self.price)
       end
     end
@@ -80,15 +81,15 @@ class CmailerSubscription < CmailerUser
       :price         => attrs[:price],
       :created_at    => attrs[:created_at],
       :expires_at    => attrs[:expires_at],
-      :offer         => offer,
+      :offer         => _offer,
       :publication   => publication,
       :pending_action => pending_action,
       :pending       => state == 'pending' ? 'payment' : nil
     )
     SubscriptionAction.create!(
       :subscription => subscription,
-      :offer_name => offer.name,
-      :term_length => offer.offer_terms.first.months,
+      :offer_name => _offer.name,
+      :term_length => _offer.offer_terms.first.months,
       :applied_at => attrs[:created_at]
     )
     # TODO: Payment?
@@ -117,16 +118,12 @@ class CmailerSubscription < CmailerUser
   def offer
     name = read_attribute(:offer).strip
     name = "Unknown Offer" if name.blank?
-    # TODO: Shouldn't do this - need to prepopulate the DB with offers
-    puts "Creating offer with name: #{name}"
-=begin
     returning(Offer.find_or_initialize_by_name(name, :publication => publication)) do |offer|
-      offer.save!
+      offer.save! if offer.new_record?
       if offer.offer_terms.empty?
         offer.offer_terms.create(:price => 100, :months => 3)
       end
     end
-=end
   end
 
   def list
