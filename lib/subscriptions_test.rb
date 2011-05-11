@@ -77,7 +77,7 @@ CmailerUser.find(:all).each do |u|
     User.transaction do
       user = u.save_to_subscriptus
       u.subscriptions.by_publication.each do |publication, subs|
-        if publication.blank? || publication.name.blank?
+        if publication.blank?
           puts "DO we get here?"
           # TODO: Work out what to do here!
           # DO we just ignore things if there is no publication set? Maybe we use a bogus pub
@@ -95,6 +95,7 @@ CmailerUser.find(:all).each do |u|
   rescue
     logger.warn("------------------")
     logger.warn($!)
+    logger.warn($!.backtrace)
     logger.warn(u.inspect)
   end
 end
