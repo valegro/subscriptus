@@ -71,7 +71,7 @@ SubscriptionLogEntry.delete_all
 
 logger = Logger.new("import-results.log")
 
-CmailerUser.find(:all, :conditions => "email = 'douglas.clark@dcconsulting.com.au'").each do |u| #:limit => 5000).each do |u|
+CmailerUser.find(:all).each do |u|
   puts u.email
   begin
     User.transaction do
@@ -95,7 +95,7 @@ CmailerUser.find(:all, :conditions => "email = 'douglas.clark@dcconsulting.com.a
   rescue
     logger.warn("------------------")
     logger.warn($!)
-    logger.warn(e.record.inspect)
+    logger.warn(u.inspect)
   end
 end
 
