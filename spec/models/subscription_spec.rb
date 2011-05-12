@@ -18,6 +18,8 @@ describe Subscription do
       s.expects(:send_later).with(:sync_to_campaign_master)
       s.save!
     end
+
+    it "should not allow more than one subscription with the same user and publication"
   end
 
   describe "reference" do

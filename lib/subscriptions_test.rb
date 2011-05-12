@@ -71,6 +71,10 @@ SubscriptionLogEntry.delete_all
 
 logger = Logger.new("import-results.log")
 
+ignored = 0
+
+logger.warn("Starting import at #{Time.now}")
+
 CmailerUser.find(:all).each do |u|
   puts u.email
   begin
@@ -78,8 +82,8 @@ CmailerUser.find(:all).each do |u|
       user = u.save_to_subscriptus
       u.subscriptions.by_publication.each do |publication, subs|
         if publication.blank?
-          # TODO: Work out what to do here!
-          # DO we just ignore things if there is no publication set? Maybe we use a bogus pub
+          # We should just ignore the sub if there is no publication (count it though)
+          ignored += 1
         else
           puts "Processing #{publication.name}"
           process_subs_for_user(user, subs, u)
@@ -99,7 +103,9 @@ CmailerUser.find(:all).each do |u|
   end
 end
 
-p @@count
+logger.warn(@@count.inspect)
+logger.warn("#{ignored} subscriptions were ignored because they had no publication")
+logger.warn("Finished at #{Time.now}")
 
 # Have subscriptions that have not expired?
 # Just one? then use this as the current subscription with whatever state it has

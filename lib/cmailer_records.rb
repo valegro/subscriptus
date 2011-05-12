@@ -20,7 +20,6 @@ class CmailerUser < ActiveRecord::Base
 
   def save_to_subscriptus
     attrs = self.attributes.symbolize_keys
-    attrs[:state].downcase!
     attrs[:auto_created] = true
     attrs[:email_confirmation] = attrs[:email]
     attrs[:password] = attrs[:password_confirmation] = "123456"
@@ -47,20 +46,63 @@ class CmailerUser < ActiveRecord::Base
 end
 
 class CmailerSubscription < CmailerUser
+  extend ActiveSupport::Memoizable
+  cattr_accessor :FYS
+
   set_table_name "subscriptions"
   set_primary_key "ContactId"
-  belongs_to :user, :class_name => "CmailerUser"
+  belongs_to :user, :class_name => "CmailerUser", :foreign_key => "ContactId"
 
   named_scope :not_expired, lambda { { :conditions => "expired_at not null and expired_at > #{Time.now}" }}
 
+  @@FYS = {
+    "FY06" => ("2005-07-01".to_time.."2006-06-30".to_time),
+    "FY07" => ("2006-07-01".to_time.."2007-06-30".to_time),
+    "FY08" => ("2007-07-01".to_time.."2008-06-30".to_time),
+    "FY09" => ("2008-07-01".to_time.."2009-06-30".to_time),
+    "FY10" => ("2009-07-01".to_time.."2010-06-30".to_time),
+    "FY11" => ("2010-07-01".to_time.."2011-06-30".to_time)
+  }
+
+  @@list_prices = {
+    "Media University Subscription (Students)" => {"FY10"=>35, "FY11"=>45, "FY06"=>35, "FY07"=>35, "FY08"=>35, "FY09"=>35},
+    "6 Month Subscription"                   => {"FY10"=>60, "FY11"=>60, "FY06"=>0, "FY07"=>0, "FY08"=>0, "FY09"=>0},
+    "Annual Gift Subscription"               => {"FY10"=>150, "FY11"=>160, "FY06"=>100, "FY07"=>115, "FY08"=>125, "FY09"=>140},
+    "Seniors/Concession Subscription"        => {"FY10"=>100, "FY11"=>110, "FY06"=>70, "FY07"=>70, "FY08"=>85, "FY09"=>95},
+    "10-19 Member Group Sub"                 => {"FY10"=>85, "FY11"=>95, "FY06"=>50, "FY07"=>50, "FY08"=>60, "FY09"=>75},
+    "1 Month Subscription"                   => {"FY10"=>13, "FY11"=>14, "FY06"=>13, "FY07"=>13, "FY08"=>13, "FY09"=>13},
+    "Christmas 2008 2-year subscriptions"    => {"FY10"=>200, "FY11"=>200, "FY06"=>200, "FY07"=>200, "FY08"=>200, "FY09"=>200},
+    "Christmas Gift Subscription"            => {"FY10"=>150, "FY11"=>160, "FY06"=>100, "FY07"=>115, "FY08"=>125, "FY09"=>140},
+    "Christmas 2008 gift subscriptions"      => {"FY10"=>125, "FY11"=>125, "FY06"=>125, "FY07"=>125, "FY08"=>125, "FY09"=>125},
+    "2 Year Gift Subscription"               => {"FY10"=>240, "FY11"=>260, "FY06"=>160, "FY07"=>200, "FY08"=>200, "FY09"=>225},
+    "Concession Subscription"                => {"FY10"=>100, "FY11"=>110, "FY06"=>70, "FY07"=>70, "FY08"=>85, "FY09"=>95},
+    "Gift Subscriptions Special Member Rate" => {"FY10"=>75, "FY11"=>79, "FY06"=>75, "FY07"=>75, "FY08"=>75, "FY09"=>75},
+    "6-9 Member Group Sub"                   => {"FY10"=>95, "FY11"=>105, "FY06"=>60, "FY07"=>60, "FY08"=>70, "FY09"=>85},
+    "Concession Subscription - Quarterly Payments" => {"FY10"=>27.5, "FY11"=>27.5, "FY06"=>27.5, "FY07"=>27.5, "FY08"=>27.5, "FY09"=>27.5},
+    "14 Month Subscription"                  => {"FY10"=>150, "FY11"=>160, "FY06"=>100, "FY07"=>115, "FY08"=>125, "FY09"=>140},
+    "Student Subscription"                   => {"FY10"=>100, "FY11"=>110, "FY06"=>70, "FY07"=>70, "FY08"=>85, "FY09"=>95},
+    "6-Week Free Subscription"               => {"FY10"=>0, "FY11"=>0, "FY06"=>0, "FY07"=>0, "FY08"=>0, "FY09"=>0},
+    "13 Month Subscription"                  => {"FY10"=>150, "FY11"=>160, "FY06"=>100, "FY07"=>115, "FY08"=>125, "FY09"=>140},
+    "50+ Group Subscription"                 => {"FY10"=>65, "FY11"=>75, "FY06"=>35, "FY07"=>35, "FY08"=>40, "FY09"=>55},
+    "20-49 Member Group Sub"                 => {"FY10"=>75, "FY11"=>85, "FY06"=>40, "FY07"=>40, "FY08"=>50, "FY09"=>65},
+    "Christmas 2009 Gift Subscription"       => {"FY10"=>140, "FY11"=>140, "FY06"=>140, "FY07"=>140, "FY08"=>140, "FY09"=>140},
+    "4 Month Christmas Gift Subscription"    => {"FY10"=>50, "FY11"=>50, "FY06"=>50, "FY07"=>50, "FY08"=>50, "FY09"=>50},
+    "Media University Subscription (Lecturers)" => {"FY10"=>65, "FY11"=>75, "FY06"=>65, "FY07"=>65, "FY08"=>65, "FY09"=>65},
+    "3-5 Member Group Sub"                   => {"FY10"=>105, "FY11"=>115, "FY06"=>70, "FY07"=>70, "FY08"=>80, "FY09"=>95},
+    "2 Year Subscription"                    => {"FY10"=>240, "FY11"=>260, "FY06"=>160, "FY07"=>200, "FY08"=>200, "FY09"=>225},
+    "Annual Subscription"                    => {"FY10"=>150, "FY11"=>160, "FY06"=>100, "FY07"=>115, "FY08"=>125, "FY09"=>140},
+    "3 Month Subscription"                   => {"FY10"=>0, "FY11"=>33, "FY06"=>0, "FY07"=>0, "FY08"=>0, "FY09"=>0}
+  }
+
   def inspect
     return <<-STR
-      state:        #{state}
-      created_at:   #{created_at}
-      expires_at:   #{expires_at}
-      publication:  #{publication.try(:name)}
-      offer:        #{offer.try(:name)}
-      list:         #{list}
+      state:                      #{state}
+      created_at:                 #{created_at}
+      expires_at:                 #{expires_at}
+      subscription_date_created:  #{subscription_date_created}
+      publication:                #{publication.try(:name)}
+      offer:                      #{offer.try(:name)}
+      list:                       #{list}
     STR
   end
 
@@ -86,20 +128,35 @@ class CmailerSubscription < CmailerUser
       :pending_action => pending_action,
       :pending       => state == 'pending' ? 'payment' : nil
     )
-    SubscriptionAction.create!(
+    # Suspension dates
+    if state == 'suspended'
+      subscription.update_attributes!(
+        :state_updated_at => self.SuspendFrom,
+        :state_expires_at => self.SuspendTo
+      )
+    end
+    # Action
+    action = SubscriptionAction.create!(
       :subscription => subscription,
       :offer_name => _offer.name,
       :term_length => _offer.offer_terms.first.months,
       :applied_at => attrs[:created_at]
     )
-    # TODO: Payment?
+    # Payment
+    unless self.PurchaseOrderNumber.blank?
+      action.create_payment(
+        :amount => self.price,
+        :reference => self.PurchaseOrderNumber,
+        :payment_type => :historical,
+        :processed_at => self.created_at
+      )
+    end
   end
 
   def publication
     name = read_attribute(:publication).try(:strip)
-    if name.blank?
-      name = (list == 'Crikey Weekender') ? list : 'Crikey Daily Mail'
-    end
+    # Ignore the record if it has no publication
+    return nil if name.blank?
     Publication.find_by_name(name)
   end
 
@@ -118,8 +175,9 @@ class CmailerSubscription < CmailerUser
   def offer
     name = read_attribute(:offer).strip
     name = "Unknown Offer" if name.blank?
+    return nil if publication.blank?
     returning(Offer.find_or_initialize_by_name(name, :publication => publication)) do |offer|
-      offer.save! if offer.new_record?
+      offer.save if offer.new_record?
       if offer.offer_terms.empty?
         offer.offer_terms.create(:price => 100, :months => 3)
       end
@@ -130,10 +188,19 @@ class CmailerSubscription < CmailerUser
     read_attribute(:list).try(:strip)
   end
 
-  private
-    def find_publication(name)
+  def price
+    # Find FY
+    pair = @@FYS.select do |fy, range|
+      range.include?(self.created_at)
     end
+    return 0 unless pair
+    fy = pair[0].try(:[], 0)
+    @@list_prices[list].try(:[], fy) || 0
+  end
 
+  memoize :offer, :publication, :price
+
+  private
     def set_status(status)
       case status
         when 'Active' then 'active'

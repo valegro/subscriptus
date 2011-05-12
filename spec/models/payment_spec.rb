@@ -83,9 +83,20 @@ describe Payment do
         payment.processed_at.should == Time.now
       end
     end
+
+    it "should set the reference to the secure pay order id" do
+      Payment.any_instance.stubs(:generate_unique_id).returns('1234')
+      payment = Factory.build(:payment, :payment_type => 'credit_card')
+      payment.process!
+      payment.reference.should == '1234'
+    end
   end
 
   describe "of type token when processed" do
+    before(:each) do
+      @response_stub = stub(:success? => true, :params => { 'ponum' => '1234' }) 
+    end
+
     it "should raise an exception if no token provided" do
       payment = Factory.build(:payment, :payment_type => :token)
       lambda {
@@ -94,8 +105,7 @@ describe Payment do
     end
 
     it "should succeed when token provided and funds available" do
-      response = stub(:success? => true)
-      GATEWAY.expects(:trigger_recurrent).with(10000, "123456").returns(response)
+      GATEWAY.expects(:trigger_recurrent).with(10000, "123456").returns(@response_stub)
       payment = Factory.build(:payment, :payment_type => :token, :amount => 100)
       expect {
         payment.process!(:token => "123456")
@@ -103,8 +113,7 @@ describe Payment do
     end
 
     it "should allow the payment to be processed even if the payment has been saved" do
-      response = stub(:success? => true)
-      GATEWAY.expects(:trigger_recurrent).with(10000, "123456").returns(response)
+      GATEWAY.expects(:trigger_recurrent).with(10000, "123456").returns(@response_stub)
       payment = Factory.create(:token_payment)
       payment.process!(:token => "123456")
     end
@@ -114,6 +123,13 @@ describe Payment do
       lambda {
         payment.process!(:token => "123456")
       }.should raise_exception(Exceptions::PaymentAlreadyProcessed)
+    end
+
+    it "should set the reference" do
+      GATEWAY.expects(:trigger_recurrent).with(10000, "123456").returns(@response_stub)
+      payment = Factory.create(:token_payment)
+      payment.process!(:token => "123456")
+      payment.reference.should == '1234'
     end
   end
 
@@ -129,6 +145,19 @@ describe Payment do
     it "should be valid even of no CC details have been provided" do
       payment = Factory.build(:direct_debit_payment)
       payment.valid?.should be(true)
+    end
+
+    it "should set the reference" do
+      payment = Factory.create(:direct_debit_payment, :reference => '123456')
+      payment.reference.should == '123456'
+    end
+  end
+
+  describe "of type historical" do
+    it "should allow creation without token or card" do
+      lambda {
+        Payment.create!(:payment_type => :historical, :processed_at => Time.now, :reference => '1234', :amount => 10)
+      }.should_not raise_error
     end
   end
 

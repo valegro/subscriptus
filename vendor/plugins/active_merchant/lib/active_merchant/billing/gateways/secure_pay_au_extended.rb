@@ -122,6 +122,8 @@ module ActiveMerchant #:nodoc:
         xml.tag! 'currency', options[:currency] || currency(money)              
         xml.tag! 'periodicType', PERIODIC_TYPES[:triggered]
         xml.tag! 'clientID', options[:customer]   # a unique string with less than 20 characters and contains no space
+        xml.tag! 'purchaseOrderNo', options[:order_id].to_s.gsub(/[ ']/, '')
+
         # xml.tag! 'paymentInterval', 
         # xml.tag! 'startDate', 
         # xml.tag! 'numberOfPayments', 

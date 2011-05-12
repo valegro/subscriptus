@@ -1,6 +1,7 @@
 
 class Payment < ActiveRecord::Base
   include ActionView::Helpers::NumberHelper
+  include ActiveMerchant::Utils
 
   belongs_to :subscription_action
 
@@ -12,7 +13,7 @@ class Payment < ActiveRecord::Base
   attr_accessor :full_name
   attr_accessor :card_verification
 
-  enum_attr :payment_type, %w(credit_card token direct_debit cheque), :init => :credit_card
+  enum_attr :payment_type, %w(credit_card token direct_debit cheque historical), :init => :credit_card
 
   default_scope :order => "created_at desc"
 
@@ -45,10 +46,12 @@ class Payment < ActiveRecord::Base
       raise Exceptions::PaymentAlreadyProcessed.new("You are trying to process a Credit Card payment that has already been saved - consider using a token payment")
     end
     raise Exceptions::PaymentAlreadyProcessed if processed_at
+    # Generate a reference number
     if self.credit_card? || self.payment_type.nil?
       # Charge the card
+      self.reference = generate_unique_id
       response = GATEWAY.purchase((amount * 100).to_i, self.credit_card,
-        :order_id => "123", # FIXME
+        :order_id => self.reference,
         :address => (self.subscription_action.try(:subscription).try(:user).try(:address_hash) || {}),
         :description => 'Crikey Subscription Payment',
         :email => self.subscription_action.try(:subscription).try(:user).try(:email)
@@ -60,10 +63,10 @@ class Payment < ActiveRecord::Base
     if self.token?
       raise Exceptions::PaymentTokenMissing if options[:token].blank?
       response = GATEWAY.trigger_recurrent((amount * 100).to_i, options[:token])
-      # TODO: Not DRY
       unless response.success?
         raise Exceptions::PaymentFailedException.new(response.message)
       end
+      self.reference = response.params['ponum']
     end
     self.processed_at = Time.now
     self.save!
