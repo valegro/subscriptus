@@ -48,7 +48,7 @@ ActionController::Routing::Routes.draw do |map|
 
   # Signup
   map.with_options  :controller => 'subscribe' do |s|
-    s.resource :subscribe, :collection => { :thanks => :any, :complete => :get }
+    s.resource :subscribe, :collection => { :thanks => :any, :complete => :get, :login => :post }
     #s.subscribe "subscribe", :action => 'new', :method => :get
 =begin
     s.subscribe_offer         'subscribe/offer', :action => 'offer', :method => :get

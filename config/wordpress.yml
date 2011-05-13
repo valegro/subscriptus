@@ -1,5 +1,5 @@
 common: &common
-  endpoint: 'http://zebra.crikey.com.au/loginConnector.php'
+  endpoint: 'http://www.crikey.com.au/loginconnector.php'
   key: '$P$B2CNRpY/MCdmoNenQKrtdRyD8H8LG9.'
   
 development:
@@ -9,4 +9,3 @@ test:
   key: 'testkey'
 production:
   <<: *common
-  endpoint: 'http://114.111.138.126/loginConnector.php'

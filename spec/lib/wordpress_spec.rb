@@ -4,7 +4,7 @@ require 'spec_helper'
 describe Wordpress do
   context "When wordpress is disabled" do
     setup do
-      Wordpress.enabled = false
+      Wordpress.enabled = true
     end
     
     context "#exists" do

@@ -88,6 +88,7 @@ class SubscriptionFactory
               action.create_payment(:payment_type => :direct_debit, :amount => @term.price)
             when :concession_verification, :student_verification
               # Ensure we have a token
+              # TODO: Raise here is no payment_attributes were provided - maybe a generic validate parameters method at the start?
               credit_card = Payment.new(@payment_attributes).credit_card
               subscription.user.store_credit_card_on_gateway(credit_card)
               action.create_payment(@payment_attributes.merge(:payment_type => :token, :amount => @term.price))
@@ -98,6 +99,7 @@ class SubscriptionFactory
         subscription.save!
       rescue ActiveRecord::RecordInvalid => e
         # Keep the subscription and any errors (they may not actually be for the subscription)
+        p e.record.errors.full_messages
         raise Exceptions::Factory::InvalidException.new(subscription, e.record.errors)
       end
     end

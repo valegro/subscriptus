@@ -1,20 +1,20 @@
 require 'spec_helper'
 
-describe SubscriptionFactory do
+describe SubscriptionFactory, "renewals" do
   shared_examples_for "An active subscription" do
     it "should set the state to active" do
-      factory = SubscriptionFactory.new(@offer, :attributes => @attributes)
+      factory = SubscriptionFactory.new(@offer, :attributes => @attributes, :payment_attributes => @payment_attributes)
       factory.update(@subscription)
       @subscription.state.should == 'active'
     end
 
     it "should add a subscription action" do
       expect {
-        factory = SubscriptionFactory.new(@offer, :attributes => @attributes)
+        factory = SubscriptionFactory.new(@offer, :attributes => @attributes, :payment_attributes => @payment_attributes)
         factory.update(@subscription)
         @subscription.actions.size.should == 1
         @subscription.actions.first.offer_name.should == @offer.name
-        @subscription.actions.first.price.should == @offer.offer_terms.first.price
+        @subscription.actions.first.payment.amount.should == @offer.offer_terms.first.price
         @subscription.actions.first.term_length.should == @offer.offer_terms.first.months
         @subscription.actions.first.applied_at.should == @t
         @subscription.save!
@@ -25,7 +25,7 @@ describe SubscriptionFactory do
 
   shared_examples_for "A pending subscription" do
     before(:each) do
-      factory = SubscriptionFactory.new(@offer, :attributes => @attributes, :concession => :student)
+      factory = SubscriptionFactory.new(@offer, :attributes => @attributes, :concession => :student, :payment_attributes => @payment_attributes)
       factory.update(@subscription)
     end
 
@@ -59,8 +59,8 @@ describe SubscriptionFactory do
     @user_attrs = Factory.attributes_for(:user)
     @attributes = {
       'user_attributes' => @user_attrs,
-      'payments_attributes' => { "0" => Factory.attributes_for(:payment) }
     }
+    @payment_attributes = Factory.attributes_for(:payment)
     @t = Time.local(2011, 1, 1, 0, 0, 0)
     Timecop.freeze(@t)
   end
@@ -74,11 +74,13 @@ describe SubscriptionFactory do
     before(:each) do
       @publication = Factory.create(:publication)
       @subscription = User.find_or_create_with_trial(@publication, Publication::DEFAULT_TRIAL_EXPIRY, "", @user_attrs)
+      @user = @subscription.user
+      @user.update_attributes!(@user_attrs)
     end
 
     it "should modify the subscription from an instance of a factory" do
       expect {
-        factory = SubscriptionFactory.new(@offer, :attributes => @attributes)
+        factory = SubscriptionFactory.new(@offer, :attributes => @attributes, :payment_attributes => @payment_attributes)
         factory.update(@subscription)
         @subscription.save!
       }.to_not change { Subscription.count }
@@ -86,7 +88,7 @@ describe SubscriptionFactory do
     
     it "should set the expiry date appropriately" do
       expect {
-        factory = SubscriptionFactory.new(@offer, :attributes => @attributes)
+        factory = SubscriptionFactory.new(@offer, :attributes => @attributes, :payment_attributes => @payment_attributes)
         factory.update(@subscription)
       }.to change { @subscription.expires_at }.by(@term1.months.months)
     end
@@ -102,7 +104,7 @@ describe SubscriptionFactory do
 
     it "should set the expiry date appropriately" do
       expect {
-        factory = SubscriptionFactory.new(@offer, :attributes => @attributes)
+        factory = SubscriptionFactory.new(@offer, :attributes => @attributes, :payment_attributes => @payment_attributes)
         factory.update(@subscription)
       }.to change { @subscription.expires_at }.by(@term1.months.months)
     end
@@ -118,8 +120,12 @@ describe SubscriptionFactory do
   # Scenario
   describe "trialler subscribes but requires verification" do
     before(:each) do
+      User.any_instance.expects(:store_credit_card_on_gateway).returns(true)
       @publication = Factory.create(:publication)
       @subscription = User.find_or_create_with_trial(@publication, Publication::DEFAULT_TRIAL_EXPIRY, "", @user_attrs)
+      # Triallers activating will need to provide further details (ie; fill out their address etc)
+      @user = @subscription.user
+      @user.update_attributes!(@user_attrs)
     end
 
     it_should_behave_like "A pending subscription"
@@ -132,7 +138,7 @@ describe SubscriptionFactory do
     end
 
     it "should set the expiry date appropriately" do
-      factory = SubscriptionFactory.new(@offer, :attributes => @attributes)
+      factory = SubscriptionFactory.new(@offer, :attributes => @attributes, :payment_attributes => @payment_attributes)
       factory.update(@subscription)
       @subscription.expires_at.should == @term1.months.months.from_now
     end
@@ -143,7 +149,7 @@ describe SubscriptionFactory do
   # Scenario
   describe "pending subscriber subscribes without concession again and becomes active" do
     before(:each) do
-      @subscription = Factory.create(:pending_subscription)
+      @subscription = Factory.create(:pending_subscription, :user => Factory.create(:user_with_token))
     end
 
     it_should_behave_like "An active subscription"
@@ -152,7 +158,7 @@ describe SubscriptionFactory do
   # Scenario
   describe "pending subscribed subscribes again and will require verification" do
     before(:each) do
-      @subscription = Factory.create(:pending_subscription)
+      @subscription = Factory.create(:pending_subscription, :user => Factory.create(:user_with_token))
     end
 
     it_should_behave_like "A pending subscription"

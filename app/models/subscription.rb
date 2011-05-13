@@ -53,6 +53,11 @@ class Subscription < ActiveRecord::Base
       transition :trial => :active
       transition :squatter => :active
     end
+    on :delay do
+      transition :trial => :pending
+      transition :squatter => :pending
+      transition :active => :pending # Renewal but goes into pending state
+    end
     on :verify do
       transition :pending => :active
     end
@@ -92,8 +97,8 @@ class Subscription < ActiveRecord::Base
   def apply_action(action)
     self.class.transaction do
       action.subscription = self
-      self.actions << action
       action.apply
+      self.actions << action # TODO: Maybe apply is called as a callback on the association??
     end
   end
 

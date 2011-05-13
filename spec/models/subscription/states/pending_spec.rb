@@ -17,7 +17,7 @@ describe Subscription do
  
   describe "in the pending state" do
     before(:each) do
-      success = stub(:success? => true)
+      success = stub(:success? => true, :params => { "ponum" => '1234' })
       GATEWAY.stubs(:trigger_recurrent).returns(success)
       SubscriptionMailer.stubs(:deliver_pending)
       @subscription_action = Factory.create(:subscription_action, :payment => Factory.create(:token_payment))
@@ -108,7 +108,7 @@ describe Subscription do
 
         it "should trigger a payment" do
           GATEWAY.unstub(:trigger_recurrent)
-          success = stub(:success? => true)
+          success = stub(:success? => true, :params => { 'ponum' => '1234' })
           GATEWAY.expects(:trigger_recurrent).with(@subscription_action.payment.amount.to_i * 100, @subscription.user.payment_gateway_token).returns(success)
           @subscription.pending = :student_verification
           @subscription.verify!

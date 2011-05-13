@@ -31,9 +31,8 @@ describe SubscribeController do
       @offer.gifts.add(@g3 = Factory(:gift, :on_hand => 0))
       @offer.gifts.add(@g4 = Factory(:gift, :on_hand => 10), true)
 
-      @attributes = {
-        'user_attributes' => @user_attributes
-      }
+      @attributes = {}
+      @expected_attributes = { 'user' => instance_of(User) }
     end
 
     it "should create a subscription" do
@@ -60,7 +59,8 @@ describe SubscribeController do
           :source_id => @source.id,
           :offer_term => @ot1.id,
           :subscription => @attributes,
-          :payment => @payment_attributes
+          :payment => @payment_attributes,
+          :user => @user_attributes
         })
       }.to_not change { Subscription.count }.by(1)
       response.should render_template("new")
@@ -101,7 +101,8 @@ describe SubscribeController do
         :offer_term => @ot1.id,
         :subscription => @attributes,
         :payment => @payment_attributes,
-        :payment_option => 'credit_card'
+        :payment_option => 'credit_card',
+        :user => @user_attributes
       })
       response.should redirect_to(:action => 'thanks')
     end
@@ -115,7 +116,7 @@ describe SubscribeController do
           :optional_gift => nil,
           :included_gift_ids => [@g1.id, @g2.id],
           :optional_gift => @g4.id.to_s,
-          :attributes => @attributes,
+          :attributes => @expected_attributes,
           :payment_attributes => @payment_attributes,
           :concession => nil,
           :payment_option => 'credit_card',
@@ -130,7 +131,8 @@ describe SubscribeController do
         :offer_term => @ot1.id,
         :subscription => @attributes,
         :payment => @payment_attributes,
-        :payment_option => 'credit_card'
+        :payment_option => 'credit_card',
+        :user => @user_attributes
       }
       response.should redirect_to(:action => 'thanks')
     end

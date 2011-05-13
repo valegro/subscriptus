@@ -8,6 +8,16 @@
         $('.payment-option').hide();
         $('#payment_by_'+$(this).val()).show();
       });
+
+      /* User Options */
+     $('.login-option').hide();
+      if ($('#user-radio-existing').attr('checked')) { $('#existing-user').show(); }
+      if ($('#user-radio-new').attr('checked')) { $('#new-user').show(); }
+      $(".user-radio").live('click', function() {
+        $('.login-option').hide();
+        $('#' + $(this).val() + '-user').show();
+      });
+
     });
   </script>
 <% end %>
@@ -58,15 +68,17 @@
   <div class='section' id='step2'>
     <img src="/images/step2.png" class='step' alt='step 2'   />
     <div class='content'>	
-      <h2>Your Details</h2>
+      <h2><%= 'Confirm ' unless @user.new_record? %>Your Details</h2>
 
-      <div id='login-choice'>
-        <input type='radio' id='rdoLogin' name='login' /><label for='rdoLogin'>Existing User Login</label>
-        <input type='radio' id='rdoNew' name='login' /><label for='rdoNew'>New User Sign-Up</label>
-      </div>
+      <% if @user.new_record? %>
+        <div id='login-choice'>
+          <input class="user-radio" type='radio' id='user-radio-existing' name='login' value="existing" /><label for='user-radio-existing'>Existing User Login</label>
+          <input class="user-radio" type='radio' id='user-radio-new' name='login' value="new" /><label for='user-radio-new'>New User Sign-Up</label>
+        </div>
+      <% end %>
 
-      <div id='section-new'>
-        <% f.fields_for :user do |u| %>
+      <div id='new-user' class="login-option">
+        <% fields_for :user, @user, :builder => SubscribeFormBuilder do |u| %>
           <%= u.select :title, %w(Mr Mrs Ms Miss) %>
           <%= u.text_field :firstname, :required => true, :label => "First Name" %>
           <%= u.text_field :lastname, :required => true, :label => "Last Name" %>
@@ -80,28 +92,32 @@
           <%= u.enum_select :state, :required => true %>
           <%= u.text_field :postcode, :required => true %>
           <%= u.country_select :country, ['Australia'], :required => true %>
-          <%= u.password_field :password, :required => true %>
-          <%= u.password_field :password_confirmation, :required => true %>
+          <% if u.object.new_record? %>
+            <%= u.password_field :password, :required => true %>
+            <%= u.password_field :password_confirmation, :required => true %>
+          <% end %>
         <% end %>
       </div>
     </div>
 
-    <div id='section-login' style="display:none;">
-      <div class='form-row'>					
-        <label for='username' >Username:<span class='mandatory'>*</span></label>
-        <input type='text' id='username' />
-      </div>
-      <div class='form-row'>	
-        <label for='password'>Password:<span class='mandatory'>*</span></label>
-        <input type='password' id='password' />
-      </div>
-  
-      <input id='btnLogin' type='image' src='images/login.png' alt='Login' onclick='simulateLogIn();return false;' />
+    <div id='existing-user' class="login-option">
+      <% form_remote_tag(:url => login_subscribe_path) do %>
+        <div class='form-row'>
+          <%= text_field_tag :email, "", :required => false %>
+          <%= label_tag(:email, "Email: <span class='mandatory'>*</span>") %>
+        </div>
+        <div class='form-row'>
+          <%= password_field_tag :password, "", :required => false %>
+          <%= label_tag(:password, "Password: <span class='mandatory'>*</span>") %>
+        </div>
+        <div class='form-row'>
+          <%= image_submit_tag "login.png" %>
+        </div>
     
-      <div class='form-row'>	
-        <a href='#'>Forgot your password?</a>
-      </div>
-      <div class='clear'></div>
+        <div class='form-row'>	
+          <%= link_to("Forgot your password?", @offer.publication.forgot_password_link) %>
+        </div>
+      <% end %>
     </div>
 
     <div class='clear'></div>

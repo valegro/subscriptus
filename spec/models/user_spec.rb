@@ -127,6 +127,12 @@ describe User do
       }.should raise_error(ActiveRecord::RecordInvalid)
     end
 
+    it "should allow blank :phone_number, :address_1, :city, :postcode, :state, :country, :role if auto_created is true" do
+      lambda {
+        User.create!(:firstname => 'Dan', :lastname => 'Draper', :email => 'daniel@netfox.com', :auto_created => true, :password => 'test', :password_confirmation => 'test')
+      }.should_not raise_error
+    end
+
     describe "wordpress" do
       it "should create a user in Wordpress" do
         Wordpress.expects(:send_later).with(:create, { :login => 'daniel', :pword => 'password', :email => 'daniel@netfox.com',:firstname => 'Daniel', :lastname => 'Draper' })
@@ -228,6 +234,8 @@ describe User do
         @user.save!
       }.should raise_exception(ActiveRecord::RecordInvalid)
     end
+
+    it "should NOT allow blank firstname, :lastname, :email, :phone_number, :address_1, :city, :postcode, :state, :country, :role if auto_created is true"
 
     describe "Wordpress" do
       it "should update Wordpress" do
