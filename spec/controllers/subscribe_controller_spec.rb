@@ -42,7 +42,8 @@ describe SubscribeController do
           :source_id => @source.id,
           :offer_term => @ot1.id,
           :subscription => @attributes,
-          :payment => @payment_attributes
+          :payment => @payment_attributes,
+          :user => @user_attributes
         })
       }.to change { Subscription.count }.by(1)
       Subscription.last.actions.size.should == 1
@@ -87,7 +88,7 @@ describe SubscribeController do
           :term_id => @ot1.id.to_s,
           :optional_gift => nil,
           :included_gift_ids => nil,
-          :attributes => @attributes,
+          :attributes => @expected_attributes,
           :source => @source.id,
           :payment_attributes => @payment_attributes,
           :concession => nil,
@@ -147,7 +148,8 @@ describe SubscribeController do
           :offer_term => @ot1.id,
           :optional_gift => @g4.id,
           :subscription => @attributes,
-          :payment => @payment_attributes
+          :payment => @payment_attributes,
+          :user => @user_attributes
         })
       }.to_not change { Subscription.count }.by(1)
       response.should render_template("new")
@@ -170,7 +172,8 @@ describe SubscribeController do
           :offer_term => @ot1.id,
           :subscription => @attributes,
           :payment => @payment_attributes,
-          :concession => 'student'
+          :concession => 'student',
+          :user => @user_attributes
         })
       end
 
@@ -181,7 +184,8 @@ describe SubscribeController do
           :offer_term => @ot1.id,
           :subscription => @attributes,
           :payment => @payment_attributes,
-          :concession => 'student'
+          :concession => 'student',
+          :user => @user_attributes
         })
         Subscription.last.pending_action.should be_an_instance_of(SubscriptionAction)
         Subscription.last.pending_action.payment.should be_an_instance_of(Payment)
@@ -193,7 +197,7 @@ describe SubscribeController do
         SubscriptionFactory.expects(:new).with(
           instance_of(Offer), {
             :term_id => @ot1.id.to_s,
-            :attributes => @attributes,
+            :attributes => @expected_attributes,
             :payment_attributes => @payment_attributes,
             :concession => 'student',
             :optional_gift => nil,
@@ -209,7 +213,8 @@ describe SubscribeController do
           :subscription => @attributes,
           :payment => @payment_attributes,
           :concession => 'student',
-          :payment_option => 'direct_debit'
+          :payment_option => 'direct_debit',
+          :user => @user_attributes
         })
       end
     end
@@ -230,7 +235,8 @@ describe SubscribeController do
           :offer_term => @ot1.id,
           :subscription => @attributes,
           :payment => @payment_attributes,
-          :concession => 'concession'
+          :concession => 'concession',
+          :user => @user_attributes
         })
       end
 
@@ -241,7 +247,8 @@ describe SubscribeController do
           :offer_term => @ot1.id,
           :subscription => @attributes,
           :payment => @payment_attributes,
-          :concession => 'concession'
+          :concession => 'concession',
+          :user => @user_attributes
         })
         Subscription.last.pending_action.should be_an_instance_of(SubscriptionAction)
         Subscription.last.pending_action.payment.should be_an_instance_of(Payment)
@@ -253,7 +260,7 @@ describe SubscribeController do
         SubscriptionFactory.expects(:new).with(
           instance_of(Offer), {
             :term_id => @ot1.id.to_s,
-            :attributes => @attributes,
+            :attributes => @expected_attributes,
             :payment_attributes => @payment_attributes,
             :concession => 'concession',
             :optional_gift => nil,
@@ -269,7 +276,8 @@ describe SubscribeController do
           :subscription => @attributes,
           :payment => @payment_attributes,
           :concession => 'concession',
-          :payment_option => 'credit_card'
+          :payment_option => 'credit_card',
+          :user => @user_attributes
         })
       end
     end
@@ -288,7 +296,8 @@ describe SubscribeController do
           :offer_term => @ot1.id,
           :subscription => @attributes,
           :payment => @payment_attributes,
-          :payment_option => 'direct_debit'
+          :payment_option => 'direct_debit',
+          :user => @user_attributes
         })
         Subscription.last.pending_action.should be_an_instance_of(SubscriptionAction)
         Subscription.last.pending_action.payment.should be_an_instance_of(Payment)
@@ -301,7 +310,7 @@ describe SubscribeController do
         SubscriptionFactory.expects(:new).with(
           instance_of(Offer), {
             :term_id => @ot1.id.to_s,
-            :attributes => @attributes,
+            :attributes => @expected_attributes,
             :payment_attributes => @payment_attributes,
             :payment_option => 'direct_debit',
             :optional_gift => nil,
@@ -316,7 +325,8 @@ describe SubscribeController do
           :offer_term => @ot1.id,
           :subscription => @attributes,
           :payment => @payment_attributes,
-          :payment_option => 'direct_debit'
+          :payment_option => 'direct_debit',
+          :user => @user_attributes
         })
       end
     end
@@ -327,8 +337,8 @@ describe SubscribeController do
     describe "when a wordpress user exists with the same email" do
       before(:each) do
         Wordpress.stubs(:exists?).with({:email => "daniel@codefire.com.au"}).returns(true)
-        @attributes['user_attributes']['email'] = 'daniel@codefire.com.au'
-        @attributes['user_attributes']['email_confirmation'] = 'daniel@codefire.com.au'
+        @user_attributes['email'] = 'daniel@codefire.com.au'
+        @user_attributes['email_confirmation'] = 'daniel@codefire.com.au'
       end
 
       it "should return to the new page and ask for a username and password" do

@@ -61,7 +61,7 @@ class User < ActiveRecord::Base
     # Default to subscriber role
     self.role ||= 'subscriber'
   end
-  
+
   # Allow authlogic to find a user by login or email
   def self.find_by_login_or_email(login)
      find_by_login(login) || find_by_email(login)
