@@ -1,5 +1,7 @@
 <% if user %>
   <dl>
+    <dt>ID</dt>
+    <dd><%= user.id %></dd>
     <dt>Name</dt>
     <dd><%= [user.title, user.name].join('&nbsp;') %></dd>
     <dt>Email address</dt>
