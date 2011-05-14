@@ -1,22 +1,6 @@
 require 'spec_helper'
 
 describe "Subscribes" do
-  shared_examples_for "a new user signup" do
-    it "should ask me for my details" do
-      page.should have_content("New User Sign-Up")
-      page.should have_content("Street Address Line 1")
-    end
-
-    it "should not ask me to login" do
-      within("div#login") do
-        page.should have_no_content("Email")
-        within("form") do
-          page.should have_no_xpath("input#email")
-        end
-      end
-    end
-  end
-
   describe "as a visitor to the subscribe page" do
     before(:each) do
       @offer = Factory.create(:offer)
@@ -28,7 +12,7 @@ describe "Subscribes" do
       page.should have_xpath("//form[contains(@action,\"/subscribe?offer_id=#{@offer.id}&source_id=#{@source.id}\")]")
     end
 
-    it "should not the source for the form action if none is provided" do
+    it "should not set the source for the form action if none is provided" do
       visit new_subscribe_path(:offer_id => @offer.id)
       page.should have_xpath("//form[contains(@action,\"/subscribe?offer_id=#{@offer.id}\")]")
     end
@@ -42,32 +26,13 @@ describe "Subscribes" do
       page.should have_xpath("//input[@id='payment_card_verification']")
     end
 
-    describe "when I click the direct debit option" do
-      it "I should see the right content" do
+    describe "when I choose the direct debit option" do
+      it "I should see the right content", :js => true do
+        visit new_subscribe_path(:offer_id => @offer.id)
+        choose("Direct Debit")
+        find('#payment_by_direct_debit').visible?.should be(true)
         page.should have_content("Click the FINISH button below once you’ve chosen your payment option:")
         page.should have_content("BSB: 083 026")
-      end
-    end
-
-    describe "when a wordpress user exists with an email and I have provided an email address" do
-      before(:each) do
-        Wordpress.stubs(:exists?).with({:email => "daniel@codefire.com.au"}).returns(true)
-      end
-
-      it "should not ask me for my details" do
-        visit new_subscribe_path(:email => "daniel@codefire.com.au")
-        page.should have_no_content("New User Sign-Up")
-        page.should have_no_content("Street Address Line 1")
-      end
-
-      it "should ask me to login" do
-        visit new_subscribe_path(:email => "daniel@codefire.com.au")
-        within("div#login") do
-          page.should have_content("Email")
-          within("form") do
-            page.should have_xpath("input#email")
-          end
-        end
       end
     end
 
@@ -171,39 +136,17 @@ describe "Subscribes" do
       end
     end
 
-    it "should show the subscriptions tab if an unknown tab name is given"
-    it "should redirect to /new if visiting /subscribe without losing data on the form!"
-
-    describe "when a wordpress user does not exist" do
-      before(:each) do
-        Wordpress.stubs(:exists?).with({:email => "daniel@codefire.com.au"}).returns(false)
-        visit new_subscribe_path(:email => "daniel@codefire.com.au")
-      end
-      it_should_behave_like "a new user signup"
-    end
-
-    describe "if I have not provided an email" do
-      before(:each) do
-        visit new_subscribe_path
-      end
-      it_should_behave_like "a new user signup"
+    it "should show the subscriptions tab if an unknown tab name is given" do
+      visit new_subscribe_path(:source_id => @source.id, :offer_id => @offer.id, :tab => 'kjregherkjghre')
+      page.should have_xpath("//li[@class='active' and @id='subscriptions-tab']")
     end
   end
 
-  describe "when I submit the form" do
-    describe "if I don't fill in the data correctly" do
-      it "I should see error messages"
-      it "I should be on the signup page again"
-    end
-  end
-
-  # TODO: Move this to another file
   describe "when I visit the subscribe page and choose student concession" do
     before(:each) do
       @offer = Factory.create(:offer)
       @term = @offer.offer_terms.create(:price => 10, :months => 3, :concession => true)
       @source = Factory.create(:source)
-      GATEWAY.expects(:setup_recurrent).returns(stub(:success? => true))
       GATEWAY.expects(:purchase).never
       stub_wordpress
       visit new_subscribe_path(:source_id => @source.id, :offer_id => @offer.id, :tab => 'students')
@@ -225,14 +168,16 @@ describe "Subscribes" do
         fill_in "Card number",           :with => "4444333322221111"
         fill_in "Card Verification (CVV Number)", :with => "123"
         check "subscription_terms"
+        GATEWAY.expects(:setup_recurrent).returns(stub(:success? => true))
       end
 
       it "should create a pending subscription with a pending action and token payment" do
         expect {
-          click "btnSubmit"
+          click_link_or_button "btnSubmit"
         }.to change { Subscription.count }.by(1)
         s = Subscription.last
         s.state.should == 'pending'
+        s.pending.should == :student_verification
         s.pending_action.should be_an_instance_of(SubscriptionAction)
         s.pending_action.payment.should be_an_instance_of(Payment)
         s.pending_action.payment.payment_type.should == :token
@@ -240,33 +185,165 @@ describe "Subscribes" do
         s.pending_action.payment.processed_at.should be(nil)
       end
 
-      it "should display the thanks page"
+      it "should display the thanks page" do
+        click_link_or_button "btnSubmit"
+        page.should have_content("Thanks for subscribing to Crikey! We hope you enjoy it.")
+      end
     end
 
     describe "and I do not provide all data" do
-      it "should take me back to the form"
+      before(:each) do
+        fill_in "First Name",            :with => "Daniel"
+        fill_in "Last Name",             :with => "Draper"
+        fill_in "Email",                 :with => "daniel@codefire.com.au"
+        fill_in "Phone number",          :with => "09090909"
+        fill_in "Street Address Line 1", :with => "1 That Pl"
+        fill_in "City",                  :with => "Adelaide"
+        fill_in "Postcode",              :with => "5000"
+        fill_in "Password",              :with => "Password1"
+        fill_in "Password confirmation", :with => "Password1"
+      end
+
+      it "should take me back to the form" do
+        click_link_or_button "btnSubmit"
+        page.should have_content "Subscribe to Crikey"
+      end
+
+      it "should show me any error messages" do
+        click_link_or_button "btnSubmit"
+        page.should have_content("Email doesn't match confirmation")
+      end
+
+      it "should be on the students tab" do
+        page.should have_xpath("//li[@id='students-tab' and @class='active']")
+      end
     end
   end
 
-  # TODO: Are these better as cukes?
   describe "when I visit the subscribe page" do
+    before(:each) do
+      @offer = Factory.create(:offer)
+      @term = @offer.offer_terms.create(:price => 10, :months => 3, :concession => true)
+      @source = Factory.create(:source)
+      stub_wordpress
+      visit new_subscribe_path(:source_id => @source.id, :offer_id => @offer.id)
+    end
+
     describe "and I fill in the information correctly" do
-      it "should create a subscription"
-      it "should display the thanks page"
+      before(:each) do
+        fill_in "First Name",            :with => "Daniel"
+        fill_in "Last Name",             :with => "Draper"
+        fill_in "Email",                 :with => "daniel@codefire.com.au"
+        fill_in "Email confirmation",    :with => "daniel@codefire.com.au"
+        fill_in "Phone number",          :with => "09090909"
+        fill_in "Street Address Line 1", :with => "1 That Pl"
+        fill_in "City",                  :with => "Adelaide"
+        fill_in "Postcode",              :with => "5000"
+        fill_in "Password",              :with => "Password1"
+        fill_in "Password confirmation", :with => "Password1"
+        fill_in "Name on Card",          :with => "Daniel Draper"
+        fill_in "Card number",           :with => "4444333322221111"
+        fill_in "Card Verification (CVV Number)", :with => "123"
+        check "subscription_terms"
+      end
+
+      it "should create a subscription" do
+        GATEWAY.expects(:purchase).returns(stub(:success? => true))
+        expect {
+          click_link_or_button "btnSubmit"
+        }.to change { Subscription.count }.by(1)
+        s = Subscription.last
+        s.state.should == 'active'
+        s.pending_action.should be(nil)
+        s.actions.size.should == 1
+        s.actions.last.payment.should be_an_instance_of(Payment)
+      end
+
+      it "should display the thanks page" do
+        GATEWAY.expects(:purchase).returns(stub(:success? => true))
+        click_link_or_button "btnSubmit"
+        page.should have_content("Thanks for subscribing to Crikey! We hope you enjoy it.")
+      end
     end
 
     describe "and I fill in the information correctly and choose direct debit as the payment method" do
-      it "should create a pending subscription with a pending action"
-      it "should display the thanks page"
+      before(:each) do
+        fill_in "First Name",            :with => "Daniel"
+        fill_in "Last Name",             :with => "Draper"
+        fill_in "Email",                 :with => "daniel@codefire.com.au"
+        fill_in "Email confirmation",    :with => "daniel@codefire.com.au"
+        fill_in "Phone number",          :with => "09090909"
+        fill_in "Street Address Line 1", :with => "1 That Pl"
+        fill_in "City",                  :with => "Adelaide"
+        fill_in "Postcode",              :with => "5000"
+        fill_in "Password",              :with => "Password1"
+        fill_in "Password confirmation", :with => "Password1"
+        check "subscription_terms"
+        choose("Direct Debit")
+      end
+
+      it "should create a pending subscription with a pending action" do
+        expect {
+          click_link_or_button "btnSubmit"
+        }.to change { Subscription.count }.by(1)
+        s = Subscription.last
+        s.state.should == 'pending'
+        s.pending.should == :payment
+        s.pending_action.should be_an_instance_of(SubscriptionAction)
+        s.pending_action.payment.should be_an_instance_of(Payment)
+        s.pending_action.payment.payment_type.should == :direct_debit
+        s.pending_action.payment.amount.should == @term.price
+        s.pending_action.payment.processed_at.should be(nil)
+      end
+
+      it "should display the thanks page" do
+        GATEWAY.expects(:purchase).never
+        click_link_or_button "btnSubmit"
+        page.should have_content("Thanks for subscribing to Crikey! We hope you enjoy it.")
+      end
     end
 
     describe "and I do not provide all data and choose direct debit as the payment method" do
-      it "should take me back to the form"
-      it "and I should see the direct debit payment option"
+      before(:each) do
+        fill_in "First Name",            :with => "Daniel"
+        fill_in "Last Name",             :with => "Draper"
+        fill_in "Email",                 :with => "daniel@codefire.com.au"
+        check "subscription_terms"
+        choose("Direct Debit")
+      end
+
+      it "should take me back to the form" do
+        click_link_or_button "btnSubmit"
+        page.should have_content "Subscribe to Crikey"
+      end
+
+      it "and I should see the direct debit payment option", :js => true do
+        click_link_or_button "btnSubmit"
+        find('#payment_by_direct_debit').visible?.should be(true)
+      end
     end
 
     describe "and I do not provide all data" do
-      it "should take me back to the form"
+      before(:each) do
+        fill_in "First Name",            :with => "Daniel"
+        fill_in "Last Name",             :with => "Draper"
+        fill_in "Phone number",          :with => "09090909"
+        fill_in "Street Address Line 1", :with => "1 That Pl"
+        fill_in "City",                  :with => "Adelaide"
+        fill_in "Postcode",              :with => "5000"
+        fill_in "Password",              :with => "Password1"
+        fill_in "Password confirmation", :with => "Password1"
+        fill_in "Name on Card",          :with => "Daniel Draper"
+        fill_in "Card number",           :with => "4444333322221111"
+        fill_in "Card Verification (CVV Number)", :with => "123"
+        check "subscription_terms"
+        GATEWAY.expects(:purchase).never
+      end
+
+      it "should take me back to the form" do
+        click_link_or_button "btnSubmit"
+        page.should have_content "Subscribe to Crikey"
+      end
     end
   end
 end

@@ -47,6 +47,11 @@ class SubscriptionFactory
           raise Exceptions::InvalidOfferTerm
         end
 
+        # Check concession status
+        if @concession && !@term.concession
+          raise Exceptions::InvalidOfferTerm
+        end
+
         # Build the Action
         action = SubscriptionAction.new do |action|
           action.offer_name   = @offer.name
@@ -99,7 +104,6 @@ class SubscriptionFactory
         subscription.save!
       rescue ActiveRecord::RecordInvalid => e
         # Keep the subscription and any errors (they may not actually be for the subscription)
-        p e.record.errors.full_messages
         raise Exceptions::Factory::InvalidException.new(subscription, e.record.errors)
       end
     end

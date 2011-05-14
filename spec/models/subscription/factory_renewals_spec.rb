@@ -25,7 +25,15 @@ describe SubscriptionFactory, "renewals" do
 
   shared_examples_for "A pending subscription" do
     before(:each) do
-      factory = SubscriptionFactory.new(@offer, :attributes => @attributes, :concession => :student, :payment_attributes => @payment_attributes)
+      @concession_term = Factory.create(:offer_term, :concession => true)
+      @offer.offer_terms << @concession_term
+      factory = SubscriptionFactory.new(
+        @offer,
+        :term_id => @concession_term.id,
+        :attributes => @attributes,
+        :concession => :student,
+        :payment_attributes => @payment_attributes
+      )
       factory.update(@subscription)
     end
 

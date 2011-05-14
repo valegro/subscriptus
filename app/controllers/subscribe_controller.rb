@@ -5,6 +5,8 @@ class SubscribeController < ApplicationController
   before_filter :load_gifts
   before_filter :load_tab
 
+  before_filter :require_user, :only => [ :edit, :update ]
+
   rescue_from(Exceptions::PaymentFailedException, Exceptions::GiftNotAvailable) do |exception|
     @subscription ||= @factory.try(:subscription) # Ensure that the subscription instance is set
     flash[:error] = exception.message
@@ -20,7 +22,6 @@ class SubscribeController < ApplicationController
   end
 
   rescue_from(ActiveRecord::RecordInvalid) do |exception|
-    # TODO: This seems hacky!
     @subscription ||= Subscription.new(params[:subscription])
     @errors = exception.record.errors
     @payment ||= Payment.new(params[:payment])
@@ -29,19 +30,9 @@ class SubscribeController < ApplicationController
 
   def new
     @payment = Payment.new
-
-    #@user = User.subscribers.first # TODO: Use current user
-    if @user
-      @subscription = @user.subscriptions.find(:first, :conditions => { :publication_id => @offer.publication.id })
-      @user.email_confirmation = @user.email
-    end
-    @subscription ||= Subscription.new
-    @user ||= @subscription.build_user(:title => 'Mr', :state => :act)
+    @subscription = Subscription.new
+    @user = @subscription.build_user(:title => 'Mr', :state => :act)
     @subscription.offer = @offer
-
-    if params[:email]
-      # TODO: Display login form prepopulated with email unless @user is an existing user (current_user)
-    end
   end
 
   def create
@@ -53,6 +44,15 @@ class SubscribeController < ApplicationController
       @subscription = @factory.build
       redirect_to :action => :thanks
     end
+  end
+
+  def edit
+    @user = current_user #User.subscribers.find(262) # TODO: Use current user
+    @subscription = @user.subscriptions.find(:first, :conditions => { :publication_id => @offer.publication.id })
+    @subscription ||= Subscription.new
+    @user.email_confirmation = @user.email
+    @renewing = true
+    render :template => 'subscribe/new'
   end
 
   def update

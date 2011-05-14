@@ -18,8 +18,15 @@ describe Subscription do
       s.expects(:send_later).with(:sync_to_campaign_master)
       s.save!
     end
+  end
 
-    it "should not allow more than one subscription with the same user and publication"
+  it "should not allow more than one subscription with the same user and publication" do
+    mypub = Factory.create(:publication)
+    u = Factory.create(:user)
+    u.subscriptions << Factory.create(:subscription, :publication => mypub)
+    lambda {
+      u.subscriptions << Factory.create(:subscription, :publication => mypub)
+    }.should raise_exception
   end
 
   describe "reference" do

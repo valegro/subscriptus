@@ -30,6 +30,7 @@ class Subscription::MailerObserver < ActiveRecord::Observer
 
   on(:pending, :active) do |subscription|
     SubscriptionMailer.send_later(:deliver_verified, subscription)
+    SubscriptionMailer.send_later(:deliver_activation, subscription)
   end
 
   def after_create(subscription)

@@ -75,7 +75,7 @@ ignored = 0
 
 logger.warn("Starting import at #{Time.now}")
 
-CmailerUser.find(:all).each do |u|
+CmailerUser.find(:all, :limit => 100).each do |u|
   puts u.email
   begin
     User.transaction do

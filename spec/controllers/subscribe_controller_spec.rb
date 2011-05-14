@@ -162,6 +162,8 @@ describe SubscribeController do
         GATEWAY.expects(:purchase).never
         success = stub(:success? => true)
         GATEWAY.stubs(:setup_recurrent).returns(success)
+        @concession_term = Factory.create(:offer_term, :concession => true)
+        @offer.offer_terms << @concession_term
       end
 
       it "should store the credit card on the gateway" do
@@ -169,7 +171,7 @@ describe SubscribeController do
         post('create', {
           :offer_id => @offer.id,
           :source_id => @source.id,
-          :offer_term => @ot1.id,
+          :offer_term => @concession_term.id,
           :subscription => @attributes,
           :payment => @payment_attributes,
           :concession => 'student',
@@ -181,7 +183,7 @@ describe SubscribeController do
         post('create', {
           :offer_id => @offer.id,
           :source_id => @source.id,
-          :offer_term => @ot1.id,
+          :offer_term => @concession_term.id,
           :subscription => @attributes,
           :payment => @payment_attributes,
           :concession => 'student',
@@ -196,7 +198,7 @@ describe SubscribeController do
         factory = stub(:build => subscription)
         SubscriptionFactory.expects(:new).with(
           instance_of(Offer), {
-            :term_id => @ot1.id.to_s,
+            :term_id => @concession_term.id.to_s,
             :attributes => @expected_attributes,
             :payment_attributes => @payment_attributes,
             :concession => 'student',
@@ -209,7 +211,7 @@ describe SubscribeController do
         post('create', {
           :offer_id => @offer.id,
           :source_id => @source.id,
-          :offer_term => @ot1.id,
+          :offer_term => @concession_term.id,
           :subscription => @attributes,
           :payment => @payment_attributes,
           :concession => 'student',
@@ -225,6 +227,8 @@ describe SubscribeController do
         GATEWAY.expects(:purchase).never
         success = stub(:success? => true)
         GATEWAY.stubs(:setup_recurrent).returns(success)
+        @concession_term = Factory.create(:offer_term, :concession => true)
+        @offer.offer_terms << @concession_term
       end
 
       it "should store the credit card on the gateway" do
@@ -232,7 +236,7 @@ describe SubscribeController do
         post('create', {
           :offer_id => @offer.id,
           :source_id => @source.id,
-          :offer_term => @ot1.id,
+          :offer_term => @concession_term.id,
           :subscription => @attributes,
           :payment => @payment_attributes,
           :concession => 'concession',
@@ -244,7 +248,7 @@ describe SubscribeController do
         post('create', {
           :offer_id => @offer.id,
           :source_id => @source.id,
-          :offer_term => @ot1.id,
+          :offer_term => @concession_term.id,
           :subscription => @attributes,
           :payment => @payment_attributes,
           :concession => 'concession',

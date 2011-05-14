@@ -38,8 +38,10 @@ class User < ActiveRecord::Base
   validates_confirmation_of :email #, :on => :create, :unless => Proc.new { |user| user.admin? }
 
   validate_on_create do |user|
-    user.errors.add(:login, "is already taken") if Wordpress.exists?(:login => user.login)
-    user.errors.add(:email, "is already taken") if Wordpress.exists?(:email => user.email)
+    unless user.admin?
+      user.errors.add(:login, "is already taken") if Wordpress.exists?(:login => user.login)
+      user.errors.add(:email, "is already taken") if Wordpress.exists?(:email => user.email)
+    end
   end
 
   validate_on_update do |user|
@@ -102,8 +104,8 @@ class User < ActiveRecord::Base
 
   def only_one_trial_allowed(subscription)
     return if subscription.active?
-    if self.subscriptions.trial.find(:first, :conditions => { :publication_id => subscription.publication_id })
-      raise "User already has a trial for publication"
+    if self.subscriptions.detect { |s| s.publication_id == subscription.publication_id }
+      raise Exceptions::DuplicateSubscription
     end
   end
 
