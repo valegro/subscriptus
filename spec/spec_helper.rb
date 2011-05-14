@@ -73,6 +73,25 @@ Spec::Runner.configure do |config|
   # For more information take a look at Spec::Runner::Configuration and Spec::Runner
 end
 
+# Fix a Mock properly
+# See https://github.com/floehopper/mocha/issues/28
+module Mocha
+  module ParameterMatchers
+    class InstanceOf
+      def ==(parameter)
+        parameter.instance_of?(@klass)
+      end
+    end
+    
+    class Equals
+      def matches?(available_parameters)
+        parameter = available_parameters.shift
+        @value == parameter
+      end
+    end
+  end
+end
+
 def login_as(user)
   controller.stubs(:current_user).returns( user )
 end

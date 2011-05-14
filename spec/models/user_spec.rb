@@ -113,6 +113,12 @@ describe User do
       @user.save!
     end
 
+    it "should NOT call update_cm if admin" do
+      @user = Factory.build(:admin)
+      @user.expects(:send_later).with(:sync_to_campaign_master).never
+      @user.save!
+    end
+
     it "should cause error if email confirmation missing" do
       user = Factory.build(:user, :email => 'daniel@netfox.com', :email_confirmation => "")
       lambda {
@@ -139,12 +145,23 @@ describe User do
         Factory.create(:user, :firstname => 'Daniel', :lastname => 'Draper', :email => 'daniel@netfox.com', :login => 'daniel', :password => 'password',:password_confirmation => 'password')
       end
 
+      it "should NOT create a user in Wordpress if admin" do
+        Wordpress.expects(:send_later).never
+        @user = Factory.create(:admin)
+      end
+
       it "should not be valid if the login exists in Wordpress" do
         Wordpress.stubs(:exists?).returns(true)
         user = Factory.build(:user)
         user.valid?.should == false
       end
       
+      it "should be valid even though the login exists in Wordpress if we are an admin" do
+        Wordpress.stubs(:exists?).returns(true)
+        user = Factory.build(:admin)
+        user.valid?.should == true
+      end
+
       it "should not create a trial user if the email exists in Wordpress" do
         Wordpress.stubs(:exists?).with(:email => 'daniel@netfox.com').returns(true)
         lambda {
@@ -228,6 +245,12 @@ describe User do
       @user.save!
     end
 
+    it "should NOT call sync_to_campaign_master if admin" do
+      @user = Factory.create(:admin)
+      @user.expects(:send_later).with(:sync_to_campaign_master).never
+      @user.save!
+    end
+
     it "should not allow us to change our login" do
       @user.login = 'anotherlogin'
       lambda {
@@ -235,11 +258,15 @@ describe User do
       }.should raise_exception(ActiveRecord::RecordInvalid)
     end
 
-    it "should NOT allow blank firstname, :lastname, :email, :phone_number, :address_1, :city, :postcode, :state, :country, :role if auto_created is true"
-
     describe "Wordpress" do
       it "should update Wordpress" do
         Wordpress.expects(:send_later).with(:update, :email => @user.email, :login => @user.login, :firstname => @user.firstname, :lastname => @user.lastname)
+        @user.save!
+      end
+
+      it "should NOT update Wordpress if user is an admin" do
+        @user = Factory.create(:admin)
+        Wordpress.expects(:send_later).never
         @user.save!
       end
 
@@ -256,6 +283,13 @@ describe User do
         lambda {
           @user.save!
         }.should raise_exception(ActiveRecord::RecordInvalid)
+      end
+
+      it "should still update the user if we change our email but that email has been taken if we are an admin" do
+        Wordpress.stubs(:exists?).with(:email => 'foo@bar.com').returns(true)
+        lambda {
+          @user.save!
+        }.should_not raise_exception(ActiveRecord::RecordInvalid)
       end
     end
   end

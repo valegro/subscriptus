@@ -12,6 +12,7 @@
   <div class="frame span_4">
     <h2>Offer Details</h2>
     <dl>
+      <dt>ID</dt><dd><%= h(@offer.id) %></dd>
       <dt>Name</dt><dd><%= h(@offer.name) %></dd>
       <dt>Publication</dt><dd> <%= @offer.publication.name %></dd>
       <dt>Expires</dt><dd> <%= @offer.expires %></dd>

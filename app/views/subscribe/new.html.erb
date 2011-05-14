@@ -8,16 +8,6 @@
         $('.payment-option').hide();
         $('#payment_by_'+$(this).val()).show();
       });
-
-      /* User Options */
-     $('.login-option').hide();
-      if ($('#user-radio-existing').attr('checked')) { $('#existing-user').show(); }
-      if ($('#user-radio-new').attr('checked')) { $('#new-user').show(); }
-      $(".user-radio").live('click', function() {
-        $('.login-option').hide();
-        $('#' + $(this).val() + '-user').show();
-      });
-
     });
   </script>
 <% end %>
@@ -28,7 +18,11 @@
     <img src="/images/step1.png" class='step' alt='step 1' />
     <div class='content'>
 
-      <h2>Subscribe to Crikey</h2>
+      <% if @renewing %>
+        <h2>Renew your Subscription</h2>
+      <% else %>
+        <h2>Subscribe to Crikey</h2>
+      <% end %>
 
       <h3><%= h(@offer.publication.try(:name)) %></h3>
       <p class='subscription-description'><%= h(@offer.publication.description) %></p>
@@ -70,13 +64,6 @@
     <div class='content'>	
       <h2><%= 'Confirm ' unless @user.new_record? %>Your Details</h2>
 
-      <% if @user.new_record? %>
-        <div id='login-choice'>
-          <input class="user-radio" type='radio' id='user-radio-existing' name='login' value="existing" /><label for='user-radio-existing'>Existing User Login</label>
-          <input class="user-radio" type='radio' id='user-radio-new' name='login' value="new" /><label for='user-radio-new'>New User Sign-Up</label>
-        </div>
-      <% end %>
-
       <div id='new-user' class="login-option">
         <% fields_for :user, @user, :builder => SubscribeFormBuilder do |u| %>
           <%= u.select :title, %w(Mr Mrs Ms Miss) %>
@@ -98,26 +85,6 @@
           <% end %>
         <% end %>
       </div>
-    </div>
-
-    <div id='existing-user' class="login-option">
-      <% form_remote_tag(:url => login_subscribe_path) do %>
-        <div class='form-row'>
-          <%= text_field_tag :email, "", :required => false %>
-          <%= label_tag(:email, "Email: <span class='mandatory'>*</span>") %>
-        </div>
-        <div class='form-row'>
-          <%= password_field_tag :password, "", :required => false %>
-          <%= label_tag(:password, "Password: <span class='mandatory'>*</span>") %>
-        </div>
-        <div class='form-row'>
-          <%= image_submit_tag "login.png" %>
-        </div>
-    
-        <div class='form-row'>	
-          <%= link_to("Forgot your password?", @offer.publication.forgot_password_link) %>
-        </div>
-      <% end %>
     </div>
 
     <div class='clear'></div>

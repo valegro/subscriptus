@@ -58,7 +58,11 @@ describe SubscriptionFactory do
     }.should raise_exception(Exceptions::Factory::InvalidException)
   end
 
-  it "should raise if concession is false but an offer term of type concession is provided"
+  it "should raise if concession is false but an offer term of type concession is provided" do
+    lambda {
+      SubscriptionFactory.build(@offer, :term_id => @term1.id, :attributes => { :user => Factory.create(:user) }, :concession => :student, :payment_attributes => @payment_attrs)
+    }.should raise_error(Exceptions::InvalidOfferTerm)
+  end
 
   describe "offer basics" do
     it "should set term to first term if none set" do
@@ -82,9 +86,8 @@ describe SubscriptionFactory do
     it "should raise if provided an invalid term id" do
       t = Time.local(2011, 1, 1, 0, 0, 0)
       Timecop.travel(t) do
-        lambda {
-          SubscriptionFactory.build(@offer, :term_id => -1, :payment_attributes => @payment_attrs, :attributes => @attributes)
-        }.should raise_exception(ActiveRecord::RecordNotFound)
+        subscription = SubscriptionFactory.build(@offer, :term_id => -1, :payment_attributes => @payment_attrs, :attributes => @attributes)
+        subscription.actions.last.term_length.should == @offer.offer_terms.first.months
       end
     end
 
@@ -290,6 +293,8 @@ describe SubscriptionFactory do
   describe "subscribing with a concession should" do
     before(:each) do
       @payment = Factory.create(:payment, :payment_type => :token)
+      @concession_term = Factory.create(:offer_term, :concession => true)
+      @offer.offer_terms << @concession_term
       success = stub(:success? => true)
       GATEWAY.stubs(:setup_recurrent).returns(success)
     end
@@ -297,29 +302,59 @@ describe SubscriptionFactory do
     it "should store the payment details on the gateway and set the user's gateway payment token" do
       @user = Factory.create(:subscriber)
       @user.expects(:store_credit_card_on_gateway)
-      @subscription = SubscriptionFactory.build(@offer, :attributes => { :user => @user }, :concession => :student, :payment_attributes => @payment_attrs)
+      @subscription = SubscriptionFactory.build(
+        @offer,
+        :term_id => @concession_term,
+        :attributes => { :user => @user },
+        :concession => :student,
+        :payment_attributes => @payment_attrs
+      )
     end
 
     it "should not store the payment details on the gateway if the user already has a valid token" do
       GATEWAY.expects(:setup_recurrent).never
       @user = Factory.create(:user_with_token)
-      @subscription = SubscriptionFactory.build(@offer, :attributes => { :user => @user }, :concession => :student, :payment_attributes => @payment_attrs)
+      @subscription = SubscriptionFactory.build(
+        @offer,
+        :term_id => @concession_term,
+        :attributes => { :user => @user },
+        :concession => :student,
+        :payment_attributes => @payment_attrs
+      )
     end
 
     it "should set state to pending" do
-      factory = SubscriptionFactory.new(@offer, :attributes => @attributes, :concession => :student, :payment_attributes => @payment_attrs)
+      factory = SubscriptionFactory.new(
+        @offer,
+        :term_id => @concession_term,
+        :attributes => @attributes,
+        :concession => :student,
+        :payment_attributes => @payment_attrs
+      )
       @subscription = factory.build
       @subscription.state.should == 'pending'
     end
 
     it "should set the pending value for student" do
-      factory = SubscriptionFactory.new(@offer, :attributes => @attributes, :concession => :student, :payment_attributes => @payment_attrs)
+      factory = SubscriptionFactory.new(
+        @offer,
+        :term_id => @concession_term,
+        :attributes => @attributes,
+        :concession => :student,
+        :payment_attributes => @payment_attrs
+      )
       @subscription = factory.build
       @subscription.pending.should == :student_verification
     end
 
     it "should set the pending value for concession" do
-      factory = SubscriptionFactory.new(@offer, :attributes => @attributes, :concession => :concession, :payment_attributes => @payment_attrs)
+      factory = SubscriptionFactory.new(
+        @offer,
+        :term_id => @concession_term,
+        :attributes => @attributes,
+        :concession => :concession,
+        :payment_attributes => @payment_attrs
+      )
       @subscription = factory.build
       @subscription.pending.should == :concession_verification
       @subscription.state.should == 'pending'
@@ -327,7 +362,13 @@ describe SubscriptionFactory do
 
     it "should set the state to active if the user already has a verified concession" do
       @attributes['user_attributes'] = Factory.attributes_for(:user, :valid_concession_holder => true)
-      factory = SubscriptionFactory.new(@offer, :attributes => @attributes, :concession => :concession, :payment_attributes => @payment_attrs)
+      factory = SubscriptionFactory.new(
+        @offer,
+        :term_id => @concession_term,
+        :attributes => @attributes,
+        :concession => :concession,
+        :payment_attributes => @payment_attrs
+      )
       @subscription = factory.build
       @subscription.pending.should be(nil)
       @subscription.state.should == 'active'
@@ -335,13 +376,25 @@ describe SubscriptionFactory do
     end
 
     it "should not set the expiry date" do
-      factory = SubscriptionFactory.new(@offer, :attributes => @attributes, :concession => :concession, :payment_attributes => @payment_attrs)
+      factory = SubscriptionFactory.new(
+        @offer,
+        :term_id => @concession_term,
+        :attributes => @attributes,
+        :concession => :concession,
+        :payment_attributes => @payment_attrs
+      )
       @subscription = factory.build
       @subscription.expires_at.should == nil
     end
 
     it "should set the action to be applied" do
-      factory = SubscriptionFactory.new(@offer, :attributes => @attributes, :concession => :concession, :payment_attributes => @payment_attrs)
+      factory = SubscriptionFactory.new(
+        @offer,
+        :term_id => @concession_term,
+        :attributes => @attributes,
+        :concession => :concession,
+        :payment_attributes => @payment_attrs
+      )
       @subscription = factory.build
       @subscription.reload
       @subscription.pending_action.should be_instance_of(SubscriptionAction)
@@ -354,7 +407,13 @@ describe SubscriptionFactory do
     it "should set the action to be applied but not create an order if gifts are requested" do
       @offer.gifts.add(Factory.create(:gift))
       expect {
-        factory = SubscriptionFactory.new(@offer, :attributes => @attributes, :concession => :concession, :payment_attributes => @payment_attrs)
+        factory = SubscriptionFactory.new(
+          @offer,
+          :term_id => @concession_term,
+          :attributes => @attributes,
+          :concession => :concession,
+          :payment_attributes => @payment_attrs
+        )
         @subscription = factory.build
         @subscription.pending_action.gifts.size.should == 1
       }.to_not change { Order.count }.by(1)

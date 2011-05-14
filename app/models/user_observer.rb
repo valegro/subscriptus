@@ -6,26 +6,32 @@ class UserObserver < ActiveRecord::Observer
   end
 
   def after_create(user)
-    Wordpress.send_later(:create, {
-      :login => user.login,
-      :firstname => user.firstname,
-      :lastname => user.lastname,
-      :email => user.email,
-      :pword => user.password
-    })
+    unless user.admin?
+      Wordpress.send_later(:create, {
+        :login => user.login,
+        :firstname => user.firstname,
+        :lastname => user.lastname,
+        :email => user.email,
+        :pword => user.password
+      })
+    end
   end
 
   def after_save(user)
-    user.send_later :sync_to_campaign_master
+    unless user.admin?
+      user.send_later :sync_to_campaign_master
+    end
   end
 
   def after_update(user)
-    Wordpress.send_later(:update, {
-      :login => user.login,
-      :firstname => user.firstname,
-      :lastname => user.lastname,
-      :email => user.email
-    })
+    unless user.admin?
+      Wordpress.send_later(:update, {
+        :login => user.login,
+        :firstname => user.firstname,
+        :lastname => user.lastname,
+        :email => user.email
+      })
+    end
   end
 
   def before_save(user)

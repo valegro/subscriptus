@@ -47,7 +47,7 @@ describe Admin::SubscriptionsController, "as admin" do
     end
 
     it "should verify if payment is successful" do
-      success = stub(:success? => true)
+      success = stub(:success? => true, :params => { 'ponum' => '1234' })
       GATEWAY.expects(:trigger_recurrent).returns(success)
       post :verify, :id => @subscription.id, :subscription => { :note => "A note about verification" }
       flash[:notice].should == "Verified Subscription"

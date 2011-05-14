@@ -48,21 +48,12 @@ ActionController::Routing::Routes.draw do |map|
 
   # Signup
   map.with_options  :controller => 'subscribe' do |s|
-    s.resource :subscribe, :collection => { :thanks => :any, :complete => :get, :login => :post }
-    #s.subscribe "subscribe", :action => 'new', :method => :get
-=begin
-    s.subscribe_offer         'subscribe/offer', :action => 'offer', :method => :get
-    s.subscribe_offer_next    'subscribe/offer', :action => 'offer', :method => :post, :commit=>'Next'
-
-    s.subscribe_details         'subscribe/details', :action => 'details', :method => :get
-    s.subscribe_details_next    'subscribe/details', :action => 'details', :method => :post, :commit=>'Next'
-
-    s.subscribe_payment         'subscribe/payment', :action => 'payment', :method => :get
-    s.subscribe_payment_next    'subscribe/payment', :action => 'payment', :method => :post, :commit=>'Finish'
-    s.subscribe_payment_direct_debit  'subscribe/direct_debit', :action => 'direct_debit', :method => :get
-
-    s.subscribe_result  'subscribe/result', :action => 'result', :method => :get
-=end
+    s.new_renew      '/renew',       :action => "edit",    :conditions => { :method => :get }
+    s.renew          '/renew',       :action => "update",  :conditions => { :method => :put }
+    s.new_subscribe  '/subscribe',   :action => "new",     :conditions => { :method => :get }
+    s.subscribe      '/subscribe',   :action => "create",  :conditions => { :method => :post }
+    s.connect        '/thanks',      :action => "thanks"
+    s.connect        '/complete',    :action => "complete"
   end
 
   # Unsubscribe

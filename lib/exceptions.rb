@@ -14,6 +14,7 @@ module  Exceptions
   class InvalidOfferTerm                     < StandardError; end
   class PaymentTokenMissing                  < StandardError; end
   class CannotStoreCard                      < StandardError; end
+  class DuplicateSubscription                < StandardError; end
 
   class GiftNotAvailable                     < StandardError
     def initialize(gift_id)

@@ -16,7 +16,7 @@ class Subscription < ActiveRecord::Base
            :before_add => Proc.new { |s, a| a.applied_at = Time.now.utc },
            :autosave => true
 
-  has_many :log_entries, :class_name => "SubscriptionLogEntry"
+  has_many :log_entries, :class_name => "SubscriptionLogEntry", :dependent => :destroy
   has_many :orders
   
   attr_accessor :note # Used to save notes to the subscription
@@ -165,21 +165,24 @@ class Subscription < ActiveRecord::Base
     hash = {
       :email => self.user.email,
       :fields => {
-        :subscription_id  => self.id,
-        :status           => self.state,
+        :subscription_id  => self.reference,
+        :state            => self.state,
         :publication_id   => self.publication_id,
         :user_id          => self.user_id,
-        :expires_at       => self.expires_at.try(:strftime, "%d/%m/%y"),
         :firstname        => self.user.firstname,
         :lastname         => self.user.lastname,
         :country          => self.user.country,
         :city             => self.user.city,
-        :state            => self.user.state,
+        :address_state    => self.user.state,
         :title            => self.user.title,
         :phone_number     => self.user.phone_number,
         :postcode         => self.user.postcode,
         :address_1        => self.user.address_1,
-        :address_2        => self.user.address_2
+        :address_2        => self.user.address_2,
+        :offer_id         => self.offer_id,
+        :expires_at       => self.expires_at.try(:strftime, "%d/%m/%y"),
+        :created_at       => self.created_at.try(:strftime, "%d/%m/%y"),
+        :state_updated_at => self.state_updated_at.try(:strftime, "%d/%m/%y")
       }
     }
     # TODO: Solus, Weekender? Are these even needed?
