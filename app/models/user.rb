@@ -128,4 +128,13 @@ class User < ActiveRecord::Base
   def gateway_token
     "%020d" % id
   end
+
+  def valid_password?(password)
+    if role == :admin
+      super
+    else
+      Wordpress.authenticate(:email => email, :pword => password)
+    end
+  end
+
 end
