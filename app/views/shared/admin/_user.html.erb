@@ -1,9 +1,13 @@
 <% if user %>
   <dl>
+    <dt>ID</dt>
+    <dd><%= user.id %></dd>
     <dt>Name</dt>
     <dd><%= [user.title, user.name].join('&nbsp;') %></dd>
     <dt>Email address</dt>
-    <dd><%= user.email %></dd>
+    <dd><%= mail_to(user.email) %></dd>
+    <dt>Gender</dt>
+    <dd><%= user.gender.blank? ? 'Unknown' : user.enums(:gender).hash[user.gender] %></dd>
   <% if user.company %>
     <dt>Company</dt>
     <dd><%= user.company.blank? ? "None Provided" : user.company %></dd>
@@ -14,5 +18,11 @@
       <%= user.state.to_s.upcase %>&nbsp;<%= user.postcode %><br/>
       <%= user.country %>
     </dd>
+    <dt>Phone Number</dt>
+    <dd><%= user.phone_number.blank? ? 'None Provided' : user.phone_number %></dd>
+    <dt>Concession Holder</dt>
+    <dd><%= user.valid_concession_holder? ? 'Yes' : 'No' %></dd>
+    <dt>Wordpress ID</dt>
+    <dd><%= user.login.blank? ? "-" : user.login %></dd>
   </dl>
 <% end %>

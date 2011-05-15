@@ -82,7 +82,7 @@
       <% if @search.user_email_like %> add_field(filter_element_for('email')); disable_option('email'); <% end -%>
       <% if @search.state %> add_field(filter_element_for('state')); disable_option('state'); <% end -%>
       <% if @search.expires_at_gte || @search.expires_at_lte %> add_field(filter_element_for('renewal')); disable_option('renewal'); <% end -%>
-      <% if @search.gifts_id_is %> add_field(filter_element_for('gift')); disable_option('gift'); <% end -%>
+      <% if @search.actions_gifts_id_is %> add_field(filter_element_for('gift')); disable_option('gift'); <% end -%>
       <% if @search.created_at_gte || @search.created_at_lte %> add_field(filter_element_for('created_at')); disable_option('created_at'); <% end -%>
     }
   );
@@ -164,10 +164,10 @@
     <div class="field field-text">
       <div class="field-label">
 
-        <%= label :search, :gifts_id_is, 'Gift' %>
+        <%= label :search, :actions_gifts_id_is, 'Gift' %>
       </div>
       <div class="field-inner">
-        <%= collection_select :search, :gifts_id_is, Gift.all, :id, :name %>
+        <%= collection_select :search, :actions_gifts_id_is, Gift.all, :id, :name %>
         <%= link_to_function '[X]', "remove_field($('#gift_field')); enable_option('gift')", :id => 'remove_gift_link' %>
       </div>
     </div>

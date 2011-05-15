@@ -1,16 +1,19 @@
 
 class Payment < ActiveRecord::Base
   include ActionView::Helpers::NumberHelper
+  include ActiveMerchant::Utils
 
-  belongs_to :subscription
+  belongs_to :subscription_action
 
-  validates_presence_of :card_number, :card_expiry_date, :first_name, :last_name, :if => Proc.new { |payment| payment.credit_card? }
+  validates_presence_of :card_number, :card_expiry_date, :if => Proc.new { |payment| payment.credit_card? }
+  validates_presence_of :first_name, :last_name, :message => "on the credit card needs to be provided", :if => Proc.new { |payment| payment.credit_card? }
   validates_presence_of :amount
   validates_numericality_of :amount, :greater_than_or_equal_to => 0
 
+  attr_accessor :full_name
   attr_accessor :card_verification
-  enum_attr :card_type, %w(visa master american_express diners_club jcb)
-  enum_attr :payment_type, %w(credit_card direct_debit cheque), :init => :credit_card
+
+  enum_attr :payment_type, %w(credit_card token direct_debit cheque historical), :init => :credit_card
 
   default_scope :order => "created_at desc"
 
@@ -22,24 +25,55 @@ class Payment < ActiveRecord::Base
 
   before_save do |payment|
     if payment.credit_card? || payment.payment_type.nil?
-      # Charge the card
-      response = GATEWAY.purchase((payment.amount * 100).to_i, payment.credit_card,
-        :order_id => "123", # FIXME
-        :address => (payment.subscription.try(:user).try(:address_hash) || {}),
-        :description => 'Crikey Subscription Payment',
-        :email => payment.subscription.try(:user).try(:email)
-      )
-      unless response.success?
-        raise Exceptions::PaymentFailedException.new(response.message)
-      end
       # Save a reference
       payment.card_number = "XXXX-XXXX-XXXX-#{payment.card_number[-4..-1]}"
     end
   end
 
+  before_validation do |payment|
+    unless payment.full_name.blank?
+      toks = payment.full_name.split(/\s+/)
+      payment.first_name = toks[0]
+      payment.last_name = toks[1..-1].join(" ")
+    end
+  end
+
+  # Process and save the payment
+  # Only valid option is :token (to be used for token payments)
+  def process!(options = {})
+    raise ActiveRecord::RecordInvalid.new(self) unless self.valid?
+    if (self.credit_card? || self.payment_type.nil?) && !new_record?
+      raise Exceptions::PaymentAlreadyProcessed.new("You are trying to process a Credit Card payment that has already been saved - consider using a token payment")
+    end
+    raise Exceptions::PaymentAlreadyProcessed if processed_at
+    # Generate a reference number
+    if self.credit_card? || self.payment_type.nil?
+      # Charge the card
+      self.reference = generate_unique_id
+      response = GATEWAY.purchase((amount * 100).to_i, self.credit_card,
+        :order_id => self.reference,
+        :address => (self.subscription_action.try(:subscription).try(:user).try(:address_hash) || {}),
+        :description => 'Crikey Subscription Payment',
+        :email => self.subscription_action.try(:subscription).try(:user).try(:email)
+      )
+      unless response.success?
+        raise Exceptions::PaymentFailedException.new(response.message)
+      end
+    end
+    if self.token?
+      raise Exceptions::PaymentTokenMissing if options[:token].blank?
+      response = GATEWAY.trigger_recurrent((amount * 100).to_i, options[:token])
+      unless response.success?
+        raise Exceptions::PaymentFailedException.new(response.message)
+      end
+      self.reference = response.params['ponum']
+    end
+    self.processed_at = Time.now
+    self.save!
+  end
+
   def credit_card
     ActiveMerchant::Billing::CreditCard.new(
-      :type       => card_type.to_s,
       :number     => self.card_number,
       :month      => self.card_expiry_date.try(:month),
       :year       => self.card_expiry_date.try(:year),

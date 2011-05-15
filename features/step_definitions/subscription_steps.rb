@@ -35,3 +35,19 @@ Given /^I should not be able to select the "([^"]*)" option from "([^"]*)"$/ do 
     }.should raise_exception(Capybara::ElementNotFound)
   end
 end
+
+Given /^a subscription is created from #{capture_fields}$/ do |offer|
+  #puts capture_model
+  
+  SubscriptionFactory.build(find_model(offer))
+end
+
+Given /^a subscription is created from an offer: "([^"]*)" with #{capture_model}(?: with #{capture_fields})?$/ do |offer, user, user_fields|
+  offer_model = find_model(offer)
+  user_model = find_model!(user, user_fields)
+  subscription = SubscriptionFactory.build(offer_model, :included_gift_ids => offer_model.gifts.included.map(&:id))
+  subscription.user = user_model
+  subscription.save!
+  store_model("subscription", "the sub", subscription)
+  subscription
+end

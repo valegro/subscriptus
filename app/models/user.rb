@@ -12,7 +12,13 @@ class User < ActiveRecord::Base
   attr_accessor :email_confirmation
 
   enum_attr :role, %w(admin subscriber)
-  enum_attr :title, %w(Mr Mrs Ms Miss)
+  #enum_attr :title, %w(Mr Sir Fr Mrs Ms Miss Lady)
+  
+  enum_attr :gender, %w(male female) do
+    labels :male => 'Male'
+    labels :female => 'Female'
+  end
+
   enum_attr :state, %w(act nsw nt qld sa tas vic wa intl) do
     labels :intl => "Outside of Australia"
     labels :act => 'ACT'
@@ -27,13 +33,24 @@ class User < ActiveRecord::Base
 
   validates_format_of :email, :with => /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i
   validates_presence_of :login, :firstname, :lastname, :email, :role, :unless => Proc.new { |user| user.auto_created? }, :if => Proc.new { |user| user.admin? }
-  validates_presence_of :firstname, :lastname, :email, :phone_number, :address_1, :city, :postcode, :state, :country, :role, :unless => Proc.new { |user| user.auto_created? or user.admin? }
+  validates_presence_of :firstname, :lastname, :email, :phone_number, :address_1, :city, :postcode, :state, :country, :role, :unless => Proc.new { |user| (user.auto_created? && user.new_record?) or user.admin? }
   validates_uniqueness_of :email
-  validates_uniqueness_of :login, :unless => Proc.new { |user| user.auto_created? }
-  validates_confirmation_of :email, :on => :create, :unless => Proc.new { |user| user.admin? }
+  validates_confirmation_of :email #, :on => :create, :unless => Proc.new { |user| user.admin? }
 
   validate_on_create do |user|
-    user.errors.add(:login, "is already taken") if Wordpress.exists?(:login => user.login)
+    unless user.admin?
+      user.errors.add(:login, "is already taken") if Wordpress.exists?(:login => user.login)
+      user.errors.add(:email, "is already taken") if Wordpress.exists?(:email => user.email)
+    end
+  end
+
+  validate_on_update do |user|
+    if user.email_changed? && Wordpress.exists?(:email => user.email)
+      user.errors.add(:email, "is already taken")
+    end
+    if user.login_changed?
+      user.errors.add(:login, "cannot be changed after initial creation")
+    end
   end
 
   # Used for search controller
@@ -46,7 +63,7 @@ class User < ActiveRecord::Base
     # Default to subscriber role
     self.role ||= 'subscriber'
   end
-  
+
   # Allow authlogic to find a user by login or email
   def self.find_by_login_or_email(login)
      find_by_login(login) || find_by_email(login)
@@ -87,8 +104,8 @@ class User < ActiveRecord::Base
 
   def only_one_trial_allowed(subscription)
     return if subscription.active?
-    if self.subscriptions.trial.find(:first, :conditions => { :publication_id => subscription.publication_id })
-      raise "User already has a trial for publication"
+    if self.subscriptions.detect { |s| s.publication_id == subscription.publication_id }
+      raise Exceptions::DuplicateSubscription
     end
   end
 
@@ -125,8 +142,17 @@ class User < ActiveRecord::Base
     self.subscriptions.each(&:sync_to_campaign_master)
   end
   
-  def gateway_token
-    "%020d" % id
+  def store_credit_card_on_gateway(credit_card)
+    if self.payment_gateway_token.blank?
+      # TODO: user module ActiveMerchant::module Utils
+      token = Utilities.generate_unique_token(self.id, 10)
+      response = GATEWAY.setup_recurrent(0, credit_card, token)
+      unless response.success?
+        raise Exceptions::CannotStoreCard.new(response.message)
+      end
+      update_attributes!(:payment_gateway_token => token)
+      save!
+    end
   end
 
   def valid_password?(password)

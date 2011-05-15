@@ -18,12 +18,7 @@ module CM
     @@password = ::CAMPAIGNMASTER_PASSWORD
     @@client_id = ::CAMPAIGNMASTER_CLIENT_ID
 
-    #def self.driver=(driver)
-    #  @@static_driver = driver
-    #end
-
     def self.driver
-
       return @@static_driver if @@static_driver
       puts "Calling factory"
       fact = SOAP::WSDLDriverFactory.new(V1_URI)

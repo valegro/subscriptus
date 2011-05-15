@@ -34,6 +34,7 @@ describe Wordpress do
       end
     end    
   end
+
   context "When wordpress is enabled" do
     setup do
       Wordpress.enabled = true

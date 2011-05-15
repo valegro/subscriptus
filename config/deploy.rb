@@ -6,6 +6,20 @@ set :deploy_to, "/home/deploy/apps/#{application}"
 set :shared_dir, "shared"
 set :use_sudo, false
 
+task :to_staging do 
+  set :user, "root"
+  set :password, "zxnm9014"
+  set :prod_db, "subscriptus"
+  set :db_hostname, "localhost"
+  set :db_port, 3306
+
+  set :branch, "refctoring-mutator"
+
+  role :app, "deploy@zebra.crikey.com.au"
+  role :web, "deploy@zebra.crikey.com.au"
+  role :db,  "deploy@zebra.crikey.com.au", :primary => true
+end
+
 task :to_production do 
   set :user, "root"
   set :password, "zxnm9014"
@@ -13,9 +27,9 @@ task :to_production do
   set :db_hostname, "localhost"
   set :db_port, 3306
 
-  role :app, "deploy@zebra.crikey.com.au"
-  role :web, "deploy@zebra.crikey.com.au"
-  role :db,  "deploy@zebra.crikey.com.au", :primary => true
+  role :app, "deploy@fraser.crikey.com.au"
+  role :web, "deploy@fraser.crikey.com.au"
+  role :db,  "deploy@fraser.crikey.com.au", :primary => true
 end
 
 namespace :bundler do

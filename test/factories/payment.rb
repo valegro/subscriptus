@@ -5,10 +5,13 @@ Factory.define :payment do |f|
   f.last_name { Faker::Name.last_name }
   f.amount { 100 }
   f.card_verification { '123' }
-  f.card_type { 'visa' }
   f.payment_type { 'credit_card' }
   f.reference { 'Reference #12345678'}
   # f.association :subscription, :factory => :subscription
+end
+
+Factory.define :token_payment, :parent => :payment do |f|
+  f.payment_type { 'token' }
 end
 
 Factory.define :direct_debit_payment, :class => 'Payment' do |f|

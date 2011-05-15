@@ -9,6 +9,9 @@ require 'faker'
 require 'factory_girl'
 require 'webmock/rspec'
 
+require 'capybara/rails' 
+require 'capybara/dsl'
+
 WebMock.disable_net_connect!(:allow_localhost => true, :allow => 'https://www.securepay.com.au/test/payment')
 
 factories = Dir.glob('*/factories.rb') + Dir.glob('*/factories/*.rb')
@@ -34,6 +37,8 @@ Spec::Runner.configure do |config|
   config.use_transactional_fixtures = true
   config.use_instantiated_fixtures  = false
   config.fixture_path = RAILS_ROOT + '/spec/fixtures/'
+
+  config.include(Capybara, :type => :integration)
 
   # == Fixtures
   #
@@ -66,6 +71,25 @@ Spec::Runner.configure do |config|
   # == Notes
   #
   # For more information take a look at Spec::Runner::Configuration and Spec::Runner
+end
+
+# Fix a Mock properly
+# See https://github.com/floehopper/mocha/issues/28
+module Mocha
+  module ParameterMatchers
+    class InstanceOf
+      def ==(parameter)
+        parameter.instance_of?(@klass)
+      end
+    end
+    
+    class Equals
+      def matches?(available_parameters)
+        parameter = available_parameters.shift
+        @value == parameter
+      end
+    end
+  end
 end
 
 def login_as(user)

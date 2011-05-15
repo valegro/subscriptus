@@ -4,9 +4,6 @@ describe Subscription do
 
   before(:each) do
     @subscription = Subscription.new()
-    today = Date.new(2010, 9, 27) # today is "Mon, 27 Sep 2010"
-    Date.stubs(:today).returns(today)
-
     cm_return = stub(:success? => true)
     CM::Recipient.stubs(:exists?).returns(true)
     CM::Recipient.stubs(:find_all).returns(cm_return)
@@ -14,7 +11,24 @@ describe Subscription do
     CM::Recipient.stubs(:create!)
     stub_wordpress
   end
-  
+
+  describe "upon save" do
+    it "should create a recipient in Campaign Master" do
+      s = Factory.create(:subscription)
+      s.expects(:send_later).with(:sync_to_campaign_master)
+      s.save!
+    end
+  end
+
+  it "should not allow more than one subscription with the same user and publication" do
+    mypub = Factory.create(:publication)
+    u = Factory.create(:user)
+    u.subscriptions << Factory.create(:subscription, :publication => mypub)
+    lambda {
+      u.subscriptions << Factory.create(:subscription, :publication => mypub)
+    }.should raise_exception
+  end
+
   describe "reference" do
     before(:each) do
       @subscription = Factory.create(:subscription)
@@ -29,31 +43,21 @@ describe Subscription do
     end
   end
 
-  describe "offer term" do
+  describe "increment expiry date" do
     before(:each) do
       @offer = Factory.create(:offer)
       @subscription.offer = @offer
-      @offer_term = Factory.create(:offer_term, :months => 3, :offer => @offer)
+      Timecop.freeze(Date.new(2010, 9, 27))
     end
 
-    it "should copy the offer term details onto the subscription" do
-      @subscription.expects(:increment_expires_at).with(@offer_term)
-      @subscription.apply_term(@offer_term)
-      @subscription.term_length.should == 3
-      @subscription.concession.should == false
-    end
-
-    it "should raise if the offer term does not match the offer" do
-      @offer_term = Factory.create(:offer_term, :months => 3, :offer => Factory.create(:offer))
-      lambda {
-        @subscription.apply_term(@offer_term)
-      }.should raise_error
+    after(:each) do
+      Timecop.return
     end
 
     it "should set expiry_date to 3 months from now if the expiry date has aleady been passed" do
       @subscription.expires_at = Date.new(2010, 1, 1)
       expected = Date.new(2010, 12, 27)
-      @subscription.increment_expires_at(@offer_term)
+      @subscription.increment_expires_at(3)
       @subscription.expires_at.localtime.year.should == expected.year
       @subscription.expires_at.localtime.month.should == expected.month
       @subscription.expires_at.localtime.day.should == expected.day
@@ -62,7 +66,7 @@ describe Subscription do
     it "should set expiry_date to 3 months from the end of current expiry date" do
       @subscription.expires_at = Date.new(2010, 10, 4)
       expected = Date.new(2011, 1, 4)
-      @subscription.increment_expires_at(@offer_term)
+      @subscription.increment_expires_at(3)
       @subscription.expires_at.localtime.year.should == expected.year
       @subscription.expires_at.localtime.month.should == expected.month
       @subscription.expires_at.localtime.day.should == expected.day
@@ -70,10 +74,65 @@ describe Subscription do
     
     it "should set expiry_date to 3 months from now if no expiry date has been set yet" do
       expected = Date.new(2010, 12, 27)
-      @subscription.increment_expires_at(@offer_term)
+      @subscription.increment_expires_at(3)
       @subscription.expires_at.localtime.year.should == expected.year
       @subscription.expires_at.localtime.month.should == expected.month
       @subscription.expires_at.localtime.day.should == expected.day
+    end
+
+    it "should set expiry_date to nil if a nil argument is provided" do
+      @subscription.increment_expires_at(nil)
+      @subscription.expires_at.should be(nil)
+    end
+  end
+
+  describe "apply_action" do
+    before(:each) do
+      @payment = Factory.build(:payment)
+      @action = Factory.build(:subscription_action, :term_length => 5)
+      @action.payment = @payment
+      @subscription.user = Factory.build(:user)
+      @subscription.publication = Factory.build(:publication)
+
+      response = stub(:success? => true)
+      GATEWAY.stubs(:purchase).returns(response)
+    end
+
+    it "should increment the expiry date" do
+      Subscription.any_instance.expects(:increment_expires_at).with(5)
+      @subscription.apply_action(@action)
+    end
+
+    it "should add the action to the actions list" do
+      expect {
+        @subscription.apply_action(@action)
+      }.to change { @subscription.actions.size }.by(1)
+    end
+
+    it "should increment the number of payments" do
+      expect {
+        @subscription.apply_action(@action)
+      }.to change { Payment.count }.by(1)
+    end
+
+    it "should process the payment" do
+      @payment.expects(:process!)
+      @subscription.apply_action(@action)
+    end
+
+    it "should raise if no valid payment available" do
+      @action.payment = nil
+      lambda {
+        @subscription.apply_action(@action)
+      }.should raise_exception
+    end
+
+    it "should raise if the payment fails" do
+      failure = stub(:success? => false, :message => "Test Failure")
+      GATEWAY.expects(:purchase).returns(failure)
+      lambda {
+        @subscription.apply_action(@action)
+      }.should raise_exception(Exceptions::PaymentFailedException)
     end
   end
   
@@ -85,8 +144,6 @@ describe Subscription do
     it { should belong_to :offer }
     it { should belong_to :publication }
     it { should have_many :log_entries }
-    it { should have_many :subscription_gifts }
-    it { should have_many :gifts }
     # could we easily spec accepts_nested_attributes_for?
   end
 
@@ -127,64 +184,5 @@ describe Subscription do
     s.destroy
     Subscription.all.size.should == sub_primary_size
     Subscription::Archive.all.size.should == archive_primary_size + 1
-  end
-  
-  it "should deliver email when the subscription enters pending" do
-    @s = Factory.create(:subscription, :pending => :concession)
-    SubscriptionMailer.expects(:deliver_pending).with(@s)
-    @s.pay_later!
-  end
-  
-  describe "with a pending subscription" do 
-    before(:each) do
-      SubscriptionMailer.stubs(:deliver_pending)
-      @s = Factory.create(:subscription, :pending => :concession)
-      @s.pay_later!
-    end
-    it "should deliver email when the subscription is verified" do
-      SubscriptionMailer.expects(:deliver_verified).with(@s)
-      @s.verify!
-    end
-  
-    it "should deliver email when the subscription pending" do
-      SubscriptionMailer.expects(:deliver_pending_expired).with(@s)
-      @s.expire!
-    end
-  end
-
-  describe "a trial subscription" do
-    before(:each) do
-      @json_hash = { "last_name"=>["Draper"], "first_name"=>["Daniel"], "email"=>["example@example.com"], "ip_address"=>"150.101.226.181" }
-      @referrer = "http://www.example.com/referral"
-      @publication = Factory.create(:publication)
-    end
-
-    it "should be created and setup correctly" do
-      t = "2011-01-01 9:00".to_time(:utc).in_time_zone('UTC')
-      Timecop.travel(t) do
-        # TODO: This a User create but returns a subscription! Eeek! Maybe move to the association? Or return the user? Or rename the method? Or move to subscription?
-        @subscription = User.find_or_create_with_trial(@publication, Publication::DEFAULT_TRIAL_EXPIRY, @referrer, @json_hash)
-        @subscription.user.subscriptions.size.should == 1
-        @subscription.user.lastname.should == 'Draper'
-        @subscription.user.firstname.should == 'Daniel'
-        @subscription.user.email.should == 'example@example.com'
-        # TODO: Should solus be on the user or the subscription?
-        @subscription.solus.should == false
-        @subscription.state.should == 'trial'
-        @subscription.expires_at.to_s.should == (t + Publication::DEFAULT_TRIAL_EXPIRY.days).to_s
-      end
-    end
-
-    it "should expire after 21 days" do
-      t = "2011-01-01 9:00".to_time(:utc).in_time_zone('UTC')
-      Timecop.travel(t) do
-        @subscription = User.find_or_create_with_trial(@publication, Publication::DEFAULT_TRIAL_EXPIRY, @referrer, @json_hash)
-        Timecop.travel(t + Publication::DEFAULT_TRIAL_EXPIRY.days + 1.minute) do
-          Subscription.expire_states
-          @subscription.reload
-          @subscription.state.should == 'squatter'
-        end
-      end
-    end
   end
 end

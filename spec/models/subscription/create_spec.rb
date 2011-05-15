@@ -13,7 +13,7 @@ describe Subscription do
     stub_wordpress
   end
 
-  # TODO: Handle when first state is pending
+  # TODO: Break this up into all of the initial states
   describe "upon creation" do
     it "should deliver a trial email for new trials" do
       @subscription = Factory.build(:subscription)
@@ -21,12 +21,32 @@ describe Subscription do
       @subscription.save
     end
 
+    it "should set both expires_at and state_expires_at for new trials"
+
     it "should deliver an active email for new active subscriptions" do
       sub = Factory.build(:subscription, :state => 'active')
       SubscriptionMailer.expects(:send_later).with(:deliver_new_trial).never
       SubscriptionMailer.expects(:send_later).with(:deliver_activation, sub)
       @user = Factory.create(:subscriber)
       @user.subscriptions << sub
+    end
+
+    it "should deliver a pending email for new pending student subscriptions" do
+      @subscription = Factory.build(:pending_subscription, :pending => 'student_verification')
+      SubscriptionMailer.expects(:send_later).with(:deliver_pending_student_verification, @subscription)
+      @subscription.save!
+    end
+
+    it "should deliver a pending email for new pending ceoncession subscriptions" do
+      @subscription = Factory.build(:pending_subscription, :pending => 'concession_verification')
+      SubscriptionMailer.expects(:send_later).with(:deliver_pending_concession_verification, @subscription)
+      @subscription.save!
+    end
+
+    it "should deliver a pending email for new pending payment subscriptions" do
+      @subscription = Factory.build(:pending_subscription, :pending => 'payment')
+      SubscriptionMailer.expects(:send_later).with(:deliver_pending_payment, @subscription)
+      @subscription.save!
     end
 
     it "should create a log entry" do
@@ -50,13 +70,24 @@ describe Subscription do
       s.save!
     end
 
-    it "should create and process a payment if one is provided" do
-      s = Factory.build(:subscription, :payments_attributes => { "0" =>  Factory.attributes_for(:payment) })
-      gw_response = stub(:success? => true)
-      GATEWAY.expects(:purchase).returns(gw_response)
-      expect {
-        s.save!
-      }.to change { s.payments.count }.by(1)
+    describe "in the pending state" do
+      it "should raise if no pending action is provided" do
+        lambda {
+          Factory.create(:subscription, :state => 'pending', :pending => :student_verification)
+        }.should raise_error
+      end
+
+      it "should raise if no pending action is provided" do
+        lambda {
+          Factory.create(:subscription, :state => 'pending', :pending_action => Factory.create(:subscription_action))
+        }.should raise_error
+      end
+
+      it "should not raise if both pending action and pending are provided" do
+        lambda {
+          Factory.create(:subscription, :pending => :student_verification, :state => 'pending', :pending_action => Factory.create(:subscription_action))
+        }.should_not raise_error
+      end
     end
   end
 end

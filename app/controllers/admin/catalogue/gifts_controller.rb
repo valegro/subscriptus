@@ -10,7 +10,7 @@ class Admin::Catalogue::GiftsController < Admin::CatalogueController
   end
 
   def show
-    @subscriptions = @gift.subscriptions.recent.paginate(:page => params[:page] || 1)
+    @subscription_actions = @gift.subscription_actions.recent.paginate(:page => params[:page] || 1)
   end
 
   def create

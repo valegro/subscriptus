@@ -1,0 +1,28 @@
+<div id='set-expiry-dialog'>
+  <% form_for :subscription, :url => set_expiry_admin_subscription_path(@subscription), :builder => Reform::Builder, :html => { :id => "set-expiry-form", :class => "form" } do |f| %>
+    <%= f.date_select :expires_at, :label => 'Expiry Date' %>
+  <% end %>
+</div>
+<script>
+  $('#set-expiry-dialog').dialog({
+    title: "Set Expiry Date", 
+    autoOpen: false,
+    modal: true,
+    width: 450,
+    buttons: {
+      "Set": function() {
+        // Submit form
+        if (confirm("Are you sure you want to manually set the expiry date of this subscription?")) {
+          $(this).find('#set-expiry-form').submit();
+          $(this).dialog('close');
+        }
+      },
+      "Cancel": function() { 
+        $(this).dialog('close'); 
+      }
+    },
+    close: function() {
+      $(this).remove();
+    }
+  });
+</script>

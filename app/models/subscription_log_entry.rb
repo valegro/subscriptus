@@ -3,5 +3,5 @@ class SubscriptionLogEntry < ActiveRecord::Base
   belongs_to :subscription
   belongs_to :source
 
-  named_scope :recent, :order => "created_at desc"
+  named_scope :recent, lambda { {:order => "created_at desc", :conditions => "updated_at > '#{5.days.ago}'" } }
 end

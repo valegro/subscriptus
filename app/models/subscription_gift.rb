@@ -1,5 +1,5 @@
 class SubscriptionGift < ActiveRecord::Base
-  belongs_to :subscription
+  belongs_to :subscription_action
   belongs_to :gift
 
   named_scope :included, :conditions => { :included => true }

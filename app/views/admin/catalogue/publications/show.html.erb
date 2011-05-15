@@ -16,6 +16,9 @@
     <dl>
       <dt>Name</dt><dd><%= h(@publication.name) %></dd>
       <dt>Description</dt><dd><%= h(@publication.description) %></dd>
+      <dt>Password Link</dt>
+        <dd><%= @publication.forgot_password_link ? link_to(truncate(h(@publication.forgot_password_link)), @publication.forgot_password_link, :target => :new) : 'Not Set' %>
+      </dd>
       <dt>Active</dt><dd><%= @publication.subscriptions.active.count %></p></dd>
       <dt>Trial</dt><dd><%= @publication.subscriptions.trial.count %></p></dd>
       <dt>Squatters</dt><dd><%= @publication.subscriptions.squatter.count %></p></dd>

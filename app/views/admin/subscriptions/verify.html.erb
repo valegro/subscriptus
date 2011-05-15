@@ -12,8 +12,17 @@
       <%= link_to "Cancel", pending_admin_subscriptions_path %>
     <% end %>
   <% end %>
-<% elsif @subscription.pending == :concession %>
+<% elsif @subscription.pending == :concession_verification %>
   <p>Subscription is pending verification of concession</p>
+  <% form_for :subscription, :url => verify_admin_subscription_path(@subscription), :builder => Reform::Builder, :html => { :class => "form" } do |f| %>
+    <%= f.text_area "note", :rows => 3 %>
+    <% f.row '&nbsp;' do %>
+      <%= f.submit "Verify" %>
+      <%= link_to "Cancel", pending_admin_subscriptions_path %>
+    <% end %>
+  <% end %>
+<% elsif @subscription.pending == :student_verification %>
+  <p>Subscription is pending verification of student card</p>
   <% form_for :subscription, :url => verify_admin_subscription_path(@subscription), :builder => Reform::Builder, :html => { :class => "form" } do |f| %>
     <%= f.text_area "note", :rows => 3 %>
     <% f.row '&nbsp;' do %>

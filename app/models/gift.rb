@@ -3,7 +3,7 @@ class Gift < ActiveRecord::Base
   has_many :offers, :through => :gift_offers
   has_many :orders
   has_many :subscription_gifts
-  has_many :subscriptions, :through => :subscription_gifts
+  has_many :subscription_actions, :through => :subscription_gifts
 
   has_attached_file :gift_image,
     :styles => { :medium => "350x350>", :thumb => "100>x100" },

@@ -25,6 +25,10 @@ gem 'will_paginate'
 gem 'json_pure'
 gem 'capistrano'
 
+# Used for Data Migration
+gem 'activerecord-sqlserver-adapter'
+gem 'tiny_tds'
+
 # soft delete- Hiding records instead of deleting-- acts_as_paranoid doesnt work correctly with new activerecord
 # Use this fork because the mover gem doesn't work with Postgres :(
 gem 'mover', :git => 'git://github.com/codefire/mover.git'
@@ -59,7 +63,7 @@ gem 'enumerated_attribute'
 
 gem 'ruby-debug'
 
-group :test, :cucumber, :development do
+#group :test, :cucumber, :development do
   gem 'webmock', :require => false
   gem 'capybara', "0.4.0"
   gem 'database_cleaner'
@@ -78,4 +82,4 @@ group :test, :cucumber, :development do
   gem 'mocha', '~> 0.9.8'
   gem 'timecop'
   gem 'akephalos'
-end
+#end

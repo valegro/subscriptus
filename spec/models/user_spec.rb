@@ -1,4 +1,5 @@
 require 'spec_helper'
+
 describe User do
   before(:each) do
     stub_wordpress
@@ -18,46 +19,27 @@ describe User do
                      :password_confirmation => 'password'
                )
     cm_return = stub(:success? => true)
-    
   end
 
   it "should create a trial user" do
-    cnt = User.count
-    user = User.create_trial_user(:first_name => 'Daniel', :last_name => 'Draper', :email => 'daniel@netfox.com')
-    user.login.should == 'trial_user'
-    user.auto_created.should == true
-    user.password.length.should == 8
-    User.count.should == cnt + 1
+    expect {
+      user = User.create_trial_user(:first_name => 'Daniel', :last_name => 'Draper', :email => 'daniel@netfox.com')
+      user.login.should == 'trial_user'
+      user.auto_created.should == true
+      user.password.length.should == 8
+    }.to change { User.count }.by(1)
+
     # Attempt a duplicate email
     lambda {
       User.create_trial_user(:first_name => 'Daniel', :last_name => 'Draper', :email => 'daniel@netfox.com')
     }.should raise_exception
-    User.count.should == cnt + 1
-    # And another with a different email
-    user2 = User.create_trial_user(:first_name => 'Daniel', :last_name => 'Draper', :email => 'daniel2@netfox.com')
-    User.count.should == cnt + 2
-    # Check different passwords
-    user.password.should_not == user2.password
-  end
-  
-  it "should not be valid if the login exists in Wordpress" do
-    Wordpress.stubs(:exists?).returns(true)
-    user = Factory.build(:user)
-    user.valid?.should == false
-  end
-  
-  it "should not create a user if the login exists in Wordpress" do
-    Wordpress.stubs(:exists?).returns(true)
-    lambda {
-      User.create_trial_user(:first_name => 'Daniel', :last_name => 'Draper', :email => 'daniel@netfox.com')
-    }.should raise_exception(ActiveRecord::RecordInvalid)
-  end
-  
-  it "should create a user in Wordpress" do
-    Wordpress.expects(:send_later).with(:create, { :login => 'daniel', :pword => 'password', :email => 'daniel@netfox.com',:firstname => 'Daniel', :lastname => 'Draper' })
-    Factory.create(:user, :firstname => 'Daniel', :lastname => 'Draper', :email => 'daniel@netfox.com', :login => 'daniel', :password => 'password',:password_confirmation => 'password')
-  end
 
+    # And another with a different email
+    expect {
+      user2 = User.create_trial_user(:first_name => 'Daniel', :last_name => 'Draper', :email => 'daniel2@netfox.com')
+    }.to change { User.count }.by(1)
+  end
+    
   it "should only allow one trial per publication" do
     publication = Factory.build(:publication)
     @user.save!
@@ -109,32 +91,206 @@ describe User do
     # test validates_format_of?
   end
 
-  describe "validating" do
-    it "should cause error if email confirmation missing"
-    it "should cause error if email confirmation not matching"
-  end
-
   it "should return full name" do
     User.new(:firstname => 'spam', :lastname => 'ham').fullname.should == 'spam ham'
   end
 
   describe "upon creation" do
+    before(:each) do
+      @stubbed_login = "abc123"
+    end
+
+    it "should generate a random username if one has not already been set" do
+      UserObserver.any_instance.stubs(:generate_unique_id).returns(@stubbed_login)
+      user = Factory.build(:user, :login => nil)
+      user.save!
+      user.login.should_not be(nil)
+      user.login.should == @stubbed_login
+    end
+
     it "should call update_cm with :create" do
       @user.expects(:send_later).with(:sync_to_campaign_master)
       @user.save!
     end
 
-    it "should have a 20 digit gateway_token" do
+    it "should NOT call update_cm if admin" do
+      @user = Factory.build(:admin)
+      @user.expects(:send_later).with(:sync_to_campaign_master).never
       @user.save!
-      @user.gateway_token.length.should == 20
+    end
+
+    it "should cause error if email confirmation missing" do
+      user = Factory.build(:user, :email => 'daniel@netfox.com', :email_confirmation => "")
+      lambda {
+        user.save!
+      }.should raise_error(ActiveRecord::RecordInvalid)
+    end
+
+    it "should cause error if email confirmation not matching" do
+      user = Factory.build(:user, :email => 'daniel@netfox.com', :email_confirmation => "foo@bar.com")
+      lambda {
+        user.save!
+      }.should raise_error(ActiveRecord::RecordInvalid)
+    end
+
+    it "should allow blank :phone_number, :address_1, :city, :postcode, :state, :country, :role if auto_created is true" do
+      lambda {
+        User.create!(:firstname => 'Dan', :lastname => 'Draper', :email => 'daniel@netfox.com', :auto_created => true, :password => 'test', :password_confirmation => 'test')
+      }.should_not raise_error
+    end
+
+    describe "wordpress" do
+      it "should create a user in Wordpress" do
+        Wordpress.expects(:send_later).with(:create, { :login => 'daniel', :pword => 'password', :email => 'daniel@netfox.com',:firstname => 'Daniel', :lastname => 'Draper' })
+        Factory.create(:user, :firstname => 'Daniel', :lastname => 'Draper', :email => 'daniel@netfox.com', :login => 'daniel', :password => 'password',:password_confirmation => 'password')
+      end
+
+      it "should NOT create a user in Wordpress if admin" do
+        Wordpress.expects(:send_later).never
+        @user = Factory.create(:admin)
+      end
+
+      it "should not be valid if the login exists in Wordpress" do
+        Wordpress.stubs(:exists?).returns(true)
+        user = Factory.build(:user)
+        user.valid?.should == false
+      end
+      
+      it "should be valid even though the login exists in Wordpress if we are an admin" do
+        Wordpress.stubs(:exists?).returns(true)
+        user = Factory.build(:admin)
+        user.valid?.should == true
+      end
+
+      it "should not create a trial user if the email exists in Wordpress" do
+        Wordpress.stubs(:exists?).with(:email => 'daniel@netfox.com').returns(true)
+        lambda {
+          User.create_trial_user(:first_name => 'Daniel', :last_name => 'Draper', :email => 'daniel@netfox.com')
+        }.should raise_exception(ActiveRecord::RecordInvalid)
+      end
+
+      it "should not create a user if the email exists in Wordpress" do
+        Wordpress.stubs(:exists?).with(:email => 'daniel@netfox.com').returns(true)
+        lambda {
+          Factory.create(:user, :email => 'daniel@netfox.com')
+        }.should raise_exception(ActiveRecord::RecordInvalid)
+      end
+
+      it "should not create a user if the login exists in Wordpress" do
+        Wordpress.stubs(:exists?).with(:login => @stubbed_login).returns(true)
+        lambda {
+          Factory.create(:user, :login => @stubbed_login)
+        }.should raise_exception(ActiveRecord::RecordInvalid)
+      end
+
+      it "should not create a user if no login is provided and the generated login already exists in Wordpress" do
+        UserObserver.any_instance.stubs(:generate_unique_id).returns(@stubbed_login)
+        Wordpress.stubs(:exists?).with(:login => @stubbed_login).returns(true)
+        lambda {
+          Factory.create(:user, :login => nil)
+        }.should raise_exception(ActiveRecord::RecordInvalid)
+      end
+    end
+
+    describe "gender" do
+      it "should be set" do
+        @user = Factory.create(:user)
+        @user.gender.should_not be(nil)
+      end
+
+      it "should be set to male if title is Mr" do
+        @user = Factory.create(:user, :title => 'Mr')
+        @user.gender.should == :male
+      end
+
+      it "should be set to male if title is Sir" do
+        @user = Factory.create(:user, :title => 'Sir')
+        @user.gender.should == :male
+      end
+
+      it "should be set to male if title is Fr" do
+        @user = Factory.create(:user, :title => 'Fr')
+        @user.gender.should == :male
+      end
+
+      it "should be set to female if title is Mrs" do
+        @user = Factory.create(:user, :title => 'Mrs')
+        @user.gender.should == :female
+      end
+
+      it "should be set to female if title is Ms" do
+        @user = Factory.create(:user, :title => 'Ms')
+        @user.gender.should == :female
+      end
+
+      it "should be set to female if title is Miss" do
+        @user = Factory.create(:user, :title => 'Miss')
+        @user.gender.should == :female
+      end
+
+      it "should be set to female if title is Lady" do
+        @user = Factory.create(:user, :title => 'Lady')
+        @user.gender.should == :female
+      end
     end
   end
 
   describe "upon update" do
-    it "should call sync_to_campaign_master" do
+    before(:each) do
       @user.save!
+    end
+
+    it "should call sync_to_campaign_master" do
       @user.expects(:send_later).with(:sync_to_campaign_master)
       @user.save!
+    end
+
+    it "should NOT call sync_to_campaign_master if admin" do
+      @user = Factory.create(:admin)
+      @user.expects(:send_later).with(:sync_to_campaign_master).never
+      @user.save!
+    end
+
+    it "should not allow us to change our login" do
+      @user.login = 'anotherlogin'
+      lambda {
+        @user.save!
+      }.should raise_exception(ActiveRecord::RecordInvalid)
+    end
+
+    describe "Wordpress" do
+      it "should update Wordpress" do
+        Wordpress.expects(:send_later).with(:update, :email => @user.email, :login => @user.login, :firstname => @user.firstname, :lastname => @user.lastname)
+        @user.save!
+      end
+
+      it "should NOT update Wordpress if user is an admin" do
+        @user = Factory.create(:admin)
+        Wordpress.expects(:send_later).never
+        @user.save!
+      end
+
+      it "should not update the user if we change our email but that email has been taken" do
+        @user.email = 'foo@bar.com'
+        Wordpress.stubs(:exists?).with(:email => 'foo@bar.com').returns(true)
+        Wordpress.expects(:send_later).with(
+          :update,
+          :email => @user.email,
+          :login => @user.login,
+          :firstname => @user.firstname,
+          :lastname => @user.lastname
+        ).never
+        lambda {
+          @user.save!
+        }.should raise_exception(ActiveRecord::RecordInvalid)
+      end
+
+      it "should still update the user if we change our email but that email has been taken if we are an admin" do
+        Wordpress.stubs(:exists?).with(:email => 'foo@bar.com').returns(true)
+        lambda {
+          @user.save!
+        }.should_not raise_exception(ActiveRecord::RecordInvalid)
+      end
     end
   end
 
@@ -145,6 +301,38 @@ describe User do
       @user.subscriptions << @subscription
       @subscription.expects(:sync_to_campaign_master)
       @user.sync_to_campaign_master
+    end
+  end
+
+  describe "storing a credit on the gateway" do
+    before(:each) do
+      @payment = Factory.build(:payment)
+      @card = @payment.credit_card
+      @token = "12345"
+      Utilities.stubs(:generate_unique_token).returns(@token)
+    end
+
+    it "should save a token to the user object" do
+      success = stub(:success? => true)
+      GATEWAY.expects(:setup_recurrent).with(0, @card, @token).returns(success)
+      user = Factory.create(:user)
+      user.store_credit_card_on_gateway(@card)
+    end
+
+    it "should not make a call to setup_recurring if there is already a token stored" do
+      GATEWAY.expects(:setup_recurrent).never
+      user = Factory.create(:user_with_token)
+      user.store_credit_card_on_gateway(@card)
+    end
+
+    it "should handle errors" do
+      failure = stub(:success? => false, :message => "Test Failure")
+      GATEWAY.expects(:setup_recurrent).with(0, @card, "12345").returns(failure)
+      user = Factory.create(:user)
+      lambda {
+        user.store_credit_card_on_gateway(@card)
+      }.should raise_exception(Exceptions::CannotStoreCard)
+      user.payment_gateway_token.should be(nil)
     end
   end
 end

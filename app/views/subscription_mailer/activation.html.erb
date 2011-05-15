@@ -47,4 +47,5 @@
 	</p>
 
 	<p style="padding: 5px 0px 5px 0px"><strong>Copyright © 2010 Private Media Pty Ltd. All rights reserved</strong></p>
+  <p>Your email address is registered as <%= @user.email %> - you can unsubscribe here: <%= unsubscribe_url(:user_id => @user.id) %></p>
 </body>
