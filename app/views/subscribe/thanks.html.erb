@@ -18,20 +18,21 @@
     
     <p>Have you signed up for Crikey Weekender yet? It's our weekly arts and culture wrap &mdash; delivered direct to your inbox every Friday morning. You'll love it.</p>
     
-    <form>
-      <input type="checkbox">
-      <label>Yes &mdash; send me your Weekender</label>
+    <% form_for @subscription, :url => complete_path do |form| %>
+
+      <%= check_box_tag :weekender %>
+      <label for="weekender">Yes &mdash; send me your Weekender</label>
       
       <h3>Promotional Materials</h3>
       
-      <input type="checkbox">
-      <label>Tick this box if you want to receive carefully selected offers by email from advertisers screened by Crikey</label>
+      <%= form.check_box :solus %>
+      <label for="subscription_solus">Tick this box if you want to receive carefully selected offers by email from advertisers screened by Crikey</label>
       
       <div id="">
       <%= image_submit_tag "/images/completerego.png", :disable_with => "Processing...", :id => "btnSubmit" %>
       </div>
       
-    </form>
+    <% end %>
       
   </div>
 </div>

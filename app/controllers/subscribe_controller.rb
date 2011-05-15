@@ -1,10 +1,11 @@
 class SubscribeController < ApplicationController
   layout 'signup'
-  before_filter :load_offer
-  before_filter :load_source
-  before_filter :load_gifts
-  before_filter :load_tab
+  before_filter :load_offer,  :except => [ :thanks, :complete ]
+  before_filter :load_source, :except => [ :thanks, :complete ]
+  before_filter :load_gifts,  :except => [ :thanks, :complete ]
+  before_filter :load_tab,    :except => [ :thanks, :complete ]
 
+  before_filter :load_subscription, :only => [ :thanks, :complete ]
   before_filter :require_user, :only => [ :edit, :update ]
 
   rescue_from(Exceptions::PaymentFailedException, Exceptions::GiftNotAvailable) do |exception|
@@ -42,12 +43,13 @@ class SubscribeController < ApplicationController
       @user.save!
       @factory = get_factory
       @subscription = @factory.build
-      redirect_to :action => :thanks
+      store_subscription_in_session
+      redirect_to thanks_path
     end
   end
 
   def edit
-    @user = current_user #User.subscribers.find(262) # TODO: Use current user
+    @user = current_user
     @subscription = @user.subscriptions.find(:first, :conditions => { :publication_id => @offer.publication.id })
     @subscription ||= Subscription.new
     @user.email_confirmation = @user.email
@@ -57,8 +59,7 @@ class SubscribeController < ApplicationController
 
   def update
     @payment_option = params[:payment_option]
-
-    @user = User.subscribers.first # TODO: Use current user
+    @user = current_user
     # See if we have an existing subscription
     # TODO: Dry this up (see new)
     @subscription = @user.subscriptions.find(:first, :conditions => { :publication_id => @offer.publication.id })
@@ -67,7 +68,25 @@ class SubscribeController < ApplicationController
       @user.update_attributes!(params[:user])
       @factory = get_factory
       @subscription = @subscription.blank? ? @factory.build : @factory.update(@subscription)
-      redirect_to :action => :thanks
+      store_subscription_in_session
+      redirect_to thanks_path
+    end
+  end
+
+  def thanks
+  end
+
+  def complete
+    @subscription.update_attributes!(params[:subscription])
+    @weekender = Publication.find_by_name("Crikey Weekender")
+    if params[:weekender]
+      @user = @subscription.user
+      @user.subscriptions.create!(
+        :publication => @weekender,
+        :offer => @subscription.offer,
+        :state => 'active',
+        :expires_at => nil
+      )
     end
   end
 
@@ -109,5 +128,13 @@ class SubscribeController < ApplicationController
       else
         @optional_gifts = @offer.gifts.in_stock.optional
       end
+    end
+
+    def store_subscription_in_session
+      session[:subscription_id] = @subscription.try(:id)
+    end
+
+    def load_subscription
+      @subscription = Subscription.find(session[:subscription_id])
     end
 end

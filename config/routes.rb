@@ -52,8 +52,8 @@ ActionController::Routing::Routes.draw do |map|
     s.renew          '/renew',       :action => "update",  :conditions => { :method => :put }
     s.new_subscribe  '/subscribe',   :action => "new",     :conditions => { :method => :get }
     s.subscribe      '/subscribe',   :action => "create",  :conditions => { :method => :post }
-    s.connect        '/thanks',      :action => "thanks"
-    s.connect        '/complete',    :action => "complete"
+    s.thanks         '/thanks',      :action => "thanks"
+    s.complete       '/complete',    :action => "complete"
   end
 
   # Unsubscribe

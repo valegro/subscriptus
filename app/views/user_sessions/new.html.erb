@@ -5,10 +5,13 @@
 <% end %>
 
 <% form_for(@user_session, :url => user_session_path, :builder => Reform::Builder, :html => { :class => "form" }) do |f| %>
-  <%= f.text_field :login %>
+  <%= f.text_field :login, :label => "Email" %>
   <%= f.password_field :password %>
   <%= f.check_box :remember_me %>
   <div class="field-inner">
     <%= image_submit_tag "login.png" %>
   </div>
+  <div id="forgot_password_link">
+		<a href="http://www.crikey.com.au/wp-login.php?action=lostpassword">Forgot password?</a>
+	</div>
 <% end %>
