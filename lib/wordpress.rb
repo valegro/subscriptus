@@ -12,7 +12,7 @@ class Wordpress
   def self.exists?(opts={})
     check_any_required(opts, :login, :email)
     res = make_request(opts.merge(:func => 'exists'))
-    return !res.blank?
+    return !res.blank? && res != "-1"
   end
   
   def self.create(opts={})
