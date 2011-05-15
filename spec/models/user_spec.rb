@@ -291,6 +291,8 @@ describe User do
           @user.save!
         }.should_not raise_exception(ActiveRecord::RecordInvalid)
       end
+
+      it "should authenticate to wordpress if role is subscriber"
     end
   end
 

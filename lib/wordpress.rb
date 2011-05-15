@@ -4,6 +4,8 @@ module Wordpress
   class << self
     attr_accessor :enabled
   end
+
+  self.enabled = true
   
   def self.config
     @@config ||= YAML.load_file(File.join(RAILS_ROOT, 'config', 'wordpress.yml'))[RAILS_ENV].symbolize_keys
@@ -26,8 +28,9 @@ module Wordpress
   
   def self.authenticate(opts={})
     check_any_required(opts, :login, :email)
+    Rails.logger.warn("Authentication #{opts.inspect}")
     check_required(opts, :pword)
-    return make_request(opts.merge(:func => 'authenticate')) == 'true'
+    return make_request(opts.merge(:func => 'authenticate')) != '-1'
   end
 
 private

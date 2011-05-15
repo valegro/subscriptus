@@ -30,3 +30,5 @@ end
 CAMPAIGNMASTER_USERNAME = 'ddraper'
 CAMPAIGNMASTER_PASSWORD = 'netfox'
 CAMPAIGNMASTER_CLIENT_ID = '5032'
+
+Wordpress.enabled = true

@@ -44,4 +44,6 @@ describe "Renewals", :type => :request do
   end
       
   it "should create a subscription if a user has no subscriptions but tries to renew"
+
+  # TODO: Test if auth succeeds but there is no subscriptus user to match
 end
