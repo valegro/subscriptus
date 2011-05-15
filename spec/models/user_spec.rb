@@ -24,7 +24,6 @@ describe User do
   it "should create a trial user" do
     expect {
       user = User.create_trial_user(:first_name => 'Daniel', :last_name => 'Draper', :email => 'daniel@netfox.com')
-      user.login.should == 'trial_user'
       user.auto_created.should == true
       user.password.length.should == 8
     }.to change { User.count }.by(1)
@@ -100,13 +99,15 @@ describe User do
       @stubbed_login = "abc123"
     end
 
-    it "should generate a random username if one has not already been set" do
+    it "should generate a random username if user is a subscriber" do
       UserObserver.any_instance.stubs(:generate_unique_id).returns(@stubbed_login)
-      user = Factory.build(:user, :login => nil)
+      user = Factory.build(:user, :login => "shit that will be overwitten")
       user.save!
       user.login.should_not be(nil)
       user.login.should == @stubbed_login
     end
+
+    it "login should not be over written if user is an admin"
 
     it "should call update_cm with :create" do
       @user.expects(:send_later).with(:sync_to_campaign_master)
@@ -114,7 +115,7 @@ describe User do
     end
 
     it "should NOT call update_cm if admin" do
-      @user = Factory.build(:admin)
+      @user = Factory.build(:admin, :login => 'daniel')
       @user.expects(:send_later).with(:sync_to_campaign_master).never
       @user.save!
     end
@@ -141,13 +142,15 @@ describe User do
 
     describe "wordpress" do
       it "should create a user in Wordpress" do
-        Wordpress.expects(:send_later).with(:create, { :login => 'daniel', :pword => 'password', :email => 'daniel@netfox.com',:firstname => 'Daniel', :lastname => 'Draper' })
-        Factory.create(:user, :firstname => 'Daniel', :lastname => 'Draper', :email => 'daniel@netfox.com', :login => 'daniel', :password => 'password',:password_confirmation => 'password')
+        @stubbed_login = '12345'
+        UserObserver.any_instance.stubs(:generate_unique_id).returns(@stubbed_login)
+        Wordpress.expects(:send_later).with(:create, { :login => '12345', :pword => 'password', :email => 'daniel@netfox.com',:firstname => 'Daniel', :lastname => 'Draper' })
+        Factory.create(:user, :firstname => 'Daniel', :lastname => 'Draper', :email => 'daniel@netfox.com', :password => 'password',:password_confirmation => 'password')
       end
 
       it "should NOT create a user in Wordpress if admin" do
         Wordpress.expects(:send_later).never
-        @user = Factory.create(:admin)
+        @user = Factory.create(:admin, :login => "daniel")
       end
 
       it "should not be valid if the login exists in Wordpress" do
@@ -158,7 +161,7 @@ describe User do
       
       it "should be valid even though the login exists in Wordpress if we are an admin" do
         Wordpress.stubs(:exists?).returns(true)
-        user = Factory.build(:admin)
+        user = Factory.build(:admin, :login => 'daniel')
         user.valid?.should == true
       end
 
@@ -178,8 +181,9 @@ describe User do
 
       it "should not create a user if the login exists in Wordpress" do
         Wordpress.stubs(:exists?).with(:login => @stubbed_login).returns(true)
+        UserObserver.any_instance.stubs(:generate_unique_id).returns(@stubbed_login)
         lambda {
-          Factory.create(:user, :login => @stubbed_login)
+          Factory.create(:user)
         }.should raise_exception(ActiveRecord::RecordInvalid)
       end
 
@@ -246,7 +250,7 @@ describe User do
     end
 
     it "should NOT call sync_to_campaign_master if admin" do
-      @user = Factory.create(:admin)
+      @user = Factory.create(:admin, :login => 'daniel')
       @user.expects(:send_later).with(:sync_to_campaign_master).never
       @user.save!
     end
@@ -265,7 +269,7 @@ describe User do
       end
 
       it "should NOT update Wordpress if user is an admin" do
-        @user = Factory.create(:admin)
+        @user = Factory.create(:admin, :login => 'daniel')
         Wordpress.expects(:send_later).never
         @user.save!
       end

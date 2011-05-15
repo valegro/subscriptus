@@ -16,6 +16,7 @@ Factory.define :user do |f| # Dont use this factory. Use either an admin or a su
 end
 
 Factory.define :admin, :parent => :user do |a|
+  a.login { Faker::Name.name.downcase }
   a.role { 'admin' }
 end
 

@@ -1,11 +1,9 @@
-module Wordpress
+class Wordpress
   class Error < StandardError; end
 
   class << self
     attr_accessor :enabled
   end
-
-  self.enabled = true
   
   def self.config
     @@config ||= YAML.load_file(File.join(RAILS_ROOT, 'config', 'wordpress.yml'))[RAILS_ENV].symbolize_keys
@@ -13,7 +11,8 @@ module Wordpress
   
   def self.exists?(opts={})
     check_any_required(opts, :login, :email)
-    return !make_request(opts.merge(:func => 'exists')).blank?
+    res = make_request(opts.merge(:func => 'exists'))
+    return !res.blank?
   end
   
   def self.create(opts={})
@@ -36,7 +35,9 @@ module Wordpress
 private
   def self.make_request(opts)
     if self.enabled
-      RestClient.get(Wordpress.config[:endpoint], :params => opts.merge(:key => Wordpress.config[:key]), :accept => :text).to_str
+      res = RestClient.get(Wordpress.config[:endpoint], :params => opts.merge(:key => Wordpress.config[:key]), :accept => :text).to_str
+      Rails.logger.warn("Wordpress: Res = #{res.inspect}")
+      res
     else
       ''
     end

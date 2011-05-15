@@ -1,8 +1,10 @@
 class UserObserver < ActiveRecord::Observer
   include ActiveMerchant::Utils
 
-  def before_validation(user)
-    user.login ||= generate_unique_id
+  def before_validation_on_create(user)
+    unless user.admin?
+      user.login = generate_unique_id
+    end
   end
 
   def after_create(user)
