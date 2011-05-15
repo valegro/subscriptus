@@ -27,12 +27,14 @@ class UserObserver < ActiveRecord::Observer
 
   def after_update(user)
     unless user.admin?
-      Wordpress.send_later(:update, {
-        :login => user.login,
-        :firstname => user.firstname,
-        :lastname => user.lastname,
-        :email => user.email
-      })
+      if user.firstname_changed? || user.lastname_changed? || user.email_changed?
+        Wordpress.send_later(:update, {
+          :login => user.login,
+          :firstname => user.firstname,
+          :lastname => user.lastname,
+          :email => user.email
+        })
+      end
     end
   end
 

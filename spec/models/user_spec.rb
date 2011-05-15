@@ -263,8 +263,28 @@ describe User do
     end
 
     describe "Wordpress" do
-      it "should update Wordpress" do
-        Wordpress.expects(:send_later).with(:update, :email => @user.email, :login => @user.login, :firstname => @user.firstname, :lastname => @user.lastname)
+      it "should update Wordpress if role is subscriber and email or name changes" do
+        @user.email = 'another@example.com'
+        @user.email_confirmation = 'another@example.com'
+        Wordpress.expects(:send_later).with(
+          :update,
+          :email => @user.email,
+          :login => @user.login,
+          :firstname => @user.firstname,
+          :lastname => @user.lastname
+        )
+        @user.save!
+      end
+
+      it "should NOT update Wordpress if role is subscriber and anything but email or name changes" do
+        @user.last_request_at = Time.now
+        Wordpress.expects(:send_later).with(
+          :update,
+          :email => @user.email,
+          :login => @user.login,
+          :firstname => @user.firstname,
+          :lastname => @user.lastname
+        ).never
         @user.save!
       end
 

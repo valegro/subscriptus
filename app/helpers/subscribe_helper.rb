@@ -28,4 +28,12 @@ module SubscribeHelper
       end
     end
   end
+
+  def get_subscribe_submit_path(offer, source, renewing = false)
+    if renewing
+      renew_path(:offer_id => offer.id, :source_id => source.try(:id))
+    else
+      subscribe_path(:offer_id => offer.id, :source_id => source.try(:id))
+    end
+  end
 end

@@ -12,7 +12,7 @@
   </script>
 <% end %>
 
-<% form_for @subscription, :url => subscribe_path(:offer_id => @offer.id, :source_id => @source.try(:id)), :builder => SubscribeFormBuilder do |f| %>
+<% form_for @subscription, :url => get_subscribe_submit_path(@offer, @source, @renewing), :builder => SubscribeFormBuilder do |f| %>
 
   <div class='section' id='step1'>
     <img src="/images/step1.png" class='step' alt='step 1' />
