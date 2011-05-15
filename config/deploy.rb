@@ -24,7 +24,7 @@ task :to_production do
   set :user, "root"
   set :password, "zxnm9014"
   set :prod_db, "subscriptus"
-  set :db_hostname, "localhost"
+  set :db_hostname, "whitlam-back"
   set :db_port, 3306
 
   role :app, "deploy@fraser.crikey.com.au"
