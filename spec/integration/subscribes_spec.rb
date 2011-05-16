@@ -346,4 +346,17 @@ describe "Subscribes" do
       end
     end
   end
+
+  describe "when I visit the subscribe page but I don't provide an offer" do
+    before(:each) do
+      @offer = Factory.create(:offer)
+      @term = @offer.offer_terms.create(:price => 10, :months => 3, :concession => true)
+      @source = Factory.create(:source)
+      stub_wordpress
+      visit new_subscribe_path(:source_id => @source.id)
+    end
+
+    it "should use the default offer"
+  end
+
 end

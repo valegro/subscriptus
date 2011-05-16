@@ -12,7 +12,6 @@ class SubscriptionFactory
   def initialize(offer, options = {})
     @offer              = offer
     @attributes         = options[:attributes] || {}
-    @term               = OfferTerm.find(options[:term_id]) rescue @offer.offer_terms.first
     @included_gift_ids  = options[:included_gift_ids]
     @optional_gift_id   = options[:optional_gift]
     @source             = options[:source] ? Source.find(options[:source]) : nil
@@ -22,6 +21,7 @@ class SubscriptionFactory
     @payment_attributes = options[:payment_attributes]
     @subscription       = Subscription.new(@attributes)
     @payment_option     = options[:payment_option] || 'credit_card'
+    @term               = OfferTerm.find(options[:term_id]) rescue @offer.offer_terms.first
   end
 
   def self.build(offer, options = {})

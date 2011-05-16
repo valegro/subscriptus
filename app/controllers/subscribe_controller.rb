@@ -1,9 +1,9 @@
 class SubscribeController < ApplicationController
   layout 'signup'
-  before_filter :load_offer,  :except => [ :thanks, :complete ]
-  before_filter :load_source, :except => [ :thanks, :complete ]
-  before_filter :load_gifts,  :except => [ :thanks, :complete ]
-  before_filter :load_tab,    :except => [ :thanks, :complete ]
+  before_filter :load_offer_and_publication,  :except => [ :thanks, :complete ]
+  before_filter :load_source,                 :except => [ :thanks, :complete ]
+  before_filter :load_gifts,                  :except => [ :thanks, :complete ]
+  before_filter :load_tab,                    :except => [ :thanks, :complete ]
 
   before_filter :load_subscription, :only => [ :thanks, :complete ]
   before_filter :require_user, :only => [ :edit, :update ]
@@ -52,6 +52,7 @@ class SubscribeController < ApplicationController
     @user = current_user
     @subscription = @user.subscriptions.find(:first, :conditions => { :publication_id => @offer.publication.id })
     @subscription ||= Subscription.new
+    # Ensure we have a valid offer
     @user.email_confirmation = @user.email
     @renewing = true
     render :template => 'subscribe/new'
@@ -104,8 +105,19 @@ class SubscribeController < ApplicationController
       })
     end
 
-    def load_offer
-      @offer = params[:offer_id] ? Offer.find(params[:offer_id]) : Offer.first
+    def load_offer_and_publication
+      @offer = if params[:offer_id]
+        Offer.find(params[:offer_id])
+      end
+      @publication = if params[:publication_id]
+        Publication.find(params[:publication_id])
+      end
+      if !@offer && @publication
+        @offer = (@publication.offers.default_for_renewal || @publication.offers.first)
+      end
+      if !@offer
+        @offer = Offer.first
+      end
     end
 
     def load_source

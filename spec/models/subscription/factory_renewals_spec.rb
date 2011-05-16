@@ -77,7 +77,7 @@ describe SubscriptionFactory, "renewals" do
     Timecop.return
   end
 
-  # Scenario
+ # Scenario
   describe "trialler subscribes and becomes active" do
     before(:each) do
       @publication = Factory.create(:publication)
@@ -171,6 +171,8 @@ describe SubscriptionFactory, "renewals" do
 
     it_should_behave_like "A pending subscription"
   end
+
+  it "should raise if we try to renew a sub with an offer that has a publication other than the one we are subscribed to"
 
   # TODO: More scenarios?
 end

@@ -3,3 +3,4 @@
 <%= form.text_area :description, :rows => 10 %>
 <%= form.text_field :forgot_password_link %>
 <%= form.file_field :publication_image %>
+<%= form.select :default_renewal_offer_id, @offers.map { |o| [ o.name, o.id ] } %>

@@ -11,6 +11,7 @@ module  Exceptions
   class CanNotBeCanceled                     < StandardError; end
   class PaymentFailedException               < StandardError; end
   class PaymentAlreadyProcessed              < StandardError; end
+  class InvalidOffer                         < StandardError; end
   class InvalidOfferTerm                     < StandardError; end
   class PaymentTokenMissing                  < StandardError; end
   class CannotStoreCard                      < StandardError; end
