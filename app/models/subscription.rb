@@ -186,15 +186,12 @@ class Subscription < ActiveRecord::Base
         :solus            => self.solus
       }
     }
-    # TODO: Solus, Weekender? Are these even needed?
 
-    if CM::Recipient.exists?(:fields => { 'subscription_id' => self.id })
+    if CM::Recipient.exists?(:fields => { 'subscription_id' => self.reference })
       CM::Recipient.update(hash)
     else
       CM::Recipient.create!(hash)
     end
-  rescue RuntimeError => ex
-    CM::Proxy.log_cm_error(ex)
   end
 
   def increment_expires_at(term_length)
