@@ -21,7 +21,9 @@ class UserObserver < ActiveRecord::Observer
 
   def after_save(user)
     unless user.admin?
-      user.send_later :sync_to_campaign_master
+      if user.firstname_changed? || user.lastname_changed? || user.email_changed?
+        user.send_later :sync_to_campaign_master
+      end
     end
   end
 

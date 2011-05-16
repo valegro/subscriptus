@@ -255,6 +255,8 @@ describe User do
       @user.save!
     end
 
+    it "should NOT call sync_to_campaign_master if anything but name or email is changed"
+
     it "should not allow us to change our login" do
       @user.login = 'anotherlogin'
       lambda {
