@@ -182,7 +182,8 @@ class Subscription < ActiveRecord::Base
         :offer_id         => self.offer_id,
         :expires_at       => self.expires_at.try(:strftime, "%d/%m/%y"),
         :created_at       => self.created_at.try(:strftime, "%d/%m/%y"),
-        :state_updated_at => self.state_updated_at.try(:strftime, "%d/%m/%y")
+        :state_updated_at => self.state_updated_at.try(:strftime, "%d/%m/%y"),
+        :solus            => self.solus
       }
     }
     # TODO: Solus, Weekender? Are these even needed?
