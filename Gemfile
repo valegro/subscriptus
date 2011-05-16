@@ -65,7 +65,7 @@ gem 'enumerated_attribute'
 
 gem 'ruby-debug'
 
-#group :test, :cucumber, :development do
+group :test, :cucumber, :development do
   gem 'webmock', :require => false
   gem 'capybara', "0.4.0"
   gem 'database_cleaner'
@@ -84,4 +84,4 @@ gem 'ruby-debug'
   gem 'mocha', '~> 0.9.8'
   gem 'timecop'
   gem 'akephalos'
-#end
+end
