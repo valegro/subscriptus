@@ -36,7 +36,9 @@ class Subscription::MailerObserver < ActiveRecord::Observer
   def after_create(subscription)
     case subscription.state
       when 'active'
-        SubscriptionMailer.send_later(:deliver_activation, subscription)
+        if !subscription.actions.empty? && !subscription.actions.last.payment.blank?
+          SubscriptionMailer.send_later(:deliver_activation, subscription)
+        end
       when 'trial'
         SubscriptionMailer.send_later(:deliver_new_trial, subscription)
       when 'pending'

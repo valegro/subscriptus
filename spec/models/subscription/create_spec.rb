@@ -31,6 +31,8 @@ describe Subscription do
       @user.subscriptions << sub
     end
 
+    it "should NOT deliver and email for new subscriptions that did not take payment"
+
     it "should deliver a pending email for new pending student subscriptions" do
       @subscription = Factory.build(:pending_subscription, :pending => 'student_verification')
       SubscriptionMailer.expects(:send_later).with(:deliver_pending_student_verification, @subscription)

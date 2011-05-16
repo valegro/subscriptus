@@ -26,7 +26,6 @@ gem 'json_pure'
 gem 'capistrano'
 
 gem 'hoptoad_notifier'
-gem 'delayed_job_extras'
 
 # Used for Data Migration
 gem 'activerecord-sqlserver-adapter'
