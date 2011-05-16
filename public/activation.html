@@ -178,9 +178,53 @@
 				padding-bottom:12px;
 			}
 			
-			div.activation-message {
-				padding-left:20px;
-				padding-right:20px;
+			.activation-message {
+				padding-left:40px !important;
+				padding-right:40px !important;
+			}
+			
+			.activation-message #logo {
+				text-align:center;
+				padding-bottom:20px;
+			}
+			
+			.activation-message h1 {
+				font-size:28px;
+				text-align:center;
+				padding-bottom:30px;
+			}
+			
+			hr {
+				color:#eee;
+				margin-bottom:20px;
+				margin-top:28px;
+			}
+			
+			em.small {
+				font-size:12px;
+			}
+			
+			#activation-footer {
+				text-align:center;
+			}
+			
+			p.copyright {
+				font-size:12px;
+				color:#999;
+			}
+			
+			a#print-page {
+				display:block;
+				width:243px;
+				height:50px;
+				background:url(images/print-page.png) no-repeat;
+				margin:0 auto;
+				padding-bottom:20px;
+			}
+			
+			a#print-page:active {
+				position:relative;
+				top:2px;
 			}
 			
 		</style>
@@ -197,7 +241,13 @@
 		
 		<div id="page" class="activation-message">
 
-		<p><strong>Thank you for subscribing to Crikey.</strong></p>
+			<div id="logo">
+				<img src="images/logo.gif" alt="Crikey" />
+			</div>
+
+		<h1>Thank you for subscribing to Crikey.</h1>
+		
+		<hr />
 		
 		<h2>Your Order Details</h2>
 
@@ -208,9 +258,10 @@
 			<strong>Payment Method:</strong> Credit Card<br/>
 			<strong>Payment Cost:</strong> $200<br/>
 			<br />
-			<em>(Please note: Blimey Holdings will appear as the transaction detail on your statement)</em><br/>
+			<em class="small">(Please note: Blimey Holdings will appear as the transaction detail on your statement)</em><br/>
 		</p>
 
+		<hr />
 
 		<h2>Your Subscription Details</h2>
 		
@@ -235,14 +286,17 @@
 			<strong>Country:</strong> Orstraya<br/>
 		</p>
 
+		<hr />
+		
+		<div id="activation-footer">
 		<p>Please <a href="#">contact us</a>, quoting your order number if you have any problems.</p>
 
-		<p>
-			The Crikey Crew<br/>
-			<a target='_blank' href="http://www.crikey.com.au/">www.crikey.com.au</a><br/><br/>
-		</p>
+		<div id="print-page-button">
+		<a id="print-page"></a>
+		</div>
 
-		<p><strong>Copyright © 2010 Private Media Pty Ltd. All rights reserved</strong></p>
+		<p class="copyright">Copyright &copy; 2010 Private Media Pty Ltd. All rights reserved</p>
+		</div>
 	
 		</div> <!-- closes #page -->
 		
