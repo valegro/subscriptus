@@ -238,35 +238,68 @@
 	</head>
 	
 	<body>
-	
-		<div id='page'>
 		
-			<div id='top-right'>
-				<p class='phone'>
-					1800 985 502
-				</p>
-				<p class='other'>
-					Want to pay by fax or mail? <a href='/forms/crikey_directdebit_bank.pdf' target="_blank">Download the Subscription form</a>
-				</p>
-			</div>
-			
-			<div class='clear'></div>
+		<div id="page" class="activation-message">
 
-			<div id='header'>
-			
-				<img src='/images/logo.gif' alt='Crikey' />
-			
+			<div id="logo">
+				<img src="images/logo.gif" alt="Crikey" />
 			</div>
-			
-      <%= yield %>
-				
-			<div id='footer'>
-			
-			</div>
-						
-		</div> <!-- id='page' -->
+
+		<h1>Thank you for subscribing to Crikey.</h1>
 		
+		<hr />
 		
+		<h2>Your Order Details</h2>
+
+		<p>
+			<strong>Supplier:</strong> Crikey<br/>
+			<strong>Order Number:</strong> 1234<br/>
+			<strong>Order Date:</strong> 16 May, 2011<br/>
+			<strong>Payment Method:</strong> Credit Card<br/>
+			<strong>Payment Cost:</strong> $200<br/>
+			<br />
+			<em class="small">(Please note: Blimey Holdings will appear as the transaction detail on your statement)</em><br/>
+		</p>
+
+		<hr />
+
+		<h2>Your Subscription Details</h2>
+		
+		<p><strong>Publication Name:</strong> This Awesome Publication</p>
+		<p>
+			<strong>Subscription Starts:</strong> 16 May, 2011<br/>
+			<strong>Subscription Ends:</strong> 16 May, 2012
+		</p>
+
+	    <p>
+	      <strong>Included Gifts:</strong><br/>
+	      Handipak of Panadol Rapid and an iPhone 4
+	    </p>
+
+		<p>
+			<strong>Your Address Details:</strong><br/>
+			<strong>Address 1:</strong> 123 Something Street<br/>
+			<strong>Address 2:</strong> <br/>
+			<strong>City:</strong> Launceston<br/>
+			<strong>Postcode:</strong> 1234<br/>
+			<strong>State:</strong> Tasmania<br/>
+			<strong>Country:</strong> Orstraya<br/>
+		</p>
+
+		<hr />
+		
+		<div id="activation-footer">
+		<p>Please <a href="#">contact us</a>, quoting your order number if you have any problems.</p>
+
+		<div id="print-page-button">
+		<a id="print-page"></a>
+		</div>
+
+		<p class="copyright">Copyright &copy; 2010 Private Media Pty Ltd. All rights reserved</p>
+		</div>
 	
+		</div> <!-- closes #page -->
+		
 	</body>
+	
 </html>
