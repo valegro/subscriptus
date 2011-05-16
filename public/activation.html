@@ -211,33 +211,31 @@
 			<em>(Please note: Blimey Holdings will appear as the transaction detail on your statement)</em><br/>
 		</p>
 
-		<p><strong>Your Subscription Details</strong></p>
-		<p>Publication Name: <%= h @subscription.publication.name %></p>
+
+		<h2>Your Subscription Details</h2>
+		
+		<p><strong>Publication Name:</strong> This Awesome Publication</p>
 		<p>
-			Subscription Starts: <%= @subscription.starts_at ? @subscription.starts_at.to_formatted_s(:long) : nil %><br/>
-			Subscription Ends: <%= @subscription.expires_at ? @subscription.expires_at.to_formatted_s(:long) : nil %>
+			<strong>Subscription Starts:</strong> 16 May, 2011<br/>
+			<strong>Subscription Ends:</strong> 16 May, 2012
 		</p>
 
-	  <% if @subscription.offer && !@subscription.offer.gifts.empty? %>
 	    <p>
 	      <strong>Included Gifts:</strong><br/>
-	      <% @subscription.offer.gifts.each do |gift| %>
-	        <%= h gift.name %><br/>
-	      <% end %>
+	      Handipak of Panadol Rapid and an iPhone 4
 	    </p>
-	  <% end %>
 
 		<p>
 			<strong>Your Address Details:</strong><br/>
-			Address 1: <%= h @subscription.user.try(:address_1) %><br/>
-			Address 2: <%= h @subscription.user.try(:address_2) %><br/>
-			City: <%= h @subscription.user.try(:city) %><br/>
-			Postcode: <%= h @subscription.user.try(:postcode) %><br/>
-			State: <%= h @subscription.user.try(:state) %><br/>
-			Country: <%= h @subscription.user.try(:country) %><br/>
+			<strong>Address 1:</strong> 123 Something Street<br/>
+			<strong>Address 2:</strong> <br/>
+			<strong>City:</strong> Launceston<br/>
+			<strong>Postcode:</strong> 1234<br/>
+			<strong>State:</strong> Tasmania<br/>
+			<strong>Country:</strong> Orstraya<br/>
 		</p>
 
-		<p>Please reply to this email, quoting your order number if you have any problems.</p>
+		<p>Please <a href="#">contact us</a>, quoting your order number if you have any problems.</p>
 
 		<p>
 			The Crikey Crew<br/>
@@ -245,7 +243,6 @@
 		</p>
 
 		<p><strong>Copyright © 2010 Private Media Pty Ltd. All rights reserved</strong></p>
-	  <p>Your email address is registered as <%= @user.email %> - you can unsubscribe here: <%= unsubscribe_url(:user_id => @user.id) %></p>
 	
 		</div> <!-- closes #page -->
 		
