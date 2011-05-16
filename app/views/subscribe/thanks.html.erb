@@ -20,7 +20,7 @@
     
     <% form_for @subscription, :url => complete_path do |form| %>
 
-      <%= check_box_tag :weekender %>
+      <%= check_box_tag :weekender, "1", true %>
       <label for="weekender">Yes &mdash; send me your Weekender</label>
       
       <h3>Promotional Materials</h3>

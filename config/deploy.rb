@@ -26,6 +26,7 @@ task :to_production do
   set :prod_db, "subscriptus"
   set :db_hostname, "whitlam-back"
   set :db_port, 3306
+  set :port, 2244 # SSH PORT
 
   role :app, "deploy@fraser.crikey.com.au"
   role :web, "deploy@fraser.crikey.com.au"
