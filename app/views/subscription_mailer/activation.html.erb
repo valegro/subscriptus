@@ -7,17 +7,17 @@
 	<p>
 		Supplier: Crikey<br/>
 		Order Number: <%= h @subscription.reference %><br/>
-		Order Date: <%= @subscription.updated_at ? @subscription.updated_at.to_formatted_s(:long) : nil %><br/>
+		Order Date: <%= @subscription.updated_at.try(:strftime, "%d/%m/%Y") %><br/>
 		Payment Method: Credit Card<br/>
-		Payment Cost: <%= number_to_currency @subscription.price, :unit => "AUD $" %><br/>
+		Payment Cost: <%= number_to_currency @subscription.actions.last.payment.amount, :unit => "AUD $" %><br/>
 		(Please note: Blimey Holdings will appear as the transaction detail on your statement)<br/>
 	</p>
 
 	<p style="padding: 10px 0px 10px 0px"><strong>Your Subscription Details</strong></p>
 	<p style="padding-bottom: 5px">Publication Name: <%= h @subscription.publication.name %></p>
 	<p style="padding-bottom: 5px">
-		Subscription Starts: <%= @subscription.starts_at ? @subscription.starts_at.to_formatted_s(:long) : nil %><br/>
-		Subscription Ends: <%= @subscription.expires_at ? @subscription.expires_at.to_formatted_s(:long) : nil %>
+		Subscription Starts: <%= @subscription.state_updated_at.try(:strftime, "%d/%m/%Y") %><br/>
+		Subscription Ends: <%= @subscription.expires_at.try(:strftime, "%d/%m/%Y") %>
 	</p>
 
   <% if @subscription.offer && !@subscription.offer.gifts.empty? %>

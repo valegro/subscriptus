@@ -29,6 +29,9 @@ describe SubscriptionMailer do
   describe "deliver activation" do
     before(:each) do
       @subscription = Factory.create(:subscription)
+      action = Factory.create(:subscription_action, :payment => Factory.create(:payment), :subscription => @subscription)
+      @subscription.actions << action
+      @subscription.save!
       @response = SubscriptionMailer.deliver_activation(@subscription)
     end
 

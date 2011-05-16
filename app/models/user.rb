@@ -5,7 +5,7 @@ class User < ActiveRecord::Base
   end
   
   has_many :audit_log_entries
-  has_many :subscriptions, :before_add => :only_one_trial_allowed
+  has_many :subscriptions, :before_add => :only_one_trial_allowed, :dependent => :destroy
   has_many :payments, :through => :subscriptions
   
   has_many :orders

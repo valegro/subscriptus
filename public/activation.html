@@ -220,12 +220,15 @@
 				background:url(images/print-page.png) no-repeat;
 				margin:0 auto;
 				padding-bottom:20px;
+        cursor:hand;
+        cursor:pointer;
 			}
 			
 			a#print-page:active {
 				position:relative;
 				top:2px;
 			}
+
 			
 		</style>
 		
@@ -294,6 +297,12 @@
 		<div id="print-page-button">
 		<a id="print-page"></a>
 		</div>
+
+    <script language="javascript">
+      $('#print-page').click(function() {
+        window.print();
+      });
+    </script>
 
 		<p class="copyright">Copyright &copy; 2010 Private Media Pty Ltd. All rights reserved</p>
 		</div>

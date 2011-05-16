@@ -8,7 +8,9 @@
 
     <h3>Invoice</h3>
 
-    <p class='subscription-description'><a href="#">View and print your invoice for your records</a></p>
+    <% unless @subscription.pending? %>
+      <p class='subscription-description'><%= link_to("View and print your invoice for your records", url_for(:action => "invoice"), :target => :new) %></p>
+    <% end %>
 
     <!-- Error Messages -->
     

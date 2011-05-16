@@ -1,14 +1,15 @@
 class SubscribeController < ApplicationController
-  layout 'signup'
+  layout 'signup', :except => :invoice
   before_filter :load_offer_and_publication,  :except => [ :thanks, :complete ]
   before_filter :load_source,                 :except => [ :thanks, :complete ]
   before_filter :load_gifts,                  :except => [ :thanks, :complete ]
   before_filter :load_tab,                    :except => [ :thanks, :complete ]
 
-  before_filter :load_subscription, :only => [ :thanks, :complete ]
+  before_filter :load_subscription, :only => [ :thanks, :complete , :invoice ]
   before_filter :require_user, :only => [ :edit, :update ]
 
   rescue_from(Exceptions::PaymentFailedException, Exceptions::GiftNotAvailable) do |exception|
+    Rails.logger.info("Payment Failed")
     @subscription ||= @factory.try(:subscription) # Ensure that the subscription instance is set
     flash[:error] = exception.message
     render :action => :new
@@ -23,6 +24,7 @@ class SubscribeController < ApplicationController
   end
 
   rescue_from(ActiveRecord::RecordInvalid) do |exception|
+    Rails.logger.info("Record Invalid #{exception.inspect}")
     @subscription ||= Subscription.new(params[:subscription])
     @errors = exception.record.errors
     @payment ||= Payment.new(params[:payment])
@@ -30,6 +32,7 @@ class SubscribeController < ApplicationController
   end
 
   def new
+    clear_session
     @payment = Payment.new
     @subscription = Subscription.new
     @user = @subscription.build_user(:title => 'Mr', :state => :act)
@@ -49,6 +52,7 @@ class SubscribeController < ApplicationController
   end
 
   def edit
+    clear_session
     @user = current_user
     @subscription = @user.subscriptions.find(:first, :conditions => { :publication_id => @offer.publication.id })
     @subscription ||= Subscription.new
@@ -80,7 +84,7 @@ class SubscribeController < ApplicationController
   def complete
     @subscription.update_attributes!(params[:subscription])
     @weekender = Publication.find_by_name("Crikey Weekender")
-    if params[:weekender]
+    if params[:weekender] && @weekender
       @user = @subscription.user
       @user.subscriptions.create!(
         :publication => @weekender,
@@ -89,6 +93,11 @@ class SubscribeController < ApplicationController
         :expires_at => nil
       )
     end
+    clear_session
+  end
+
+  def invoice
+    @user = @subscription.user
   end
 
   private
@@ -144,6 +153,10 @@ class SubscribeController < ApplicationController
 
     def store_subscription_in_session
       session[:subscription_id] = @subscription.try(:id)
+    end
+
+    def clear_session
+      session[:subscription_id] = nil
     end
 
     def load_subscription

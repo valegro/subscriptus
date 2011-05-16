@@ -217,9 +217,10 @@
 				display:block;
 				width:243px;
 				height:50px;
-				background:url(images/print-page.png) no-repeat;
+				background:url(/images/print-page.png) no-repeat;
 				margin:0 auto;
 				padding-bottom:20px;
+        cursor:hand;
         cursor:pointer;
 			}
 			
@@ -227,6 +228,7 @@
 				position:relative;
 				top:2px;
 			}
+
 			
 		</style>
 		
@@ -239,35 +241,78 @@
 	</head>
 	
 	<body>
-	
-		<div id='page'>
 		
-			<div id='top-right'>
-				<p class='phone'>
-					1800 985 502
-				</p>
-				<p class='other'>
-					Want to pay by fax or mail? <a href='/forms/crikey_directdebit_bank.pdf' target="_blank">Download the Subscription form</a>
-				</p>
-			</div>
-			
-			<div class='clear'></div>
+		<div id="page" class="activation-message">
 
-			<div id='header'>
-			
-				<img src='/images/logo.gif' alt='Crikey' />
-			
+			<div id="logo">
+				<img src="/images/logo.gif" alt="Crikey" />
 			</div>
-			
-      <%= yield %>
-				
-			<div id='footer'>
-			
-			</div>
-						
-		</div> <!-- id='page' -->
+
+		<h1>Thank you for subscribing to Crikey.</h1>
 		
+		<hr />
 		
+		<h2>Your Order Details</h2>
+
+		<p>
+			<strong>Supplier:</strong> Crikey<br/>
+      <strong>Order Number:</strong> <%= @subscription.reference %><br/>
+      <strong>Order Date:</strong> <%= @subscription.updated_at.try(:strftime, "%d/%m/%Y") %><br/>
+			<strong>Payment Method:</strong> Credit Card<br/>
+      <strong>Payment Cost:</strong> <%= number_to_currency @subscription.actions.last.payment.amount, :unit => "AUD $" %><br/>
+			<br />
+			<em class="small">(Please note: Blimey Holdings will appear as the transaction detail on your statement)</em><br/>
+		</p>
+
+		<hr />
+
+		<h2>Your Subscription Details</h2>
+		
+    <p><strong>Publication Name:</strong> <%= @subscription.publication.name %></p>
+		<p>
+      <strong>Subscription Starts:</strong> <%= @subscription.state_updated_at.try(:strftime, "%d/%m/%Y") %><br/>
+      <strong>Subscription Ends:</strong> <%= @subscription.expires_at.try(:strftime, "%d/%m/%Y") %>
+		</p>
+
+  <% if @subscription.offer && !@subscription.offer.gifts.empty? %>
+    <p style="padding: 10pt;">
+      <strong>Included Gifts:</strong><br/>
+      <% @subscription.offer.gifts.each do |gift| %>
+        <%= h gift.name %><br/>
+      <% end %>
+    </p>
+  <% end %>
+
+	<p style="padding: 10px 0px 10px 0px">
+		<strong>Your Address Details:</strong><br/>
+		Address 1: <%= h @subscription.user.try(:address_1) %><br/>
+		Address 2: <%= h @subscription.user.try(:address_2) %><br/>
+		City: <%= h @subscription.user.try(:city) %><br/>
+		Postcode: <%= h @subscription.user.try(:postcode) %><br/>
+		State: <%= h @subscription.user.try(:state) %><br/>
+		Country: <%= h @subscription.user.try(:country) %><br/>
+	</p>
+
+		<hr />
+		
+		<div id="activation-footer">
+      <p>Please <%= mail_to("subs@crikey.com.au", "contact us") %>, quoting your order number if you have any problems.</p>
+
+		<div id="print-page-button">
+		<a id="print-page"></a>
+		</div>
+
+    <script language="javascript">
+      $('#print-page').click(function() {
+        window.print();
+      });
+    </script>
+
+    <p class="copyright">Copyright &copy; <%= Time.now.year %> Private Media Pty Ltd. All rights reserved</p>
+		</div>
 	
+		</div> <!-- closes #page -->
+		
 	</body>
+	
 </html>
