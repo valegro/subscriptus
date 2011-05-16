@@ -31,7 +31,7 @@ class CmailerUser < ActiveRecord::Base
     attrs[:phone_number] = attrs.delete(:phone)
     attrs.delete(:ContactId)
 
-    unless %w(act nsw nt qld sa tas vic wa).include?(attrs[:state].to_s)
+    unless %w(act nsw nt qld sa tas vic wa).include?(attrs[:state].to_s.downcase)
       attrs[:state] = 'intl'
     end
 
