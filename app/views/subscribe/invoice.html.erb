@@ -251,6 +251,12 @@
 		<h1>Thank you for subscribing to Crikey.</h1>
 		
 		<hr />
+
+    <h2>TAX INVOICE</h2>
+    <p>
+    Blimey Holdings (trading as Crikey)<br/>
+    ABN 98 101 558 847
+    </p>
 		
 		<h2>Your Order Details</h2>
 
@@ -284,7 +290,10 @@
   <% end %>
 
 	<p style="padding: 10px 0px 10px 0px">
-		<strong>Your Address Details:</strong><br/>
+		<strong>Your Details:</strong><br/>
+
+		Name: <%= h @subscription.user.try(:name) %><br/>
+    Email: <%= h @subscription.user.try(:email) %><br/>
 		Address 1: <%= h @subscription.user.try(:address_1) %><br/>
 		Address 2: <%= h @subscription.user.try(:address_2) %><br/>
 		City: <%= h @subscription.user.try(:city) %><br/>

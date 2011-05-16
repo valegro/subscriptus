@@ -5,7 +5,7 @@ class SubscribeController < ApplicationController
   before_filter :load_gifts,                  :except => [ :thanks, :complete ]
   before_filter :load_tab,                    :except => [ :thanks, :complete ]
 
-  before_filter :load_subscription, :only => [ :thanks, :complete , :invoice ]
+  before_filter :load_subscription, :only => [ :thanks, :complete, :invoice ]
   before_filter :require_user, :only => [ :edit, :update ]
 
   rescue_from(Exceptions::PaymentFailedException, Exceptions::GiftNotAvailable) do |exception|
