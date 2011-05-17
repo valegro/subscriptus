@@ -9,7 +9,7 @@ group :postgres do
 end
 
 group :mysql do
-  gem 'mysql'
+#  gem 'mysql'
 end
 
 gem 'fastercsv'
@@ -65,7 +65,7 @@ gem 'enumerated_attribute'
 
 gem 'ruby-debug'
 
-group :test, :cucumber, :development do
+group :development, :test, :cucmber do
   gem 'webmock', :require => false
   gem 'capybara', "0.4.0"
   gem 'database_cleaner'

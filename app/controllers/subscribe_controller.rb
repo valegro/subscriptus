@@ -125,7 +125,7 @@ class SubscribeController < ApplicationController
         @offer = (@publication.offers.default_for_renewal || @publication.offers.first)
       end
       if !@offer
-        @offer = Offer.first
+        @offer = Offer.primary_offer
       end
     end
 

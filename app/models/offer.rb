@@ -27,4 +27,15 @@ class Offer < ActiveRecord::Base
   def is_trial?
     self.trial
   end
+
+  def make_primary!
+    self.class.transaction do
+      self.class.update_all "primary_offer = 'false'"
+      self.update_attributes!(:primary_offer => true)
+    end
+  end
+
+  def self.primary_offer
+    self.find(:first, :conditions => { :primary_offer => true }) || self.first
+  end
 end
