@@ -43,13 +43,11 @@ ActionMailer::Base.default_url_options[:host] = "subscribe.crikey.com.au"
 # config.threadsafe!
 
 # Setup Active Merchant for Staging Production
-# FIXME for final production: change login and pwd and test mode
 config.after_initialize do
-  ActiveMerchant::Billing::Base.mode = :test
   # Secure Pay Gateway Settings
   ::GATEWAY = ActiveMerchant::Billing::SecurePayAuExtendedGateway.new(  # the default_currency of this gateway is 'AUD'
-        :login => 'CKR0030',  # <MerchantID> input to Au securePay Gateway.
-        :password => "q02nnn8h"
+    :login => 'CKR0030',  # <MerchantID> input to Au securePay Gateway.
+    :password => "q02nnn8h"
   )
 end
 
