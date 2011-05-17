@@ -64,10 +64,10 @@ def process_subs_for_user(user, subs, cm_user = nil)
   # TODO: Handle ALL the actions
 end
 
-User.delete_all "role = 'subscriber'"
-Subscription.connection.execute("delete from subscriptions")
-SubscriptionAction.delete_all
-SubscriptionLogEntry.delete_all
+#User.delete_all "role = 'subscriber'"
+#Subscription.connection.execute("delete from subscriptions")
+#SubscriptionAction.delete_all
+#SubscriptionLogEntry.delete_all
 
 logger = Logger.new("import-results.log")
 

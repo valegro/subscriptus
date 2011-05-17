@@ -27,6 +27,8 @@ class Subscription < ActiveRecord::Base
   named_scope :ascend_by_name, :include => 'user', :order => "users.lastname ASC, users.firstname ASC"
   named_scope :descend_by_name, :include => 'user', :order => "users.lastname DESC, users.firstname DESC"
   named_scope :recent, :order => "updated_at desc"
+  # TODO: Should we make this look at state_expires_at?
+  # We need both because of suspension mainly
   named_scope :expired, lambda { { :conditions => [ "expires_at < ?", Time.now ] } }
 
   validates_presence_of :publication, :user, :state
@@ -213,9 +215,15 @@ class Subscription < ActiveRecord::Base
     self.payment_method = Billing::Charger::CREDIT_CARD
   end
 
+  # TODO: I'm sure we could do this within has_states using state_expires_at ??
   def self.expire_active_subscribers
     self.active.expired.find_each(:batch_size => 100) do |subscription|
       subscription.expire!
     end
+  end
+
+  # TODO: Ditto above (has_states/state_expires_at)
+  def self.unsuspend_expiring_suspensions
+    #self.suspended.expired.find_each(
   end
 end

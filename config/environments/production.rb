@@ -46,7 +46,7 @@ ActionMailer::Base.default_url_options[:host] = "subscribe.crikey.com.au"
 config.after_initialize do
   # Secure Pay Gateway Settings
   ::GATEWAY = ActiveMerchant::Billing::SecurePayAuExtendedGateway.new(  # the default_currency of this gateway is 'AUD'
-    :login => 'CKR',  # <MerchantID> input to Au securePay Gateway.
+    :login => 'CKR00',  # <MerchantID> input to Au securePay Gateway.
     :password => "abc123"
   )
 end
