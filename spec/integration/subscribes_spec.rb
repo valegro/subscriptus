@@ -264,6 +264,67 @@ describe "Subscribes" do
         click_link_or_button "btnSubmit"
         page.should have_content("Thanks for subscribing to Crikey! We hope you enjoy it.")
       end
+
+      describe "but I already registered a trial for this publication" do
+        before(:each) do
+          @user_attrs = Factory.attributes_for(:user, :email => "daniel@codefire.com.au")
+          @subscription = User.find_or_create_with_trial(@offer.publication, 21, "test", @user_attrs)
+          @user = @subscription.user
+          GATEWAY.expects(:purchase).returns(stub(:success? => true))
+        end
+
+        it "should turn my subscription into an active one" do
+          click_link_or_button "btnSubmit"
+          page.should have_content("Thanks for subscribing to Crikey! We hope you enjoy it.")
+          user = User.find(@user.id)
+          user.subscriptions.count.should == 1
+          user.subscriptions.last.state.should == 'active'
+        end
+
+        it "should update my personal details with the ones I provided on the form" do
+          click_link_or_button "btnSubmit"
+          user = User.find(@user.id)
+          user.firstname.should == 'Daniel'
+          user.lastname.should == 'Draper'
+        end
+
+        it "should update the user in wordpress" do
+          Wordpress.expects(:send_later).with(
+            :update,
+            :login => @user.login,
+            :firstname => 'Daniel',
+            :lastname => 'Draper',
+            :email => @user.email
+          )
+          click_link_or_button "btnSubmit"
+        end
+      end
+
+      describe "but I already have a squatter subscription to this publication" do
+        it "should turn my subscription into an active one"
+        it "should update my personal details with the ones I provided on the form"
+        it "should update the user in wordpress"
+      end
+
+      describe "but I already have a matching email address in Wordpress" do
+        it "should do something but I don't know what yet!"
+      end
+
+      describe "but I already have a user account with that email but no subs for the offered publication" do
+        it "should do something but I don't know what yet!"
+      end
+
+      describe "but I already have an active subscription to this publication" do
+        before(:each) do
+          @user = Factory.create(:subscriber, :email => 'daniel@codefire.com.au')
+          @subscription = Factory.create(:active_subscription, :publication => @offer.publication, :user => @user)
+          click_link_or_button "btnSubmit"
+        end
+
+        it "should redirect me to the renew page" do
+          page.should have_content("Login now to renew or access your account")
+        end
+      end
     end
 
     describe "and I fill in the information correctly and choose direct debit as the payment method" do
@@ -374,9 +435,7 @@ describe "Subscribes" do
       @offer1.offer_terms.size.should == 1
 
       visit new_subscribe_path(:source_id => @source.id)
-      save_and_open_page
       page.should have_content("1 month")
-
     end
   end
 end

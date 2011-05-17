@@ -15,7 +15,6 @@ class SubscribeController < ApplicationController
     render :action => :new
   end
 
-  # TODO: Will this ever get called again?
   rescue_from(Exceptions::Factory::InvalidException) do |exception|
     @subscription = exception.subscription
     @errors = exception.errors
@@ -42,11 +41,26 @@ class SubscribeController < ApplicationController
   def create
     @payment_option = params[:payment_option]
     Subscription.transaction do
-      @user = User.new(params[:user])
+      # First check if a user exists with the given email
+      @user = User.find_by_email(params[:user][:email])
+      if @user
+        @subscription = @user.subscriptions.first(
+          :conditions => { :publication_id => @offer.publication.id }
+        )
+        if !@subscription.trial? && !@subscription.squatter?
+          redirect_to new_renew_path(:offer_id => @offer, :source_id => @source)
+          return
+        end
+      end
+      @user ||= User.new(params[:user])
       @user.rollback_active_record_state! do
-        @user.save!
+        if @user
+          @user.update_attributes!(params[:user])
+        else
+          @user.save!
+        end
         @factory = get_factory
-        @subscription = @factory.build
+        @subscription = @subscription ? @factory.update(@subscription) : @factory.build
       end
       store_subscription_in_session
       redirect_to thanks_path
