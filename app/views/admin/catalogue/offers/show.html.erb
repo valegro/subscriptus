@@ -2,6 +2,9 @@
   <%= content_tag :h2, "View Offer" %>
   <div class="actions">
     <%= link_to 'Delete', admin_catalogue_offer_path(@offer), :method => :delete, :confirm => "Are you sure?", :class => "delete" %>
+    <% unless @offer.primary_offer? %>
+      <%= link_to 'Make Primary', make_primary_admin_catalogue_offer_path(@offer), :confirm => "Are you sure you want to make this offer the Primary Offer? All new subscriptions will use this offer by default!" %>
+    <% end %>
     <%= link_to 'Promote', "#", :id => "generate_offer_link", :class => 'promote' %>
     <%= link_to 'Edit Details', edit_admin_catalogue_offer_path(@offer), :class => 'edit' %>
     <%= link_to 'Back to Offers', admin_catalogue_offers_path, :class => 'back' %>
@@ -15,8 +18,8 @@
       <dt>ID</dt><dd><%= h(@offer.id) %></dd>
       <dt>Name</dt><dd><%= h(@offer.name) %></dd>
       <dt>Publication</dt><dd> <%= @offer.publication.name %></dd>
-      <dt>Expires</dt><dd> <%= @offer.expires %></dd>
-      <dt>Auto-renews</dt><dd> <%= @offer.auto_renews %></dd>
+      <dt>Expires</dt><dd> <%= @offer.expires.try(:strftime, "%d/%m/%Y") || "Never" %></dd>
+      <dt>Primary?</dt><dd><%= @offer.primary_offer? ? "<strong>This is the Primary Offer</strong>" : "No" %></dd>
     </dl>
   </div>
   <div class="frame span_3">

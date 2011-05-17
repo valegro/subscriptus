@@ -1,5 +1,6 @@
 class User < ActiveRecord::Base
   
+  MAIL_SYSTEM_SYNC_COLUMNS = %w(email firstname lastname country city state title phone_number postcode address_1 address_2)
   acts_as_authentic do |c|
     c.validate_login_field = false
   end

@@ -55,11 +55,6 @@ describe Subscription do
         # TODO: Check the values inside the logs
       end
 
-      it "should deliver an email" do
-        SubscriptionMailer.expects(:send_later).with(:deliver_activation, @subscription)
-        @subscription.activate!
-      end
-
       # TODO: Process a payment - when calling activate, a payment should be processed somehow
       # TODO: Set expires_at
     end

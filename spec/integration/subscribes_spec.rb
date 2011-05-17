@@ -349,14 +349,34 @@ describe "Subscribes" do
 
   describe "when I visit the subscribe page but I don't provide an offer" do
     before(:each) do
-      @offer = Factory.create(:offer)
-      @term = @offer.offer_terms.create(:price => 10, :months => 3, :concession => true)
       @source = Factory.create(:source)
       stub_wordpress
-      visit new_subscribe_path(:source_id => @source.id)
     end
 
-    it "should use the default offer"
-  end
+    it "should use the primary offer if one is set" do
+      @offer1 = Factory.create(:offer)
+      @offer1.offer_terms << Factory.create(:offer_term, :months => 1)
+      @offer2 = Factory.create(:offer)
+      @offer2.offer_terms << Factory.create(:offer_term, :months => 2)
+      @offer1.offer_terms.size.should == 1
 
+      @offer2.make_primary!
+
+      visit new_subscribe_path(:source_id => @source.id)
+      page.should have_content("2 months")
+    end
+
+    it "should just use the first offer found if there is no primary offer" do
+      @offer1 = Factory.create(:offer)
+      @offer1.offer_terms << Factory.create(:offer_term, :months => 1)
+      @offer2 = Factory.create(:offer)
+      @offer2.offer_terms << Factory.create(:offer_term, :months => 2)
+      @offer1.offer_terms.size.should == 1
+
+      visit new_subscribe_path(:source_id => @source.id)
+      save_and_open_page
+      page.should have_content("1 month")
+
+    end
+  end
 end

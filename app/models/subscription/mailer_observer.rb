@@ -8,10 +8,6 @@ class Subscription::MailerObserver < ActiveRecord::Observer
     SubscriptionMailer.send_later(:deliver_unsuspended, subscription)
   end
 
-  on(:trial, :active) do |subscription|
-    SubscriptionMailer.send_later(:deliver_activation, subscription)
-  end
-
   on(:pending, :squatter) do |subscription|
     SubscriptionMailer.send_later(:deliver_cancelation, subscription)
   end
@@ -30,15 +26,10 @@ class Subscription::MailerObserver < ActiveRecord::Observer
 
   on(:pending, :active) do |subscription|
     SubscriptionMailer.send_later(:deliver_verified, subscription)
-    SubscriptionMailer.send_later(:deliver_activation, subscription)
   end
 
   def after_create(subscription)
     case subscription.state
-      when 'active'
-        if !subscription.actions.empty? && !subscription.actions.last.payment.blank?
-          SubscriptionMailer.send_later(:deliver_activation, subscription)
-        end
       when 'trial'
         SubscriptionMailer.send_later(:deliver_new_trial, subscription)
       when 'pending'

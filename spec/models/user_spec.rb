@@ -246,7 +246,16 @@ describe User do
 
     it "should call sync_to_campaign_master" do
       @user.expects(:send_later).with(:sync_to_campaign_master)
+      @user.firstname = "Changed"
       @user.save!
+    end
+
+    it "should NOT call sync_to_campaign_master if only last_request_at was changed" do
+      user2 = Factory.create(:user)
+      user2 = User.find(user2.id)
+      user2.expects(:send_later).with(:sync_to_campaign_master).never
+      user2.last_request_at = Time.now
+      user2.save!
     end
 
     it "should NOT call sync_to_campaign_master if admin" do
