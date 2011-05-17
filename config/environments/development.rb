@@ -19,12 +19,10 @@ ActionMailer::Base.default_url_options[:host] = "127.0.0.1:3000"
 
 # Setup Active Merchant for development
 config.after_initialize do
-  ActiveMerchant::Billing::Base.mode = :test
   # Secure Pay Gateway Settings
   ::GATEWAY = ActiveMerchant::Billing::SecurePayAuExtendedGateway.new(  # the default_currency of this gateway is 'AUD'
     :login => 'CKR0030',  # <MerchantID> input to Au securePay Gateway.
-    :password => "q02nnn8h",
-    :test => true
+    :password => "abc123"
   )
 end
 
