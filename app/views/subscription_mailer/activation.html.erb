@@ -20,10 +20,10 @@
 		Subscription Ends: <%= @subscription.expires_at.try(:strftime, "%d/%m/%Y") %>
 	</p>
 
-  <% if @subscription.offer && !@subscription.offer.gifts.empty? %>
+  <% if @subscription.action && !@subscription.action.gifts.empty? %>
     <p style="padding: 10pt;">
       <strong>Included Gifts:</strong><br/>
-      <% @subscription.offer.gifts.each do |gift| %>
+      <% @subscription.action.gifts.each do |gift| %>
         <%= h gift.name %><br/>
       <% end %>
     </p>
