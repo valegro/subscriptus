@@ -13,7 +13,7 @@ module ActiveMerchant #:nodoc:
       API_VERSION = 'xml-4.2'
       
       TEST_URL = 'https://www.securepay.com.au/test/payment'
-      LIVE_URL = 'https://www.securepay.com.au/xmlapi/payment'
+      LIVE_URL = 'https://api.securepay.com.au/xmlapi/payment'
       TEST_PERIODIC_URL ='https://test.securepay.com.au/xmlapi/periodic'
       LIVE_PERIODIC_URL ='https://api.securepay.com.au/xmlapi/periodic'
       TEST_AMOUNT = 1000 # cents. test money should be integer not float
