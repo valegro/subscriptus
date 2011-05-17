@@ -12,7 +12,11 @@ require 'webmock/rspec'
 require 'capybara/rails' 
 require 'capybara/dsl'
 
-WebMock.disable_net_connect!(:allow_localhost => true, :allow => 'https://www.securepay.com.au/test/payment')
+WebMock.disable_net_connect!(
+  :allow_localhost => true,
+  :allow => 'https://api.securepay.com.au/xmlapi/payment',
+  :allow => 'https://test.securepay.com.au/xmlapi/payment'
+)
 
 factories = Dir.glob('*/factories.rb') + Dir.glob('*/factories/*.rb')
 factories.each { |f|

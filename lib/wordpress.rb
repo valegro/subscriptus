@@ -29,7 +29,8 @@ class Wordpress
     check_any_required(opts, :login, :email)
     Rails.logger.warn("Authentication #{opts.inspect}")
     check_required(opts, :pword)
-    return make_request(opts.merge(:func => 'authenticate')) != '-1'
+    res = make_request(opts.merge(:func => 'authenticate'))
+    return !res.blank? && res != "-1"
   end
 
 private

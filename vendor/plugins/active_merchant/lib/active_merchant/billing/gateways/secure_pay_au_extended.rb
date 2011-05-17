@@ -12,7 +12,7 @@ module ActiveMerchant #:nodoc:
     class SecurePayAuExtendedGateway < Gateway
       API_VERSION = 'xml-4.2'
       
-      TEST_URL = 'https://test.securepay.com.au/test/payment'
+      TEST_URL = 'https://test.securepay.com.au/xmlapi/payment'
       LIVE_URL = 'https://api.securepay.com.au/xmlapi/payment'
       TEST_PERIODIC_URL ='https://test.securepay.com.au/xmlapi/periodic'
       LIVE_PERIODIC_URL ='https://api.securepay.com.au/xmlapi/periodic'

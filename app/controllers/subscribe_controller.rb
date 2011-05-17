@@ -43,9 +43,11 @@ class SubscribeController < ApplicationController
     @payment_option = params[:payment_option]
     Subscription.transaction do
       @user = User.new(params[:user])
-      @user.save!
-      @factory = get_factory
-      @subscription = @factory.build
+      @user.rollback_active_record_state! do
+        @user.save!
+        @factory = get_factory
+        @subscription = @factory.build
+      end
       store_subscription_in_session
       redirect_to thanks_path
     end
