@@ -55,6 +55,11 @@ task :after_setup do
   run "mkdir -p #{deploy_to}/#{shared_dir}/config/"
 end
 
+before "deploy:symlink" do
+  run "sudo monit stop delayed_job"
+  sleep(15) # monit stop is non-blocking so this is a kludge ...
+end
+
 after "deploy:symlink" do
 
   template = File.read("config/database.yml.erb")
@@ -64,6 +69,8 @@ after "deploy:symlink" do
   run "ln -nfs #{deploy_to}/#{shared_dir}/config/database.yml #{release_path}/config/database.yml"
 
   #run("cd #{deploy_to}/current; /usr/bin/rake db:migrate RAILS_ENV=production")
+
+  run "sudo monit start delayed_job"
 end
 
 after "deploy:symlink", "deploy:update_crontab"
