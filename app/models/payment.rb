@@ -2,6 +2,9 @@
 class Payment < ActiveRecord::Base
   include ActionView::Helpers::NumberHelper
   include ActiveMerchant::Utils
+  include ActiveSupport::Callbacks
+
+  define_callbacks :after_process
 
   belongs_to :subscription_action
 
@@ -38,6 +41,12 @@ class Payment < ActiveRecord::Base
     end
   end
 
+  after_process do |payment|
+    if subscription = payment.try(:subscription_action).try(:subscription)
+      SubscriptionMailer.send_later(:deliver_activation, subscription)
+    end
+  end
+
   # Process and save the payment
   # Only valid option is :token (to be used for token payments)
   def process!(options = {})
@@ -70,6 +79,8 @@ class Payment < ActiveRecord::Base
     end
     self.processed_at = Time.now
     self.save!
+    run_callbacks(:after_process)
+    return true
   end
 
   def credit_card

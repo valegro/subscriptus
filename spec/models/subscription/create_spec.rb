@@ -23,14 +23,6 @@ describe Subscription do
 
     it "should set both expires_at and state_expires_at for new trials"
 
-    it "should deliver an active email for new active subscriptions" do
-      sub = Factory.build(:subscription, :state => 'active')
-      SubscriptionMailer.expects(:send_later).with(:deliver_new_trial).never
-      SubscriptionMailer.expects(:send_later).with(:deliver_activation, sub)
-      @user = Factory.create(:subscriber)
-      @user.subscriptions << sub
-    end
-
     it "should NOT deliver and email for new subscriptions that did not take payment"
 
     it "should deliver a pending email for new pending student subscriptions" do

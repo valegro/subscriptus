@@ -8,7 +8,6 @@ describe Subscription do
     Timecop.freeze("2011-01-10".to_time)
     stub_wordpress
     @subscription = Factory.build(:subscription, :state => 'active', :expires_at => 25.days.from_now)
-    SubscriptionMailer.expects(:send_later).with(:deliver_activation, @subscription)
     @subscription.save!
   end
 

@@ -173,6 +173,35 @@ describe Payment do
     end
   end
 
+  describe "activation email" do
+    it "should be delivered after processing if there is a subscription attached" do
+      stub_wordpress
+      subscription = Factory.create(:subscription)
+      action = Factory.create(:subscription_action, :subscription => subscription)
+      subscription.actions << action
+      payment = Factory.build(:payment, :subscription_action => action)
+      SubscriptionMailer.expects(:send_later).with(:deliver_activation, subscription)
+      payment.process!
+    end
+
+    it "should NOT be delivered after processing if there is a NO subscription attached" do
+      stub_wordpress
+      payment = Factory.build(:payment, :subscription_action => nil)
+      SubscriptionMailer.expects(:send_later).never
+      payment.process!
+    end
+
+    it "should NOT be delivered after processing if we only call save and not process" do
+      stub_wordpress
+      subscription = Factory.create(:subscription)
+      action = Factory.create(:subscription_action, :subscription => subscription)
+      subscription.actions << action
+      payment = Factory.build(:payment, :subscription_action => action)
+      SubscriptionMailer.expects(:send_later).with(:deliver_activation, subscription).never
+      payment.save!
+    end
+  end
+
   describe "full name" do
     it "should set firstname and lastname if provided" do
       payment = Factory.build(:payment, :full_name => "Daniel Draper")
