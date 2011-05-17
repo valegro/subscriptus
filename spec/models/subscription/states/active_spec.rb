@@ -15,6 +15,22 @@ describe Subscription do
     Timecop.return
   end
 
+  it "should expire when the expiry data passes" do
+    @subscription.state.should == 'active'
+    Timecop.travel(26.days.from_now) do
+      @subscription.expired?.should be(true)
+      @subscription.expire!
+      @subscription.state.should == 'squatter'
+    end
+  end
+
+  it "should expire all active subs that have passed their expiry date" do
+    5.times { Factory.create(:subscription, :state => 'active', :expires_at => 1.day.ago) }
+    Subscription.active.count.should == 6 # (Including the one in the before block)
+    Subscription.expire_active_subscribers
+    Subscription.active.count.should == 1
+  end
+
   describe "upon expire!" do
     before(:each) do
       SubscriptionMailer.expects(:send_later).with(:deliver_expired, @subscription)

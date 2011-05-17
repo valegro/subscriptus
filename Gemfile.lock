@@ -105,6 +105,7 @@ GEM
     meta_programming (0.2.2)
     mime-types (1.16)
     mocha (0.9.12)
+    mysql (2.8.1)
     navigasmic (0.5.5)
     net-scp (1.0.4)
       net-ssh (>= 1.99.1)
@@ -201,6 +202,7 @@ DEPENDENCIES
   mechanize
   mocha (~> 0.9.8)
   mover!
+  mysql
   navigasmic
   pickle
   postgres-pr

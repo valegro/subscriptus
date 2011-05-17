@@ -27,6 +27,7 @@ class Subscription < ActiveRecord::Base
   named_scope :ascend_by_name, :include => 'user', :order => "users.lastname ASC, users.firstname ASC"
   named_scope :descend_by_name, :include => 'user', :order => "users.lastname DESC, users.firstname DESC"
   named_scope :recent, :order => "updated_at desc"
+  named_scope :expired, lambda { { :conditions => [ "expires_at < ?", Time.now ] } }
 
   validates_presence_of :publication, :user, :state
   validates_acceptance_of :terms
@@ -92,6 +93,10 @@ class Subscription < ActiveRecord::Base
   end
   # TODO: Should go into an observer
   after_exit_suspended :restore_subscription_expiry
+
+  def expired?
+    Time.now > self.expires_at
+  end
 
   # TODO: Rename to apply_action! (maybe even move to the association? And disable <<)
   def apply_action(action)
@@ -206,5 +211,11 @@ class Subscription < ActiveRecord::Base
 
   def default_payment_method
     self.payment_method = Billing::Charger::CREDIT_CARD
+  end
+
+  def self.expire_active_subscribers
+    self.active.expired.find_each(:batch_size => 100) do |subscription|
+      subscription.expire!
+    end
   end
 end

@@ -8,8 +8,8 @@ group :postgres do
   gem 'postgres-pr'
 end
 
-group :mysql do
-#  gem 'mysql'
+group :production do
+  gem 'mysql'
 end
 
 gem 'fastercsv'
