@@ -14,7 +14,8 @@ Feature: Subscription search
       And a user: "u02" exists with firstname: "f02", lastname: "l02", email: "u02@example.com", email_confirmation: "u02@example.com"
       And a subscription: "s01" exists with publication: publication "p01", user: user "u01", state: "trial", created_at: "2011-01-01", expires_at: "2011-12-05"
       And a subscription exists with publication: publication "p02", user: user "u02", state: "active", expires_at: "2011-12-05"
-      And a subscription_gift exists with subscription: subscription "s01", gift: gift "g01"
+      And a subscription_action "the sub action" exists with subscription: subscription "s01"
+      And a subscription_gift exists with subscription_action: subscription_action "the sub action", gift: gift "g01"
      When I log in as admin "Homer"
 
   Scenario: An admin can search results even if one of the users has been deleted
@@ -95,7 +96,7 @@ Feature: Subscription search
     Given I am on admin subscription search page
      When I select "Gift" from "filter_name"
       And I follow "Add"
-      And I select "gift 01" from "search_gifts_id_is"
+      And I select "gift 01" from "search_actions_gifts_id_is"
       And I press "Search"
      Then I should see "trial"
       And I should see "u01@example.com"
@@ -272,7 +273,7 @@ Feature: Subscription search
       And I am on admin subscription search page
     When I select "Gift" from "filter_name"
       And I follow "Add"
-      And I select "gift 03" from "search_gifts_id_is"
+      And I select "gift 03" from "search_actions_gifts_id_is"
       And I press "Search"
     Then I should see "No entries found"
 

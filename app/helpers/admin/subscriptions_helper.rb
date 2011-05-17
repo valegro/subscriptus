@@ -15,9 +15,8 @@ module Admin::SubscriptionsHelper
 
   def subscription_event_links(subscription)
     # Don't allow manual expiration
-    subscription.allowed_events_for(:state).select { |event| ![ :pay_later, :expire, :enqueue_for_renewal ].include?(event.to_sym) }.map do |event|
+    subscription.allowed_events_for(:state).select { |event| ![ :pay_later, :expire, :enqueue_for_renewal, :delay ].include?(event.to_sym) }.map do |event|
       link_to(event.humanize, send("#{event}_admin_subscription_path", subscription), :confirm => "Are you sure you want to #{event} this subscription?")
     end
   end
-
 end

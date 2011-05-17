@@ -1,8 +1,19 @@
 class Admin::SubscriptionsController < AdminController
   layout 'admin/subscriptions'
+  helper 'admin'
   include Admin::SubscriptionsHelper
   
-  before_filter :find_subscription, :only => [ :verify, :cancel, :suspend, :unsuspend, :show ]
+  before_filter :find_subscription, :only => [ :verify, :cancel, :suspend, :unsuspend, :show, :set_expiry ]
+
+  rescue_from(Exceptions::PaymentTokenMissing) do
+    flash[:error] = "The User has no payment gateway token - the payment will need to processed manually"
+    render :action => action_name
+  end
+
+  rescue_from(Exceptions::PaymentFailedException) do
+    flash[:error] = "The Subscriber's Card was declined. You may need to contact them."
+    render :action => action_name
+  end
 
   def index
     @log_entries = SubscriptionLogEntry.recent.paginate(:page => params[:page] || 1)
@@ -27,23 +38,43 @@ class Admin::SubscriptionsController < AdminController
   end
 
   def verify
-    @payment = Payment.new(:amount => @subscription.price, :payment_type => 'direct_debit')
-    if request.post?
+    @payment = @subscription.pending_action.try(:payment)
+    if request.post? || request.put?
       unless @subscription.active?
-        if params[:payment]
-          @payment = Payment.new(params[:payment])
-          @payment.amount = @subscription.price
-          @subscription.verify!(@payment)
-          # TODO: Validations? Exceptions?
+        if params[:payment] && @payment
+          @payment.update_attributes(params[:payment])
+          @subscription.verify!
         else
           @subscription.update_attributes(params[:subscription])
           @subscription.verify!
         end
         flash[:notice] = "Verified Subscription"
       else
-        flash[:notice] = "Subscription has already been verified"
+        flash[:error] = "Subscription has already been verified"
       end
       redirect_to :action => :pending
+    end
+  end
+
+  def set_expiry
+    respond_to do |format|
+      unless request.post?
+        format.js {
+          render :update do |page|
+            page.insert_html :bottom, 'content', :partial => 'set_expiry_dialog'
+            page['set-expiry-dialog'].dialog('open')
+          end
+        }
+      else
+        format.html {
+          if @subscription.update_attributes(params[:subscription])
+            flash[:notice] = "Expiry date to #{@subscription.publication.name} for #{@subscription.user.name} set to #{format_timestamp(@subscription.expires_at)}"
+          else
+            flash[:error] = @subscription.errors.full_messages.join("<br/>")
+          end
+          redirect_to :action => :show
+        }
+      end
     end
   end
   

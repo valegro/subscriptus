@@ -20,6 +20,21 @@
   </div>
   <div class="frame span_10">
     <h2>Subscriptions</h2>
-    <%= render :partial => "admin/subscriptions/subscriptions", :object => @subscriptions %>
+    <%= render_table @subscription_actions do |t|
+      t.header :at
+      t.header :ref, :label => "Subscription Ref"
+      t.header :publication
+      t.header :subscriber
+      t.header :subscribed_for
+
+      t.rows do |row, action, index|
+        row.at format_timestamp(action.applied_at)
+        row.ref link_to(action.subscription.reference, admin_subscription_path(action.subscription))
+        row.publication link_to(action.subscription.publication.name, admin_catalogue_publication_path(action.subscription.publication))
+        row.subscriber link_to(action.subscription.user.try(:fullname), admin_subscriber_path(action.subscription.user))
+        row.subscribed_for pluralize(action.term_length, "month")
+      end
+    end
+  %>
   </div>
 </div>

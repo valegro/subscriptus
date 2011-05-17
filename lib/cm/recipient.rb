@@ -18,12 +18,7 @@ module CM
     @@password = ::CAMPAIGNMASTER_PASSWORD
     @@client_id = ::CAMPAIGNMASTER_CLIENT_ID
 
-    #def self.driver=(driver)
-    #  @@static_driver = driver
-    #end
-
     def self.driver
-
       return @@static_driver if @@static_driver
       puts "Calling factory"
       fact = SOAP::WSDLDriverFactory.new(V1_URI)
@@ -73,8 +68,6 @@ module CM
         :primaryKeyName => Recipient::PRIMARY_KEY_NAME
       )
       ServiceReturn.new(result)
-    rescue SocketError, HTTPClient::ReceiveTimeoutError, HTTPClient::ConnectTimeoutError => ex
-      return ServiceReturn.new(false, :message => ex.message)
     end
 
     # you could specify operation in the form like:
@@ -90,8 +83,6 @@ module CM
       end
       result = driver.GetRecipients(:token => access_token, :page => 1, :criteria => criteria)
       return ServiceReturn.new(result)
-    rescue SocketError, HTTPClient::ReceiveTimeoutError, HTTPClient::ConnectTimeoutError => ex
-      return ServiceReturn.new(false, :message => ex.message)
     end
 
     def self.conditions_to_criteria(conditions, camelize_field = false, criterion_order = 1)

@@ -1,4 +1,4 @@
-module Wordpress
+class Wordpress
   class Error < StandardError; end
 
   class << self
@@ -11,7 +11,8 @@ module Wordpress
   
   def self.exists?(opts={})
     check_any_required(opts, :login, :email)
-    return !make_request(opts.merge(:func => 'exists')).blank?
+    res = make_request(opts.merge(:func => 'exists'))
+    return !res.blank? && res != "-1"
   end
   
   def self.create(opts={})
@@ -26,14 +27,18 @@ module Wordpress
   
   def self.authenticate(opts={})
     check_any_required(opts, :login, :email)
+    Rails.logger.warn("Authentication #{opts.inspect}")
     check_required(opts, :pword)
-    return make_request(opts.merge(:func => 'authenticate')) == 'true'
+    res = make_request(opts.merge(:func => 'authenticate'))
+    return !res.blank? && res != "-1"
   end
 
 private
   def self.make_request(opts)
     if self.enabled
-      RestClient.get(Wordpress.config[:endpoint], :params => opts.merge(:key => Wordpress.config[:key]), :accept => :text).to_str
+      res = RestClient.get(Wordpress.config[:endpoint], :params => opts.merge(:key => Wordpress.config[:key]), :accept => :text).to_str
+      Rails.logger.warn("Wordpress: Res = #{res.inspect}")
+      res
     else
       ''
     end

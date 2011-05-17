@@ -5,10 +5,7 @@ describe Admin::SubscriptionsController, "as admin" do
     stub_wordpress
     admin_login
   end
-  it "should have subscriptions layout"
-  it "should have index"
-  it "should have activity"
-  it "should have pending"
+
   it "should have search" do
     get :search
     response.should be_success
@@ -33,7 +30,7 @@ describe Admin::SubscriptionsController, "as admin" do
 
   describe "pending" do
     before(:each) do
-      @subscription = Factory.create(:subscription, :state => 'pending')
+      @subscription = Factory.create(:pending_subscription)
     end
 
     it "should list all pending subscriptions" do
@@ -47,6 +44,36 @@ describe Admin::SubscriptionsController, "as admin" do
       Subscription.any_instance.expects(:verify!)
       post :verify, :id => @subscription.id, :payment => { "reference" => "1234", "payment_type" => "direct_debit" }
       response.should redirect_to :action => :pending
+    end
+
+    it "should verify if payment is successful" do
+      success = stub(:success? => true, :params => { 'ponum' => '1234' })
+      GATEWAY.expects(:trigger_recurrent).returns(success)
+      post :verify, :id => @subscription.id, :subscription => { :note => "A note about verification" }
+      flash[:notice].should == "Verified Subscription"
+      response.should redirect_to :action => :pending
+    end
+
+    it "should not verify if the subscription has already been verified" do
+      @subscription = Factory.create(:active_subscription)
+      post :verify, :id => @subscription.id, :payment => { "reference" => "1234", "payment_type" => "direct_debit" }
+      flash[:error].should == "Subscription has already been verified"
+      response.should redirect_to :action => :pending
+    end
+
+    it "should handle a failed payment" do
+      failure = stub(:success? => false, :message => "Test Failure")
+      GATEWAY.expects(:trigger_recurrent).returns(failure)
+      post :verify, :id => @subscription.id, :subscription => { :note => "A note about verification" }
+      flash[:error].should == "The Subscriber's Card was declined. You may need to contact them."
+      response.should render_template("admin/subscriptions/verify")
+    end
+
+    it "should handle a missing payment token" do
+      @subscription.user.update_attributes(:payment_gateway_token => nil)
+      post :verify, :id => @subscription.id, :subscription => { :note => "A note about verification" }
+      flash[:error].should == "The User has no payment gateway token - the payment will need to processed manually"
+      response.should render_template("admin/subscriptions/verify")
     end
   end
 end

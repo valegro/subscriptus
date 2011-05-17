@@ -10,7 +10,12 @@ module  Exceptions
   class CanNotBePaidFor                      < StandardError; end
   class CanNotBeCanceled                     < StandardError; end
   class PaymentFailedException               < StandardError; end
+  class PaymentAlreadyProcessed              < StandardError; end
+  class InvalidOffer                         < StandardError; end
   class InvalidOfferTerm                     < StandardError; end
+  class PaymentTokenMissing                  < StandardError; end
+  class CannotStoreCard                      < StandardError; end
+  class DuplicateSubscription                < StandardError; end
 
   class GiftNotAvailable                     < StandardError
     def initialize(gift_id)
@@ -22,6 +27,16 @@ module  Exceptions
       "The Gift #{gift.name} is no longer available"
     rescue
       "The Gift is no longer available"
+    end
+  end
+
+  module Factory
+    class InvalidException < StandardError
+      attr_reader :subscription, :errors
+      def initialize(subscription, errors)
+        @subscription = subscription
+        @errors = errors
+      end
     end
   end
 end

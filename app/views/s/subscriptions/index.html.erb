@@ -7,9 +7,11 @@
 
   t.rows do |row, subscription, index|
     row.publication subscription.publication.name
-    row.from subscription.created_at
-    row.to subscription.expires_at
-    row.status subscription.state
-    row.actions link_to_if(can_be_paid_for(subscription.state) , 'Pay', payment_s_subscription_path(subscription), :class => "pay") + ' | ' + link_to_if(can_be_canceled(subscription.state), 'Cancel', cancel_s_subscription_path(subscription), :confirm => "Are you sure you want to cancel #{subscription.publication.try(:name)} ?", :class => "destroy")
+    row.from subscription.state_updated_at.try(:strftime, "%d/%m/%Y")
+    row.to subscription.expires_at.try(:strftime, "%d/%m/%Y")
+    row.status subscription.state.try(:capitalize)
+    unless subscription.publication.offers.default_for_renewal.blank?
+      row.actions link_to_if(can_be_paid_for(subscription.state), 'Renew', new_renew_path(:publication_id => subscription.publication), :class => "pay")
+    end
   end
 end %>

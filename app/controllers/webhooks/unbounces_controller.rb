@@ -8,5 +8,6 @@ class Webhooks::UnbouncesController < ApplicationController
        @referrer = params[:page_url]
        @subscription = User.find_or_create_with_trial(@publication, Publication::DEFAULT_TRIAL_EXPIRY, @referrer, @json)
      end
+     render :text => "OK"
    end
 end

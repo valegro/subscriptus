@@ -12,14 +12,22 @@
   <div class="frame span_3">
     <%= image_tag(@publication.publication_image.url(:medium)) %> 
   </div>
-  <div class="frame span_4 last">
+  <div class="frame span_4">
     <dl>
       <dt>Name</dt><dd><%= h(@publication.name) %></dd>
       <dt>Description</dt><dd><%= h(@publication.description) %></dd>
+      <dt>Password Link</dt>
+        <dd><%= @publication.forgot_password_link ? link_to(truncate(h(@publication.forgot_password_link)), @publication.forgot_password_link, :target => :new) : 'Not Set' %>
+      </dd>
       <dt>Active</dt><dd><%= @publication.subscriptions.active.count %></p></dd>
       <dt>Trial</dt><dd><%= @publication.subscriptions.trial.count %></p></dd>
       <dt>Squatters</dt><dd><%= @publication.subscriptions.squatter.count %></p></dd>
     </dl>
+  </div>
+  <div class="frame span_3 last">
+    <h3>Default Renewal Offer</h3>
+    <p>The offer that will be used when a subscriber renews but no specific offer has been made.</p>
+    <%= @publication.offers.default_for_renewal.blank? ? "None Set (warning, renewals may fail)" : link_to(@publication.offers.default_for_renewal.try(:name), admin_catalogue_offer_path(@publication.offers.default_for_renewal)) %>
   </div>
   <div class="frame span_10 last">
     <h2>Subscriptions</h2>

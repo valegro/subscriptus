@@ -1,96 +1,60 @@
 <% content_for :ujs do %>
   <script language="javascript">
     $(document).ready(function() {
-      $('.tab-action').click(function() {
-        $(this).trigger('show-type', [$(this).attr('id')]);
-      });
-
-      $(document).bind('show-type', function(e, arg) {
-        $('.subscription-type').hide();
-        $('#' + arg + '-info').show();
-        $('#subscription-tabs li').removeClass('active');
-        $('#' + arg).parent().addClass('active');
+      $('.payment-option').hide();
+      if ($('#payment-radio-direct-debit').attr('checked')) { $('#payment_by_direct_debit').show(); }
+      if ($('#payment-radio-credit-card').attr('checked')) { $('#payment_by_credit_card').show(); }
+      $(".payment-radio").live('click', function() {
+        $('.payment-option').hide();
+        $('#payment_by_'+$(this).val()).show();
       });
     });
   </script>
 <% end %>
 
-<% form_for @subscription, :url => subscribe_path(:offer_id => @offer.id), :builder => SubscribeFormBuilder do |f| %>
+<% form_for @subscription, :url => get_subscribe_submit_path(@offer, @source, @renewing), :builder => SubscribeFormBuilder do |f| %>
 
   <div class='section' id='step1'>
     <img src="/images/step1.png" class='step' alt='step 1' />
     <div class='content'>
 
-      <h2>Subscribe to Crikey</h2>
+      <% if @renewing %>
+        <h2>Renew your Subscription</h2>
+      <% else %>
+        <h2>Subscribe to Crikey</h2>
+      <% end %>
 
       <h3><%= h(@offer.publication.try(:name)) %></h3>
       <p class='subscription-description'><%= h(@offer.publication.description) %></p>
 
       <!-- Error Messages -->
+      <div id="form-errors">
+			<%= error_messages(@errors) %>
       <% unless flash[:error].blank? %>
         <div id="flash"><%= flash[:error] %></div>
       <% end %>
-      <%= f.error_messages %>
-
+			</div> <!-- closes #form-errors -->
+			
       <ul id='subscription-tabs'>
-        <li class='active'>
-          <a class="tab-action" href='#' id="type-normal">SUBSCRIPTIONS</a>
+        <li id="subscriptions-tab" class='<%= "active" if @tab == 'subscriptions' || @tab.blank? %>'>
+          <%= link_to("SUBSCRIPTIONS", tab_path('subscriptions')) %>
         </li>
-        <li>
-          <a class="tab-action" href='#' id="type-student">STUDENTS</a>
-        </li>
-        <li>	
-          <a class="tab-action" href='#' id="type-senior">SENIOR / CONCESSIONS</a>
-        </li>	
-        <li class='last'>
-          <a class="tab-action" href='#' id="type-group">DISCOUNT GROUP</a>
-        </li>
+        <% unless @offer.offer_terms.concession.blank? %>
+          <li id="students-tab" class='<%= "active" if @tab == 'students' %>'>
+            <%= link_to("STUDENTS", tab_path('students')) %>
+          </li>
+          <li id="concessions-tab" class='<%= "active" if @tab == 'concessions' %>'>
+            <%= link_to("SENIOR / CONCESSIONS", tab_path('concessions')) %>
+          </li>	
+          <li id="groups-tab" class='<%= "active" if @tab == 'groups' %> last'>
+            <%= link_to("DISCOUNT GROUP", tab_path('groups')) %>
+          </li>
+        <% end %>
       </ul>
       <div class="clear"></div>
 
-      <div id='subscription-options' class='form-section'>
-        <div id="type-normal-info" class="subscription-type">
-          <%= render :partial => "offer_terms", :object => @offer.offer_terms.full_price %>  
-        </div>
-        <div id="type-student-info" class="subscription-type" style="display:none;">
-          <div class="promo">
-            <h4>Get 32% off the normal price of Crikey Subscriber</h4>
-            <p>Crikey offers a discount subscription rate of $100 per year to students. All you need to do is fill out the online form below and then fax or mail us a copy of your student card.</p>
-          </div>
-          <%= render :partial => "offer_terms", :object => @offer.offer_terms.concession %>  
-        </div>
-        <div id="type-senior-info" class="subscription-type" style="display:none;">
-          <div class="promo">
-            <h4>Get 32% off the normal price of Crikey Subscriber</h4>
-            <p>Crikey offers a discount subscription rate of $100 per year to seniors and concession card holders. All you need to do is fill out the online form below and then fax or mail us a copy of your seniors/concession card.</p>
-          </div>
-          <%= render :partial => "offer_terms", :object => @offer.offer_terms.concession %>  
-        </div>
-        <div id="type-group-info" class="subscription-type" style="display:none;">
-          Groups
-        </div>
-      </div>
-
-      <!-- Gifts -->
-
-      <div id='gift-options' class='form-section'>
-          <% unless @included_gifts.blank? %>
-            <h3>Subscribe and Receive</h3>
-            <%= render :partial => "included_gift", :collection => @included_gifts %>
-          <% end %>
-          <% if @optional_gifts.size > 1 %>
-            <% if @offer.gifts.included.empty? %>
-              <h3>Choose a gift!</h3>
-            <% else %>
-              <div class="clear"></div>
-              <h3>Plus, choose one of the following:</h3>
-            <% end %>
-            <% @optional_gifts.each_with_index do |o_gift, i| %>
-              <%= render :partial => "optional_gift", :object => o_gift, :locals => { :checked => (i == 0) } %>
-            <% end %>
-          <% end %>
-      </div>
-
+      <%= render :partial => "subscribe/#{@tab}" %>
+     
     </div>
     <div class='clear'></div>
   </div> <!-- Step 1 -->
@@ -98,19 +62,13 @@
   <div class='section' id='step2'>
     <img src="/images/step2.png" class='step' alt='step 2'   />
     <div class='content'>	
-      <h2>Your Details</h2>
+      <h2><%= 'Confirm ' unless @user.new_record? %>Your Details</h2>
 
-      <div id='login-choice'>
-        <input type='radio' id='rdoLogin' name='login' /><label for='rdoLogin'>Existing User Login</label>
-        <input type='radio' id='rdoNew' name='login' /><label for='rdoNew'>New User Sign-Up</label>
-      </div>
-
-      <div id='section-ne'>
-        <% f.fields_for :user do |u| %>
-          <%= u.enum_select :title %>
+      <div id='new-user' class="login-option">
+        <% fields_for :user, @user, :builder => SubscribeFormBuilder do |u| %>
+          <%= u.select :title, %w(Mr Mrs Ms Miss) %>
           <%= u.text_field :firstname, :required => true, :label => "First Name" %>
           <%= u.text_field :lastname, :required => true, :label => "Last Name" %>
-          <%= u.select :hear_about, [ "The web", "Someone else" ], :required => true, :label => "How did you hear about Crikey?" %>
           <%= u.text_field :email, :help => "This is the email address Crikey will be sent to", :required => true %>
           <%= u.text_field :email_confirmation, :required => true %>
           <%= u.text_field :phone_number, :help => "If there are problems with email delivery this is how we contact you", :required => true %>
@@ -121,11 +79,14 @@
           <%= u.enum_select :state, :required => true %>
           <%= u.text_field :postcode, :required => true %>
           <%= u.country_select :country, ['Australia'], :required => true %>
-          <%= u.password_field :password, :required => true %>
-          <%= u.password_field :password_confirmation, :required => true %>
+          <% if @user.new_record? %>
+            <%= u.password_field :password, :required => true %>
+            <%= u.password_field :password_confirmation, :required => true %>
+          <% end %>
         <% end %>
       </div>
     </div>
+
     <div class='clear'></div>
   </div> <!-- Step 2 -->
 
@@ -137,36 +98,51 @@
 
 			  <img id='securepay' src="/images/securepay.png" alt="Powered by Secure Pay" />
 				<div id='payment-options'>
-    			<input type='radio' name='rdoPaymentOptions' id='rdoPaymentOptions1' />
-          <label for='rdoPaymentOptions1' >
+          <input class="payment-radio" type='radio' name='payment_option' value="credit_card" id='payment-radio-credit-card' <%= 'checked="true"' if (@payment_option.blank? || @payment_option == 'credit_card' || !@direct_debit_allowed) %> />
+          <label for='payment-radio-credit-card'>
             Credit Card
           </label>
           
-        
-          <input type='radio' name='rdoPaymentOptions' id='rdoPaymentOptions2' />
-          <label for='rdoPaymentOptions2' >
-            Direct Debit
-          </label>									
-          
-          <label for='rdoPaymentOptions1' >
-            <img src='/images/cc.png' alt='Credit Cards' />		
+          <span><%= @payment_option %></span>
+          <% if @direct_debit_allowed %>
+            <input type='radio' class="payment-radio" name='payment_option' value="direct_debit" id='payment-radio-direct-debit' <%= 'checked="true"' if @payment_option == 'direct_debit' %> />
+            <label for='payment-radio-direct-debit'>
+              Direct Debit
+            </label>									
+          <% end %>
+            
+          <label for='payment-radio-credit-card'>
+            <img src='/images/cc.png' alt='Credit Cards' />	
           </label>
-
         </div>
 
-
         <div id='payment-details'>
-          <h4>Credit Card Details</h4>
-          
-          <% f.fields_for :payments do |p| %>
-            <%= p.enum_select :card_type, :required => true %>
-              <%= p.text_field :first_name, :required => true %>
-              <%= p.text_field :last_name, :required => true %>
+          <div class="payment-option" id="payment_by_credit_card" style="<%= 'display:none;' if @payment_option != 'credit_card' && !@payment_option.blank? %>">
+            <h4>Credit Card Details</h4>
+            <% fields_for :payment, @payment, :builder => SubscribeFormBuilder do |p| %>
+              <%= p.text_field :full_name, :required => true, :label => "Name on Card" %>
               <%= p.text_field :card_number, :required => true, :help => "e.g. 0000123455677675" %>
-            <%= p.date_select :card_expiry_date, :discard_day => true, :start_year => Time.now.year, :label => "Expiry", :required => true %>
-            <%= p.text_field :card_verification, :class => "smallText", :required => true %>
-          <% end %>
+              <%= p.date_select :card_expiry_date, :discard_day => true, :start_year => Time.now.year, :label => "Expiry", :required => true %>
+              <%= p.text_field :card_verification, :class => "smallText", :required => true, :label => "Card Verification (CVV Number)" %>
+            <% end %>
+          </div>
 
+          <% if @tab.blank? || @tab == 'subscriptions' %>
+            <div class="payment-option" id="payment_by_direct_debit" style="<%= 'display:none;' unless @payment_option == 'direct_debit' %>">
+              <h4>Direct Debit</h4>
+              <h4>Click the FINISH button below once you’ve chosen your payment option:</h4>
+              <ol>
+                <li>Download our <%= link_to("subscription form", "/forms/crikey_directdebit_bank.pdf", :target => :new) %> and fax it to 03 8623 9975 or mail it to Crikey, Level 6, 22 William Street, Melbourne VIC 3000.</li>
+                <li>Or you can do a direct transfer into our bank account – make sure you include your name in the reference so we can match up your payment:</li>
+              </ol>
+              <p>
+              BSB: 083 026<br/>
+              Account Number: 58 171 0456<br/>
+              Account Name: Blimey Holdings
+              </p>
+            </div>
+          <% end %>
+          
 					<div id='terms'>
             <%= f.check_box :terms, :label => "I agree to the Crikey " %>
             <%= link_to('Terms and Conditions', "http://www.crikey.com.au/about/terms-conditions/", :target => '_blank') %>
@@ -178,7 +154,7 @@
             </p>
           </div>
 							
-          <%= image_submit_tag "/images/finish.png", :disable_with => "Processing...", :id => "btnSubmit" %>
+          <%= image_submit_tag "/images/nextstep.png", :disable_with => "Processing...", :id => "btnSubmit" %>
 				  <div class='clear'></div>
         </div>
 

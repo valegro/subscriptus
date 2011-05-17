@@ -26,30 +26,33 @@ config.action_mailer.delivery_method = :smtp
 config.action_mailer.perform_deliveries = true
 config.action_mailer.raise_delivery_errors = true
 config.action_mailer.default_charset = "utf-8"
+
+# NetFox Sendgrid (for now)
 config.action_mailer.smtp_settings = {
-  :address => "smtp.sendgrid.net",
-  :port => "25",
+  :address        => "smtp.sendgrid.net",
+  :port           => "25",
   :authentication => :plain,
-  :user_name => ENV['SENDGRID_USERNAME'],
-  :password => ENV['SENDGRID_PASSWORD'],
-  :domain => ENV['SENDGRID_DOMAIN'],
+  :user_name      => 'daniel@netfox.com',
+  :password       => '12qwaszx',
+  :domain         => 'crikey.com.au'
 }
+
+ActionMailer::Base.default_url_options[:host] = "subscribe.crikey.com.au"
 
 # Enable threaded mode
 # config.threadsafe!
 
 # Setup Active Merchant for Staging Production
-# FIXME for final production: change login and pwd and test mode
 config.after_initialize do
-  ActiveMerchant::Billing::Base.mode = :test
   # Secure Pay Gateway Settings
   ::GATEWAY = ActiveMerchant::Billing::SecurePayAuExtendedGateway.new(  # the default_currency of this gateway is 'AUD'
-        :login => 'CKR0030',  # <MerchantID> input to Au securePay Gateway.
-        :password => "q02nnn8h"
+    :login => 'CKR0030',  # <MerchantID> input to Au securePay Gateway.
+    :password => "abc123"
   )
-  Wordpress.enabled = false # TODO: Enable this
 end
 
 CAMPAIGNMASTER_USERNAME = 'ddraper'
 CAMPAIGNMASTER_PASSWORD = 'netfox'
 CAMPAIGNMASTER_CLIENT_ID = '5032'
+
+Wordpress.enabled = true

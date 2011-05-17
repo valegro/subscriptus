@@ -230,6 +230,13 @@ a:hover {
   background-position: 5px center;
 }
 
+#content div.title .actions a.set-expiry {
+  padding-left: 26px;
+  background-image: url(/images/admin/icons/calendar-small-month.png);
+  background-repeat: no-repeat;
+  background-position: 5px center;
+}
+
 #content div.title .actions a.delete {
   padding-left: 26px;
   background-image: url(/images/admin/icons/cross-circle.png);
@@ -364,6 +371,11 @@ form.form div.field {
 	border-bottom: 1px solid #DDD;
 }
 
+form.form div.field h3 {
+  padding:0;
+  margin:0;
+}
+
 form.form div.field input[type=text], form.form div.field input[type=password] {
 /* A placeholder for more styles*/
 }
@@ -487,6 +499,13 @@ dt:after {
 }
 
 dd {
-  margin: 0 0 0 120px;
+  margin: 0 0 0 160px;
   padding: 0 0 0.5em 0;
+}
+
+#footer {
+  border-top:solid 1px #e3e3e3;
+  padding-top:5px;
+  margin-top:20px;
+  text-align:right;
 }

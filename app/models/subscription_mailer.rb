@@ -10,8 +10,8 @@ class SubscriptionMailer < ActionMailer::Base
     raise Exceptions::EmailDataError.new("nil user/ email") unless !subscription.user.blank? && !subscription.user.email.blank?
     recipients     "#{subscription.user.email}"
     subject        "Crikey Online Order #{subscription.reference}"
-    from           SEND_TO
-    body           :subscription => subscription
+    from           NO_REPLY
+    body           :subscription => subscription, :user => subscription.user
     content_type   'text/html'
   end
 
@@ -21,8 +21,8 @@ class SubscriptionMailer < ActionMailer::Base
     raise Exceptions::EmailDataError.new("nil user/ email") unless !subscription.user.blank? && !subscription.user.email.blank?
     recipients     "#{subscription.user.email}"
     subject        "Crikey Online Cancelation"
-    from           SEND_TO
-    body           :subscription => subscription
+    from           NO_REPLY
+    body           :subscription => subscription, :user => subscription.user
     content_type   'text/html'
   end
 
@@ -34,11 +34,27 @@ class SubscriptionMailer < ActionMailer::Base
     content_type 'text/html'
   end
   
-  def pending(subscription)
+  def pending_student_verification(subscription)
     recipients subscription.user.email
     subject "Your subscription is pending verification"
     from NO_REPLY
-    body :subscription => subscription
+    body :subscription => subscription, :user => subscription.user
+    content_type 'text/html'
+  end
+
+  def pending_concession_verification(subscription)
+    recipients subscription.user.email
+    subject "Your subscription is pending verification"
+    from NO_REPLY
+    body :subscription => subscription, :user => subscription.user
+    content_type 'text/html'
+  end
+
+  def pending_payment(subscription)
+    recipients subscription.user.email
+    subject "Your subscription is pending payment"
+    from NO_REPLY
+    body :subscription => subscription, :user => subscription.user
     content_type 'text/html'
   end
 
@@ -54,8 +70,31 @@ class SubscriptionMailer < ActionMailer::Base
     recipients subscription.user.email
     subject "Your pending subscription has been verified"
     from NO_REPLY
-    body :subscription => subscription
+    body :subscription => subscription, :user => subscription.user
+    content_type 'text/html'
+  end
+
+  def expired(subscription)
+    recipients subscription.user.email
+    subject "Your subscription has expired"
+    from NO_REPLY
+    body :subscription => subscription, :user => subscription.user
     content_type 'text/html'
   end
   
+  def suspended(subscription)
+    recipients subscription.user.email
+    subject "Your subscription has been suspended"
+    from NO_REPLY
+    body :subscription => subscription, :user => subscription.user
+    content_type 'text/html'
+  end
+
+  def unsuspended(subscription)
+    recipients subscription.user.email
+    subject "Your subscription has been reactivated"
+    from NO_REPLY
+    body :subscription => subscription, :user => subscription.user
+    content_type 'text/html'
+  end
 end

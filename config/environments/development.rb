@@ -15,14 +15,15 @@ config.action_controller.perform_caching             = false
 
 # Don't care if the mailer can't send
 config.action_mailer.raise_delivery_errors = false
+ActionMailer::Base.default_url_options[:host] = "127.0.0.1:3000"
 
 # Setup Active Merchant for development
 config.after_initialize do
-  ActiveMerchant::Billing::Base.mode = :test
   # Secure Pay Gateway Settings
+  ActiveMerchant::Billing::Base.mode = :test
   ::GATEWAY = ActiveMerchant::Billing::SecurePayAuExtendedGateway.new(  # the default_currency of this gateway is 'AUD'
     :login => 'CKR0030',  # <MerchantID> input to Au securePay Gateway.
-    :password => "q02nnn8h",
+    :password => "abc123",
     :test => true
   )
 end
@@ -30,3 +31,5 @@ end
 CAMPAIGNMASTER_USERNAME = 'ddraper'
 CAMPAIGNMASTER_PASSWORD = 'netfox'
 CAMPAIGNMASTER_CLIENT_ID = '5032'
+
+Wordpress.enabled = true

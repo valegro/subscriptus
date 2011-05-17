@@ -37,6 +37,12 @@ class Admin::Catalogue::OffersController < Admin::CatalogueController
     end
   end
 
+  def make_primary
+    @offer.make_primary!
+    flash[:notice] = "This offer is now the primary offer"
+    redirect_to admin_catalogue_offer_path(@offer)
+  end
+
   def add_gift
     @gift = Gift.find(params[:gift_id])
     render :update do |page|

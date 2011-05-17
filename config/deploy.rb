@@ -6,16 +6,31 @@ set :deploy_to, "/home/deploy/apps/#{application}"
 set :shared_dir, "shared"
 set :use_sudo, false
 
-task :to_production do 
+task :to_staging do 
   set :user, "root"
   set :password, "zxnm9014"
   set :prod_db, "subscriptus"
   set :db_hostname, "localhost"
   set :db_port, 3306
 
+  set :branch, "refctoring-mutator"
+
   role :app, "deploy@zebra.crikey.com.au"
   role :web, "deploy@zebra.crikey.com.au"
   role :db,  "deploy@zebra.crikey.com.au", :primary => true
+end
+
+task :to_production do 
+  set :user, "root"
+  set :password, "zxnm9014"
+  set :prod_db, "subscriptus"
+  set :db_hostname, "whitlam-back"
+  set :db_port, 3306
+  set :port, 2244 # SSH PORT
+
+  role :app, "deploy@fraser.crikey.com.au"
+  role :web, "deploy@fraser.crikey.com.au"
+  role :db,  "deploy@fraser.crikey.com.au", :primary => true
 end
 
 namespace :bundler do
@@ -40,6 +55,11 @@ task :after_setup do
   run "mkdir -p #{deploy_to}/#{shared_dir}/config/"
 end
 
+before "deploy:symlink" do
+  run "sudo monit stop delayed_job"
+  sleep(15) # monit stop is non-blocking so this is a kludge ...
+end
+
 after "deploy:symlink" do
 
   template = File.read("config/database.yml.erb")
@@ -49,6 +69,8 @@ after "deploy:symlink" do
   run "ln -nfs #{deploy_to}/#{shared_dir}/config/database.yml #{release_path}/config/database.yml"
 
   #run("cd #{deploy_to}/current; /usr/bin/rake db:migrate RAILS_ENV=production")
+
+  run "sudo monit start delayed_job"
 end
 
 after "deploy:symlink", "deploy:update_crontab"
@@ -88,3 +110,10 @@ namespace :deploy do
   end
 end
 
+
+
+Dir[File.join(File.dirname(__FILE__), '..', 'vendor', 'gems', 'hoptoad_notifier-*')].each do |vendored_notifier|
+  $: << File.join(vendored_notifier, 'lib')
+end
+
+require 'hoptoad_notifier/capistrano'

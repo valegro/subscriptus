@@ -21,14 +21,15 @@ ActionController::Routing::Routes.draw do |map|
       :expire => :get,
       :activate => :get,
       :cancel => :get,
-      :verify => [ :get, :post ],
+      :verify => [ :get, :post, :put ],
       :suspend => [ :get, :post ],
+      :set_expiry => [ :get, :post ],
       :unsuspend => [ :post ]
     }
     admin.resources :orders, :member => { :fulfill => [:get, :post], :delay => [:get, :post] }, :collection => { :delayed => :get, :completed => :get }
     admin.resources :subscribers
     admin.namespace :catalogue do |catalogue|
-      catalogue.resources :offers, :member => { :add_gift => :post, :remove_gift => :post }, :has_many => [ :offer_terms ]
+      catalogue.resources :offers, :member => { :add_gift => :post, :remove_gift => :post, :make_primary => :get }, :has_many => [ :offer_terms ]
       catalogue.resources :gifts
       catalogue.resources :publications
     end
@@ -47,22 +48,16 @@ ActionController::Routing::Routes.draw do |map|
 
   # Signup
   map.with_options  :controller => 'subscribe' do |s|
-    s.resource :subscribe, :collection => { :thanks => :get }
-    #s.subscribe "subscribe", :action => 'new', :method => :get
-=begin
-    s.subscribe_offer         'subscribe/offer', :action => 'offer', :method => :get
-    s.subscribe_offer_next    'subscribe/offer', :action => 'offer', :method => :post, :commit=>'Next'
-
-    s.subscribe_details         'subscribe/details', :action => 'details', :method => :get
-    s.subscribe_details_next    'subscribe/details', :action => 'details', :method => :post, :commit=>'Next'
-
-    s.subscribe_payment         'subscribe/payment', :action => 'payment', :method => :get
-    s.subscribe_payment_next    'subscribe/payment', :action => 'payment', :method => :post, :commit=>'Finish'
-    s.subscribe_payment_direct_debit  'subscribe/direct_debit', :action => 'direct_debit', :method => :get
-
-    s.subscribe_result  'subscribe/result', :action => 'result', :method => :get
-=end
+    s.new_renew      '/renew',       :action => "edit",    :conditions => { :method => :get }
+    s.renew          '/renew',       :action => "update",  :conditions => { :method => :put }
+    s.new_subscribe  '/subscribe',   :action => "new",     :conditions => { :method => :get }
+    s.subscribe      '/subscribe',   :action => "create",  :conditions => { :method => :post }
+    s.thanks         '/thanks',      :action => "thanks"
+    s.complete       '/complete',    :action => "complete"
   end
+
+  # Unsubscribe
+  map.resource :unsubscribe
 
   # Webhooks
   map.namespace :webhooks do |webhooks|
@@ -101,7 +96,7 @@ ActionController::Routing::Routes.draw do |map|
   #   end
 
   # You can have the root of your site routed with map.root -- just remember to delete public/index.html.
-  # map.root :controller => "welcome"
+  map.root :controller => "home"
 
   # See how all your routes lay out with "rake routes"
 

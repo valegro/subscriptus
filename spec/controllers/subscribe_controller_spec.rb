@@ -3,7 +3,7 @@ require 'spec_helper'
 describe SubscribeController do
 
   integrate_views
-  
+
   before(:each) do
     Timecop.freeze('2011-01-01 0:00')
     @source = Factory(:source)
@@ -19,7 +19,7 @@ describe SubscribeController do
     stub_wordpress
   end
 
-  describe "creating a subscription" do
+  describe "on create" do
     before(:each) do
       @offer = Factory(:offer)
       @ot1 = Factory(:offer_term, :months => 1)
@@ -31,10 +31,8 @@ describe SubscribeController do
       @offer.gifts.add(@g3 = Factory(:gift, :on_hand => 0))
       @offer.gifts.add(@g4 = Factory(:gift, :on_hand => 10), true)
 
-      @attributes = {
-        'user_attributes' => @user_attributes,
-        'payments_attributes' => { "0" => @payment_attributes }
-      }
+      @attributes = {}
+      @expected_attributes = { 'user' => instance_of(User) }
     end
 
     it "should create a subscription" do
@@ -43,10 +41,13 @@ describe SubscribeController do
           :offer_id => @offer.id,
           :source_id => @source.id,
           :offer_term => @ot1.id,
-          :subscription => @attributes
+          :subscription => @attributes,
+          :payment => @payment_attributes,
+          :user => @user_attributes
         })
       }.to change { Subscription.count }.by(1)
-      Subscription.last.payments.size.should == 1
+      Subscription.last.actions.size.should == 1
+      Subscription.last.actions.last.payment.should be_an_instance_of(Payment)
       response.should redirect_to(:action => 'thanks')
     end
 
@@ -58,7 +59,9 @@ describe SubscribeController do
           :offer_id => @offer.id,
           :source_id => @source.id,
           :offer_term => @ot1.id,
-          :subscription => @attributes
+          :subscription => @attributes,
+          :payment => @payment_attributes,
+          :user => @user_attributes
         })
       }.to_not change { Subscription.count }.by(1)
       response.should render_template("new")
@@ -85,22 +88,28 @@ describe SubscribeController do
           :term_id => @ot1.id.to_s,
           :optional_gift => nil,
           :included_gift_ids => nil,
-          :attributes => @attributes
+          :attributes => @expected_attributes,
+          :source => @source.id,
+          :payment_attributes => @payment_attributes,
+          :concession => nil,
+          :source => @source.id.to_s,
+          :payment_option => 'credit_card'
         }
       ).returns(factory)
-      subscription.expects(:save!).returns(true)
       post('create', {
         :offer_id => @offer.id,
         :source_id => @source.id,
         :offer_term => @ot1.id,
-        :subscription => @attributes
+        :subscription => @attributes,
+        :payment => @payment_attributes,
+        :payment_option => 'credit_card',
+        :user => @user_attributes
       })
       response.should redirect_to(:action => 'thanks')
     end
 
     it "should build a subscription with included and an optional gift" do
       subscription = stub(:user => Factory.stub(:user))
-      subscription.expects(:save!).returns(true)
       factory = stub(:build => subscription)
       SubscriptionFactory.expects(:new).with(
         instance_of(Offer), {
@@ -108,7 +117,11 @@ describe SubscribeController do
           :optional_gift => nil,
           :included_gift_ids => [@g1.id, @g2.id],
           :optional_gift => @g4.id.to_s,
-          :attributes => @attributes
+          :attributes => @expected_attributes,
+          :payment_attributes => @payment_attributes,
+          :concession => nil,
+          :payment_option => 'credit_card',
+          :source => @source.id.to_s
         }
       ).returns(factory)
       post 'create', {
@@ -117,7 +130,10 @@ describe SubscribeController do
         :included_gifts => [@g1.id, @g2.id],
         :optional_gift => @g4.id,
         :offer_term => @ot1.id,
-        :subscription => @attributes
+        :subscription => @attributes,
+        :payment => @payment_attributes,
+        :payment_option => 'credit_card',
+        :user => @user_attributes
       }
       response.should redirect_to(:action => 'thanks')
     end
@@ -131,19 +147,222 @@ describe SubscribeController do
           :source_id => @source.id,
           :offer_term => @ot1.id,
           :optional_gift => @g4.id,
-          :subscription => @attributes
+          :subscription => @attributes,
+          :payment => @payment_attributes,
+          :user => @user_attributes
         })
       }.to_not change { Subscription.count }.by(1)
       response.should render_template("new")
       flash[:error].should == "The Gift #{@g4.name} is no longer available"
     end
 
+    describe "when choosing student concession" do
+      before(:each) do
+        GATEWAY.stubs(:trigger_recurrent)
+        GATEWAY.expects(:purchase).never
+        success = stub(:success? => true)
+        GATEWAY.stubs(:setup_recurrent).returns(success)
+        @concession_term = Factory.create(:offer_term, :concession => true)
+        @offer.offer_terms << @concession_term
+      end
+
+      it "should store the credit card on the gateway" do
+        User.any_instance.expects(:store_credit_card_on_gateway).with(instance_of(ActiveMerchant::Billing::CreditCard))
+        post('create', {
+          :offer_id => @offer.id,
+          :source_id => @source.id,
+          :offer_term => @concession_term.id,
+          :subscription => @attributes,
+          :payment => @payment_attributes,
+          :concession => 'student',
+          :user => @user_attributes
+        })
+      end
+
+      it "should create a pending action with a payment" do
+        post('create', {
+          :offer_id => @offer.id,
+          :source_id => @source.id,
+          :offer_term => @concession_term.id,
+          :subscription => @attributes,
+          :payment => @payment_attributes,
+          :concession => 'student',
+          :user => @user_attributes
+        })
+        Subscription.last.pending_action.should be_an_instance_of(SubscriptionAction)
+        Subscription.last.pending_action.payment.should be_an_instance_of(Payment)
+      end
+
+      it "should set the subscription to pending" do
+        subscription = stub(:save! => true)
+        factory = stub(:build => subscription)
+        SubscriptionFactory.expects(:new).with(
+          instance_of(Offer), {
+            :term_id => @concession_term.id.to_s,
+            :attributes => @expected_attributes,
+            :payment_attributes => @payment_attributes,
+            :concession => 'student',
+            :optional_gift => nil,
+            :included_gift_ids => nil,
+            :source => @source.id.to_s,
+            :payment_option => 'direct_debit'
+          }
+        ).returns(factory)
+        post('create', {
+          :offer_id => @offer.id,
+          :source_id => @source.id,
+          :offer_term => @concession_term.id,
+          :subscription => @attributes,
+          :payment => @payment_attributes,
+          :concession => 'student',
+          :payment_option => 'direct_debit',
+          :user => @user_attributes
+        })
+      end
+    end
+
+    describe "when choosing senior concession" do
+      before(:each) do
+        GATEWAY.stubs(:trigger_recurrent)
+        GATEWAY.expects(:purchase).never
+        success = stub(:success? => true)
+        GATEWAY.stubs(:setup_recurrent).returns(success)
+        @concession_term = Factory.create(:offer_term, :concession => true)
+        @offer.offer_terms << @concession_term
+      end
+
+      it "should store the credit card on the gateway" do
+        User.any_instance.expects(:store_credit_card_on_gateway).with(instance_of(ActiveMerchant::Billing::CreditCard))
+        post('create', {
+          :offer_id => @offer.id,
+          :source_id => @source.id,
+          :offer_term => @concession_term.id,
+          :subscription => @attributes,
+          :payment => @payment_attributes,
+          :concession => 'concession',
+          :user => @user_attributes
+        })
+      end
+
+      it "should create a pending action with a payment" do
+        post('create', {
+          :offer_id => @offer.id,
+          :source_id => @source.id,
+          :offer_term => @concession_term.id,
+          :subscription => @attributes,
+          :payment => @payment_attributes,
+          :concession => 'concession',
+          :user => @user_attributes
+        })
+        Subscription.last.pending_action.should be_an_instance_of(SubscriptionAction)
+        Subscription.last.pending_action.payment.should be_an_instance_of(Payment)
+      end
+
+      it "should set the subscription to pending" do
+        subscription = stub(:save! => true)
+        factory = stub(:build => subscription)
+        SubscriptionFactory.expects(:new).with(
+          instance_of(Offer), {
+            :term_id => @ot1.id.to_s,
+            :attributes => @expected_attributes,
+            :payment_attributes => @payment_attributes,
+            :concession => 'concession',
+            :optional_gift => nil,
+            :included_gift_ids => nil,
+            :source => @source.id.to_s,
+            :payment_option => 'credit_card'
+          }
+        ).returns(factory)
+        post('create', {
+          :offer_id => @offer.id,
+          :source_id => @source.id,
+          :offer_term => @ot1.id,
+          :subscription => @attributes,
+          :payment => @payment_attributes,
+          :concession => 'concession',
+          :payment_option => 'credit_card',
+          :user => @user_attributes
+        })
+      end
+    end
+
+    describe "when choosing direct debit" do
+      before(:each) do
+        GATEWAY.expects(:trigger_recurrent).never
+        GATEWAY.expects(:purchase).never
+        GATEWAY.expects(:setup_recurrent).never
+      end
+
+      it "should create a pending action with a payment" do
+        post('create', {
+          :offer_id => @offer.id,
+          :source_id => @source.id,
+          :offer_term => @ot1.id,
+          :subscription => @attributes,
+          :payment => @payment_attributes,
+          :payment_option => 'direct_debit',
+          :user => @user_attributes
+        })
+        Subscription.last.pending_action.should be_an_instance_of(SubscriptionAction)
+        Subscription.last.pending_action.payment.should be_an_instance_of(Payment)
+        Subscription.last.pending_action.payment.payment_type.should == :direct_debit
+      end
+
+      it "should set the subscription to pending" do
+        subscription = stub(:save! => true)
+        factory = stub(:build => subscription)
+        SubscriptionFactory.expects(:new).with(
+          instance_of(Offer), {
+            :term_id => @ot1.id.to_s,
+            :attributes => @expected_attributes,
+            :payment_attributes => @payment_attributes,
+            :payment_option => 'direct_debit',
+            :optional_gift => nil,
+            :included_gift_ids => nil,
+            :source => @source.id.to_s,
+            :concession => nil
+          }
+        ).returns(factory)
+        post('create', {
+          :offer_id => @offer.id,
+          :source_id => @source.id,
+          :offer_term => @ot1.id,
+          :subscription => @attributes,
+          :payment => @payment_attributes,
+          :payment_option => 'direct_debit',
+          :user => @user_attributes
+        })
+      end
+    end
+
+
+    # This scenario should only occur if for some reason there exists a wordpress user with the given
+    # email but there is no subscriptus user with that email
+    describe "when a wordpress user exists with the same email" do
+      before(:each) do
+        Wordpress.stubs(:exists?).with({:email => "daniel@codefire.com.au"}).returns(true)
+        @user_attributes['email'] = 'daniel@codefire.com.au'
+        @user_attributes['email_confirmation'] = 'daniel@codefire.com.au'
+      end
+
+      it "should return to the new page and ask for a username and password" do
+        post('create', {
+          :offer_id => @offer.id,
+          :source_id => @source.id,
+          :offer_term => @ot1.id,
+          :optional_gift => @g4.id,
+          :subscription => @attributes,
+          :payment => @payment_attributes
+        })
+        response.should render_template("subscribe/new")
+      end
+
+      # TODO: Once again, should we also check to see if there is a user who has the email address too?
+    end
+
     # TODO
     # Invalid gift
     # check error messages
-    # set the source
-    # Concession
     # Direct Debit
-    # Existing User, wordpress etc
   end
 end

@@ -8,41 +8,58 @@ class Subscription < ActiveRecord::Base
   belongs_to :user, :autosave => true
   belongs_to :offer
   belongs_to :publication
-  belongs_to :source
+  belongs_to :pending_action, :class_name => "SubscriptionAction"
 
-  has_many :log_entries, :class_name => "SubscriptionLogEntry"
-  has_many :subscription_gifts, :dependent => :destroy
-  has_many :payments, :autosave => true
+  has_many :actions,
+           :class_name => "SubscriptionAction",
+           :order => "applied_at desc",
+           :before_add => Proc.new { |s, a| a.applied_at = Time.now.utc },
+           :autosave => true
+
+  has_many :log_entries, :class_name => "SubscriptionLogEntry", :dependent => :destroy
   has_many :orders
-  
-  # TODO: Test this
-  has_many :gifts, :through => :subscription_gifts, :uniq => true, :before_add => Proc.new { |a, gift| raise "Gift is out of stock" unless gift.in_stock? }
   
   attr_accessor :note # Used to save notes to the subscription
   attr_accessor :terms
   attr_accessor :starts_at # the start date of the newest subscription #TODO: Is this used anywhere?
-  accepts_nested_attributes_for :payments, :user
+  accepts_nested_attributes_for :user
 
   named_scope :ascend_by_name, :include => 'user', :order => "users.lastname ASC, users.firstname ASC"
   named_scope :descend_by_name, :include => 'user', :order => "users.lastname DESC, users.firstname DESC"
   named_scope :recent, :order => "updated_at desc"
+  # TODO: Should we make this look at state_expires_at?
+  # We need both because of suspension mainly
+  named_scope :expired, lambda { { :conditions => [ "expires_at < ?", Time.now ] } }
 
   validates_presence_of :publication, :user, :state
   validates_acceptance_of :terms
+
+  def validate_on_create
+    if state == 'pending'
+      if self.pending_action.blank?
+        errors.add_to_base("A pending action must be provided in the pending state")
+      end
+      if self.pending.blank?
+        errors.add_to_base("The pending column must be set in the pending state")
+      end
+    end
+  end
 
   # Used to specify what the pending state is waiting on
   enum_attr :pending, %w(payment concession_verification student_verification)
   
   # Subscription States
-  has_states :trial, :squatter, :active, :suspended, :pending, :renewal_due, :payment_failed, :init => :trial do
+  # TODO: Do something with unsubscribed
+  has_states :trial, :squatter, :active, :suspended, :pending, :renewal_due, :payment_failed, :unsubscribed, :init => :trial do
     on :activate do
       transition :active => :active # when the subscriber extends their subscription while its still active
       transition :trial => :active
       transition :squatter => :active
     end
-    on :pay_later do
+    on :delay do
       transition :trial => :pending
-      transition :active => :pending # when the subscriber is currently active but is going to pay for the new subscription using Direct Debit
+      transition :squatter => :pending
+      transition :active => :pending # Renewal but goes into pending state
     end
     on :verify do
       transition :pending => :active
@@ -50,7 +67,6 @@ class Subscription < ActiveRecord::Base
     on :expire do
       transition :trial => :squatter
       transition :active => :squatter
-      transition :pending => :squatter
     end
     on :enqueue_for_renewal do
       transition :active => :renewal_due
@@ -75,23 +91,24 @@ class Subscription < ActiveRecord::Base
     end
     
     # Expiries
-    expires :pending => :squatter, :after => 14.days
     expires :trial => :squatter, :after => Publication::DEFAULT_TRIAL_EXPIRY.days
-
   end
+  # TODO: Should go into an observer
   after_exit_suspended :restore_subscription_expiry
 
-  def apply_term(offer_term)
-    if offer_term.blank? || offer_term.offer.blank? || offer_term.offer != self.offer
-      raise Exceptions::InvalidOfferTerm
-    end
-    self.price = offer_term.price
-    self.term_length = offer_term.months
-    # Set the payment price
-    self.payments.last.try(:amount=, offer_term.price)
-    self.increment_expires_at(offer_term)
+  def expired?
+    Time.now > self.expires_at
   end
-  
+
+  # TODO: Rename to apply_action! (maybe even move to the association? And disable <<)
+  def apply_action(action)
+    self.class.transaction do
+      action.subscription = self
+      action.apply
+      self.actions << action # TODO: Maybe apply is called as a callback on the association??
+    end
+  end
+
   def restore_subscription_expiry
     if self.state_expires_at
       days_to_restore = (Date.yesterday - self.state_expires_at.to_date).to_i
@@ -103,16 +120,16 @@ class Subscription < ActiveRecord::Base
     end
   end
 
-  # TODO: Also alias verify
+  # TODO: No longer need to have an argument to verify - so can move to an observer
   def verify_with_params!(object = nil)
-    # TODO: Transaction?
-    case pending.to_sym
-      when :payment
-        raise "Requires Payment to verify" unless object.kind_of?(Payment)
-        payments << object
-      when :concession
+    self.class.transaction do
+      if pending.to_sym == :concession_verification
+        self.user.valid_concession_holder = true
+      end
+      self.apply_action(self.pending_action) if self.pending_action
+      self.pending_action = nil
+      verify_without_params!
     end
-    verify_without_params!
   end
 
   alias_method_chain :verify!, :params
@@ -155,76 +172,58 @@ class Subscription < ActiveRecord::Base
     hash = {
       :email => self.user.email,
       :fields => {
-        :subscription_id  => self.id,
-        :status           => self.state,
+        :subscription_id  => self.reference,
+        :state            => self.state,
         :publication_id   => self.publication_id,
         :user_id          => self.user_id,
-        :expires_at       => self.expires_at.try(:strftime, "%d/%m/%y"),
         :firstname        => self.user.firstname,
         :lastname         => self.user.lastname,
         :country          => self.user.country,
         :city             => self.user.city,
-        :state            => self.user.state,
+        :address_state    => self.user.state,
         :title            => self.user.title,
         :phone_number     => self.user.phone_number,
         :postcode         => self.user.postcode,
         :address_1        => self.user.address_1,
-        :address_2        => self.user.address_2
+        :address_2        => self.user.address_2,
+        :offer_id         => self.offer_id,
+        :expires_at       => self.expires_at.try(:strftime, "%d/%m/%y"),
+        :created_at       => self.created_at.try(:strftime, "%d/%m/%y"),
+        :state_updated_at => self.state_updated_at.try(:strftime, "%d/%m/%y"),
+        :solus            => self.solus
       }
     }
-    # TODO: Solus, Weekender? Are these even needed?
 
-    if CM::Recipient.exists?(:fields => { 'subscription_id' => self.id })
+    if CM::Recipient.exists?(:fields => { 'subscription_id' => self.reference })
       CM::Recipient.update(hash)
     else
       CM::Recipient.create!(hash)
     end
-  rescue RuntimeError => ex
-    CM::Proxy.log_cm_error(ex)
   end
 
-  # if the subscription is new or expired, start it from now
-  # otherwise start it after the expiration time
-  def increment_expires_at(offer_term)
-    self.expires_at = nil && return unless offer_term.expires?
-    self.expires_at = Date.today if self.expires_at.blank? || self.expires_at < Date.today
+  def increment_expires_at(term_length)
+    unless term_length
+      self.expires_at = nil
+      return
+    end
+    self.expires_at = Time.now if self.expires_at.blank? || self.expires_at < Time.now
     self.starts_at = self.expires_at
-    self.expires_at = self.expires_at.advance(:months => offer_term.months)
-  end
-
-  def pay_non_first_time(payment)
-    returning self do
-      payment.money = price # setting the money of payment object
-      payment.customer_id = self.user.recurrent_id
-      payment.call_recurrent_profile # make the payment through secure pay
-      # change the state of subscription from trial to active
-      self.activate
-    end
-  end
-  
-  def pay_first_time(payment)
-    returning self do
-      payment.money = self.price # setting the money of payment object
-      payment.customer_id = self.user.generate_recurrent_profile_id # customer_id is used to create recurrent_profile in secure pay
-      payment.create_recurrent_profile
-      # recurrent setup successul, so now the customer_id should be saved as a reference to later transactions
-      self.user.recurrent_id = payment.customer_id
-      payment.order_num = self.generate_and_set_order_number # order_num is sent to the user as a reference number of their subscriptions
-      payment.call_recurrent_profile # make the payment through secure pay
-      # change the state of subscription from trial to active
-      self.activate
-    end
-  end
-  
-  private
-
-  # If the current account is expired, and the subscription now has a
-  # gateway token, activate the account.
-  def update_from_expired
-    self.activate! if gateway_token_changed? && !gateway_token.blank? && self.expired?
+    self.expires_at = self.expires_at.advance(:months => term_length)
   end
 
   def default_payment_method
     self.payment_method = Billing::Charger::CREDIT_CARD
+  end
+
+  # TODO: I'm sure we could do this within has_states using state_expires_at ??
+  def self.expire_active_subscribers
+    self.active.expired.find_each(:batch_size => 100) do |subscription|
+      subscription.expire!
+    end
+  end
+
+  # TODO: Ditto above (has_states/state_expires_at)
+  def self.unsuspend_expiring_suspensions
+    #self.suspended.expired.find_each(
   end
 end

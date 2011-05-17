@@ -1,5 +1,4 @@
 Factory.define :user do |f| # Dont use this factory. Use either an admin or a subscriber instead
-  f.login { Faker::Name.first_name }
   f.firstname { Faker::Name.first_name }
   f.lastname { Faker::Name.last_name }
   f.email { @email= Faker::Internet.email }
@@ -11,13 +10,20 @@ Factory.define :user do |f| # Dont use this factory. Use either an admin or a su
   f.postcode { Faker::Address.zip_code }
   f.city { Faker::Address.city }
   f.state :sa
+  f.title :Mr
   f.country 'Australia'
+  f.role 'subscriber'
 end
 
 Factory.define :admin, :parent => :user do |a|
+  a.login { Faker::Name.name.downcase }
   a.role { 'admin' }
 end
 
 Factory.define :subscriber, :parent => :user do |a|
   a.role { 'subscriber' }
+end
+
+Factory.define :user_with_token, :parent => :user do |a|
+  a.payment_gateway_token { '1234567' }
 end

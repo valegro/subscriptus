@@ -34,6 +34,7 @@ describe Wordpress do
       end
     end    
   end
+
   context "When wordpress is enabled" do
     setup do
       Wordpress.enabled = true
@@ -133,7 +134,7 @@ describe Wordpress do
       end
       
       it "should not return true if the authentication details are incorrect" do
-        stub_request(:get, Wordpress.config[:endpoint]).with(:query => {:login => 'joebloggs', :key => 'testkey', :func =>'authenticate', :pword => 'password'}).to_return(:body => 'false')
+        stub_request(:get, Wordpress.config[:endpoint]).with(:query => {:login => 'joebloggs', :key => 'testkey', :func =>'authenticate', :pword => 'password'}).to_return(:body => '-1')
         Wordpress.authenticate(:login => 'joebloggs', :pword => 'password').should == false
       end
     end

@@ -9,4 +9,3 @@ test:
   key: 'testkey'
 production:
   <<: *common
-  endpoint: 'http://114.111.138.126/loginConnector.php'

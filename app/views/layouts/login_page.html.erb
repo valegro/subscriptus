@@ -1,0 +1,124 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" dir="ltr">
+	<head profile="http://gmpg.org/xfn/11">
+		
+		<meta http-equiv="X-UA-Compatible" content="IE=8" />
+		
+		<title>Crikey Login</title>
+
+		<style type="text/css">
+			
+			body {
+				background:#2e2e2e;
+				color:#666;
+				font-family:Arial,Helvetica,sans-serif;
+				font-size:14px;
+				padding-top:88px;
+			}
+			
+			#main {
+				background:#fff;
+				width:360px;
+				margin:0 auto;
+				padding:30px 30px 15px;
+				border-radius:24px;
+				-moz-border-radius:24px;
+				-webkit-border-radius:24px;
+				-o-border-radius:24px;
+				box-shadow:0px 0px 10px #000;
+				-moz-box-shadow:0px 0px 10px #000;
+				-webkit-box-shadow:0px 0px 10px #000;
+				-o-box-shadow:0px 0px 10px #000;
+				position:relative;
+			}
+			
+			h1,h2,h3,h4 {
+				color:#333;
+			}
+			
+			.title {
+				text-align:center;
+				margin-bottom:48px;
+			}
+			
+			#logo {
+				text-align:center;
+				margin-bottom:-10px;
+			}
+			
+			form .field {
+				margin-top:30px;
+				margin-bottom:20px;
+			}
+			
+			form label {
+				float:left;
+			}
+			
+			form input[type="password"], form input[type="text"] {
+				padding:8px;
+			}
+
+			#field_user_session_submit {
+				clear:both;
+				margin-top:28px;
+				text-align:center;
+			}
+			
+			#field_user_session_submit:active {
+				position:relative;
+				top:2px;
+			}
+
+			#field_user_session_password label, #field_user_session_login label {
+				margin-top:10px;
+			}
+			
+			#field_user_session_login input, #field_user_session_password input {
+				float:right;
+				width:256px;
+			}
+			
+			#field_user_session_password {
+				clear:both;
+				padding-top:20px;
+			}
+			
+			#field_user_session_remember_me {
+				clear:both;
+				padding-top:20px;
+			}
+			
+			#forgot_password_link {
+				margin-top:20px;
+			}
+			
+			#forgot_password_link a {
+				color:#999;
+				text-decoration:none;
+			}
+			
+			#forgot_password_link a:hover {
+				text-decoration:underline;
+			}
+			
+		</style>
+		
+	</head>
+	
+	<body>
+		
+	<div id="main">
+		
+		<div class="title">
+			<div id="logo">
+        <%= image_tag "logo-midsize.gif", :alt => "Crikey" %>
+  		</div>
+			<h3>Login now to renew or access your account</h3>
+		</div>  
+
+    <%= yield %>
+	
+	</div> <!-- closes #main -->
+
+</body>

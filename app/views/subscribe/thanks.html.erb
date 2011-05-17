@@ -1,1 +1,43 @@
-<h2>Thanks!</h2>
+
+
+<div class='section' id='page-2'>
+  
+  <div class='content'>
+
+    <h2>Thanks for subscribing to Crikey! We hope you enjoy it.</h2>
+
+    <h3>Invoice</h3>
+
+    <% if @subscription.pending? %>
+      <p class='subscription-description'>Please check your inbox for instructions on how to activate your subscription</p>
+    <% else %>
+      <p class='subscription-description'><%= link_to("View and print your invoice for your records", url_for(:action => "invoice"), :target => :new) %></p>
+    <% end %>
+
+    <!-- Error Messages -->
+    
+    <h2>Complete your registration</h2>
+    
+    <h3>Crikey Weekender</h3>
+    
+    <p>Have you signed up for Crikey Weekender yet? It's our weekly arts and culture wrap &mdash; delivered direct to your inbox every Friday morning. You'll love it.</p>
+    
+    <% form_for @subscription, :url => complete_path do |form| %>
+
+      <%= check_box_tag :weekender, "1", true %>
+      <label for="weekender">Yes &mdash; send me your Weekender</label>
+      
+      <h3>Promotional Materials</h3>
+      
+      <%= form.check_box :solus %>
+      <label for="subscription_solus">Tick this box if you want to receive carefully selected offers by email from advertisers screened by Crikey</label>
+      
+      <div id="">
+      <%= image_submit_tag "/images/completerego.png", :disable_with => "Processing...", :id => "btnSubmit" %>
+      </div>
+      
+    <% end %>
+      
+  </div>
+</div>
+<div class="clear"></div>

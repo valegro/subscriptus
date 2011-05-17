@@ -33,8 +33,7 @@ Rails::Initializer.run do |config|
   # config.frameworks -= [ :active_record, :active_resource, :action_mailer ]
 
   # Activate observers that should always be running
-  # config.active_record.observers = :cacher, :garbage_collector, :forum_observer
-  config.active_record.observers = :subscription_observer, :user_observer, "subscription/logging_observer", "subscription/mailer_observer", "subscription/campaign_master_observer"
+  config.active_record.observers = :subscription_observer, :subscription_action_observer, :user_observer, "subscription/logging_observer", "subscription/mailer_observer", "subscription/campaign_master_observer"
 
   # Set Time.zone default to the specified zone and make Active Record auto-convert to this zone.
   # Run "rake -D time" for a list of tasks for finding time zone names.
@@ -46,7 +45,7 @@ Rails::Initializer.run do |config|
 end
 
 # TODO: Make confir options
-STANDARD_TIME_FORMAT = '%H:%M %d/%m/%Y %Z'
+STANDARD_TIME_FORMAT = '%d/%m/%Y %Z'
 APP_TIMEZONE = 'Melbourne'
 
 require 'delayed_job'
