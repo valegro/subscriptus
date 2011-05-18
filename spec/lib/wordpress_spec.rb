@@ -84,12 +84,12 @@ describe Wordpress do
       end
     
       it "should return the newly created user's login" do
-        stub_request(:get, Wordpress.config[:endpoint]).with(:query => {:key => 'testkey', :func =>'create', :email => 'joebloggs@example.com', :login => 'joebloggs', :pword => 'password'}).to_return(:body => 'joebloggs')
+        stub_request(:get, Wordpress.config[:endpoint]).with(:query => {:key => 'testkey', :func =>'create', :email => 'joebloggs@example.com', :login => 'joebloggs', :pword => 'password', :premium => 'false'}).to_return(:body => 'joebloggs')
         Wordpress.create(:login => 'joebloggs', :pword => 'password', :email => 'joebloggs@example.com').should == 'joebloggs'
       end
-    
+
       it "should raise an error if the user already exists" do
-        stub_request(:get, Wordpress.config[:endpoint]).with(:query => {:key => 'testkey', :func =>'create', :email => 'joebloggs@example.com', :login => 'joebloggs', :pword => 'password'}).to_return(:body => 'User already exists')
+        stub_request(:get, Wordpress.config[:endpoint]).with(:query => {:key => 'testkey', :func =>'create', :email => 'joebloggs@example.com', :login => 'joebloggs', :pword => 'password', :premium => 'false'}).to_return(:body => 'User already exists')
         lambda {Wordpress.create(:login => 'joebloggs', :pword => 'password', :email => 'joebloggs@example.com')}.should raise_error
       end
     end

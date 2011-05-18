@@ -39,23 +39,13 @@ describe User do
     }.to change { User.count }.by(1)
   end
     
-  it "should only allow one trial per publication" do
+  it "should only allow one subscription per publication" do
     publication = Factory.build(:publication)
     @user.save!
-    @user.subscriptions.count.should == 0
-    @user.subscriptions.create(:publication => publication)
-    @user.subscriptions.count.should == 1
+    @user.subscriptions.create!(:publication => publication)
     lambda {
-      @user.subscriptions.create(:publication => publication)
-    }.should raise_exception
-    # Change the first subscription to active
-    @user.subscriptions.first.activate!
-    @user.subscriptions.first.state.should == 'active'
-    lambda {
-      @user.subscriptions.create(:publication => publication)
-    }.should_not raise_exception
-    @user.subscriptions.count.should == 2
-    @user.subscriptions.trial.count.should == 1
+      @user.subscriptions.create!(:publication => publication)
+    }.should raise_exception(Exceptions::DuplicateSubscription)
   end
 
   it "should show active subscriptions" do
@@ -107,7 +97,10 @@ describe User do
       user.login.should == @stubbed_login
     end
 
-    it "login should not be over written if user is an admin"
+    it "login should not be over written if user is an admin" do
+      user = Factory.create(:admin, :login => "mesocool")
+      user.login.should == 'mesocool'
+    end
 
     it "should call update_cm with :create" do
       @user.expects(:send_later).with(:sync_to_campaign_master)
@@ -264,8 +257,6 @@ describe User do
       @user.save!
     end
 
-    it "should NOT call sync_to_campaign_master if anything but name or email is changed"
-
     it "should not allow us to change our login" do
       @user.login = 'anotherlogin'
       lambda {
@@ -326,8 +317,6 @@ describe User do
           @user.save!
         }.should_not raise_exception(ActiveRecord::RecordInvalid)
       end
-
-      it "should authenticate to wordpress if role is subscriber"
     end
   end
 

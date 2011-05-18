@@ -48,6 +48,17 @@ describe Subscription do
       @subscription.expire!
       @subscription.state.should == 'squatter'
     end
+
+    it "should set state_expires_at to nil" do
+      @subscription.expire!
+      @subscription.state_expires_at.should be(nil) 
+    end
+
+    it "should not change expires_at" do
+      expect {
+        @subscription.expire!
+      }.to_not change { @subscription.expires_at }
+    end
   end
 
   describe "upon suspend!" do
@@ -73,27 +84,11 @@ describe Subscription do
         @subscription.suspend!(10)
       }.to change { @subscription.expires_at }.by(10.days)
     end
-  end
 
-  describe "upon unsuspend" do
-    before(:each) do
-      SubscriptionMailer.expects(:send_later).with(:deliver_suspended, @subscription)
-      @subscription.state = "suspended"
-      @subscription.save!
-      SubscriptionMailer.expects(:send_later).with(:deliver_unsuspended, @subscription)
-    end
-
-    it "should create a log entry" do
-      expect {
-        @subscription.unsuspend!
-      }.to change { @subscription.log_entries.count }.by(1)
-      entry = @subscription.log_entries.last
-      entry.new_state.should == 'active'
-    end
-
-    it "should set the state to active" do
-      @subscription.unsuspend!
-      @subscription.state.should == 'active'
+    it "should set state_expires_at" do
+      @subscription.suspend!(10)
+      @subscription.state_expires_at.time.should == 10.days.from_now
+      @subscription.state_expires_at.time.should_not == @subscription.expires_at
     end
   end
 end

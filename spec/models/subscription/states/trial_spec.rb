@@ -3,8 +3,6 @@ require 'spec_helper'
 describe Subscription do
 
   before(:each) do
-    today = Date.new(2010, 9, 27) # today is "Mon, 27 Sep 2010"
-    Date.stubs(:today).returns(today)
     stub_wordpress
   end
 
@@ -24,7 +22,6 @@ describe Subscription do
         @subscription.user.lastname.should == 'Draper'
         @subscription.user.firstname.should == 'Daniel'
         @subscription.user.email.should == 'example@example.com'
-        # TODO: Should solus be on the user or the subscription?
         @subscription.solus.should == false
         @subscription.state.should == 'trial'
         @subscription.expires_at.to_s.should == (t + Publication::DEFAULT_TRIAL_EXPIRY.days).to_s
@@ -35,11 +32,40 @@ describe Subscription do
       t = "2011-01-01 9:00".to_time(:utc).in_time_zone('UTC')
       Timecop.travel(t) do
         @subscription = User.find_or_create_with_trial(@publication, Publication::DEFAULT_TRIAL_EXPIRY, @referrer, @json_hash)
+        Subscription.any_instance.expects(:send).with('trial_state_expire!').once
         Timecop.travel(t + Publication::DEFAULT_TRIAL_EXPIRY.days + 1.minute) do
           Subscription.expire_states
-          @subscription.reload
-          @subscription.state.should == 'squatter'
         end
+      end
+    end
+
+    describe "upon expire!" do
+      before(:each) do
+        @subscription = User.find_or_create_with_trial(@publication, Publication::DEFAULT_TRIAL_EXPIRY, @referrer, @json_hash)
+      end
+
+      it "should create a log entry" do
+        expect {
+          @subscription.expire!
+        }.to change { @subscription.log_entries.count }.by(1)
+        entry = @subscription.log_entries.last
+        entry.new_state.should == 'squatter'
+      end
+
+      it "the state should be squatter" do
+        @subscription.expire!
+        @subscription.state.should == 'squatter'
+      end
+
+      it "should set state_expires_at to nil" do
+        @subscription.expire!
+        @subscription.state_expires_at.should be(nil)
+      end
+
+      it "should not change expires_at" do
+        expect {
+          @subscription.expire!
+        }.to_not change { @subscription.expires_at }
       end
     end
 
@@ -49,14 +75,21 @@ describe Subscription do
       end
 
       it "should create a log entry" do
-        @subscription.log_entries.size.should == 1
-        @subscription.activate!
-        @subscription.log_entries.size.should == 2
-        # TODO: Check the values inside the logs
+        expect {
+          @subscription.activate!
+        }.to change { @subscription.log_entries.size }.by(1)
       end
 
-      # TODO: Process a payment - when calling activate, a payment should be processed somehow
-      # TODO: Set expires_at
+      it "should set both expires_at and state_expires_at" do
+        @time = "2011-03-03".to_time(:utc)
+        Timecop.freeze(@time) do
+          @subscription = Factory.create(:subscription, :state => 'trial')
+          @subscription.increment_expires_at(10)
+          @subscription.expires_at.time.should == @time.advance(:months => 10)
+          @subscription.activate!
+          @subscription.state_expires_at.time.should == @subscription.expires_at.time
+        end
+      end
     end
   end
 end

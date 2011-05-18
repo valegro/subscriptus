@@ -3,8 +3,6 @@ require 'spec_helper'
 describe Subscription do
 
   before(:each) do
-    today = Date.new(2010, 9, 27) # today is "Mon, 27 Sep 2010"
-    Date.stubs(:today).returns(today)
     cm_return = stub(:success? => true)
     #cm_return.expects(:has_key?).with(:recipients).returns(false)
     CM::Recipient.stubs(:find_all).returns(cm_return)
@@ -21,9 +19,25 @@ describe Subscription do
       @subscription.save
     end
 
-    it "should set both expires_at and state_expires_at for new trials"
+    it "should set both expires_at and state_expires_at for new trials" do
+      @time = "2011-03-03".to_time(:utc)
+      Timecop.freeze(@time) do
+        @subscription = Factory.create(:subscription, :state => 'trial', :expires_at => 10.days.from_now)
+        @subscription.created_at.time.should == @time
+        @subscription.expires_at.time.should == 10.days.from_now
+        @subscription.state_expires_at.time.should == 10.days.from_now
+      end
+    end
 
-    it "should NOT deliver and email for new subscriptions that did not take payment"
+    it "should set both expires_at and state_expires_at for new active subscriptions" do
+      @time = "2011-03-03".to_time(:utc)
+      Timecop.freeze(@time) do
+        @subscription = Factory.create(:subscription, :state => 'active', :expires_at => 10.days.from_now)
+        @subscription.created_at.time.should == @time
+        @subscription.expires_at.time.should == 10.days.from_now
+        @subscription.state_expires_at.time.should == 10.days.from_now
+      end
+    end
 
     it "should deliver a pending email for new pending student subscriptions" do
       @subscription = Factory.build(:pending_subscription, :pending => 'student_verification')

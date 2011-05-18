@@ -51,6 +51,7 @@ describe Subscription do
       it "should should set the expiry date appropriately" do
         @subscription.verify!
         @subscription.expires_at.utc.should == Time.now.utc.advance(:months => @subscription_action.term_length)
+        @subscription.state_expires_at.utc.should == Time.now.utc.advance(:months => @subscription_action.term_length)
       end
 
       it "should should set the state_updated_at to now" do

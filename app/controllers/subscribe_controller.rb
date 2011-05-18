@@ -42,7 +42,7 @@ class SubscribeController < ApplicationController
     @payment_option = params[:payment_option]
     Subscription.transaction do
       # First check if a user exists with the given email
-      @user = User.find_by_email(params[:user][:email])
+      @user = User.find_by_email(params[:user].try(:[], :email))
       if @user
         @subscription = @user.subscriptions.first(
           :conditions => { :publication_id => @offer.publication.id }

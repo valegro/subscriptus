@@ -5,7 +5,7 @@ class Subscription < ActiveRecord::Base
     belongs_to :offer
   end
   
-  belongs_to :user, :autosave => true
+  belongs_to :user
   belongs_to :offer
   belongs_to :publication
   belongs_to :pending_action, :class_name => "SubscriptionAction"
@@ -27,11 +27,9 @@ class Subscription < ActiveRecord::Base
   named_scope :ascend_by_name, :include => 'user', :order => "users.lastname ASC, users.firstname ASC"
   named_scope :descend_by_name, :include => 'user', :order => "users.lastname DESC, users.firstname DESC"
   named_scope :recent, :order => "updated_at desc"
-  # TODO: Should we make this look at state_expires_at?
-  # We need both because of suspension mainly
   named_scope :expired, lambda { { :conditions => [ "expires_at < ?", Time.now ] } }
 
-  validates_presence_of :publication, :user, :state
+  validates_presence_of :publication, :state
   validates_acceptance_of :terms
 
   def validate_on_create

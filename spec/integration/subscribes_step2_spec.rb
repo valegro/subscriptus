@@ -4,6 +4,8 @@ describe "Subscribes", "step 2" do
   describe "when I have subscribed and I am on the thanks page" do
     before(:each) do
       @offer = Factory.create(:offer)
+      @gift = Factory.create(:gift)
+      @offer.gifts << @gift
       @term = @offer.offer_terms.create(:price => 10, :months => 3, :concession => true)
       @source = Factory.create(:source)
       stub_wordpress
@@ -84,6 +86,34 @@ describe "Subscribes", "step 2" do
 
       describe "if there is no publication called Crikey Weekender" do
         it "should render the 404 page"
+      end
+    end
+
+    describe "and I click view my invoice link" do
+      before(:each) do
+        click_link_or_button "View and print your invoice for your records"
+      end
+
+      it "should display TAX Invoice" do
+        page.should have_content("TAX INVOICE")
+        page.should have_content("ABN 98 101 558 847")
+      end
+
+      it "should display the gifts I chose" do
+        page.should have_content("Included Gifts")
+        page.should have_content(@gift.name)
+      end
+
+      it "should display my details" do
+        page.should have_content("Daniel Draper")
+        page.should have_content("daniel@codefire.com.au")
+      end
+
+      it "should display the payment amount and order number" do
+        subscription = Subscription.last
+        page.should have_content(subscription.reference)
+        save_and_open_page
+        page.should have_content("$#{subscription.actions.last.payment.amount}")
       end
     end
   end

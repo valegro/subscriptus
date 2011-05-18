@@ -6,11 +6,10 @@ describe StateCallbacks::CallbackHandler do
   end
 
   it "should add a callback" do
-    expect {
-      @callbacks.add('foo', 'bar') do
-        # Do stuff
-      end
-    }.to change { @callbacks.size }.by(1)
+    @callbacks.add('foo', 'bar') do
+      # Do stuff
+    end
+    @callbacks.after.size.should == 1
   end
 
   it "should retrieve a callback" do
@@ -21,4 +20,21 @@ describe StateCallbacks::CallbackHandler do
     end
     @callbacks.get('foo', 'bar').call
   end
+
+  it "should add a callback to run before" do
+    @callbacks.add('foo', 'bar', :before) do
+      # Do stuff
+    end
+    @callbacks.before.size.should == 1
+  end
+
+  it "should retrieve a callback to run before" do
+    @array = []
+    @array.expects(:test_method)
+    @callbacks.add('foo', 'bar', :before) do
+      @array.test_method
+    end
+    @callbacks.get('foo', 'bar', :before).call
+  end
+
 end

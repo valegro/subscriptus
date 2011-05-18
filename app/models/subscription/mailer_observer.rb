@@ -3,6 +3,7 @@ require 'state_callbacks'
 class Subscription::MailerObserver < ActiveRecord::Observer
   extend StateCallbacks 
   observe :subscription
+  observe_state :state
 
   on(:suspended, :active) do |subscription|
     SubscriptionMailer.send_later(:deliver_unsuspended, subscription)
@@ -35,11 +36,5 @@ class Subscription::MailerObserver < ActiveRecord::Observer
       when 'pending'
         SubscriptionMailer.send_later("deliver_pending_#{subscription.pending}".to_sym, subscription)
     end
-  end
-
-  def after_save(subscription)
-    state_changes = subscription.changes['state']
-    from, to = state_changes.try(:first), state_changes.try(:last)
-    self.class.state_change_callback(from, to, subscription)
   end
 end
