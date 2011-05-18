@@ -142,6 +142,29 @@ class User < ActiveRecord::Base
   def sync_to_campaign_master
     self.subscriptions.each(&:sync_to_campaign_master)
   end
+
+  def sync_to_wordpress
+    options = {
+      :login       => self.login,
+      :firstname   => self.firstname,
+      :lastname    => self.lastname,
+      :email       => self.email,
+      :premium     => self.premium?
+    }
+    if Wordpress.exists?(:login => self.login)
+      Wordpress.send_later(:update, options)
+    else
+      options[:pword] = self.password unless self.password.blank?
+      Wordpress.send_later(:create, options)
+    end
+  end
+
+  def premium?
+    # TODO Crikey Weekender here is a Hack for Crikey!
+    self.subscriptions.any? do |sub|
+      sub.active? && sub.publication.name != 'Crikey Weekender'
+    end
+  end
   
   def store_credit_card_on_gateway(credit_card)
     if self.payment_gateway_token.blank?
@@ -163,5 +186,4 @@ class User < ActiveRecord::Base
       Wordpress.authenticate(:email => email, :pword => password)
     end
   end
-
 end

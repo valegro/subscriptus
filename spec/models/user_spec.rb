@@ -103,6 +103,7 @@ describe User do
     end
 
     it "should call update_cm with :create" do
+      @user.stubs(:send_later).with(:sync_to_wordpress)
       @user.expects(:send_later).with(:sync_to_campaign_master)
       @user.save!
     end
@@ -137,7 +138,8 @@ describe User do
       it "should create a user in Wordpress" do
         @stubbed_login = '12345'
         UserObserver.any_instance.stubs(:generate_unique_id).returns(@stubbed_login)
-        Wordpress.expects(:send_later).with(:create, { :login => '12345', :pword => 'password', :email => 'daniel@netfox.com',:firstname => 'Daniel', :lastname => 'Draper' })
+        User.any_instance.expects(:send_later).with(:sync_to_wordpress)
+        User.any_instance.expects(:send_later).with(:sync_to_campaign_master)
         Factory.create(:user, :firstname => 'Daniel', :lastname => 'Draper', :email => 'daniel@netfox.com', :password => 'password',:password_confirmation => 'password')
       end
 
@@ -186,6 +188,27 @@ describe User do
         lambda {
           Factory.create(:user, :login => nil)
         }.should raise_exception(ActiveRecord::RecordInvalid)
+      end
+    end
+
+    describe "premium" do
+      before(:each) do
+        @user = Factory.create(:user)
+      end
+
+      it "should be false if no active subscriptions" do
+        @user.premium?.should be(false)
+      end
+
+      it "should be true if the user has at least one active subscription" do
+        @user.subscriptions << Factory.create(:subscription, :state => 'active')
+        @user.premium?.should be(true)
+      end
+
+      it "should be false if the only active sub is to Crikey Weekender" do
+        @weekender = Factory.create(:publication, :name => "Crikey Weekender")
+        @user.subscriptions << Factory.create(:subscription, :state => 'active', :publication => @weekender)
+        @user.premium?.should be(false)
       end
     end
 
@@ -239,6 +262,7 @@ describe User do
 
     it "should call sync_to_campaign_master" do
       @user.expects(:send_later).with(:sync_to_campaign_master)
+      @user.expects(:send_later).with(:sync_to_wordpress)
       @user.firstname = "Changed"
       @user.save!
     end
@@ -268,13 +292,8 @@ describe User do
       it "should update Wordpress if role is subscriber and email or name changes" do
         @user.email = 'another@example.com'
         @user.email_confirmation = 'another@example.com'
-        Wordpress.expects(:send_later).with(
-          :update,
-          :email => @user.email,
-          :login => @user.login,
-          :firstname => @user.firstname,
-          :lastname => @user.lastname
-        )
+        @user.expects(:send_later).with(:sync_to_campaign_master)
+        @user.expects(:send_later).with(:sync_to_wordpress)
         @user.save!
       end
 
@@ -327,6 +346,75 @@ describe User do
       @user.subscriptions << @subscription
       @subscription.expects(:sync_to_campaign_master)
       @user.sync_to_campaign_master
+    end
+  end
+
+  describe "upon call to sync_to_wordpress" do
+    describe "and password is accessible (ie; new user)" do
+      describe "for a user who doesn't exist in WP" do
+        it "should call Wordpress with create" do
+          @user.save!
+          Wordpress.expects(:send_later).with(
+            :create, {
+            :login       => @user.login,
+            :firstname   => @user.firstname,
+            :lastname    => @user.lastname,
+            :email       => @user.email,
+            :pword       => @user.password,
+            :premium     => false
+          })
+          @user.sync_to_wordpress
+        end
+      end
+
+      describe "for a user who does exist in WP" do
+        it "should call Wordpress with update" do
+          @user.save!
+          Wordpress.stubs(:exists?).with(:login => @user.login).returns(true)
+          Wordpress.expects(:send_later).with(
+            :update, {
+            :login       => @user.login,
+            :firstname   => @user.firstname,
+            :lastname    => @user.lastname,
+            :email       => @user.email,
+            :premium     => false
+          })
+          @user.sync_to_wordpress
+        end
+      end
+    end
+
+    describe "and password is NOT accessible" do
+      describe "for a user who doesn't exist in WP" do
+        it "should call Wordpress with create" do
+          @user.save!
+          @user = User.find(@user.id)
+          Wordpress.expects(:send_later).with(
+            :create, {
+            :login       => @user.login,
+            :firstname   => @user.firstname,
+            :lastname    => @user.lastname,
+            :email       => @user.email,
+            :premium     => false
+          })
+          @user.sync_to_wordpress
+        end
+      end
+    end
+
+    it "should set premium true if the user is premium" do
+      @user.stubs(:premium?).returns(true)
+      @user.save!
+      Wordpress.expects(:send_later).with(
+        :create, {
+        :login       => @user.login,
+        :firstname   => @user.firstname,
+        :lastname    => @user.lastname,
+        :email       => @user.email,
+        :pword       => @user.password,
+        :premium     => true
+      })
+      @user.sync_to_wordpress
     end
   end
 

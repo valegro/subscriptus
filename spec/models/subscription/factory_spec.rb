@@ -225,7 +225,7 @@ describe SubscriptionFactory do
   describe "Initial State" do
     it "should raise if not valid" do
       lambda {
-        SubscriptionFactory.build(@offer, :payment_attributes => @payment_attrs, :attributes => {})
+        SubscriptionFactory.build(@offer, :payment_attributes => @payment_attrs, :attributes => {:user_attributes => { :email => "jwfhwekjfhwe" }})
       }.should raise_exception(Exceptions::Factory::InvalidException)
     end
 

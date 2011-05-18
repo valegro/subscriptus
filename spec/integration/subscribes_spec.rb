@@ -289,13 +289,8 @@ describe "Subscribes" do
         end
 
         it "should update the user in wordpress" do
-          Wordpress.expects(:send_later).with(
-            :update,
-            :login => @user.login,
-            :firstname => 'Daniel',
-            :lastname => 'Draper',
-            :email => @user.email
-          )
+          User.any_instance.expects(:send_later).with(:sync_to_wordpress)
+          User.any_instance.expects(:send_later).with(:sync_to_campaign_master)
           click_link_or_button "btnSubmit"
         end
       end

@@ -104,12 +104,12 @@ describe Wordpress do
       end
     
       it "should return the updated user's login" do
-        stub_request(:get, Wordpress.config[:endpoint]).with(:query => {:login => 'joebloggs', :key => 'testkey', :func =>'update', :firstname => 'Joe'}).to_return(:body => 'joebloggs')
+        stub_request(:get, Wordpress.config[:endpoint]).with(:query => {:login => 'joebloggs', :key => 'testkey', :func =>'update', :firstname => 'Joe', :premium => 'false'}).to_return(:body => 'joebloggs')
         Wordpress.update(:login => 'joebloggs', :firstname => 'Joe').should == 'joebloggs'
       end
     
       it "should raise an error if the user does not exist" do
-        stub_request(:get, Wordpress.config[:endpoint]).with(:query => {:login => 'janebloggs', :key => 'testkey', :func =>'update', :firstname => 'Jane'}).to_return(:body => 'User does not exists!')
+        stub_request(:get, Wordpress.config[:endpoint]).with(:query => {:login => 'janebloggs', :key => 'testkey', :func =>'update', :firstname => 'Jane', :premium => 'false'}).to_return(:body => 'User does not exists!')
         lambda {Wordpress.update(:login => 'janebloggs', :firstname => 'Jane')}.should raise_error
       end
     end

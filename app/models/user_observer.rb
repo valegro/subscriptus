@@ -7,36 +7,14 @@ class UserObserver < ActiveRecord::Observer
     end
   end
 
-  def after_create(user)
-    unless user.admin?
-      Wordpress.send_later(:create, {
-        :login => user.login,
-        :firstname => user.firstname,
-        :lastname => user.lastname,
-        :email => user.email,
-        :pword => user.password
-      })
-    end
-  end
-
   def after_save(user)
+    # Only sync if a sync'd column changes
     unless user.admin?
-      # Only sync if a sync'd column changes
       if user.changes.keys.any? { |column| User::MAIL_SYSTEM_SYNC_COLUMNS.include?(column.to_s) }
-        user.send_later :sync_to_campaign_master
+        user.send_later(:sync_to_campaign_master)
       end
-    end
-  end
-
-  def after_update(user)
-    unless user.admin?
       if user.firstname_changed? || user.lastname_changed? || user.email_changed?
-        Wordpress.send_later(:update, {
-          :login => user.login,
-          :firstname => user.firstname,
-          :lastname => user.lastname,
-          :email => user.email
-        })
+        user.send_later(:sync_to_wordpress)
       end
     end
   end
