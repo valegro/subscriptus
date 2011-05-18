@@ -49,7 +49,7 @@ class Admin::OrdersController < AdminController
   end
   
   def delay
-    @order.delay!
+    @order.postpone!
     find_orders(params[:order_scope])
     respond_to do |wants|
       wants.html {

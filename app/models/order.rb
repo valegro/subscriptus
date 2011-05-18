@@ -15,7 +15,7 @@ class Order < ActiveRecord::Base
       transition :pending => :completed
       transition :delayed => :completed
     end
-    on :delay do
+    on :postpone do
       transition :pending => :delayed
     end
   end

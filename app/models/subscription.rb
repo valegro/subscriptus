@@ -54,7 +54,7 @@ class Subscription < ActiveRecord::Base
       transition :trial => :active
       transition :squatter => :active
     end
-    on :delay do
+    on :postpone do
       transition :trial => :pending
       transition :squatter => :pending
       transition :active => :pending # Renewal but goes into pending state
