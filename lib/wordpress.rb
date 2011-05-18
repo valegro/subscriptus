@@ -17,11 +17,13 @@ class Wordpress
   
   def self.create(opts={})
     check_required(opts, :login, :pword, :email)
+    opts[:premium] = false unless opts.has_key?(:premium)
     make_request_and_raise_error(opts.merge(:func => 'create'))
   end
   
   def self.update(opts={})
     check_required(opts, :login)
+    opts[:premium] = false unless opts.has_key?(:premium)
     make_request_and_raise_error(opts.merge(:func => 'update'))
   end
   
@@ -48,7 +50,7 @@ private
     expected_result ||= opts[:login] 
     if self.enabled
       make_request(opts).tap do |result|
-        raise Error.new(result) unless result == expected_result
+        raise Error.new("#{result} was returned, #{expected_result} was expected: (#{opts.inspect})") unless result == expected_result
       end
     else
       opts[:login]

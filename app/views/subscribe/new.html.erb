@@ -79,7 +79,7 @@
           <%= u.enum_select :state, :required => true %>
           <%= u.text_field :postcode, :required => true %>
           <%= u.country_select :country, ['Australia'], :required => true %>
-          <% if @user.new_record? %>
+          <% unless @renewing %>
             <%= u.password_field :password, :required => true %>
             <%= u.password_field :password_confirmation, :required => true %>
           <% end %>

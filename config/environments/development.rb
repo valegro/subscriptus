@@ -23,7 +23,7 @@ config.after_initialize do
   ActiveMerchant::Billing::Base.mode = :test
   ::GATEWAY = ActiveMerchant::Billing::SecurePayAuExtendedGateway.new(  # the default_currency of this gateway is 'AUD'
     :login => 'CKR0030',  # <MerchantID> input to Au securePay Gateway.
-    :password => "abc123",
+    :password => "q02nnn8h",
     :test => true
   )
 end

@@ -12,7 +12,7 @@ module ActiveMerchant #:nodoc:
     class SecurePayAuExtendedGateway < Gateway
       API_VERSION = 'xml-4.2'
       
-      TEST_URL = 'https://test.securepay.com.au/xmlapi/payment'
+      TEST_URL = 'https://www.securepay.com.au/test/payment'
       LIVE_URL = 'https://api.securepay.com.au/xmlapi/payment'
       TEST_PERIODIC_URL ='https://test.securepay.com.au/xmlapi/periodic'
       LIVE_PERIODIC_URL ='https://api.securepay.com.au/xmlapi/periodic'
@@ -79,6 +79,7 @@ module ActiveMerchant #:nodoc:
       end
       
       def purchase(money, credit_card, options = {})
+        puts "Parhcasinf: #{test?}"
         commit :purchase, build_purchase_request(test? ? TEST_AMOUNT : money, credit_card, options)
       end                       
     

@@ -405,6 +405,27 @@ describe "Subscribes" do
         click_link_or_button "btnSubmit"
         page.should have_content "Subscribe to Crikey"
       end
+
+      describe "and I fill in the missing data and submit again" do
+        it "should display the thanks page"
+        it "should create a subscription"
+      end
+
+      describe "but I already registered a trial for this publication" do
+        before(:each) do
+          @user_attrs = Factory.attributes_for(:user, :email => "daniel@codefire.com.au")
+          @subscription = User.find_or_create_with_trial(@offer.publication, 21, "test", @user_attrs)
+          @user = @subscription.user
+          GATEWAY.expects(:purchase).returns(stub(:success? => true))
+        end
+
+        it "should take me back to the form"
+        it "should show me the password fields"
+
+        describe "and I fill in the missing data and submit again" do
+          it "should upgrade my subscription to active"
+        end
+      end
     end
   end
 
