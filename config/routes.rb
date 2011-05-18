@@ -26,7 +26,7 @@ ActionController::Routing::Routes.draw do |map|
       :set_expiry => [ :get, :post ],
       :unsuspend => [ :post ]
     }
-    admin.resources :orders, :member => { :fulfill => [:get, :post], :delay => [:get, :post] }, :collection => { :delayed => :get, :completed => :get }
+    admin.resources :orders, :member => { :fulfill => [:get, :post], :postpone => [:get, :post] }, :collection => { :delayed => :get, :completed => :get }
     admin.resources :subscribers
     admin.namespace :catalogue do |catalogue|
       catalogue.resources :offers, :member => { :add_gift => :post, :remove_gift => :post, :make_primary => :get }, :has_many => [ :offer_terms ]

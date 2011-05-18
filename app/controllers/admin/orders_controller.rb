@@ -1,7 +1,7 @@
 class Admin::OrdersController < AdminController
   layout 'admin/orders'
   
-  before_filter :find_order, :only => [:show, :fulfill, :delay]
+  before_filter :find_order, :only => [:show, :fulfill, :postpone]
   
   def index
     find_orders(:pending)
@@ -48,7 +48,7 @@ class Admin::OrdersController < AdminController
     end
   end
   
-  def delay
+  def postpone
     @order.postpone!
     find_orders(params[:order_scope])
     respond_to do |wants|

@@ -1,7 +1,7 @@
 <% content_for :lower do %>
   <% semantic_navigation :secondary, :html => { :class => "lower" } do |n| %>
     <%= n.item 'Pending', :link => admin_orders_path %>
-    <%= n.item 'Delayed', :link => delayed_admin_orders_path %>
+    <%= n.item 'Postponed', :link => delayed_admin_orders_path %>
     <%= n.item 'Completed', :link => completed_admin_orders_path %>
   <% end %>
 <% end %>
