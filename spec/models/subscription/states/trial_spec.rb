@@ -8,7 +8,13 @@ describe Subscription do
 
   describe "a trial subscription" do
     before(:each) do
-      @json_hash = { "last_name"=>["Draper"], "first_name"=>["Daniel"], "email"=>["example@example.com"], "ip_address"=>"150.101.226.181" }
+      @json_hash = {
+        "last_name"=> "Draper",
+        "first_name"=> "Daniel",
+        "email"=> "example@example.com",
+        "ip_address"=>"150.101.226.181",
+        :options => { :solus => false }
+      }
       @referrer = "http://www.example.com/referral"
       @publication = Factory.create(:publication)
     end

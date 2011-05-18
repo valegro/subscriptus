@@ -76,14 +76,17 @@ class User < ActiveRecord::Base
     user = self.find_by_email(user_attributes[:email].to_s)
     user ||= self.create_trial_user(user_attributes)
     # Weekender & Solus options
-    solus = !user_attributes.fetch(:options, []).select { |s| /advertisers/i === s }.empty?
-    weekender = !user_attributes.fetch(:options, []).select { |s| /weekender/i === s }.empty?
+    solus = user_attributes.fetch(:options, {})[:solus]
+    #solus = !user_attributes.fetch(:options, []).select { |s| /advertisers/i === s }.empty?
+    weekender = user_attributes.fetch(:options, {})[:weekender]
+    #weekender = !user_attributes.fetch(:options, []).select { |s| /weekender/i === s }.empty?
+    # Add weekender
+    user.add_weekender_to_subs if weekender
     # Add the subscription
     user.subscriptions.create!(
       :publication => publication,
       :expires_at => trial_period_in_days.days.from_now,
       :referrer => referrer,
-      :weekender => weekender,
       :solus => solus
     )
   end
@@ -103,6 +106,7 @@ class User < ActiveRecord::Base
     )
   end
 
+  # TODO: I suspect this is no longer relevant
   def only_one_trial_allowed(subscription)
     return if subscription.active?
     if self.subscriptions.detect { |s| s.publication_id == subscription.publication_id }
@@ -163,6 +167,25 @@ class User < ActiveRecord::Base
     # TODO Crikey Weekender here is a Hack for Crikey!
     self.subscriptions.any? do |sub|
       sub.active? && sub.publication.name != 'Crikey Weekender'
+    end
+  end
+
+  # TODO: Custom for Crikey
+  def has_weekender?
+    self.subscriptions.any? do |sub|
+      sub.publication.name == 'Crikey Weekender'
+    end
+  end
+
+  def add_weekender_to_subs
+    unless has_weekender?
+      weekender = Publication.find_by_name("Crikey Weekender")
+      return unless weekender
+      self.subscriptions.create!(
+        :publication => weekender,
+        :expires_at => nil,
+        :state => 'active'
+      )
     end
   end
   

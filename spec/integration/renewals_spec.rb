@@ -59,6 +59,8 @@ describe "Renewals", :type => :integration do
       it "should raise an exception if there are no offers"
     end
   end
+
+  # TODO: Test not showing the weekender tickbox if we already have the weekender
 =begin
   describe "I visit the renewal page" do
 

@@ -21,22 +21,64 @@ describe User do
     cm_return = stub(:success? => true)
   end
 
-  it "should create a trial user" do
-    expect {
-      user = User.create_trial_user(:first_name => 'Daniel', :last_name => 'Draper', :email => 'daniel@netfox.com')
-      user.auto_created.should == true
-      user.password.length.should == 8
-    }.to change { User.count }.by(1)
+  describe "trial user" do
+    it "should create" do
+      expect {
+        user = User.create_trial_user(:first_name => 'Daniel', :last_name => 'Draper', :email => 'daniel@netfox.com')
+        user.auto_created.should == true
+        user.password.length.should == 8
+      }.to change { User.count }.by(1)
 
-    # Attempt a duplicate email
-    lambda {
-      User.create_trial_user(:first_name => 'Daniel', :last_name => 'Draper', :email => 'daniel@netfox.com')
-    }.should raise_exception
+      # Attempt a duplicate email
+      lambda {
+        User.create_trial_user(:first_name => 'Daniel', :last_name => 'Draper', :email => 'daniel@netfox.com')
+      }.should raise_exception
 
-    # And another with a different email
-    expect {
-      user2 = User.create_trial_user(:first_name => 'Daniel', :last_name => 'Draper', :email => 'daniel2@netfox.com')
-    }.to change { User.count }.by(1)
+      # And another with a different email
+      expect {
+        user2 = User.create_trial_user(:first_name => 'Daniel', :last_name => 'Draper', :email => 'daniel2@netfox.com')
+      }.to change { User.count }.by(1)
+    end
+  end
+
+  describe "webhook" do
+    before(:each) do
+      @publication = Factory.create(:publication)
+      @weekender = Factory.create(:publication, :name => "Crikey Weekender")
+    end
+
+    it "should create a trial user and subscription" do
+      expect {
+        @sub = User.find_or_create_with_trial(@publication, 10, "Refer", {
+          :first_name => 'Daniel', :last_name => 'Draper', :email => 'daniel2@netfox.com'
+        })
+        @sub.state.should == 'trial'
+        @sub.user.subscriptions.count.should == 1
+      }.to change { User.count }.by(1)
+    end
+
+    it "should create a trial user and subscription + weekender if requested" do
+      expect {
+        @sub = User.find_or_create_with_trial(@publication, 10, "Refer", {
+          :first_name => 'Daniel', :last_name => 'Draper', :email => 'daniel2@netfox.com', :options => { :weekender => true }
+        })
+        @sub.state.should == 'trial'
+        @sub.user.subscriptions.size.should == 2
+        @sub.user.has_weekender?.should be(true)
+      }.to change { User.count }.by(1)
+    end
+
+    it "should create a trial and set solus if requested" do
+      expect {
+        @sub = User.find_or_create_with_trial(@publication, 10, "Refer", {
+          :first_name => 'Daniel', :last_name => 'Draper', :email => 'daniel2@netfox.com', :options => { :solus => true }
+        })
+        @sub.state.should == 'trial'
+        @sub.solus.should be(true)
+        @sub.user.subscriptions.count.should == 1
+      }.to change { User.count }.by(1)
+
+    end
   end
     
   it "should only allow one subscription per publication" do
@@ -209,6 +251,29 @@ describe User do
         @weekender = Factory.create(:publication, :name => "Crikey Weekender")
         @user.subscriptions << Factory.create(:subscription, :state => 'active', :publication => @weekender)
         @user.premium?.should be(false)
+      end
+    end
+
+    describe "weekender" do
+      before(:each) do
+        @weekender = Factory.create(:publication, :name => "Crikey Weekender")
+        @user.save!
+      end
+
+      it "should be added if not already present" do
+        expect {
+          @user.add_weekender_to_subs
+        }.to change { @user.subscriptions.size }.by(1)
+        @user.has_weekender?.should be(true)
+      end
+
+      it "should NOT be added if present" do
+        @user.add_weekender_to_subs
+        @user.has_weekender?.should be(true)
+        expect {
+          @user.add_weekender_to_subs
+        }.to_not change { @user.subscriptions.size }
+        @user.has_weekender?.should be(true)
       end
     end
 

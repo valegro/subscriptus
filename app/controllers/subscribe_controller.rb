@@ -95,19 +95,14 @@ class SubscribeController < ApplicationController
   end
 
   def thanks
+    @has_weekender = @subscription.user.has_weekender?
   end
 
   def complete
     @subscription.update_attributes!(params[:subscription])
-    @weekender = Publication.find_by_name("Crikey Weekender")
-    if params[:weekender] && @weekender
+    if params[:weekender]
       @user = @subscription.user
-      @user.subscriptions.create!(
-        :publication => @weekender,
-        :offer => @subscription.offer,
-        :state => 'active',
-        :expires_at => nil
-      )
+      @user.add_weekender_to_subs
     end
     clear_session
   end
