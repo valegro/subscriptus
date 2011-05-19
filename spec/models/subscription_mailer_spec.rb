@@ -80,6 +80,29 @@ describe SubscriptionMailer do
     it_should_behave_like "an email with an unsubscribe link"
   end
 
+  describe "deliver new trial" do
+    before(:each) do
+      @user = Factory.stub(:user, :password => 'testpass')
+      @subscription = Factory.stub(
+        :subscription,
+        :id => 1,
+        :state_updated_at => Time.now,
+        :expires_at => 3.months.from_now,
+        :user => @user,
+        :state => 'trial'
+      )
+      @response = SubscriptionMailer.deliver_new_trial(@subscription)
+    end
+
+    it "should include the password in the email" do
+      @response.body.should include_text('testpass')
+    end
+
+    it "should include the email address" do
+      @response.body.should include_text(@user.email)
+    end
+  end
+
   describe "deliver expired" do
     before(:each) do
       @subscription = Factory.stub(:expired_subscription, :id => 1)

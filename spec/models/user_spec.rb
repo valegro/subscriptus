@@ -145,7 +145,7 @@ describe User do
     end
 
     it "should call update_cm with :create" do
-      @user.stubs(:send_later).with(:sync_to_wordpress)
+      @user.stubs(:send_later).with(:sync_to_wordpress, 'password')
       @user.expects(:send_later).with(:sync_to_campaign_master)
       @user.save!
     end
@@ -180,7 +180,7 @@ describe User do
       it "should create a user in Wordpress" do
         @stubbed_login = '12345'
         UserObserver.any_instance.stubs(:generate_unique_id).returns(@stubbed_login)
-        User.any_instance.expects(:send_later).with(:sync_to_wordpress)
+        User.any_instance.expects(:send_later).with(:sync_to_wordpress, 'password')
         User.any_instance.expects(:send_later).with(:sync_to_campaign_master)
         Factory.create(:user, :firstname => 'Daniel', :lastname => 'Draper', :email => 'daniel@netfox.com', :password => 'password',:password_confirmation => 'password')
       end
@@ -327,7 +327,7 @@ describe User do
 
     it "should call sync_to_campaign_master" do
       @user.expects(:send_later).with(:sync_to_campaign_master)
-      @user.expects(:send_later).with(:sync_to_wordpress)
+      @user.expects(:send_later).with(:sync_to_wordpress, 'password')
       @user.firstname = "Changed"
       @user.save!
     end
@@ -358,7 +358,7 @@ describe User do
         @user.email = 'another@example.com'
         @user.email_confirmation = 'another@example.com'
         @user.expects(:send_later).with(:sync_to_campaign_master)
-        @user.expects(:send_later).with(:sync_to_wordpress)
+        @user.expects(:send_later).with(:sync_to_wordpress, 'password')
         @user.save!
       end
 
@@ -428,7 +428,7 @@ describe User do
             :pword       => @user.password,
             :premium     => false
           })
-          @user.sync_to_wordpress
+          @user.sync_to_wordpress(@user.password)
         end
       end
 
@@ -479,7 +479,7 @@ describe User do
         :pword       => @user.password,
         :premium     => true
       })
-      @user.sync_to_wordpress
+      @user.sync_to_wordpress(@user.password)
     end
   end
 

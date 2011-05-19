@@ -15,7 +15,7 @@ describe Subscription do
   describe "upon creation" do
     it "should deliver a trial email for new trials" do
       @subscription = Factory.build(:subscription)
-      SubscriptionMailer.expects(:send_later).with(:deliver_new_trial, @subscription)
+      SubscriptionMailer.expects(:deliver_new_trial).with(@subscription)
       @subscription.save
     end
 
