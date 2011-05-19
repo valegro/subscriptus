@@ -29,6 +29,10 @@ class Subscription::MailerObserver < ActiveRecord::Observer
     SubscriptionMailer.send_later(:deliver_verified, subscription)
   end
 
+  on(:active, :pending) do |subscription|
+    SubscriptionMailer.send_later("deliver_pending_#{subscription.pending}".to_sym, subscription)
+  end
+
   def after_create(subscription)
     case subscription.state
       when 'pending'

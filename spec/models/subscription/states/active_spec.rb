@@ -91,4 +91,17 @@ describe Subscription do
       @subscription.state_expires_at.time.should_not == @subscription.expires_at
     end
   end
+
+  # Goes into a pending state on renewal
+  describe "on postpone" do
+    before(:each) do
+      @subscription.pending = :payment
+      SubscriptionMailer.expects(:send_later).with(:deliver_pending_payment, @subscription)
+    end
+
+    it "should set the state to suspended" do
+      @subscription.postpone!
+      @subscription.state.should == 'pending'
+    end
+  end
 end
