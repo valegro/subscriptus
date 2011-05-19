@@ -15,6 +15,12 @@ class SubscriptionAction < ActiveRecord::Base
 
   define_callbacks :after_apply
 
+  after_apply do |action|
+    if action.subscription && action.payment
+      SubscriptionMailer.send_later(:deliver_activation, action.subscription)
+    end
+  end
+
   def apply
     raise "No Subscription Set" if self.subscription.blank?
     self.class.transaction do

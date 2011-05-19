@@ -102,6 +102,11 @@ describe SubscriptionFactory do
       subscription = SubscriptionFactory.build(@offer, :payment_attributes => @payment_attrs, :attributes => @attributes)
       subscription.publication.should == @offer.publication
     end
+
+    it "should deliver an activation email" do
+      SubscriptionMailer.expects(:send_later).with(:deliver_activation, instance_of(Subscription))
+      subscription = SubscriptionFactory.build(@offer, :payment_attributes => @payment_attrs, :attributes => @attributes)
+    end
   end
 
   describe "gifts" do
@@ -417,6 +422,18 @@ describe SubscriptionFactory do
         @subscription = factory.build
         @subscription.pending_action.gifts.size.should == 1
       }.to_not change { Order.count }.by(1)
+    end
+
+    it "should deliver a pending email" do
+      SubscriptionMailer.expects(:send_later).with(:deliver_pending_concession_verification, instance_of(Subscription))
+      factory = SubscriptionFactory.new(
+        @offer,
+        :term_id => @concession_term,
+        :attributes => @attributes,
+        :concession => :concession,
+        :payment_attributes => @payment_attrs
+      )
+      @subscription = factory.build
     end
   end
 

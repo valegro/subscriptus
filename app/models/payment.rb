@@ -41,12 +41,6 @@ class Payment < ActiveRecord::Base
     end
   end
 
-  after_process do |payment|
-    if subscription = payment.try(:subscription_action).try(:subscription)
-      SubscriptionMailer.send_later(:deliver_activation, subscription)
-    end
-  end
-
   # Process and save the payment
   # Only valid option is :token (to be used for token payments)
   def process!(options = {})
