@@ -14,7 +14,7 @@ class UserObserver < ActiveRecord::Observer
         user.send_later(:sync_to_campaign_master)
       end
       if user.firstname_changed? || user.lastname_changed? || user.email_changed?
-        user.send_later(:sync_to_wordpress)
+        user.send_later(:sync_to_wordpress, user.password)
       end
     end
   end

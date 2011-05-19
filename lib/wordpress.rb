@@ -11,6 +11,7 @@ class Wordpress
   
   def self.exists?(opts={})
     check_any_required(opts, :login, :email)
+    Rails.logger.warn("Exists #{opts.inspect}")
     res = make_request(opts.merge(:func => 'exists'))
     return !res.blank? && res != "-1"
   end

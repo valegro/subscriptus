@@ -147,7 +147,7 @@ class User < ActiveRecord::Base
     self.subscriptions.each(&:sync_to_campaign_master)
   end
 
-  def sync_to_wordpress
+  def sync_to_wordpress(password = nil)
     options = {
       :login       => self.login,
       :firstname   => self.firstname,
@@ -158,7 +158,7 @@ class User < ActiveRecord::Base
     if Wordpress.exists?(:login => self.login)
       Wordpress.send_later(:update, options)
     else
-      options[:pword] = self.password unless self.password.blank?
+      options[:pword] = password unless password.blank?
       Wordpress.send_later(:create, options)
     end
   end
