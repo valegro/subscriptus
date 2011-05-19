@@ -159,10 +159,10 @@ class User < ActiveRecord::Base
       :email       => self.email,
       :premium     => self.premium?
     }
+    options[:pword] = password unless password.blank?
     if Wordpress.exists?(:login => self.login)
       Wordpress.send_later(:update, options)
     else
-      options[:pword] = password unless password.blank?
       Wordpress.send_later(:create, options)
     end
   end

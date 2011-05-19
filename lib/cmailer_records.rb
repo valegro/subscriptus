@@ -20,7 +20,7 @@ class CmailerUser < ActiveRecord::Base
 
   def save_to_subscriptus
     attrs = self.attributes.symbolize_keys
-    attrs[:auto_created] = true
+    attrs[:auto_created] = false # MUST TURN OFF validations too
     attrs[:email_confirmation] = attrs[:email]
     attrs[:password] = attrs[:password_confirmation] = "123456"
     process_title!(attrs[:title])
