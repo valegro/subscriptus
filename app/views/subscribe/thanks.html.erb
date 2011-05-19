@@ -20,7 +20,9 @@
     
     <h3>Crikey Weekender</h3>
     
-    <p>Have you signed up for Crikey Weekender yet? It's our weekly arts and culture wrap &mdash; delivered direct to your inbox every Friday morning. You'll love it.</p>
+    <% unless @has_weekender %>
+      <p>Have you signed up for Crikey Weekender yet? It's our weekly arts and culture wrap &mdash; delivered direct to your inbox every Friday morning. You'll love it.</p>
+    <% end %>
     
     <% form_for @subscription, :url => complete_path do |form| %>
 
