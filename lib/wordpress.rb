@@ -58,10 +58,10 @@ private
   end
   
   def self.check_any_required(opts, *required)
-    raise Error.new(%(options missing one of the following required key(s): #{required.map{|k| ":#{k}"}.join(', ')})) if (required - opts.keys == required)
+    raise Error.new(%(options missing one of the following required key(s): #{required.map{|k| ":#{k}"}.join(', ')} (#{opts.inspect}) were provided)) if (required - opts.keys == required)
   end
   
   def self.check_required(opts, *required)
-    raise Error.new(%(options missing required key(s): #{(required - opts.keys).map{|k| ":#{k}"}.join(', ')})) unless (required & opts.keys == required)
+    raise Error.new(%(options missing required key(s): #{(required - opts.keys).map{|k| ":#{k}"}.join(', ')} (#{opts.inspect}) were provided)) unless (required & opts.keys == required)
   end
 end
