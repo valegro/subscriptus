@@ -1,7 +1,7 @@
 class CmailerUser < ActiveRecord::Base
-  set_table_name "users"
-  set_primary_key "ContactId"
-  has_many :subscriptions, :class_name => "CmailerSubscription", :foreign_key => "ContactId", :order => "expires_at" do
+  set_table_name "users_cache"
+  set_primary_key "userid"
+  has_many :subscriptions, :class_name => "CmailerSubscription", :foreign_key => "userid", :order => "expires_at" do
     def by_publication
       self.group_by { |s| s.publication }
     end
@@ -49,9 +49,9 @@ class CmailerSubscription < CmailerUser
   extend ActiveSupport::Memoizable
   cattr_accessor :FYS
 
-  set_table_name "subscriptions"
-  set_primary_key "ContactId"
-  belongs_to :user, :class_name => "CmailerUser", :foreign_key => "ContactId"
+  set_table_name "subscriptions_cache"
+  set_primary_key "userid"
+  belongs_to :user, :class_name => "CmailerUser", :foreign_key => "userid"
 
   named_scope :not_expired, lambda { { :conditions => "expired_at not null and expired_at > #{Time.now}" }}
 
