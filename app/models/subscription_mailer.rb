@@ -30,7 +30,7 @@ class SubscriptionMailer < ActionMailer::Base
     recipients subscription.user.email
     subject "New Trial Subscription"
     from NO_REPLY
-    body :user => subscription.user, :password => subscription.user.try(:password)
+    body :user => subscription.user, :password => subscription.temp_password
     content_type 'text/html'
   end
   
