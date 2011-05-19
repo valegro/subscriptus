@@ -83,18 +83,21 @@ class User < ActiveRecord::Base
     # Add weekender
     user.add_weekender_to_subs if weekender
     # Add the subscription
-    user.subscriptions.create!(
+    sub = user.subscriptions.create!(
       :publication => publication,
       :expires_at => trial_period_in_days.days.from_now,
       :referrer => referrer,
       :solus => solus
     )
+    sub.temp_password = user.password
+    SubscriptionMailer.deliver_new_trial(sub)
+    return sub
   end
 
   # Used for creating new users from trial forms
   def self.create_trial_user(attributes)
     r_password = (0...7).map { ('a'..'z').to_a[rand(26)] }.join << rand(9).to_s
-    self.create!(
+    user = self.create!(
       :firstname => attributes[:first_name].to_s,
       :lastname => attributes[:last_name].to_s,
       :email => attributes[:email].to_s,
@@ -104,6 +107,7 @@ class User < ActiveRecord::Base
       :login => 'trial_user',
       :auto_created => true
     )
+    user
   end
 
   # TODO: I suspect this is no longer relevant

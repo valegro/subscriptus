@@ -19,6 +19,7 @@ class Subscription < ActiveRecord::Base
   has_many :log_entries, :class_name => "SubscriptionLogEntry", :dependent => :destroy
   has_many :orders
   
+  attr_accessor :temp_password # Used for sending password to new trialers
   attr_accessor :note # Used to save notes to the subscription
   attr_accessor :terms
   attr_accessor :starts_at # the start date of the newest subscription #TODO: Is this used anywhere?

@@ -31,9 +31,6 @@ class Subscription::MailerObserver < ActiveRecord::Observer
 
   def after_create(subscription)
     case subscription.state
-      when 'trial'
-        # Must be delivered in real time so that we can send the password
-        SubscriptionMailer.deliver_new_trial(subscription)
       when 'pending'
         SubscriptionMailer.send_later("deliver_pending_#{subscription.pending}".to_sym, subscription)
     end
