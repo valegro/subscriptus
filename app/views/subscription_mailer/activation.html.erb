@@ -4,6 +4,12 @@
 	<p style="padding-bottom: 10px">Thank you for subscribing to Crikey.</p>
 	<p style="padding-bottom: 5px"><strong>Your Order Details</strong></p>
 
+    <h2>TAX INVOICE</h2>
+    <p>
+    Blimey Holdings (trading as Crikey)<br/>
+    ABN 98 101 558 847
+    </p>
+
 	<p>
 		Supplier: Crikey<br/>
 		Order Number: <%= h @subscription.reference %><br/>
@@ -16,7 +22,6 @@
 	<p style="padding: 10px 0px 10px 0px"><strong>Your Subscription Details</strong></p>
 	<p style="padding-bottom: 5px">Publication Name: <%= h @subscription.publication.name %></p>
 	<p style="padding-bottom: 5px">
-		Subscription Starts: <%= @subscription.state_updated_at.try(:strftime, "%d/%m/%Y") %><br/>
 		Subscription Ends: <%= @subscription.expires_at.try(:strftime, "%d/%m/%Y") %>
 	</p>
 
