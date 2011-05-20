@@ -23,3 +23,13 @@ production:
   port: <%= db_port %>
   socket: /tmp/mysql.sock
   reconnect: true
+
+import:
+  database: <%= prod_db %>
+  adapter: mysql
+  host: <%= db_hostname %>
+  username: <%= user %>
+  password: <%= password %>
+  port: <%= db_port %>
+  socket: /tmp/mysql.sock
+  reconnect: true

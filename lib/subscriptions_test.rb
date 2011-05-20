@@ -1,5 +1,15 @@
 require 'cmailer_records'
 
+
+require 'ruby-prof'
+
+# Ignore DJ
+class Object
+  def send_later(*args)
+    # Do nothing
+  end
+end
+
 # Does the user have a subscription with state = active or state = trial and expiry > now?
 # Yes, just one: make this the active sub
 # Yes, two: merge these into the active sub
@@ -64,10 +74,12 @@ def process_subs_for_user(user, subs, cm_user = nil)
   # TODO: Handle ALL the actions
 end
 
-#User.delete_all "role = 'subscriber'"
-#Subscription.connection.execute("delete from subscriptions")
-#SubscriptionAction.delete_all
-#SubscriptionLogEntry.delete_all
+if RAILS_ENV = 'development'
+  User.delete_all "role = 'subscriber'"
+  Subscription.connection.execute("delete from subscriptions")
+  SubscriptionAction.delete_all
+  SubscriptionLogEntry.delete_all
+end
 
 logger = Logger.new("import-results.log")
 
@@ -75,24 +87,30 @@ ignored = 0
 
 logger.warn("Starting import at #{Time.now}")
 
-CmailerUser.find(:all, :limit => 100).each do |u|
+#RubyProf.start
+
+start_time = Time.now
+
+CmailerUser.find_each(:include => [:subscriptions, :address]) do |u|
   puts u.email
   begin
-    User.transaction do
-      user = u.save_to_subscriptus
-      u.subscriptions.by_publication.each do |publication, subs|
-        if publication.blank?
-          # We should just ignore the sub if there is no publication (count it though)
-          ignored += 1
-        else
-          puts "Processing #{publication.name}"
-          process_subs_for_user(user, subs, u)
+    Rails.logger.silence do
+      User.transaction do
+        user = u.save_to_subscriptus
+        u.subscriptions.by_publication.each do |publication, subs|
+          if publication.blank?
+            # We should just ignore the sub if there is no publication (count it though)
+            ignored += 1
+          else
+            process_subs_for_user(user, subs, u)
+          end
         end
       end
     end
   rescue ActiveRecord::RecordInvalid => e
     logger.warn("------------------")
     logger.warn($!)
+    logger.warn($!.backtrace)
     logger.warn(u.inspect)
     logger.warn(e.record.inspect)
   rescue
@@ -106,6 +124,29 @@ end
 logger.warn(@@count.inspect)
 logger.warn("#{ignored} subscriptions were ignored because they had no publication")
 logger.warn("Finished at #{Time.now}")
+
+end_time = Time.now
+
+puts
+puts
+puts "#{(end_time - start_time)} seconds"
+puts
+puts
+puts
+
+=begin
+
+result = RubyProf.stop
+
+printer = RubyProf::FlatPrinter.new(result)
+printer.print(STDOUT, 0)
+
+puts "\n\n------------------------------\n\n"
+
+printer = RubyProf::GraphPrinter.new(result)
+printer.print(STDOUT, 0)
+
+=end
 
 # Have subscriptions that have not expired?
 # Just one? then use this as the current subscription with whatever state it has

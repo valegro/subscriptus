@@ -1,6 +1,35 @@
+class PublicationCache < Hash
+  def get(name)
+    if self.has_key?(name)
+      self[name]
+    else
+      returning(Publication.find_by_name(name)) do |pub|
+        self[name] = pub
+      end
+    end
+  end
+end
+
+class OfferCache < Hash
+  def get(name, publication)
+    if self.has_key?(name)
+      self[name]
+    else
+      returning(Offer.find_or_initialize_by_name(name, :publication => publication)) do |offer|
+        offer.save if offer.new_record?
+        if offer.offer_terms.empty?
+          offer.offer_terms.create(:price => 100, :months => 3)
+        end
+        self[name] = offer
+      end
+    end
+  end
+end
+
 class CmailerUser < ActiveRecord::Base
   set_table_name "users_cache"
   set_primary_key "userid"
+  has_one :address, :class_name => "CmailerUserAddress", :foreign_key => "userid"
   has_many :subscriptions, :class_name => "CmailerSubscription", :foreign_key => "userid", :order => "expires_at" do
     def by_publication
       self.group_by { |s| s.publication }
@@ -30,12 +59,25 @@ class CmailerUser < ActiveRecord::Base
     attrs[:role] = 'subscriber'
     attrs[:phone_number] = attrs.delete(:phone)
     attrs.delete(:ContactId)
+    attrs.delete(:userid)
+    attrs.delete(:priority)
 
-    unless %w(act nsw nt qld sa tas vic wa).include?(attrs[:state].to_s.downcase)
-      attrs[:state] = 'intl'
+    unless self.address.blank?
+      address_attributes = address.attributes
+      address_attributes.delete('ContactId')
+      address_attributes.delete('userid')
+      address_attributes['state'] = address_attributes['state'].try(:to_s).try(:downcase!)
+      address_attributes['city'] = address_attributes.delete('suburb')
+      unless %w(act nsw nt qld sa tas vic wa).include?(address_attributes['state'])
+        address_attributes['state'] = 'intl'
+      end
+      attrs.merge!(address_attributes)
     end
 
-    User.create!(attrs)
+
+    returning(User.new(attrs)) do |u|
+      u.save_with_validation(false)
+    end
   end
 
   def process_title!(title)
@@ -43,6 +85,12 @@ class CmailerUser < ActiveRecord::Base
     title.capitalize!
     title.gsub!(/\./, "")
   end
+end
+
+class CmailerUserAddress < CmailerUser
+  set_table_name "useraddress_cache"
+  belongs_to :user, :class_name => "CmailerUser", :foreign_key => "userid"
+
 end
 
 class CmailerSubscription < CmailerUser
@@ -54,6 +102,9 @@ class CmailerSubscription < CmailerUser
   belongs_to :user, :class_name => "CmailerUser", :foreign_key => "userid"
 
   named_scope :not_expired, lambda { { :conditions => "expired_at not null and expired_at > #{Time.now}" }}
+
+  @@publication_cache = PublicationCache.new
+  @@offer_cache = OfferCache.new
 
   @@FYS = {
     "FY06" => ("2005-07-01".to_time.."2006-06-30".to_time),
@@ -117,7 +168,7 @@ class CmailerSubscription < CmailerUser
         act.payment = Payment.new(:payment_type => 'direct_debit', :amount => self.price)
       end
     end
-    subscription = Subscription.create!(
+    subscription = Subscription.new(
       :user          => user,
       :state         => state,
       :price         => attrs[:price],
@@ -128,28 +179,32 @@ class CmailerSubscription < CmailerUser
       :pending_action => pending_action,
       :pending       => state == 'pending' ? 'payment' : nil
     )
+    subscription.save_with_validation(false)
     # Suspension dates
     if state == 'suspended'
-      subscription.update_attributes!(
+      subscription.update_attributes(
         :state_updated_at => self.SuspendFrom,
         :state_expires_at => self.SuspendTo
       )
+      subscription.save_with_validation(false)
     end
     # Action
-    action = SubscriptionAction.create!(
+    action = SubscriptionAction.new(
       :subscription => subscription,
       :offer_name => _offer.name,
       :term_length => _offer.offer_terms.first.months,
       :applied_at => attrs[:created_at]
     )
+    action.save_with_validation(false)
     # Payment
     unless self.PurchaseOrderNumber.blank?
-      action.create_payment(
+      payment = action.build_payment(
         :amount => self.price,
         :reference => self.PurchaseOrderNumber,
         :payment_type => :historical,
         :processed_at => self.created_at
       )
+      payment.save_with_validation(false)
     end
   end
 
@@ -157,7 +212,7 @@ class CmailerSubscription < CmailerUser
     name = read_attribute(:publication).try(:strip)
     # Ignore the record if it has no publication
     return nil if name.blank?
-    Publication.find_by_name(name)
+    @@publication_cache.get(name)
   end
 
   def state
@@ -176,12 +231,7 @@ class CmailerSubscription < CmailerUser
     name = read_attribute(:offer).strip
     name = "Unknown Offer" if name.blank?
     return nil if publication.blank?
-    returning(Offer.find_or_initialize_by_name(name, :publication => publication)) do |offer|
-      offer.save if offer.new_record?
-      if offer.offer_terms.empty?
-        offer.offer_terms.create(:price => 100, :months => 3)
-      end
-    end
+    @@offer_cache.get(name, publication)
   end
 
   def list
@@ -209,5 +259,6 @@ class CmailerSubscription < CmailerUser
       end
     end
 end
+
 
 

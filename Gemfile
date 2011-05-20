@@ -84,4 +84,5 @@ group :development, :test, :cucmber do
   gem 'mocha', '~> 0.9.8'
   gem 'timecop'
   gem 'akephalos'
+  gem 'ruby-prof'
 end
