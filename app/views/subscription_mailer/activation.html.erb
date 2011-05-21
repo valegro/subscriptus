@@ -15,7 +15,7 @@
 		Order Number: <%= h @subscription.reference %><br/>
 		Order Date: <%= @subscription.updated_at.try(:strftime, "%d/%m/%Y") %><br/>
 		Payment Method: Credit Card<br/>
-		Payment Cost: <%= number_to_currency @subscription.actions.last.payment.amount, :unit => "AUD $" %><br/>
+    Payment Cost: <%= number_to_currency @subscription.actions.last.payment.amount, :unit => "AUD $" %> (includes <%= number_to_currency(@subscription.actions.last.payment.amount/11.0) %> GST)<br/>
 		(Please note: Blimey Holdings will appear as the transaction detail on your statement)<br/>
 	</p>
 
