@@ -7,6 +7,7 @@ class Admin::SubscribersController < AdminController
       :conditions => { "subscriptions.user_id" => @subscriber.id },
       :joins => :subscription,
       :include => [:payment, :subscription],
+      :order => "applied_at desc",
       :page => params[:page] || 1
     )
     @subscriptions = @subscriber.subscriptions

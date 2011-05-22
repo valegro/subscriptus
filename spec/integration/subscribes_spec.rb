@@ -431,6 +431,89 @@ describe "Subscribes" do
     end
   end
 
+  describe "when a squatter user with my email address exists" do
+    before(:each) do
+      stub_wordpress
+      @user = Factory.create(:user)
+      @subscription = Factory.create(:expired_subscription, :user => @user)
+    end
+
+    describe "and I visit the subscribe page" do
+      before(:each) do
+        @offer = Factory.create(:offer)
+        @term = @offer.offer_terms.create(:price => 10, :months => 3, :concession => true)
+        @term2 = @offer.offer_terms.create(:price => 20, :months => 3)
+        @source = Factory.create(:source)
+        visit new_subscribe_path(:source_id => @source.id, :offer_id => @offer.id)
+      end
+
+      describe "and I fill in the information correctly" do
+        before(:each) do
+          fill_in "First Name",            :with => "Daniel"
+          fill_in "Last Name",             :with => "Draper"
+          fill_in "Email",                 :with => "daniel@codefire.com.au"
+          fill_in "Email confirmation",    :with => "daniel@codefire.com.au"
+          fill_in "Phone number",          :with => "09090909"
+          fill_in "Street Address Line 1", :with => "1 That Pl"
+          fill_in "City",                  :with => "Adelaide"
+          fill_in "Postcode",              :with => "5000"
+          fill_in "Nominate your password",              :with => "Password1"
+          fill_in "Password confirmation", :with => "Password1"
+          fill_in "Name on Card",          :with => "Daniel Draper"
+          fill_in "Card number",           :with => "4444333322221111"
+          fill_in "Card Verification (CVV Number)", :with => "123"
+          choose "offer_term_#{@term2.id}"
+          check "subscription_terms"
+        end
+      end
+
+      describe "and I do not provide all data" do
+        before(:each) do
+          choose "offer_term_#{@term2.id}"
+          fill_in "First Name",            :with => "Daniel"
+          fill_in "Last Name",             :with => "Draper"
+          fill_in "Phone number",          :with => "09090909"
+          fill_in "Street Address Line 1", :with => "1 That Pl"
+          fill_in "City",                  :with => "Adelaide"
+          fill_in "Postcode",              :with => "5000"
+          fill_in "Name on Card",          :with => "Daniel Draper"
+          fill_in "Card number",           :with => "4444333322221111"
+          fill_in "Card Verification (CVV Number)", :with => "123"
+          check "subscription_terms"
+          GATEWAY.expects(:purchase).never
+        end
+
+        it "should take me back to the form" do
+          click_link_or_button "btnSubmit"
+          page.should have_content "Subscribe to Crikey"
+        end
+
+        describe "and I fill in the remaining data and resubmit" do
+          before(:each) do
+            save_and_open_page
+            fill_in "Email",                 :with => "daniel@codefire.com.au"
+            fill_in "Email confirmation",    :with => "daniel@codefire.com.au"
+            fill_in "Street Address Line 1", :with => "1 That Pl"
+            fill_in "City",                  :with => "Adelaide"
+            fill_in "Postcode",              :with => "5000"
+            fill_in "Nominate your password",              :with => "Password1"
+            fill_in "Password confirmation", :with => "Password1"
+            choose "offer_term_#{@term2.id}"
+            GATEWAY.expects(:purchase).returns(stub(:success? => true, :params => { 'ponum' => '1234' })) 
+          end
+
+          it "should display the thanks page" do
+            click_link_or_button "btnSubmit"
+            save_and_open_page
+            page.should have_content("Thanks for subscribing to Crikey! We hope you enjoy it.")
+          end
+        end
+      end
+
+
+    end
+  end
+
   describe "when I visit the subscribe page but I don't provide an offer" do
     before(:each) do
       @source = Factory.create(:source)

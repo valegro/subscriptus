@@ -34,16 +34,6 @@
         row.term pluralize(action.term_length, "month")
         row.source action.source.try(:name)
         row.gifts action.gifts.size
-      #t.rows do |row, action, index|
-      #  row.payment_date  format_timestamp(payment.created_at)
-      #  row.cardholder_name "#{payment.first_name} #{payment.last_name}"
-      #  row.amount        number_to_currency(payment.amount/100.0) # in cents
-      #  if payment.payment_type == :credit_card
-      #    row.card_number   payment.card_number
-      #    row.expiry_date   l(payment.card_expiry_date, :format => "%m/%y")
-      #  end
-      #  row.payment_type  payment.payment_type.to_s.titleize
-      #  row.reference     payment.reference
       end
     end %>
   </div>

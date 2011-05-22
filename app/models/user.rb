@@ -49,9 +49,6 @@ class User < ActiveRecord::Base
     if user.email_changed? && Wordpress.exists?(:email => user.email)
       user.errors.add(:email, "is already taken")
     end
-    if user.login_changed?
-      user.errors.add(:login, "cannot be changed after initial creation")
-    end
   end
 
   # Used for search controller
