@@ -75,108 +75,109 @@
     <div class='clear'></div>
   </div> <!-- Step 1 -->
 
-  <div class='section' id='step2'>
-    <img src="/images/step2.png" class='step' alt='step 2'   />
-    <div class='content'>	
-      <h2><%= 'Confirm ' unless @user.new_record? %>Your Details</h2>
+  <% unless @tab == 'groups' %>
+    <div class='section' id='step2'>
+      <img src="/images/step2.png" class='step' alt='step 2'   />
+      <div class='content'>	
+        <h2><%= 'Confirm ' unless @user.new_record? %>Your Details</h2>
 
-      <div id='new-user' class="login-option">
-        <% fields_for :user, @user, :builder => SubscribeFormBuilder do |u| %>
-          <%= u.select :title, %w(Mr Mrs Ms Miss) %>
-          <%= u.text_field :firstname, :required => true, :label => "First Name" %>
-          <%= u.text_field :lastname, :required => true, :label => "Last Name" %>
-          <%= u.text_field :email, :help => "This is the email address Crikey will be sent to", :required => true %>
-          <%= u.text_field :email_confirmation, :required => true %>
-          <%= u.text_field :phone_number, :help => "If there are problems with email delivery this is how we contact you", :required => true %>
-          <%= u.text_field :company %>
-          <%= u.text_field :address_1, :label => "Street Address Line 1", :required => true %>
-          <%= u.text_field :address_2, :label => "Street Address Line 2" %>
-          <%= u.text_field :city, :required => true %>
-          <%= u.enum_select :state, :required => true %>
-          <%= u.text_field :postcode, :required => true %>
-          <%= u.country_select :country, ['Australia'], :required => true %>
-          <% unless @renewing %>
-            <%= u.password_field :password, :required => true, :label => "Nominate your password" %>
-            <%= u.password_field :password_confirmation, :required => true %>
-          <% end %>
-        <% end %>
-      </div>
-    </div>
-
-    <div class='clear'></div>
-  </div> <!-- Step 2 -->
-
-  <div class='section' id='step3'>
-    <img src="/images/step3.png"  class='step' alt='step 3' />
-    <div class='content'>			
-  		<div id='payment' class='form-section'>
-			  <h2>Choose your Payment method</h2>
-
-			  <img id='securepay' src="/images/securepay.png" alt="Powered by Secure Pay" />
-				<div id='payment-options'>
-          <input class="payment-radio" type='radio' name='payment_option' value="credit_card" id='payment-radio-credit-card' <%= 'checked="true"' if (@payment_option.blank? || @payment_option == 'credit_card' || !@direct_debit_allowed) %> />
-          <label for='payment-radio-credit-card'>
-            Credit Card
-          </label>
-          
-          <% if @direct_debit_allowed %>
-            <input type='radio' class="payment-radio" name='payment_option' value="direct_debit" id='payment-radio-direct-debit' <%= 'checked="true"' if @payment_option == 'direct_debit' %> />
-            <label for='payment-radio-direct-debit'>
-              Direct Debit
-            </label>									
-          <% end %>
-            
-          <label for='payment-radio-credit-card'>
-            <img src='/images/cc.png' alt='Credit Cards' />	
-          </label>
-        </div>
-
-        <div id='payment-details'>
-          <div class="payment-option" id="payment_by_credit_card" style="<%= 'display:none;' if @payment_option != 'credit_card' && !@payment_option.blank? %>">
-            <h4>Credit Card Details</h4>
-            <% fields_for :payment, @payment, :builder => SubscribeFormBuilder do |p| %>
-              <%= p.text_field :full_name, :required => true, :class => "cc-field", :label => "Name on Card" %>
-              <%= p.text_field :card_number, :required => true, :class => "cc-field", :help => "e.g. 0000123455677675" %>
-              <%= p.date_select :card_expiry_date, :discard_day => true, :start_year => Time.now.year, :label => "Expiry", :required => true, :class => "cc-field" %>
-              <%= p.text_field :card_verification, :class => "smallText cc-field", :required => true, :label => "Card Verification (CVV Number)" %>
+        <div id='new-user' class="login-option">
+          <% fields_for :user, @user, :builder => SubscribeFormBuilder do |u| %>
+            <%= u.select :title, %w(Mr Mrs Ms Miss) %>
+            <%= u.text_field :firstname, :required => true, :label => "First Name" %>
+            <%= u.text_field :lastname, :required => true, :label => "Last Name" %>
+            <%= u.text_field :email, :help => "This is the email address Crikey will be sent to", :required => true %>
+            <%= u.text_field :email_confirmation, :required => true %>
+            <%= u.text_field :phone_number, :help => "If there are problems with email delivery this is how we contact you", :required => true %>
+            <%= u.text_field :company %>
+            <%= u.text_field :address_1, :label => "Street Address Line 1", :required => true %>
+            <%= u.text_field :address_2, :label => "Street Address Line 2" %>
+            <%= u.text_field :city, :required => true %>
+            <%= u.enum_select :state, :required => true %>
+            <%= u.text_field :postcode, :required => true %>
+            <%= u.country_select :country, ['Australia'], :required => true %>
+            <% unless @renewing %>
+              <%= u.password_field :password, :required => true, :label => "Nominate your password" %>
+              <%= u.password_field :password_confirmation, :required => true %>
             <% end %>
+          <% end %>
+        </div>
+      </div>
+
+      <div class='clear'></div>
+    </div> <!-- Step 2 -->
+
+    <div class='section' id='step3'>
+      <img src="/images/step3.png"  class='step' alt='step 3' />
+      <div class='content'>			
+        <div id='payment' class='form-section'>
+          <h2>Choose your Payment method</h2>
+
+          <img id='securepay' src="/images/securepay.png" alt="Powered by Secure Pay" />
+          <div id='payment-options'>
+            <input class="payment-radio" type='radio' name='payment_option' value="credit_card" id='payment-radio-credit-card' <%= 'checked="true"' if (@payment_option.blank? || @payment_option == 'credit_card' || !@direct_debit_allowed) %> />
+            <label for='payment-radio-credit-card'>
+              Credit Card
+            </label>
+            
+            <% if @direct_debit_allowed %>
+              <input type='radio' class="payment-radio" name='payment_option' value="direct_debit" id='payment-radio-direct-debit' <%= 'checked="true"' if @payment_option == 'direct_debit' %> />
+              <label for='payment-radio-direct-debit'>
+                Direct Debit
+              </label>									
+            <% end %>
+              
+            <label for='payment-radio-credit-card'>
+              <img src='/images/cc.png' alt='Credit Cards' />	
+            </label>
           </div>
 
-          <% if @tab.blank? || @tab == 'subscriptions' %>
-            <div class="payment-option" id="payment_by_direct_debit" style="<%= 'display:none;' unless @payment_option == 'direct_debit' %>">
-              <h4>Direct Debit</h4>
-              <h4>Click the FINISH button below once you’ve chosen your payment option:</h4>
-              <ol>
-                <li>Download our <%= link_to("subscription form", "/forms/crikey_directdebit_bank.pdf", :target => :new) %> and fax it to 03 8623 9975 or mail it to Crikey, Level 6, 22 William Street, Melbourne VIC 3000.</li>
-                <li>Or you can do a direct transfer into our bank account – make sure you include your name in the reference so we can match up your payment:</li>
-              </ol>
-              <p>
-              BSB: 083 026<br/>
-              Account Number: 58 171 0456<br/>
-              Account Name: Blimey Holdings
+          <div id='payment-details'>
+            <div class="payment-option" id="payment_by_credit_card" style="<%= 'display:none;' if @payment_option != 'credit_card' && !@payment_option.blank? %>">
+              <h4>Credit Card Details</h4>
+              <% fields_for :payment, @payment, :builder => SubscribeFormBuilder do |p| %>
+                <%= p.text_field :full_name, :required => true, :class => "cc-field", :label => "Name on Card" %>
+                <%= p.text_field :card_number, :required => true, :class => "cc-field", :help => "e.g. 0000123455677675" %>
+                <%= p.date_select :card_expiry_date, :discard_day => true, :start_year => Time.now.year, :label => "Expiry", :required => true, :class => "cc-field" %>
+                <%= p.text_field :card_verification, :class => "smallText cc-field", :required => true, :label => "Card Verification (CVV Number)" %>
+              <% end %>
+            </div>
+
+            <% if @tab.blank? || @tab == 'subscriptions' %>
+              <div class="payment-option" id="payment_by_direct_debit" style="<%= 'display:none;' unless @payment_option == 'direct_debit' %>">
+                <h4>Direct Debit</h4>
+                <h4>Click the FINISH button below once you’ve chosen your payment option:</h4>
+                <ol>
+                  <li>Download our <%= link_to("subscription form", "/forms/crikey_directdebit_bank.pdf", :target => :new) %> and fax it to 03 8623 9975 or mail it to Crikey, Level 6, 22 William Street, Melbourne VIC 3000.</li>
+                  <li>Or you can do a direct transfer into our bank account – make sure you include your name in the reference so we can match up your payment:</li>
+                </ol>
+                <p>
+                BSB: 083 026<br/>
+                Account Number: 58 171 0456<br/>
+                Account Name: Blimey Holdings
+                </p>
+              </div>
+            <% end %>
+            
+            <div id='terms'>
+              <%= f.check_box :terms, :label => "I agree to the Crikey " %>
+              <%= link_to('Terms and Conditions', "http://www.crikey.com.au/about/terms-conditions/", :target => '_blank') %>
+            </div>
+
+            <div id='bottom-right'>
+              <p class='phone'>
+                1800 985 502
               </p>
             </div>
-          <% end %>
-          
-					<div id='terms'>
-            <%= f.check_box :terms, :label => "I agree to the Crikey " %>
-            <%= link_to('Terms and Conditions', "http://www.crikey.com.au/about/terms-conditions/", :target => '_blank') %>
+                
+            <%= image_submit_tag "/images/nextstep.png", :disable_with => "Processing...", :id => "btnSubmit" %>
+            <div class='clear'></div>
           </div>
 
-        	<div id='bottom-right'>
-            <p class='phone'>
-              1800 985 502
-            </p>
-          </div>
-							
-          <%= image_submit_tag "/images/nextstep.png", :disable_with => "Processing...", :id => "btnSubmit" %>
-				  <div class='clear'></div>
         </div>
-
       </div>
-    </div>
-    <div class='clear'></div>
-  </div> <!-- Step 3 -->
-  
+      <div class='clear'></div>
+    </div> <!-- Step 3 -->
+  <% end %>
 
 <% end %>
