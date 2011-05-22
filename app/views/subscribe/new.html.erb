@@ -1,12 +1,28 @@
 <% content_for :ujs do %>
   <script language="javascript">
     $(document).ready(function() {
-      $('.payment-option').hide();
-      if ($('#payment-radio-direct-debit').attr('checked')) { $('#payment_by_direct_debit').show(); }
-      if ($('#payment-radio-credit-card').attr('checked')) { $('#payment_by_credit_card').show(); }
-      $(".payment-radio").live('click', function() {
+
+      if ($('#payment-radio-direct-debit').attr('checked')) { enableDirectDebit(); }
+      if ($('#payment-radio-credit-card').attr('checked')) { enableCreditCard(); }
+
+      function enableDirectDebit() {
         $('.payment-option').hide();
-        $('#payment_by_'+$(this).val()).show();
+        $('#payment_by_direct_debit').show();
+        $('.cc-field').attr("disabled", "disabled");
+      }
+
+      function enableCreditCard() {
+        $('.payment-option').hide();
+        $('#payment_by_credit_card').show();
+        $('.cc-field').attr("disabled", "");
+      }
+
+      $(".payment-radio").live('click', function() {
+        if ($(this).val() == 'credit_card') {
+          enableCreditCard();
+        } else {
+          enableDirectDebit();
+        }
       });
     });
   </script>
@@ -120,10 +136,10 @@
           <div class="payment-option" id="payment_by_credit_card" style="<%= 'display:none;' if @payment_option != 'credit_card' && !@payment_option.blank? %>">
             <h4>Credit Card Details</h4>
             <% fields_for :payment, @payment, :builder => SubscribeFormBuilder do |p| %>
-              <%= p.text_field :full_name, :required => true, :label => "Name on Card" %>
-              <%= p.text_field :card_number, :required => true, :help => "e.g. 0000123455677675" %>
-              <%= p.date_select :card_expiry_date, :discard_day => true, :start_year => Time.now.year, :label => "Expiry", :required => true %>
-              <%= p.text_field :card_verification, :class => "smallText", :required => true, :label => "Card Verification (CVV Number)" %>
+              <%= p.text_field :full_name, :required => true, :class => "cc-field", :label => "Name on Card" %>
+              <%= p.text_field :card_number, :required => true, :class => "cc-field", :help => "e.g. 0000123455677675" %>
+              <%= p.date_select :card_expiry_date, :discard_day => true, :start_year => Time.now.year, :label => "Expiry", :required => true, :class => "cc-field" %>
+              <%= p.text_field :card_verification, :class => "smallText cc-field", :required => true, :label => "Card Verification (CVV Number)" %>
             <% end %>
           </div>
 
