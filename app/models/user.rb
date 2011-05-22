@@ -197,7 +197,8 @@ class User < ActiveRecord::Base
     if self.payment_gateway_token.blank?
       # TODO: user module ActiveMerchant::module Utils
       token = Utilities.generate_unique_token(self.id, 10)
-      response = GATEWAY.setup_recurrent(0, credit_card, token)
+      # The amount is 1 cent to keep SecurePay happy but nothing is charged at this point
+      response = GATEWAY.setup_recurrent(1, credit_card, token)
       unless response.success?
         raise Exceptions::CannotStoreCard.new(response.message)
       end
