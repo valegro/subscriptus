@@ -28,7 +28,7 @@
   </script>
 <% end %>
 
-<% form_for @subscription, :url => get_subscribe_submit_path(@offer, @source, @renewing), :builder => SubscribeFormBuilder do |f| %>
+<% form_for @subscription, :url => get_subscribe_submit_path(@offer, @source, @tab, @renewing), :builder => SubscribeFormBuilder do |f| %>
 
   <div class='section' id='step1'>
     <img src="/images/step1.png" class='step' alt='step 1' />
@@ -119,7 +119,6 @@
             Credit Card
           </label>
           
-          <span><%= @payment_option %></span>
           <% if @direct_debit_allowed %>
             <input type='radio' class="payment-radio" name='payment_option' value="direct_debit" id='payment-radio-direct-debit' <%= 'checked="true"' if @payment_option == 'direct_debit' %> />
             <label for='payment-radio-direct-debit'>

@@ -162,7 +162,7 @@ describe "Subscribes" do
         fill_in "Street Address Line 1", :with => "1 That Pl"
         fill_in "City",                  :with => "Adelaide"
         fill_in "Postcode",              :with => "5000"
-        fill_in "Password",              :with => "Password1"
+        fill_in "Nominate your password",:with => "Password1"
         fill_in "Password confirmation", :with => "Password1"
         fill_in "Name on Card",          :with => "Daniel Draper"
         fill_in "Card number",           :with => "4444333322221111"
@@ -206,6 +206,7 @@ describe "Subscribes" do
 
       it "should take me back to the form" do
         click_link_or_button "btnSubmit"
+        save_and_open_page
         page.should have_content "Subscribe to Crikey"
       end
 
@@ -215,7 +216,9 @@ describe "Subscribes" do
       end
 
       it "should be on the students tab" do
+        click_link_or_button "btnSubmit"
         page.should have_xpath("//li[@id='students-tab' and @class='active']")
+        page.should have_content("Are you a full-time student? Crikey offers a 30% discount on the normal subscription rate for students.")
       end
     end
   end
@@ -239,7 +242,7 @@ describe "Subscribes" do
         fill_in "Street Address Line 1", :with => "1 That Pl"
         fill_in "City",                  :with => "Adelaide"
         fill_in "Postcode",              :with => "5000"
-        fill_in "Password",              :with => "Password1"
+        fill_in "Nominate your password",              :with => "Password1"
         fill_in "Password confirmation", :with => "Password1"
         fill_in "Name on Card",          :with => "Daniel Draper"
         fill_in "Card number",           :with => "4444333322221111"
@@ -289,7 +292,7 @@ describe "Subscribes" do
         end
 
         it "should update the user in wordpress" do
-          User.any_instance.expects(:send_later).with(:sync_to_wordpress)
+          User.any_instance.expects(:send_later).with(:sync_to_wordpress, 'Password1')
           User.any_instance.expects(:send_later).with(:sync_to_campaign_master)
           click_link_or_button "btnSubmit"
         end
@@ -332,7 +335,7 @@ describe "Subscribes" do
         fill_in "Street Address Line 1", :with => "1 That Pl"
         fill_in "City",                  :with => "Adelaide"
         fill_in "Postcode",              :with => "5000"
-        fill_in "Password",              :with => "Password1"
+        fill_in "Nominate your password",              :with => "Password1"
         fill_in "Password confirmation", :with => "Password1"
         check "subscription_terms"
         choose("Direct Debit")
