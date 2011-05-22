@@ -13,21 +13,29 @@
   <div class="frame span_6 last">
     <%= render :partial => "admin/subscriptions/subscriptions", :object => @subscriptions %>
   </div>
-  <div class="frame span_10">
+  <div class="frame span_10 last">
     <h2>Action History</h2>
     <%= render_table @actions, :name => 'action_history' do |t| 
-      #t.header :payment_date, :sort_by => :created_at
-      #t.header :publication, :sort_by => :subscription_id
-      #t.header :cardholder_name
-      #t.header :amount
-      #t.header :card_number
-      #t.header :expiry_date
-      #t.header :payment_type, :sort_by => :payment_type
-      #t.header :reference
-      
+      t.header :date, :sort_by => :created_at
+      t.header :publication
+      t.header :amount
+      t.header :payment_reference
+      t.header :offer_name
+      t.header :term
+      t.header :source
+      t.header :gifts
+
+      t.rows do |row, action, index|
+        row.date format_timestamp(action.applied_at)
+        row.publication link_to(action.subscription.publication.name, admin_catalogue_publication_path(action.subscription.publication))
+        row.amount number_to_currency(action.payment.amount)
+        row.payment_reference link_to(action.payment.reference, admin_payment_path(action.payment))
+        row.offer_name action.offer_name
+        row.term pluralize(action.term_length, "month")
+        row.source action.source.try(:name)
+        row.gifts action.gifts.size
       #t.rows do |row, action, index|
       #  row.payment_date  format_timestamp(payment.created_at)
-      #  row.publication  payment.subscription.publication.name
       #  row.cardholder_name "#{payment.first_name} #{payment.last_name}"
       #  row.amount        number_to_currency(payment.amount/100.0) # in cents
       #  if payment.payment_type == :credit_card
@@ -36,7 +44,7 @@
       #  end
       #  row.payment_type  payment.payment_type.to_s.titleize
       #  row.reference     payment.reference
-      #end
+      end
     end %>
   </div>
 </div>

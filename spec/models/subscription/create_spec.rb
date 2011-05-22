@@ -14,9 +14,17 @@ describe Subscription do
   # TODO: Break this up into all of the initial states
   describe "upon creation" do
     it "should deliver a trial email for new trials" do
-      @subscription = Factory.build(:subscription)
-      SubscriptionMailer.expects(:deliver_new_trial).with(@subscription)
-      @subscription.save
+      @json_hash = {
+        "last_name"=> "Draper",
+        "first_name"=> "Daniel",
+        "email"=> "example@example.com",
+        "ip_address"=>"150.101.226.181",
+        :options => { :solus => false }
+      }
+      @publication = Factory.create(:publication)
+      SubscriptionMailer.expects(:deliver_new_trial).with(instance_of(Subscription))
+      Subscription.any_instance.expects(:temp_password=)
+      User.find_or_create_with_trial(@publication, Publication::DEFAULT_TRIAL_EXPIRY, 'referrer', @json_hash)
     end
 
     it "should set both expires_at and state_expires_at for new trials" do

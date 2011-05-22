@@ -7,9 +7,11 @@ describe "Subscribes", "step 2" do
       @gift = Factory.create(:gift)
       @offer.gifts << @gift
       @term = @offer.offer_terms.create(:price => 10, :months => 3, :concession => true)
+      @term2 = @offer.offer_terms.create(:price => 10, :months => 3)
       @source = Factory.create(:source)
       stub_wordpress
       visit new_subscribe_path(:source_id => @source.id, :offer_id => @offer.id)
+      choose "offer_term_#{@term2.id}" 
       fill_in "First Name",            :with => "Daniel"
       fill_in "Last Name",             :with => "Draper"
       fill_in "Email",                 :with => "daniel@codefire.com.au"
@@ -18,7 +20,7 @@ describe "Subscribes", "step 2" do
       fill_in "Street Address Line 1", :with => "1 That Pl"
       fill_in "City",                  :with => "Adelaide"
       fill_in "Postcode",              :with => "5000"
-      fill_in "Password",              :with => "Password1"
+      fill_in "Nominate your password",              :with => "Password1"
       fill_in "Password confirmation", :with => "Password1"
       fill_in "Name on Card",          :with => "Daniel Draper"
       fill_in "Card number",           :with => "4444333322221111"

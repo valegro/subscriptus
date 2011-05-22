@@ -8,5 +8,9 @@ class SubscriptionActionObserver < ActiveRecord::Observer
         end
       end
     end
+    # Invoice
+    if action.subscription && action.payment
+      SubscriptionMailer.send_later(:deliver_activation, action.subscription)
+    end
   end
 end

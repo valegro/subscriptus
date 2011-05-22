@@ -180,7 +180,6 @@ describe Payment do
       action = Factory.create(:subscription_action, :subscription => subscription)
       subscription.actions << action
       payment = Factory.build(:payment, :subscription_action => action)
-      SubscriptionMailer.expects(:send_later).with(:deliver_activation, subscription)
       payment.process!
     end
 

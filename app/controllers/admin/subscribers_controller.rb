@@ -3,7 +3,12 @@ class Admin::SubscribersController < AdminController
   before_filter :find_subscriber
 
   def show
-    @actions = [] # TODO: Fix this! @subscriber.actions.find(:all, sort_by_conditions).paginate(:page => params[:page], :per_page => 10)
+    @actions = SubscriptionAction.paginate(
+      :conditions => { "subscriptions.user_id" => @subscriber.id },
+      :joins => :subscription,
+      :include => [:payment, :subscription],
+      :page => params[:page] || 1
+    )
     @subscriptions = @subscriber.subscriptions
   end
 

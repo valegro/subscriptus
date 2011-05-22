@@ -89,7 +89,8 @@ describe SubscriptionMailer do
         :state_updated_at => Time.now,
         :expires_at => 3.months.from_now,
         :user => @user,
-        :state => 'trial'
+        :state => 'trial',
+        :temp_password => 'testpass'
       )
       @response = SubscriptionMailer.deliver_new_trial(@subscription)
     end

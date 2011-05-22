@@ -24,7 +24,6 @@ describe Subscription do
     it "should create a log entry" do
       expect {
         @subscription.unsuspend!
-        p @subscription.log_entries
       }.to change { @subscription.log_entries.count }.by(1)
       entry = @subscription.log_entries.last
       entry.new_state.should == 'active'

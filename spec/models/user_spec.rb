@@ -133,7 +133,7 @@ describe User do
 
     it "should generate a random username if user is a subscriber" do
       UserObserver.any_instance.stubs(:generate_unique_id).returns(@stubbed_login)
-      user = Factory.build(:user, :login => "shit that will be overwitten")
+      user = Factory.build(:user, :login => nil)
       user.save!
       user.login.should_not be(nil)
       user.login.should == @stubbed_login
