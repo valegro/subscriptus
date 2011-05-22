@@ -16,7 +16,7 @@
   <% end %>
 <% else %>
   <div class='subscription-option'>
-    <%= radio_button_tag "offer_term", offer_terms.first, true %>
+    <%= radio_button_tag "offer_term", offer_terms.first.id, true %>
     <span><%= pluralize(offer_terms.first.try(:months), 'month') %></span>
     <span class="cost"><%= number_to_currency_with_free(offer_terms.first.try(:price)) %></span>
   </div>

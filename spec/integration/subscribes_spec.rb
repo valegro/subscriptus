@@ -4,6 +4,7 @@ describe "Subscribes" do
   describe "as a visitor to the subscribe page" do
     before(:each) do
       @offer = Factory.create(:offer)
+      @term1 = @offer.offer_terms.create(:price => 10, :months => 3)
       @source = Factory.create(:source)
     end
 
@@ -167,6 +168,7 @@ describe "Subscribes" do
         fill_in "Name on Card",          :with => "Daniel Draper"
         fill_in "Card number",           :with => "4444333322221111"
         fill_in "Card Verification (CVV Number)", :with => "123"
+        choose "offer_term_#{@term.id}" 
         check "subscription_terms"
         GATEWAY.expects(:setup_recurrent).returns(stub(:success? => true))
       end
@@ -206,7 +208,6 @@ describe "Subscribes" do
 
       it "should take me back to the form" do
         click_link_or_button "btnSubmit"
-        save_and_open_page
         page.should have_content "Subscribe to Crikey"
       end
 
@@ -227,6 +228,7 @@ describe "Subscribes" do
     before(:each) do
       @offer = Factory.create(:offer)
       @term = @offer.offer_terms.create(:price => 10, :months => 3, :concession => true)
+      @term2 = @offer.offer_terms.create(:price => 20, :months => 3)
       @source = Factory.create(:source)
       stub_wordpress
       visit new_subscribe_path(:source_id => @source.id, :offer_id => @offer.id)
@@ -247,6 +249,7 @@ describe "Subscribes" do
         fill_in "Name on Card",          :with => "Daniel Draper"
         fill_in "Card number",           :with => "4444333322221111"
         fill_in "Card Verification (CVV Number)", :with => "123"
+        choose "offer_term_#{@term2.id}"
         check "subscription_terms"
       end
 
@@ -337,6 +340,7 @@ describe "Subscribes" do
         fill_in "Postcode",              :with => "5000"
         fill_in "Nominate your password",              :with => "Password1"
         fill_in "Password confirmation", :with => "Password1"
+        choose "offer_term_#{@term2.id}"
         check "subscription_terms"
         choose("Direct Debit")
       end
@@ -351,7 +355,7 @@ describe "Subscribes" do
         s.pending_action.should be_an_instance_of(SubscriptionAction)
         s.pending_action.payment.should be_an_instance_of(Payment)
         s.pending_action.payment.payment_type.should == :direct_debit
-        s.pending_action.payment.amount.should == @term.price
+        s.pending_action.payment.amount.should == @term2.price
         s.pending_action.payment.processed_at.should be(nil)
       end
 
