@@ -1,0 +1,23 @@
+<% if flash[:notice] %>
+  <% content_tag :span, :style => "color: red" do %>
+    <%= flash[:notice] %>
+  <% end %>
+<% end %>
+
+<% form_tag(password_resets_path) do %>
+  <div id="field_user_session_login" class="field field-text " style="">
+    <div class="field-label">
+      <%= label_tag :email, "Email" %>
+    </div>
+    <div class="field-inner ">
+      <%= text_field_tag :email %>
+    </div>
+  </div>
+  <div id="field_user_session_submit" class="field field-submit " style="">
+    <div class="field-label ">&nbsp;</div>
+    <div class="field-inner">
+      <%= submit_tag "Send Reset Link" %>
+    </div>
+  </div>
+<% end %>
+

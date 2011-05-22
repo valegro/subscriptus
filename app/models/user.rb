@@ -115,6 +115,11 @@ class User < ActiveRecord::Base
     end
   end
 
+  def deliver_password_reset_instructions!
+    reset_perishable_token!  
+    UserMailer.deliver_password_reset_instructions(self)
+  end
+
   # Returns true if user has at least one active sub
   def has_active_subscriptions?
     subscriptions.any?(&:active?)
@@ -158,9 +163,9 @@ class User < ActiveRecord::Base
     }
     options[:pword] = password unless password.blank?
     if Wordpress.exists?(:login => self.login)
-      Wordpress.send_later(:update, options)
+      Wordpress.update(options)
     else
-      Wordpress.send_later(:create, options)
+      Wordpress.create(options)
     end
   end
 

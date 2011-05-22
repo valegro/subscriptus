@@ -1,0 +1,31 @@
+<% if flash[:notice] %>
+  <% content_tag :span, :style => "color: red" do %>
+    <%= flash[:notice] %>
+  <% end %>
+<% end %>
+
+<% form_for(@user, :url => password_reset_path(@user.perishable_token)) do |f| %>
+  <div id="field_user_session_login" class="field field-text " style="">
+    <div class="field-label">
+      <%= f.label :password, "Password" %>
+    </div>
+    <div class="field-inner ">
+      <%= f.password_field :password %>
+    </div>
+  </div>
+  <div id="field_user_session_password" class="field field-text " style="">
+    <div class="field-label">
+      <%= f.label :password_confirmation, "Confirm" %>
+    </div>
+    <div class="field-inner ">
+      <%= f.password_field :password_confirmation %>
+    </div>
+  </div>
+  <div id="field_user_session_submit" class="field field-submit " style="">
+    <div class="field-label ">&nbsp;</div>
+    <div class="field-inner">
+      <%= f.submit "Reset" %>
+    </div>
+  </div>
+<% end %>
+

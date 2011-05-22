@@ -1,8 +1,12 @@
 class Wordpress
   class Error < StandardError; end
 
-  class << self
-    attr_accessor :enabled
+  #class << self
+  #  attr_accessor :enabled
+  #end
+
+  def self.enabled
+    true
   end
   
   def self.config
