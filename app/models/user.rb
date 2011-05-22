@@ -101,7 +101,6 @@ class User < ActiveRecord::Base
       :email_confirmation => attributes[:email].to_s,
       :password => r_password,
       :password_confirmation => r_password,
-      :login => 'trial_user',
       :auto_created => true
     )
     user
