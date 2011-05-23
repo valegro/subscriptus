@@ -265,7 +265,7 @@
       <strong>Order Number:</strong> <%= @subscription.reference %><br/>
       <strong>Order Date:</strong> <%= @subscription.updated_at.try(:strftime, "%d/%m/%Y") %><br/>
 			<strong>Payment Method:</strong> Credit Card<br/>
-      <strong>Payment Cost:</strong> <%= number_to_currency @subscription.actions.last.payment.amount, :unit => "AUD $" %> (includes <%= number_to_currency(@subscription.actions.last.payment.amount/11.0) %> GST)<br/>
+      <strong>Payment Cost:</strong> <%= number_to_currency @subscription.actions.first.payment.amount, :unit => "AUD $" %> (includes <%= number_to_currency(@subscription.actions.first.payment.amount/11.0) %> GST)<br/>
 			<br />
 			<em class="small">(Please note: Blimey Holdings will appear as the transaction detail on your statement)</em><br/>
 		</p>
@@ -280,10 +280,10 @@
       <strong>Subscription Ends:</strong> <%= @subscription.expires_at.try(:strftime, "%d/%m/%Y") %>
 		</p>
 
-  <% if !@subscription.actions.empty? && !@subscription.actions.last.gifts.blank? %>
+  <% if !@subscription.actions.empty? && !@subscription.actions.first.gifts.blank? %>
     <p style="padding: 10pt;">
       <strong>Included Gifts:</strong><br/>
-      <% @subscription.actions.last.gifts.each do |gift| %>
+      <% @subscription.actions.first.gifts.each do |gift| %>
         <%= h gift.name %><br/>
       <% end %>
     </p>

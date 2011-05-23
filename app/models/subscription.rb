@@ -88,6 +88,12 @@ class Subscription < ActiveRecord::Base
     on :unsuspend do
       transition :suspended => :active
     end
+    on :unsubscribe do
+      transition :trial => :unsubscribed
+      transition :squatter => :unsubscribed
+      transition :suspended => :unsubscribed
+      transition :pending => :unsubscribed
+    end
     
     # Expiries
     expires :trial => :squatter, :after => Publication::DEFAULT_TRIAL_EXPIRY.days

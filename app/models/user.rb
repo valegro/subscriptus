@@ -165,7 +165,7 @@ class User < ActiveRecord::Base
       Wordpress.update(options)
     else
       # Can't create a WP user if we don't have a password - so we will create a random one!
-      options[:pword] ||= User.random_password
+      options[:pword] = User.random_password if options[:pword].blank?
       Wordpress.create(options)
     end
   end
