@@ -211,7 +211,9 @@ class Subscription < ActiveRecord::Base
       self.expires_at = nil
       return
     end
-    self.expires_at = Time.now if self.expires_at.blank? || self.expires_at < Time.now
+    if self.state_changed? || self.expires_at.blank? || self.expires_at < Time.now
+      self.expires_at = Time.now
+    end
     self.starts_at = self.expires_at
     self.expires_at = self.expires_at.advance(:months => term_length)
   end

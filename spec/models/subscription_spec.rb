@@ -62,16 +62,7 @@ describe Subscription do
       @subscription.expires_at.localtime.month.should == expected.month
       @subscription.expires_at.localtime.day.should == expected.day
     end
-    
-    it "should set expiry_date to 3 months from the end of current expiry date" do
-      @subscription.expires_at = Date.new(2010, 10, 4)
-      expected = Date.new(2011, 1, 4)
-      @subscription.increment_expires_at(3)
-      @subscription.expires_at.localtime.year.should == expected.year
-      @subscription.expires_at.localtime.month.should == expected.month
-      @subscription.expires_at.localtime.day.should == expected.day
-    end
-    
+
     it "should set expiry_date to 3 months from now if no expiry date has been set yet" do
       expected = Date.new(2010, 12, 27)
       @subscription.increment_expires_at(3)
@@ -83,6 +74,30 @@ describe Subscription do
     it "should set expiry_date to nil if a nil argument is provided" do
       @subscription.increment_expires_at(nil)
       @subscription.expires_at.should be(nil)
+    end
+
+    describe "for an active state" do
+      it "should set expiry_date to 3 months from the end of current expiry date" do
+        @subscription.expires_at = Date.new(2010, 10, 4)
+        expected = Date.new(2011, 1, 4)
+        @subscription.increment_expires_at(3)
+        @subscription.expires_at.localtime.year.should == expected.year
+        @subscription.expires_at.localtime.month.should == expected.month
+        @subscription.expires_at.localtime.day.should == expected.day
+      end
+    end
+
+    describe "if the state changes" do
+      it "should set expiry date to 3 months from now even if the current expiry date is in the future" do
+        @subscription = Factory.create(:expired_subscription, :expires_at => Date.new(2011, 1, 4))
+        @subscription.expires_at = Date.new(2010, 10, 4)
+        @subscription.state = 'active'
+        expected = Date.new(2010, 12, 27)
+        @subscription.increment_expires_at(3)
+        @subscription.expires_at.localtime.year.should == expected.year
+        @subscription.expires_at.localtime.month.should == expected.month
+        @subscription.expires_at.localtime.day.should == expected.day
+      end
     end
   end
 

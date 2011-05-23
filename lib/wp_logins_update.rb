@@ -1,4 +1,4 @@
-require 'CSV'
+require 'csv'
 
 CSV.open('users.csv', 'r') do |csv|
   login, email = csv

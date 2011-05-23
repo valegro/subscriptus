@@ -104,10 +104,33 @@ describe SubscriptionFactory, "renewals" do
     end
     
     it "should set the expiry date appropriately" do
+      factory = SubscriptionFactory.new(@offer, :attributes => @attributes, :payment_attributes => @payment_attributes)
+      factory.update(@subscription)
+      @subscription.expires_at.should == @term1.months.months.from_now
+    end
+
+    it_should_behave_like "An active subscription"
+  end
+
+   describe "squatter subscribes and becomes active" do
+    before(:each) do
+      @publication = Factory.create(:publication)
+      @subscription = Factory.create(:expired_subscription, :publication => @publication)
+      @user = @subscription.user
+    end
+
+    it "should modify the subscription from an instance of a factory" do
       expect {
         factory = SubscriptionFactory.new(@offer, :attributes => @attributes, :payment_attributes => @payment_attributes)
         factory.update(@subscription)
-      }.to change { @subscription.expires_at }.by(@term1.months.months)
+        @subscription.save!
+      }.to_not change { Subscription.count }
+    end
+    
+    it "should set the expiry date appropriately" do
+      factory = SubscriptionFactory.new(@offer, :attributes => @attributes, :payment_attributes => @payment_attributes)
+      factory.update(@subscription)
+      @subscription.expires_at.should == @term1.months.months.from_now
     end
 
     it_should_behave_like "An active subscription"
