@@ -28,7 +28,7 @@
       t.rows do |row, action, index|
         row.date format_timestamp(action.applied_at)
         row.publication link_to(action.subscription.publication.name, admin_catalogue_publication_path(action.subscription.publication))
-        row.amount number_to_currency(action.payment.try(amount) || 0)
+        row.amount number_to_currency(action.payment.try(:amount) || 0)
         unless action.payment.blank?
           row.payment_reference link_to(action.payment.reference, admin_payment_path(action.payment))
         end
