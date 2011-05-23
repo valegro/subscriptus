@@ -93,7 +93,7 @@ class User < ActiveRecord::Base
 
   # Used for creating new users from trial forms
   def self.create_trial_user(attributes)
-    r_password = (0...7).map { ('a'..'z').to_a[rand(26)] }.join << rand(9).to_s
+    r_password = random_password
     user = self.create!(
       :firstname => attributes[:first_name].to_s,
       :lastname => attributes[:last_name].to_s,
@@ -164,10 +164,9 @@ class User < ActiveRecord::Base
     if Wordpress.exists?(:login => self.login) || Wordpress.exists?(:email => self.email)
       Wordpress.update(options)
     else
-      # Can't create a WP user if we don't have a password!
-      unless password.blank?
-        Wordpress.create(options)
-      end
+      # Can't create a WP user if we don't have a password - so we will create a random one!
+      options[:pword] ||= random_password
+      Wordpress.create(options)
     end
   end
 
@@ -218,4 +217,9 @@ class User < ActiveRecord::Base
       Wordpress.authenticate(:email => email, :pword => password)
     end
   end
+
+  private
+    def random_password
+      (0...7).map { ('a'..'z').to_a[rand(26)] }.join << rand(9).to_s
+    end
 end
