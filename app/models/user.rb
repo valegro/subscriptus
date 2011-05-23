@@ -161,10 +161,13 @@ class User < ActiveRecord::Base
       :premium     => self.premium?
     }
     options[:pword] = password unless password.blank?
-    if Wordpress.exists?(:login => self.login)
+    if Wordpress.exists?(:login => self.login) || Wordpress.exists?(:email => self.email)
       Wordpress.update(options)
     else
-      Wordpress.create(options)
+      # Can't create a WP user if we don't have a password!
+      unless password.blank?
+        Wordpress.create(options)
+      end
     end
   end
 
