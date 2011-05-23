@@ -25,7 +25,8 @@ ActionController::Routing::Routes.draw do |map|
       :verify => [ :get, :post, :put ],
       :suspend => [ :get, :post ],
       :set_expiry => [ :get, :post ],
-      :unsuspend => [ :post ]
+      :unsuspend => [ :post ],
+      :unsubscribe => :get
     }
     admin.resources :orders, :member => { :fulfill => [:get, :post], :postpone => [:get, :post] }, :collection => { :delayed => :get, :completed => :get }
     admin.resources :subscribers
