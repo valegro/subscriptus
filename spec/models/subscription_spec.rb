@@ -166,6 +166,15 @@ describe Subscription do
     end
   end
 
+  describe "actions" do
+    it "should return the most recently applied action first" do
+      @subscription = Factory.create(:subscription)
+      @subscription.actions << Factory.create(:subscription_action, :applied_at => "2011-03-01 10:00".to_time, :offer_name => "AA", :subscription => @subscription)
+      @subscription.actions << Factory.create(:subscription_action, :applied_at => "2011-04-01 10:00".to_time, :offer_name => "BB", :subscription => @subscription)
+      @subscription.actions.first.offer_name.should == "BB"
+    end
+  end
+
   # -------------------------- Soft Deletion Scenarios
   it "should archive the deleted subscriptions" do
     sub_primary_size = Subscription.all.size
