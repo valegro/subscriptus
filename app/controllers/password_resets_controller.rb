@@ -29,7 +29,7 @@ class PasswordResetsController < ApplicationController
   def update  
     @user.password = params[:user][:password]
     @user.password_confirmation = params[:user][:password_confirmation]
-    if @user.password == @password.confirmation
+    if @user.password == @user.password_confirmation
       # Cannot use validations here as some old data from Crikey is invalid
       @user.save_with_validation(false)
       @user.sync_to_wordpress(@user.password)
