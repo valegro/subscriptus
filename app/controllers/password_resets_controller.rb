@@ -27,14 +27,18 @@ class PasswordResetsController < ApplicationController
   end
 
   def update  
-    @user.update_attributes(params[:user])
-    if @user.save
+    @user.password = params[:user][:password]
+    @user.password_confirmation = params[:user][:password_confirmation]
+    if @user.password == @password.confirmation
+      # Cannot use validations here as some old data from Crikey is invalid
+      @user.save_with_validation(false)
       @user.sync_to_wordpress(@user.password)
       flash[:notice] = "Password successfully updated."  
       redirect_to root_url
-    else  
+    else
+      flash[:notice] = "The password you provided does not match the confirmation"
       render :action => :edit  
-    end  
+    end
   end
 
   private
