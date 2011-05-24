@@ -1,9 +1,59 @@
 require 'spec_helper'
 
 describe "Renewals", :type => :integration do
+  before(:each) do
+    stub_wordpress
+  end
+
   describe "when I visit the renewals page" do
     describe "and I am an admin" do
-      it "I should be taken to the admin root"
+      before(:each) do
+        @publication = Factory.create(:publication)
+        @offer = Factory.create(:offer, :publication => @publication)
+        @user = Factory.create(:admin, :firstname => 'Daniel')
+        @subscriber = Factory.create(:subscriber, :id => 123)
+        @subscription = Factory.create(:active_subscription, :user => @subscriber, :publication => @publication)
+        SubscribeController.any_instance.stubs(:current_user).returns(@user)
+        Admin::SubscriptionsController.any_instance.stubs(:current_user).returns(@user)
+      end
+
+      it "I should be taken to the admin root" do
+        visit "/renew"
+        current_url.should == 'http://www.example.com/admin/subscriptions'
+      end
+
+      describe "and I provide a renewal_for parameter" do
+        before(:each) do
+          visit "/renew?for=123"
+        end
+
+        it "should show me the renewal page for that user" do
+          current_url.should == 'http://www.example.com/renew?for=123'
+          page.should have_xpath("//input[@value='#{@subscriber.firstname}' and @id='user_firstname']")
+        end
+
+        describe "and I submit without entering my payment details" do
+          before(:each) do
+            save_and_open_page
+            click_link_or_button "btnSubmit"
+            save_and_open_page
+          end
+
+          it "should show me the renewal page for the subscriber"
+          it "should display any errors"
+        end
+      end
+    end
+
+    describe "and I provide a for option but I am not an admin" do
+      before(:each) do
+        @offer = Factory.create(:offer)
+      end
+
+      it "should redirect me to the login page" do
+        visit "/renew?for=123"
+        current_url.should == 'http://www.example.com/login'
+      end
     end
 
     describe "and no offer is set" do
@@ -61,6 +111,10 @@ describe "Renewals", :type => :integration do
       end
 
       it "should raise an exception if there are no offers"
+
+      describe "and I provide my payment details" do
+        it "should update my subscription"
+      end
     end
   end
 

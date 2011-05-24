@@ -7,6 +7,7 @@ class SubscribeController < ApplicationController
 
   before_filter :load_subscription, :only => [ :thanks, :complete, :invoice ]
   before_filter :require_user, :only => [ :edit, :update ]
+  before_filter :load_user, :only => [ :edit, :update ]
 
   rescue_from(Exceptions::PaymentFailedException, Exceptions::GiftNotAvailable) do |exception|
     Rails.logger.info("Payment Failed")
@@ -69,7 +70,6 @@ class SubscribeController < ApplicationController
 
   def edit
     clear_session
-    @user = current_user
     @subscription = @user.subscriptions.find(:first, :conditions => { :publication_id => @offer.publication.id })
     @subscription ||= Subscription.new
     # Ensure we have a valid offer
@@ -80,9 +80,7 @@ class SubscribeController < ApplicationController
 
   def update
     @payment_option = params[:payment_option]
-    @user = current_user
     # See if we have an existing subscription
-    # TODO: Dry this up (see new)
     @subscription = @user.subscriptions.find(:first, :conditions => { :publication_id => @offer.publication.id })
 
     Subscription.transaction do
@@ -173,4 +171,18 @@ class SubscribeController < ApplicationController
     def load_subscription
       @subscription = Subscription.find(session[:subscription_id])
     end
+
+    def load_user
+      if current_user.admin?
+        if params[:for]
+          @user = User.find(params[:for])
+        else
+          redirect_to admin_subscriptions_path
+          return
+        end
+      else
+        @user = current_user
+      end
+    end
+
 end
