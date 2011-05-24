@@ -419,8 +419,7 @@ describe User do
       describe "for a user who doesn't exist in WP" do
         it "should call Wordpress with create" do
           @user.save!
-          Wordpress.expects(:send_later).with(
-            :create, {
+          Wordpress.expects(:create).with({
             :login       => @user.login,
             :firstname   => @user.firstname,
             :lastname    => @user.lastname,
@@ -436,8 +435,7 @@ describe User do
         it "should call Wordpress with update" do
           @user.save!
           Wordpress.stubs(:exists?).with(:login => @user.login).returns(true)
-          Wordpress.expects(:send_later).with(
-            :update, {
+          Wordpress.expects(:update).with({
             :login       => @user.login,
             :firstname   => @user.firstname,
             :lastname    => @user.lastname,
@@ -451,16 +449,17 @@ describe User do
 
     describe "and password is NOT accessible" do
       describe "for a user who doesn't exist in WP" do
-        it "should call Wordpress with create" do
+        it "should call Wordpress with create and a random password" do
           @user.save!
+          User.stubs(:random_password).returns('12345')
           @user = User.find(@user.id)
-          Wordpress.expects(:send_later).with(
-            :create, {
+          Wordpress.expects(:create).with({
             :login       => @user.login,
             :firstname   => @user.firstname,
             :lastname    => @user.lastname,
             :email       => @user.email,
-            :premium     => false
+            :premium     => false,
+            :pword       => '12345'
           })
           @user.sync_to_wordpress
         end
@@ -470,16 +469,16 @@ describe User do
     it "should set premium true if the user is premium" do
       @user.stubs(:premium?).returns(true)
       @user.save!
-      Wordpress.expects(:send_later).with(
-        :create, {
-        :login       => @user.login,
-        :firstname   => @user.firstname,
-        :lastname    => @user.lastname,
-        :email       => @user.email,
-        :pword       => @user.password,
-        :premium     => true
-      })
+      Wordpress.expects(:create).with(has_entry(:premium, true))
       @user.sync_to_wordpress(@user.password)
+    end
+  end
+
+  describe "deliver password reset instructions" do
+    it "should send me a password reset email" do
+      @user = Factory.create(:subscriber)
+      UserMailer.expects(:send_later).with(:deliver_password_reset_instructions, @user)
+      @user.deliver_password_reset_instructions!
     end
   end
 
@@ -493,7 +492,7 @@ describe User do
 
     it "should save a token to the user object" do
       success = stub(:success? => true)
-      GATEWAY.expects(:setup_recurrent).with(0, @card, @token).returns(success)
+      GATEWAY.expects(:setup_recurrent).with(1, @card, @token).returns(success)
       user = Factory.create(:user)
       user.store_credit_card_on_gateway(@card)
     end
@@ -506,7 +505,7 @@ describe User do
 
     it "should handle errors" do
       failure = stub(:success? => false, :message => "Test Failure")
-      GATEWAY.expects(:setup_recurrent).with(0, @card, "12345").returns(failure)
+      GATEWAY.expects(:setup_recurrent).with(1, @card, "12345").returns(failure)
       user = Factory.create(:user)
       lambda {
         user.store_credit_card_on_gateway(@card)

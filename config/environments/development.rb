@@ -26,6 +26,10 @@ config.after_initialize do
     :password => "q02nnn8h",
     :test => true
   )
+
+  # Mock Wordpress
+  require 'mocha'
+  Wordpress.stubs(:authenticate).returns(true)
 end
 
 CAMPAIGNMASTER_USERNAME = 'ddraper'

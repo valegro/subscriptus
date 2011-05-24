@@ -8,8 +8,11 @@ class PasswordResetsController < ApplicationController
 
   def create
     @user = User.find_by_email(params[:email])  
-    if @user  
-      @user.deliver_password_reset_instructions!  
+    if @user
+      @user.transaction do
+        @user.update_attributes!(:next_login_redirect => session[:return_to])
+        @user.deliver_password_reset_instructions!  
+      end
       flash[:notice] = "Instructions to reset your password have been emailed to you. Please check your email."  
       redirect_to login_url
     else  

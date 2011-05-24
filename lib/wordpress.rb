@@ -29,6 +29,7 @@ class Wordpress
   
   def self.update(opts={})
     check_required(opts, :login)
+    Rails.logger.warn("Update #{opts.inspect.reject { |key,v| key == :pword }}")
     opts[:premium] = false unless opts.has_key?(:premium)
     make_request_and_raise_error(opts.merge(:func => 'update'))
   end

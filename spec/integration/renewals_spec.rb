@@ -2,6 +2,10 @@ require 'spec_helper'
 
 describe "Renewals", :type => :integration do
   describe "when I visit the renewals page" do
+    describe "and I am an admin" do
+      it "I should be taken to the admin root"
+    end
+
     describe "and no offer is set" do
       before(:each) do
         @publication = Factory.create(:publication)

@@ -4,6 +4,8 @@
   <% end %>
 <% end %>
 
+<p>Please enter your e-mail address. You will receive an email with instructions to reset your password.</p>
+
 <% form_tag(password_resets_path) do %>
   <div id="field_user_session_login" class="field field-text " style="">
     <div class="field-label">
@@ -16,7 +18,7 @@
   <div id="field_user_session_submit" class="field field-submit " style="">
     <div class="field-label ">&nbsp;</div>
     <div class="field-inner">
-      <%= submit_tag "Send Reset Link" %>
+      <%= submit_tag "Send Reset Link", :id => "submit" %>
     </div>
   </div>
 <% end %>

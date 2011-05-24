@@ -7,6 +7,7 @@ describe Wordpress do
       Wordpress.enabled = false
     end
     
+=begin
     context "#exists" do
       it "should return false" do
         Wordpress.exists?(:login => 'joebloggs').should == false
@@ -33,6 +34,7 @@ describe Wordpress do
         Wordpress.update(:login => 'joebloggs', :firstname => 'Joe').should == 'joebloggs'
       end
     end    
+=end
   end
 
   context "When wordpress is enabled" do

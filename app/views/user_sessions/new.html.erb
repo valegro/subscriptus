@@ -32,10 +32,10 @@
   <div id="field_user_session_submit" class="field field-submit " style="">
     <div class="field-label "></div>
     <div class="field-inner">
-      <%= image_submit_tag "login.png" %>
+      <%= image_submit_tag "login.png", :id => "submit" %>
     </div>
     <div id="forgot_password_link">
-      <a href="http://www.crikey.com.au/wp-login.php?action=lostpassword">Forgot password?</a>
+      <a href="/password_resets/new">Forgot password?</a>
     </div>
   </div>
 <% end %>

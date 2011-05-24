@@ -6,7 +6,6 @@ class UserMailer < ActionMailer::Base
     from          NO_REPLY
     recipients    user.email  
     sent_on       Time.now
-    puts user.perishable_token
     body          :edit_password_reset_link => edit_password_reset_url(user.perishable_token)
   end
 end
