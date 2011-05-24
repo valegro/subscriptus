@@ -47,7 +47,6 @@ describe "Sessions", :type => :integration do
         end
 
         it "should take me to the admin console" do
-          page.should have_content("Subscriptus Administration")
           current_url.should == 'http://www.example.com/admin/subscriptions'
         end
       end
