@@ -1,11 +1,11 @@
 class SubscribeController < ApplicationController
   layout 'signup', :except => :invoice
+
+  before_filter :load_subscription
   before_filter :load_offer_and_publication,  :except => [ :thanks, :complete ]
   before_filter :load_source,                 :except => [ :thanks, :complete ]
   before_filter :load_gifts,                  :except => [ :thanks, :complete ]
   before_filter :load_tab,                    :except => [ :thanks, :complete ]
-
-  before_filter :load_subscription, :only => [ :thanks, :complete, :invoice ]
   before_filter :require_user, :only => [ :edit, :update ]
   before_filter :load_user, :only => [ :edit, :update ]
 
@@ -69,14 +69,11 @@ class SubscribeController < ApplicationController
   end
 
   def edit
+    puts "EDIT!     current_user = #{current_user.inspect}"
     clear_session
     @renewing = true
-    @subscription = @user.subscriptions.find(:first, :conditions => { :publication_id => @offer.publication.id })
+    @subscription ||= @user.subscriptions.find(:first, :conditions => { :publication_id => @offer.publication.id })
     @subscription ||= Subscription.new
-    puts "0000: offer_id = #{@offer.id}"
-    puts "AAA: looking for subscription with publication_id = #{@offer.publication.id}"
-    puts "User (role = #{@user.role}, id = #{@user.id} has subs: #{@user.subscriptions.inspect}"
-    puts "HERE : subscription = #{@subscription.inspect}"
 
     # Ensure we have a valid offer
     @user.email_confirmation = @user.email
@@ -136,6 +133,14 @@ class SubscribeController < ApplicationController
       })
     end
 
+    def load_subscription
+      if current_user && current_user.admin? && @for = params[:for]
+        @subscription = Subscription.find(params[:for])
+      elsif session[:subscription_id]
+        @subscription = Subscription.find(session[:subscription_id])
+      end
+    end
+
     def load_offer_and_publication
       @offer = if params[:offer_id]
         Offer.find(params[:offer_id])
@@ -143,11 +148,15 @@ class SubscribeController < ApplicationController
       @publication = if params[:publication_id]
         Publication.find(params[:publication_id])
       end
+      @publication = @subscription.publication if @subscription
+
       if !@offer && @publication
         @offer = (@publication.offers.default_for_renewal || @publication.offers.first)
+        puts "USING PUBLICATION OFFER #{@offer.id}"
       end
       if !@offer
         @offer = Offer.primary_offer
+        puts "****** USING DEFAULT OFFER #{@offer.id}"
       end
     end
 
@@ -181,14 +190,10 @@ class SubscribeController < ApplicationController
       session[:subscription_id] = nil
     end
 
-    def load_subscription
-      @subscription = Subscription.find(session[:subscription_id])
-    end
-
     def load_user
       if current_user.admin?
-        if (@for = params[:for]) && @offer
-          @user = User.find(params[:for])
+        if (@subscription)
+          @user = @subscription.user
           # We also need a list of the available offers if we are renewing for someone else
           @offers = Offer.for_publication(@offer.publication_id)
         else

@@ -22,16 +22,6 @@ describe "Renewals", :type => :integration do
         @subscriber.subscriptions << @subscription
         SubscribeController.any_instance.stubs(:current_user).returns(@user)
         Admin::SubscriptionsController.any_instance.stubs(:current_user).returns(@user)
-        puts "\nFACTORY START"
-        p @publication
-        puts
-        p @offer
-        puts
-        p @subscription
-        puts
-        puts "Total offers in DB: #{Offer.count}"
-        puts "Total publications in DB: #{Publication.count}"
-        puts "FACTORY END\n"
       end
 
       it "I should be taken to the admin root" do
@@ -41,23 +31,21 @@ describe "Renewals", :type => :integration do
 
       describe "and I provide a renewal_for parameter" do
         before(:each) do
-          visit "/renew?for=#{@subscriber.id}"
+          visit "/renew?for=#{@subscription.id}"
         end
 
         it "should show me the renewal page for that user" do
-          current_url.should == "http://www.example.com/renew?for=#{@subscriber.id}"
+          current_url.should == "http://www.example.com/renew?for=#{@subscription.id}"
           page.should have_xpath("//input[@value='#{@subscriber.firstname}' and @id='user_firstname']")
         end
 
         describe "and I submit without entering my payment details" do
           before(:each) do
-            save_and_open_page
             click_link_or_button "btnSubmit"
-            save_and_open_page
           end
 
           it "should show me the renewal page for the subscriber" do
-            current_url.should == "http://www.example.com/renew?for=#{@subscriber.id}&offer_id=#{@offer.id}&tab=subscriptions"
+            current_url.should == "http://www.example.com/renew?for=#{@subscription.id}&offer_id=#{@offer.id}&tab=subscriptions"
           end
 
           it "should display any errors" do
@@ -84,14 +72,17 @@ describe "Renewals", :type => :integration do
       end
     end
 
-=begin
     describe "and I provide a for option but I am not an admin" do
       before(:each) do
+        SubscribeController.any_instance.stubs(:current_user).returns(nil)
+        Admin::SubscriptionsController.any_instance.stubs(:current_user).returns(nil)
         @offer = Factory.create(:offer)
       end
 
       it "should redirect me to the login page" do
+        puts "\n\nnBBBBBBBBB"
         visit "/renew?for=123"
+        save_and_open_page
         current_url.should == 'http://www.example.com/login'
       end
     end
@@ -142,12 +133,12 @@ describe "Renewals", :type => :integration do
         end
       end
 
-      it "should use the first offer available if none is provided" do
-        @user = Factory.create(:subscriber)
-        @subscription = Factory.create(:active_subscription, :user => @user, :publication => @publication)
-        SubscribeController.any_instance.stubs(:current_user).returns(@user)
-        visit "/renew"
-        page.should have_content("1 month")
+      describe "if the user has just one subscription" do
+        it "should use the first offer available for the publication that matches the users subscription"
+      end
+
+      describe "if the user has more than one subscription" do
+        it "should let them choose which subscription to renew"
       end
 
       it "should raise an exception if there are no offers"
@@ -156,6 +147,9 @@ describe "Renewals", :type => :integration do
         it "should update my subscription"
       end
     end
-=end
+
+    describe "and I provide an offer" do
+      it "should suggest subscribing if the user has no subscriptions with the publication from the provided offer"
+    end
   end
 end

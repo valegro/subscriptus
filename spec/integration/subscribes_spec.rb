@@ -139,6 +139,7 @@ describe "Subscribes" do
 
     it "should show the subscriptions tab if an unknown tab name is given" do
       visit new_subscribe_path(:source_id => @source.id, :offer_id => @offer.id, :tab => 'kjregherkjghre')
+      save_and_open_page
       page.should have_xpath("//li[@class='active' and @id='subscriptions-tab']")
     end
   end
