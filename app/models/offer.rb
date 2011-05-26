@@ -14,6 +14,9 @@ class Offer < ActiveRecord::Base
   validates_presence_of :name, :publication
   validates_uniqueness_of :name
 
+  named_scope :for_publication, lambda { |publication_id| { :conditions => { :publication_id => publication_id } } }
+  default_scope :order => "name"
+
   def available_included_gifts
     result = gifts.in_stock.included
     # include the optional gift if there is only one!

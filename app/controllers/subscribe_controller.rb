@@ -70,25 +70,38 @@ class SubscribeController < ApplicationController
 
   def edit
     clear_session
+    @renewing = true
     @subscription = @user.subscriptions.find(:first, :conditions => { :publication_id => @offer.publication.id })
     @subscription ||= Subscription.new
+    puts "0000: offer_id = #{@offer.id}"
+    puts "AAA: looking for subscription with publication_id = #{@offer.publication.id}"
+    puts "User (role = #{@user.role}, id = #{@user.id} has subs: #{@user.subscriptions.inspect}"
+    puts "HERE : subscription = #{@subscription.inspect}"
+
     # Ensure we have a valid offer
     @user.email_confirmation = @user.email
-    @renewing = true
     render :template => 'subscribe/new'
   end
 
   def update
+    puts "UPDATE"
+    @renewing = true
     @payment_option = params[:payment_option]
     # See if we have an existing subscription
     @subscription = @user.subscriptions.find(:first, :conditions => { :publication_id => @offer.publication.id })
+
 
     Subscription.transaction do
       @user.update_attributes!(params[:user])
       @factory = get_factory
       @subscription = @subscription.blank? ? @factory.build : @factory.update(@subscription)
-      store_subscription_in_session
-      redirect_to thanks_path
+      if @for
+        flash[:notice] = "Successfully renewed subscription"
+        redirect_to admin_subscription_path(@subscription)
+      else
+        store_subscription_in_session
+        redirect_to thanks_path
+      end
     end
   end
 
@@ -174,8 +187,10 @@ class SubscribeController < ApplicationController
 
     def load_user
       if current_user.admin?
-        if params[:for]
+        if (@for = params[:for]) && @offer
           @user = User.find(params[:for])
+          # We also need a list of the available offers if we are renewing for someone else
+          @offers = Offer.for_publication(@offer.publication_id)
         else
           redirect_to admin_subscriptions_path
           return

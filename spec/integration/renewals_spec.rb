@@ -9,12 +9,29 @@ describe "Renewals", :type => :integration do
     describe "and I am an admin" do
       before(:each) do
         @publication = Factory.create(:publication)
-        @offer = Factory.create(:offer, :publication => @publication)
+        @offer = Offer.new(Factory.attributes_for(:offer))
+        @offer.publication = @publication
+        @offer.save!
+        @offer.offer_terms.create(Factory.attributes_for(:offer_term))
         @user = Factory.create(:admin, :firstname => 'Daniel')
-        @subscriber = Factory.create(:subscriber, :id => 123)
-        @subscription = Factory.create(:active_subscription, :user => @subscriber, :publication => @publication)
+        @subscriber = Factory.create(:subscriber)
+        @subscription = Factory.build(:active_subscription)
+        @subscription.publication = @publication
+        @subscription.user = @subscriber
+        @subscription.save!
+        @subscriber.subscriptions << @subscription
         SubscribeController.any_instance.stubs(:current_user).returns(@user)
         Admin::SubscriptionsController.any_instance.stubs(:current_user).returns(@user)
+        puts "\nFACTORY START"
+        p @publication
+        puts
+        p @offer
+        puts
+        p @subscription
+        puts
+        puts "Total offers in DB: #{Offer.count}"
+        puts "Total publications in DB: #{Publication.count}"
+        puts "FACTORY END\n"
       end
 
       it "I should be taken to the admin root" do
@@ -24,11 +41,11 @@ describe "Renewals", :type => :integration do
 
       describe "and I provide a renewal_for parameter" do
         before(:each) do
-          visit "/renew?for=123"
+          visit "/renew?for=#{@subscriber.id}"
         end
 
         it "should show me the renewal page for that user" do
-          current_url.should == 'http://www.example.com/renew?for=123'
+          current_url.should == "http://www.example.com/renew?for=#{@subscriber.id}"
           page.should have_xpath("//input[@value='#{@subscriber.firstname}' and @id='user_firstname']")
         end
 
@@ -39,12 +56,35 @@ describe "Renewals", :type => :integration do
             save_and_open_page
           end
 
-          it "should show me the renewal page for the subscriber"
-          it "should display any errors"
+          it "should show me the renewal page for the subscriber" do
+            current_url.should == "http://www.example.com/renew?for=#{@subscriber.id}&offer_id=#{@offer.id}&tab=subscriptions"
+          end
+
+          it "should display any errors" do
+            page.should have_content("Card number can't be blank")
+            page.should have_content("First name on the credit card needs to be provided")
+            page.should have_content("Last name on the credit card needs to be provided")
+            page.should have_content("Credit Card is not valid - check the details and try again")
+          end
+
+          describe "and on the second attempt I enter all the required information" do
+            before(:each) do
+              GATEWAY.expects(:purchase).returns(stub(:success? => true, :params => { 'ponum' => '12345' }))
+              fill_in "Name on Card",          :with => "Daniel Draper"
+              fill_in "Card number",           :with => "4444333322221111"
+              fill_in "Card Verification (CVV Number)", :with => "123"
+              click_link_or_button "btnSubmit"
+            end
+
+            it "should take me back to the admin page for the subscription" do
+              current_url.should == "http://www.example.com/admin/subscriptions/#{@subscriber.subscriptions.last.id}"
+            end
+          end
         end
       end
     end
 
+=begin
     describe "and I provide a for option but I am not an admin" do
       before(:each) do
         @offer = Factory.create(:offer)
@@ -116,98 +156,6 @@ describe "Renewals", :type => :integration do
         it "should update my subscription"
       end
     end
-  end
-
-  # TODO: Test not showing the weekender tickbox if we already have the weekender
-=begin
-  describe "I visit the renewal page" do
-
-    context "#I am not logged in" do
-      it "should prompt me to login"
-    end
-
-    context "#I am logged in" do
-      before(:each) do
-        SubscribeController.any_instance.stubs(:current_user).with(@user)
-      end
-
-      it "should display the renewals page" do
-        visit "/renew"
-        page.should have_content("Renew your Subscription")
-      end
-
-      describe "and I do not modify my details" do
-        visit "/renew"
-        it "should NOT create a new subscription" do
-          expect {
-            click_link_or_button "btnSubmit"
-          }.to_not change { Subscription.count }
-        end
-
-        it "should extend and activate my subscription"
-        it "should display the thanks page"
-      end
-
-      describe "and I change some of my personal details" do
-        before(:each) do
-          fill_in "First Name", :with => "Sam"
-        end
-
-      end
-    end
-  end
-      
-  it "should create a subscription if a user has no subscriptions but tries to renew"
 =end
-
-  # TODO: Test if auth succeeds but there is no subscriptus user to match
-end
-__END__
-  describe "when I visit the renewals page" do
-    before(:each) do
-        visit "/renew"
-    end
-    it "should be foo" do
-    end
-
-    describe "and no offer is set" do
-      before(:each) do
-        @publication = Factory.create(:publication)
-        @publication_with_default_set = Factory.create(:publication)
-        @offera = Factory.create(:offer, :publication => @publication)
-        @offerb = Factory.create(:offer, :publication => @publication)
-        @offerc = Factory.create(:offer, :publication => @publication_with_default_set)
-        @offerd = Factory.create(:offer, :publication => @publication_with_default_set)
-
-        @terma = Factory.create(:offer_term, :price => 100, :months => 1)
-        @termb = Factory.create(:offer_term, :price => 200, :months => 2)
-        @termc = Factory.create(:offer_term, :price => 100, :months => 3)
-        @termd = Factory.create(:offer_term, :price => 200, :months => 4)
-        @offera.offer_terms << @terma
-        @offerb.offer_terms << @termb
-        @offerc.offer_terms << @termc
-        @offerd.offer_terms << @termd
-
-        @publication.reload
-        @publication_with_default_set.reload
-
-        @publication.offers.size.should == 2
-        @publication_with_default_set.offers.size.should == 2
-
-        @publication_with_default_set.offers.default_for_renewal = @offerd
-        stub_wordpress
-      end
-
-      it "should use the publication's default for renewal if one is set" do
-        @user = Factory.create(:subscriber)
-        @subscription = Factory.create(:active_subscription, :user => @user, :publication => @publication_with_default_set)
-        SubscribeController.any_instance.stubs(:current_user).returns(@user)
-
-        #visit "/renew"
-        #page.should have_content("4 months")
-      end
-
-    end
   end
-   
 end
