@@ -353,6 +353,14 @@ describe User do
       }.should raise_exception(ActiveRecord::RecordInvalid)
     end
 
+    it "should not allow us to change our login UNLESS it was blank" do
+      puts "\n\nAAAA"
+      @user = Factory.create(:user, :login => 'nil')
+      lambda {
+        @user.save!
+      }.should_not raise_exception(ActiveRecord::RecordInvalid)
+    end
+
     describe "Wordpress" do
       it "should update Wordpress if role is subscriber and email or name changes" do
         @user.email = 'another@example.com'
