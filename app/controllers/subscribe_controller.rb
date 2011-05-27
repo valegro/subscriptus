@@ -49,7 +49,7 @@ class SubscribeController < ApplicationController
         @subscription = @user.subscriptions.first(
           :conditions => { :publication_id => @offer.publication.id }
         )
-        if !@subscription.trial? && !@subscription.squatter?
+        if @subscription && !@subscription.trial? && !@subscription.squatter?
           redirect_to new_renew_path(:offer_id => @offer, :source_id => @source)
           return
         end
