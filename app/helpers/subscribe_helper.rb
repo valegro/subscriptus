@@ -17,7 +17,7 @@ module SubscribeHelper
   end
 
   def tab_path(tab)
-    url_for(:tab => tab, :offer_id => @offer.try(:id), :source_id => @source.try(:id))
+    url_for(:tab => tab, :offer_id => @offer.try(:id), :source_id => @source.try(:id), :for => @for)
   end
   
   def error_messages(errors)

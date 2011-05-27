@@ -497,8 +497,8 @@ describe User do
       user.store_credit_card_on_gateway(@card)
     end
 
-    it "should not make a call to setup_recurring if there is already a token stored" do
-      GATEWAY.expects(:setup_recurrent).never
+    it "should still make a call to setup_recurring if there is already a token stored" do
+      GATEWAY.expects(:setup_recurrent).returns(stub(:success? => true))
       user = Factory.create(:user_with_token)
       user.store_credit_card_on_gateway(@card)
     end
@@ -511,6 +511,15 @@ describe User do
         user.store_credit_card_on_gateway(@card)
       }.should raise_exception(Exceptions::CannotStoreCard)
       user.payment_gateway_token.should be(nil)
+    end
+
+    it "should raise an exception if I provide a dodgy card" do
+      @card.number = 'kjwefgwekjqfhw'
+      GATEWAY.expects(:setup_recurrent).never
+      user = Factory.create(:user)
+      lambda {
+        user.store_credit_card_on_gateway(@card)
+      }.should raise_exception(Exceptions::CannotStoreCard)
     end
   end
 end

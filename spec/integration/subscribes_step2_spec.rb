@@ -114,7 +114,6 @@ describe "Subscribes", "step 2" do
       it "should display the payment amount and order number" do
         subscription = Subscription.last
         page.should have_content(subscription.reference)
-        save_and_open_page
         page.should have_content("$#{subscription.actions.last.payment.amount}")
       end
     end

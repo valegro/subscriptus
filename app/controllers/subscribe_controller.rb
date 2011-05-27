@@ -1,15 +1,16 @@
 class SubscribeController < ApplicationController
   layout 'signup', :except => :invoice
 
-  before_filter :load_subscription
-  before_filter :load_offer_and_publication,  :except => [ :thanks, :complete ]
-  before_filter :load_source,                 :except => [ :thanks, :complete ]
-  before_filter :load_gifts,                  :except => [ :thanks, :complete ]
-  before_filter :load_tab,                    :except => [ :thanks, :complete ]
-  before_filter :require_user, :only => [ :edit, :update ]
-  before_filter :load_user, :only => [ :edit, :update ]
+  before_filter :load_subscription_from_session,    :only   => [ :thanks, :invoice, :complete ]
+  before_filter :load_subscription_from_for,        :only   => [ :edit, :update ]
+  before_filter :load_offer_and_publication,        :except => [ :thanks, :complete ]
+  before_filter :load_source,                       :except => [ :thanks, :complete ]
+  before_filter :load_gifts,                        :except => [ :thanks, :complete ]
+  before_filter :load_tab,                          :except => [ :thanks, :complete ]
+  before_filter :require_user,                      :only => [ :edit, :update ]
+  before_filter :load_user,                         :only => [ :edit, :update ]
 
-  rescue_from(Exceptions::PaymentFailedException, Exceptions::GiftNotAvailable) do |exception|
+  rescue_from(Exceptions::PaymentFailedException, Exceptions::GiftNotAvailable, Exceptions::CannotStoreCard) do |exception|
     Rails.logger.info("Payment Failed")
     @subscription ||= @factory.try(:subscription) # Ensure that the subscription instance is set
     flash[:error] = exception.message
@@ -69,7 +70,6 @@ class SubscribeController < ApplicationController
   end
 
   def edit
-    puts "EDIT!     current_user = #{current_user.inspect}"
     clear_session
     @renewing = true
     @subscription ||= @user.subscriptions.find(:first, :conditions => { :publication_id => @offer.publication.id })
@@ -81,7 +81,6 @@ class SubscribeController < ApplicationController
   end
 
   def update
-    puts "UPDATE"
     @renewing = true
     @payment_option = params[:payment_option]
     # See if we have an existing subscription
@@ -133,11 +132,15 @@ class SubscribeController < ApplicationController
       })
     end
 
-    def load_subscription
+    def load_subscription_from_session
+      if session[:subscription_id]
+        @subscription = Subscription.find(session[:subscription_id])
+      end
+    end
+
+    def load_subscription_from_for
       if current_user && current_user.admin? && @for = params[:for]
         @subscription = Subscription.find(params[:for])
-      elsif session[:subscription_id]
-        @subscription = Subscription.find(session[:subscription_id])
       end
     end
 
@@ -152,11 +155,9 @@ class SubscribeController < ApplicationController
 
       if !@offer && @publication
         @offer = (@publication.offers.default_for_renewal || @publication.offers.first)
-        puts "USING PUBLICATION OFFER #{@offer.id}"
       end
       if !@offer
         @offer = Offer.primary_offer
-        puts "****** USING DEFAULT OFFER #{@offer.id}"
       end
     end
 

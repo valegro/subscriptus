@@ -200,17 +200,18 @@ class User < ActiveRecord::Base
   end
   
   def store_credit_card_on_gateway(credit_card)
-    if self.payment_gateway_token.blank?
-      # TODO: user module ActiveMerchant::module Utils
-      token = Utilities.generate_unique_token(self.id, 10)
-      # The amount is 1 cent to keep SecurePay happy but nothing is charged at this point
-      response = GATEWAY.setup_recurrent(1, credit_card, token)
-      unless response.success?
-        raise Exceptions::CannotStoreCard.new(response.message)
-      end
-      update_attributes!(:payment_gateway_token => token)
-      save!
+    unless credit_card.valid?
+      raise Exceptions::CannotStoreCard.new(credit_card.errors.full_messages.join(",&nbsp;"))
     end
+    # TODO: user module ActiveMerchant::module Utils
+    token = Utilities.generate_unique_token(self.id, 10)
+    # The amount is 1 cent to keep SecurePay happy but nothing is charged at this point
+    response = GATEWAY.setup_recurrent(1, credit_card, token)
+    unless response.success?
+      raise Exceptions::CannotStoreCard.new(response.message)
+    end
+    update_attributes!(:payment_gateway_token => token)
+    save!
   end
 
   def valid_password?(password)

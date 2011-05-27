@@ -34,11 +34,7 @@ class Payment < ActiveRecord::Base
   end
 
   before_validation do |payment|
-    unless payment.full_name.blank?
-      toks = payment.full_name.split(/\s+/)
-      payment.first_name = toks[0]
-      payment.last_name = toks[1..-1].join(" ")
-    end
+    payment.split_name
   end
 
   # Process and save the payment
@@ -91,6 +87,14 @@ class Payment < ActiveRecord::Base
   def description
     returning str = [ number_to_currency(amount), payment_type.to_s.humanize ].join(" by ") do
       str << " (Ref: #{reference})" if reference
+    end
+  end
+
+  def split_name
+    unless self.full_name.blank?
+      toks = self.full_name.split(/\s+/)
+      self.first_name = toks[0]
+      self.last_name = toks[1..-1].join(" ")
     end
   end
 end

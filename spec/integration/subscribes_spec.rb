@@ -139,7 +139,6 @@ describe "Subscribes" do
 
     it "should show the subscriptions tab if an unknown tab name is given" do
       visit new_subscribe_path(:source_id => @source.id, :offer_id => @offer.id, :tab => 'kjregherkjghre')
-      save_and_open_page
       page.should have_xpath("//li[@class='active' and @id='subscriptions-tab']")
     end
   end
@@ -222,6 +221,12 @@ describe "Subscribes" do
         page.should have_xpath("//li[@id='students-tab' and @class='active']")
         page.should have_content("Are you a full-time student? Crikey offers a 30% discount on the normal subscription rate for students.")
       end
+    end
+
+    describe "and I fill in all the data correctly by my Credit Card will decline" do
+      it "should take me back to the form"
+      it "should show me any error messages"
+      it "should be on the students tab"
     end
   end
 
@@ -491,7 +496,6 @@ describe "Subscribes" do
 
         describe "and I fill in the remaining data and resubmit" do
           before(:each) do
-            save_and_open_page
             fill_in "Email",                 :with => "daniel@codefire.com.au"
             fill_in "Email confirmation",    :with => "daniel@codefire.com.au"
             fill_in "Street Address Line 1", :with => "1 That Pl"
@@ -505,13 +509,10 @@ describe "Subscribes" do
 
           it "should display the thanks page" do
             click_link_or_button "btnSubmit"
-            save_and_open_page
             page.should have_content("Thanks for subscribing to Crikey! We hope you enjoy it.")
           end
         end
       end
-
-
     end
   end
 
@@ -535,9 +536,9 @@ describe "Subscribes" do
     end
 
     it "should just use the first offer found if there is no primary offer" do
-      @offer1 = Factory.create(:offer)
+      @offer1 = Factory.create(:offer, :name => "ABC")
       @offer1.offer_terms << Factory.create(:offer_term, :months => 1)
-      @offer2 = Factory.create(:offer)
+      @offer2 = Factory.create(:offer, :name => "BAC")
       @offer2.offer_terms << Factory.create(:offer_term, :months => 2)
       @offer1.offer_terms.size.should == 1
 

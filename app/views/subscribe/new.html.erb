@@ -32,9 +32,9 @@
   </script>
 <% end %>
 
-<% if false &&  @for && current_user.admin? %>
+<% if @for && current_user.admin? %>
   <p id="admin-renew">
-    Renewing subscription to <% #link_to(@subscription.publication.try(:name), admin_catalogue_publication_path(@subscription.publication)) %> for <%= link_to(@user.name, admin_subscriber_path(@user)) %><br/>
+    Renewing subscription to <%= link_to(@subscription.publication.try(:name), admin_catalogue_publication_path(@subscription.publication)) %> for <%= link_to(@user.name, admin_subscriber_path(@user)) %><br/>
     Offer: <%= select_tag('select_offer_id', options_for_select(@offers.map { |o| [ o.name, o.id ] }, @offer.id)) %>
   </p>
   <hr/>

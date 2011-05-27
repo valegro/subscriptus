@@ -316,9 +316,38 @@ describe SubscriptionFactory do
       )
     end
 
-    it "should not store the payment details on the gateway if the user already has a valid token" do
-      GATEWAY.expects(:setup_recurrent).never
+    it "should raise if the payment details are provided incorrectly" do
+      @user = Factory.create(:subscriber)
+      lambda {
+        @subscription = SubscriptionFactory.build(
+          @offer,
+          :term_id => @concession_term,
+          :attributes => { :user => @user },
+          :concession => :student,
+          :payment_attributes => { 'card_number' => '2342342' }
+        )
+      }.should raise_exception(Exceptions::CannotStoreCard)
+    end
+
+    it "should raise if the Gateway declines" do
+      failure = stub(:success? => false, :message => "Test Failure")
+      GATEWAY.stubs(:setup_recurrent).returns(failure)
+      @user = Factory.create(:subscriber)
+      lambda {
+        @subscription = SubscriptionFactory.build(
+          @offer,
+          :term_id => @concession_term,
+          :attributes => { :user => @user },
+          :concession => :student,
+          :payment_attributes => @payment_attributes
+        )
+      }.should raise_exception(Exceptions::CannotStoreCard)
+    end
+
+
+    it "should STILL store the payment details on the gateway if the user already has a valid token" do
       @user = Factory.create(:user_with_token)
+      @user.expects(:store_credit_card_on_gateway)
       @subscription = SubscriptionFactory.build(
         @offer,
         :term_id => @concession_term,

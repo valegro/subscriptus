@@ -12,7 +12,8 @@ describe "Renewals", :type => :integration do
         @offer = Offer.new(Factory.attributes_for(:offer))
         @offer.publication = @publication
         @offer.save!
-        @offer.offer_terms.create(Factory.attributes_for(:offer_term))
+        @offer.offer_terms.create(Factory.attributes_for(:offer_term, :months => 1))
+        @offer.offer_terms.create(Factory.attributes_for(:offer_term, :concession => true, :months => 3))
         @user = Factory.create(:admin, :firstname => 'Daniel')
         @subscriber = Factory.create(:subscriber)
         @subscription = Factory.build(:active_subscription)
@@ -37,6 +38,16 @@ describe "Renewals", :type => :integration do
         it "should show me the renewal page for that user" do
           current_url.should == "http://www.example.com/renew?for=#{@subscription.id}"
           page.should have_xpath("//input[@value='#{@subscriber.firstname}' and @id='user_firstname']")
+        end
+
+        describe "and I click the students tab" do
+          before(:each) do
+            click_link_or_button "STUDENTS"
+          end
+
+          it "should show me the concession options" do
+            page.should have_content("3 months")
+          end
         end
 
         describe "and I submit without entering my payment details" do
@@ -80,9 +91,7 @@ describe "Renewals", :type => :integration do
       end
 
       it "should redirect me to the login page" do
-        puts "\n\nnBBBBBBBBB"
         visit "/renew?for=123"
-        save_and_open_page
         current_url.should == 'http://www.example.com/login'
       end
     end
@@ -91,8 +100,8 @@ describe "Renewals", :type => :integration do
       before(:each) do
         @publication = Factory.create(:publication)
         @publication_with_default_set = Factory.create(:publication)
-        @offera = Factory.create(:offer, :publication => @publication)
-        @offerb = Factory.create(:offer, :publication => @publication)
+        @offera = Factory.create(:offer, :name => "ABC", :publication => @publication)
+        @offerb = Factory.create(:offer, :name => "DEF", :publication => @publication)
         @offerc = Factory.create(:offer, :publication => @publication_with_default_set)
         @offerd = Factory.create(:offer, :publication => @publication_with_default_set)
 
@@ -128,6 +137,7 @@ describe "Renewals", :type => :integration do
           @user = Factory.create(:subscriber)
           @subscription = Factory.create(:active_subscription, :user => @user, :publication => @publication)
           SubscribeController.any_instance.stubs(:current_user).returns(@user)
+          puts "Publication = #{@publication.inspect}"
           visit "/renew?publication_id=#{@publication.id}"
           page.should have_content("1 month")
         end
