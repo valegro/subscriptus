@@ -29,6 +29,7 @@ class Subscription < ActiveRecord::Base
   named_scope :descend_by_name, :include => 'user', :order => "users.lastname DESC, users.firstname DESC"
   named_scope :recent, :order => "updated_at desc"
   named_scope :expired, lambda { { :conditions => [ "expires_at < ?", Time.now ] } }
+  named_scope :not_unsubscribed, :conditions => "state != 'unsubscribed'"
 
   validates_presence_of :publication, :state
   validates_acceptance_of :terms
@@ -50,15 +51,21 @@ class Subscription < ActiveRecord::Base
   # Subscription States
   # TODO: Do something with unsubscribed
   has_states :trial, :squatter, :active, :suspended, :pending, :renewal_due, :payment_failed, :unsubscribed, :init => :trial do
+    on :new_trial do
+      transition :squatter => :trial
+      transition :unsubscribed => :trial
+    end
     on :activate do
       transition :active => :active # when the subscriber extends their subscription while its still active
       transition :trial => :active
       transition :squatter => :active
+      transition :unsubscribed => :active
     end
     on :postpone do
       transition :trial => :pending
       transition :squatter => :pending
       transition :active => :pending # Renewal but goes into pending state
+      transition :unsubscribed => :pending
     end
     on :verify do
       transition :pending => :active
@@ -91,6 +98,7 @@ class Subscription < ActiveRecord::Base
     on :unsubscribe do
       transition :trial => :unsubscribed
       transition :squatter => :unsubscribed
+      transition :active => :unsubscribed
       transition :suspended => :unsubscribed
       transition :pending => :unsubscribed
     end

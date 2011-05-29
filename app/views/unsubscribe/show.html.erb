@@ -1,0 +1,26 @@
+<div class='section' id="unsubscribe">
+  <h2>Unsubscribe</h2>
+  <p>Unsubscribe from Crikey and we won't send you any more emails &mdash; check the boxes to the publications you do NOT wish to receive any more.</p>
+  <% unless flash[:error].blank? %>
+    <div id="flash"><%= flash[:error] %></div>
+  <% end %>
+  <p><em>Unsubscribe me from:</em></p>
+  <% form_tag unsubscribe_path do %>
+    <%= hidden_field_tag :user_id, @user.id %>
+    <ul>
+      <% @subscriptions.each do |sub| %>
+        <li>
+          <%= check_box_tag "subscriptions[]", sub.id, true, :id => "subscription_#{sub.id}" %>
+          <%= label_tag "subscription_#{sub.id}", sub.publication.name %> 
+        </li>
+      <% end %>
+      <% if @subscriptions.empty? %>
+        <span>You have no subscriptions</span>
+      <% end %>
+    </ul>
+    <!-- TODO: Use email address to verify the user -->
+    <% #label_tag "email_address", "Your email address:" %>
+    <% #text_field_tag "email", '', :id => "email_address" %>
+    <%= submit_tag "Unsubscribe" %>
+  <% end %>
+</div>

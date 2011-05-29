@@ -60,7 +60,7 @@ ActionController::Routing::Routes.draw do |map|
   end
 
   # Unsubscribe
-  map.resource :unsubscribe
+  map.resource :unsubscribe, :controller => 'unsubscribe'
 
   # Webhooks
   map.namespace :webhooks do |webhooks|
