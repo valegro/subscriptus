@@ -5,7 +5,7 @@ class Subscription::MailerObserver < ActiveRecord::Observer
   observe :subscription
   observe_state :state
 
-  on(:suspended, :active) do |subscription|
+  on(:suspended, :active, :when => :before) do |subscription|
     SubscriptionMailer.send_later(:deliver_unsuspended, subscription)
   end
 
