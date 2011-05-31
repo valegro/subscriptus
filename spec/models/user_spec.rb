@@ -41,6 +41,27 @@ describe User do
     end
   end
 
+  describe "find_or_create_with_trial" do
+    describe "an existing user" do
+      before(:each) do
+        @user = Factory.create(:subscriber, :email => 'guy@example.com')
+        @publication = Factory.create(:publication)
+      end
+
+      it "should add a publication to that user" do
+        expect {
+          User.find_or_create_with_trial(@publication, 10, 'referrer', { :first_name => 'Daniel', :last_name => 'Draper', :email => 'guy@example.com' })
+        }.to change { @user.subscriptions(true).size }.by(1)
+      end
+
+      it "should reset the user's password" do
+        User.stubs(:random_password).returns('password')
+        Subscription.any_instance.expects(:temp_password=).with('password')
+        User.find_or_create_with_trial(@publication, 10, 'referrer', { :first_name => 'Daniel', :last_name => 'Draper', :email => 'guy@example.com' })
+      end
+    end
+  end
+
   describe "webhook" do
     before(:each) do
       @publication = Factory.create(:publication)

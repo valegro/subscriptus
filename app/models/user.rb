@@ -76,6 +76,12 @@ class User < ActiveRecord::Base
     user_attributes.symbolize_keys!
     user = self.find_by_email(user_attributes[:email].to_s)
     user ||= self.create_trial_user(user_attributes)
+    # Reset the password
+    if user.password.blank?
+      user.password = random_password
+      user.password_confirmation = user.password
+      user.save!
+    end
     # Weekender & Solus options
     solus = user_attributes.fetch(:options, {})[:solus]
     #solus = !user_attributes.fetch(:options, []).select { |s| /advertisers/i === s }.empty?

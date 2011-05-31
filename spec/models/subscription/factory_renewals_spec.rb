@@ -204,6 +204,7 @@ describe SubscriptionFactory, "renewals" do
   # Scenario
   describe "pending subscribed subscribes again and will require verification" do
     before(:each) do
+      User.any_instance.expects(:store_credit_card_on_gateway).returns(true)
       @subscription = Factory.create(:pending_subscription, :user => Factory.create(:user_with_token))
     end
 

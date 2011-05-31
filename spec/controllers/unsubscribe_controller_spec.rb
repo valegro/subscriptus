@@ -36,4 +36,4 @@ describe UnsubscribeController do
     end
   end
 
- end
+end
