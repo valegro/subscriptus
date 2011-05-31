@@ -35,44 +35,48 @@
 
 <h2>Results</h2>
 
-<%= render_table @results, :name => 'search_results' do |t|
-    t.header :reference do
-      order @search, :by => :id, :as => 'Reference'
-    end
-    
-    t.header :name do
-      order @search, :by => :name
-    end
-    t.header :email do
-      order @search, :by => :user_email, :as => 'Email'
-    end
-    t.header :publication do
-      order @search, :by => :publication_id
-    end
-    t.header :state, :renewal_due, :signed_up, :actions
-    t.rows do |row, result, index|
-      row.reference    link_to(result.reference, admin_subscription_path(result))
-      if result.user
-        row.name         link_to(result.user.try(:fullname) || 'No name', admin_subscriber_path(result.user))
-      else
-        row.name       'User does not exist'
+<% unless @results.blank? %>
+  <%= render_table @results, :name => 'search_results' do |t|
+      t.header :reference do
+        order @search, :by => :id, :as => 'Reference'
       end
-      row.email        result.user.try(:email)
-      row.publication  result.publication ? link_to(result.publication.try(:name), admin_catalogue_publication_url(result.publication)) : '-'
-      row.state        result.state
-      row.renewal_due  format_timestamp(result.expires_at)
-      row.signed_up    format_timestamp(result.created_at)
-      row.actions do
-        case 
-        when result.active?  && result.expires_at
-          link_to_remote 'Suspend', :url => suspend_admin_subscription_path(result), :method => :get
-        when result.suspended?
-          link_to 'Unsuspend', unsuspend_admin_subscription_path(result), :method => :post
+      
+      t.header :name do
+        order @search, :by => :name
+      end
+      t.header :email do
+        order @search, :by => :user_email, :as => 'Email'
+      end
+      t.header :publication do
+        order @search, :by => :publication_id
+      end
+      t.header :state, :renewal_due, :signed_up, :actions
+      t.rows do |row, result, index|
+        row.reference    link_to(result.reference, admin_subscription_path(result))
+        if result.user
+          row.name         link_to(result.user.try(:fullname) || 'No name', admin_subscriber_path(result.user))
+        else
+          row.name       'User does not exist'
+        end
+        row.email        result.user.try(:email)
+        row.publication  result.publication ? link_to(result.publication.try(:name), admin_catalogue_publication_url(result.publication)) : '-'
+        row.state        result.state
+        row.renewal_due  format_timestamp(result.expires_at)
+        row.signed_up    format_timestamp(result.created_at)
+        row.actions do
+          case 
+          when result.active?  && result.expires_at
+            link_to_remote 'Suspend', :url => suspend_admin_subscription_path(result), :method => :get
+          when result.suspended?
+            link_to 'Unsuspend', unsuspend_admin_subscription_path(result), :method => :post
+          end
         end
       end
     end
-  end
-%>  
+  %>
+<% else %>
+  <span>No results to display</span>
+<% end %>
 
 <script type="text/javascript"><!--
   $(document).ready( function() {
