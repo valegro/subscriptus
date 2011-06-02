@@ -13,7 +13,7 @@ class UserObserver < ActiveRecord::Observer
       if user.changes.keys.any? { |column| User::MAIL_SYSTEM_SYNC_COLUMNS.include?(column.to_s) }
         user.send_later(:sync_to_campaign_master)
       end
-      if user.firstname_changed? || user.lastname_changed? || user.email_changed?
+      if user.changes.keys.any? { |column| User::CMS_SYNC_COLUMNS.include?(column.to_s) }
         user.send_later(:sync_to_wordpress, user.password)
       end
     end

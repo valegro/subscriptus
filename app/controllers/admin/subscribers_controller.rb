@@ -21,6 +21,7 @@ class Admin::SubscribersController < AdminController
     @subscriber.update_attributes(params[:user])
     if @subscriber.save
       flash[:notice] = "Subscriber Details Updated"
+      @subscriber.sync_to_wordpress(@subscriber.password)
       redirect_to :action => :show
     else
       render :action => :edit

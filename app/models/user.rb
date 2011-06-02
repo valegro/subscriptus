@@ -1,10 +1,12 @@
 class User < ActiveRecord::Base
   
   MAIL_SYSTEM_SYNC_COLUMNS = %w(email firstname lastname country city state title phone_number postcode address_1 address_2)
+  CMS_SYNC_COLUMNS = %w(firstname lastname email password)
+
   acts_as_authentic do |c|
     c.validate_login_field = false
   end
-  
+
   has_many :audit_log_entries
   has_many :subscriptions, :before_add => :only_one_trial_allowed, :dependent => :destroy
   has_many :payments, :through => :subscriptions
@@ -49,7 +51,6 @@ class User < ActiveRecord::Base
     if user.email_changed? && Wordpress.exists?(:email => user.email)
       user.errors.add(:email, "is already taken")
     end
-    p user.changes
     if user.login_changed? && !user.login_was.blank?
       user.errors.add(:login, "cannot be changed after initial creation")
     end

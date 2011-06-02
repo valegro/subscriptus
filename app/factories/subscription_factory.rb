@@ -103,6 +103,9 @@ class SubscriptionFactory
         end
 
         subscription.save!
+        unless subscription.user.blank?
+          subscription.user.send_later(:sync_to_wordpress, user.password)
+        end
       rescue ActiveRecord::RecordInvalid => e
         # Keep the subscription and any errors (they may not actually be for the subscription)
         raise Exceptions::Factory::InvalidException.new(subscription, e.record.errors)
