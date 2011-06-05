@@ -28,6 +28,39 @@ describe Admin::SubscriptionsController, "as admin" do
     end
   end
 
+  describe "on unsubscribe" do
+    describe "a subscription that has NOT already been unsubscribed" do
+      before(:each) do
+        @subscription = Factory.create(:active_subscription)
+        get('unsubscribe', :id => @subscription.id)
+      end
+
+      it "should now be unsubscribed" do
+        s = Subscription.find(@subscription.id)
+        s.state.should == 'unsubscribed'
+      end
+
+      it "should show me the subscription page" do
+        response.should redirect_to("http://test.host/admin/subscriptions/#{@subscription.id}")
+      end
+    end
+
+    describe "a subscription that has already been unsubscribed" do
+      before(:each) do
+        @subscription = Factory.create(:unsubscribed_subscription)
+        get('unsubscribe', :id => @subscription.id)
+      end
+
+      it "should show me a flash error" do
+        flash[:error].should == 'Already Unsubscribed'
+      end
+
+      it "should show me the subscription page" do
+        response.should redirect_to("http://test.host/admin/subscriptions/#{@subscription.id}")
+      end
+    end
+  end
+
   describe "pending" do
     before(:each) do
       @subscription = Factory.create(:pending_subscription)

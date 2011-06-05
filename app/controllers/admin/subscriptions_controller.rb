@@ -3,7 +3,7 @@ class Admin::SubscriptionsController < AdminController
   helper 'admin'
   include Admin::SubscriptionsHelper
   
-  before_filter :find_subscription, :only => [ :verify, :cancel, :suspend, :unsuspend, :show, :set_expiry ]
+  before_filter :find_subscription, :only => [ :verify, :cancel, :suspend, :unsuspend, :show, :set_expiry, :unsubscribe ]
 
   rescue_from(Exceptions::PaymentTokenMissing) do
     flash[:error] = "The User has no payment gateway token - the payment will need to processed manually"
@@ -28,7 +28,6 @@ class Admin::SubscriptionsController < AdminController
       params[:search][:id] = Subscription.id_from_reference(params[:search][:id])
     end
 
-    p params[:search]
     @search = Subscription.search(params[:search])
       
     @search.class.send :attr_accessor, :renewal   # TODO: renewal search
@@ -39,6 +38,15 @@ class Admin::SubscriptionsController < AdminController
 
   def pending
     @subscriptions = Subscription.pending.paginate(:page => params[:page], :per_page => Subscription.per_page, :order => 'updated_at') 
+  end
+
+  def unsubscribe
+    @subscription.unsubscribe!
+    flash[:notice] = "Unsubscribed successfully"
+  rescue
+    flash[:error] = "Already Unsubscribed"
+  ensure
+    redirect_to :action => :show
   end
 
   def verify

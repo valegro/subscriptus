@@ -37,3 +37,7 @@ Factory.define :suspended_subscription, :parent => :subscription do |s|
   s.expires_at { 20.days.from_now }
   s.state 'suspended'
 end
+
+Factory.define :unsubscribed_subscription, :parent => :subscription do |s|
+  s.state 'unsubscribed'
+end
