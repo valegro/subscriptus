@@ -2,6 +2,12 @@ class Admin::SubscribersController < AdminController
   layout 'admin/subscriptions'
   before_filter :find_subscriber
 
+  rescue_from Wordpress::Error do |error|
+    flash[:error] = "Wordpress Error: #{error.message}"
+    notify_hoptoad(error)
+    render :action => :edit
+  end
+
   def show
     @actions = SubscriptionAction.paginate(
       :conditions => { "subscriptions.user_id" => @subscriber.id },
