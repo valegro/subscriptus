@@ -18,6 +18,7 @@ Feature: Subscription search
   @javascript
   Scenario: An admin adds publication field to search form
     Given I am on admin subscription search page
+      Then show me the page
       When I select "Publication" from "filter_name"
       And I follow "Add"
     Then I should see "Publication" within "form div label"
