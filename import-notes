@@ -1,0 +1,33 @@
+Email of missing user = asampson@smh.com.au
+Email of missing user = karol.florek@unitedvoice.org.au
+Email of missing user = karol.florek@unitedvoice.org.au
+Email of missing user = cooldiver@me.com
+Email of missing user = margi@cetaceanconservation.com.au
+Email of missing user = jenniferw@nat.uca.org.au
+Email of missing user = marg.m1@bigpond.com
+Email of missing user = jalex.byrne@gmail.com
+Email of missing user = normarnold@live.com.au
+Email of missing user = jonathan.hart2@dhs.nsw.gov.au
+Email of missing user = ageoff@bigpond.net.au
+Email of missing user = andrew.carter@bhpbilliton.com
+invalid date
+expires_at = "26/11/2012 0:00", starts_at = "26/10/2011"
+Email of missing user = brett@sharmans.com.au
+Email of missing user = peter.phipps@rmit.edu.au
+Email of missing user = mzs@panurban.com
+Email of missing user = crikey.chris2@iinet.net.au
+Email of missing user = hunpaul19@gmail.com
+Email of missing user = ann.larson@socialdimensions.com.au
+Email of missing user = pmcmullin@cornwalls.com.au
+Email of missing user = linda.iandavis@virtual.net.au
+Email of missing user = mcgrathliz7@gmail.com
+Email of missing user = crikey@sacharun.com
+Email of missing user = kendall667@hotmail.com
+Email of missing user = culkoff.sandy@abc.net.au
+Email of missing user = timothyjforster@gmail.com
+
+
+Crikey Daily Mail,53,23/05/2011 11:26,Active,NotStarted,15/07/2011 17:37,15/07/2012 17:37,Mr ,John,O'Sullivan,john.o'sullivan@credit-suisse.com,2 Nelson Avenue,,Bronte ,NSW,2024,Australia,
+Crikey Daily Mail,53,23/05/2011 11:41,Active,NotStarted,15/08/2011 0:00,15/08/2012 0:00,Mr,Kerry,O''Brien,Judge.O'Brien@courts.qld.gov.au,23 Cavell Tce.,,Ashgrove,QLD,4060,Australia,
+
+Also, the applied_at timestamp should be set to the payment_at time but for some reason its setting to Time.now - this is probably because of a before filter or the apply action??

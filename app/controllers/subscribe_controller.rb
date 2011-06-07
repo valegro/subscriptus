@@ -86,7 +86,6 @@ class SubscribeController < ApplicationController
     # See if we have an existing subscription
     @subscription = @user.subscriptions.find(:first, :conditions => { :publication_id => @offer.publication.id })
 
-
     Subscription.transaction do
       @user.update_attributes!(params[:user])
       @factory = get_factory
