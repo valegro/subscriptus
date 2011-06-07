@@ -13,7 +13,7 @@ class Subscription < ActiveRecord::Base
   has_many :actions,
            :class_name => "SubscriptionAction",
            :order => "applied_at desc",
-           :before_add => Proc.new { |s, a| a.applied_at = Time.now.utc },
+           :before_add => Proc.new { |s, a| a.applied_at ||= Time.now.utc },
            :autosave => true
 
   has_many :log_entries, :class_name => "SubscriptionLogEntry", :dependent => :destroy
