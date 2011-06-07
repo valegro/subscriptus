@@ -9,8 +9,8 @@ e = 0 #users_that_do_not_exist_but_and_cmaile_state_is_future = 0
 def create_action(subscription, starts_at, expires_at, payment_at, offer_name)
   begin
     term_length = ((DateTime.strptime(expires_at, '%d/%m/%Y %H:%M') - DateTime.strptime(starts_at, '%d/%m/%Y %H:%M'))/30).to_i
-    # First clear any actions made today
-    subscription.delete_all("applied_at > '2011-06-07 16:00'")
+    # First clear any actions made today - not nec unless we are running several times
+    #subscription.actions.find(:all, :conditions => "applied_at > '2011-06-07 16:00'").each(&:delete)
     subscription.actions.create!(
       :offer_name => offer_name,
       :applied_at => DateTime.strptime(payment_at, '%d/%m/%Y %H:%M'),

@@ -127,7 +127,7 @@ class User < ActiveRecord::Base
 
   def deliver_password_reset_instructions!
     reset_perishable_token!
-    UserMailer.send_later(:deliver_password_reset_instructions, self)
+    UserMailer.deliver_password_reset_instructions(self)
   end
 
   # Returns true if user has at least one active sub
