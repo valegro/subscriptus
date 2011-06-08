@@ -10,11 +10,7 @@ class SubscriptionActionObserver < ActiveRecord::Observer
     end
     # Invoice
     if action.subscription && action.payment
-      begin
-        SubscriptionMailer.deliver_activation(action.subscription)
-      rescue
-        notify_hoptoad($!)
-      end
+      SubscriptionMailer.send_later(:deliver_activation, action.subscription)
     end
   end
 end
