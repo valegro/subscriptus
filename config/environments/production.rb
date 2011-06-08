@@ -29,12 +29,20 @@ config.action_mailer.default_charset = "utf-8"
 config.action_mailer.logger = Logger.new("log/mail.log")
 
 # NetFox Sendgrid (for now)
+=begin
 config.action_mailer.smtp_settings = {
   :address        => "smtp.sendgrid.net",
   :port           => "25",
   :authentication => :plain,
   :user_name      => 'daniel@netfox.com',
   :password       => '12qwaszx',
+  :domain         => 'crikey.com.au'
+}
+=end
+
+config.action_mailer.smtp_settings = {
+  :address        => "localhost",
+  :port           => "25",
   :domain         => 'crikey.com.au'
 }
 
