@@ -126,7 +126,8 @@ class User < ActiveRecord::Base
   end
 
   def deliver_password_reset_instructions!
-    reset_perishable_token!
+    reset_perishable_token
+    save_with_validation(false)
     UserMailer.deliver_password_reset_instructions(self)
   end
 

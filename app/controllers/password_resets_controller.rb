@@ -11,8 +11,7 @@ class PasswordResetsController < ApplicationController
     if @user
       @user.transaction do
         @user.next_login_redirect = session[:return_to]
-        @user.deliver_password_reset_instructions!  
-        @user.save_with_validation(false)
+        @user.deliver_password_reset_instructions!
       end
       flash[:notice] = "Instructions to reset your password have been emailed to you. Please check your email."  
       redirect_to login_url
