@@ -108,6 +108,8 @@ class Subscription < ActiveRecord::Base
     
     # Expiries
     expires :trial => :squatter, :after => Publication::DEFAULT_TRIAL_EXPIRY.days
+    expires :active => :squatter
+    expires :suspended => :active
   end
   # TODO: Should go into an observer
   after_exit_suspended :restore_subscription_expiry

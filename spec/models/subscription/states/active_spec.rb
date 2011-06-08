@@ -24,6 +24,16 @@ describe Subscription do
     end
   end
 
+  it "should automatically expire a subscription that has passed its expiry date" do
+    @subscription.state.should == 'active'
+    @subscription.state_expires_at.should == 25.days.from_now
+    Timecop.travel(26.days.from_now) do
+      Subscription.expire_states
+      @subscription.reload
+      @subscription.state.should == 'squatter'
+    end
+  end
+
   it "should expire all active subs that have passed their expiry date" do
     5.times { Factory.create(:subscription, :state => 'active', :expires_at => 1.day.ago) }
     Subscription.active.count.should == 6 # (Including the one in the before block)

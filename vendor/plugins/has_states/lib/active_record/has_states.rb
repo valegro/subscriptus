@@ -92,7 +92,7 @@ module ActiveRecord
       end
 
       def expires(options)
-        raise ArgumentError, ":after is required when expiring states" unless options.include?(:after)
+        #raise ArgumentError, ":after is required when expiring states" unless options.include?(:after)
         expiry = options.delete(:after)
         guard = options.delete(:if)
         options.each_pair do |from, to|
@@ -130,9 +130,15 @@ module ActiveRecord
 
           @named_scope_name = "with_expired_#{@from}_#{column_name}".to_sym
           unless @model.respond_to?(@named_scope_name)
-            @model.class_eval %Q(named_scope :#{@named_scope_name}, lambda { { 
-              :conditions => [ " ( (#{column_name}_updated_at < ? OR #{column_name}_expires_at < ?) AND #{column_name} = ? ) ", Time.now.utc - #{@expiry}, Time.now.utc, "#{from.to_s}" ] } 
-            }), __FILE__, __LINE__
+            if @expiry
+              @model.class_eval %Q(named_scope :#{@named_scope_name}, lambda { { 
+                :conditions => [ " ( (#{column_name}_updated_at < ? OR #{column_name}_expires_at < ?) AND #{column_name} = ? ) ", Time.now.utc - #{@expiry}, Time.now.utc, "#{from.to_s}" ] } 
+              }), __FILE__, __LINE__
+            else
+              @model.class_eval %Q(named_scope :#{@named_scope_name}, lambda { { 
+                :conditions => [ " ( (#{column_name}_expires_at < ?) AND #{column_name} = ? ) ", Time.now.utc, "#{from.to_s}" ] } 
+              }), __FILE__, __LINE__
+            end
           end
         end
 
