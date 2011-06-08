@@ -13,8 +13,11 @@ class Subscription < ActiveRecord::Base
   has_many :actions,
            :class_name => "SubscriptionAction",
            :order => "applied_at desc",
-           :before_add => Proc.new { |s, a| a.applied_at ||= Time.now.utc },
-           :autosave => true
+           :autosave => true,
+           :before_add => Proc.new { |s, a|
+             a.applied_at ||= Time.now.utc
+             a.renewal = true if !s.actions.empty?
+           }
 
   has_many :log_entries, :class_name => "SubscriptionLogEntry", :dependent => :destroy
   has_many :orders

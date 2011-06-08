@@ -149,6 +149,23 @@ describe Subscription do
         @subscription.apply_action(@action)
       }.should raise_exception(Exceptions::PaymentFailedException)
     end
+
+    it "should set 'renewal' to false" do
+      @subscription.apply_action(@action)
+      @action.renewal.should be(false)
+    end
+
+    describe "if the subscription already has an action" do
+      before(:each) do
+        @subscription.save!
+        @subscription.actions.create(Factory.attributes_for(:subscription_action))
+      end
+
+      it "should set 'renewal' to true" do
+        @subscription.apply_action(@action)
+        @action.renewal.should be(true)
+      end
+    end
   end
   
   describe "class definition" do

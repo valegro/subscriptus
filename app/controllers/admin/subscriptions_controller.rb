@@ -16,7 +16,7 @@ class Admin::SubscriptionsController < AdminController
   end
 
   def index
-    @log_entries = SubscriptionLogEntry.recent.paginate(:page => params[:page] || 1)
+    @actions = SubscriptionAction.recent.paginate(:page => params[:page] || 1)
   end
 
   def show
