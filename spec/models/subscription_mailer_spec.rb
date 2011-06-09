@@ -104,16 +104,6 @@ describe SubscriptionMailer do
     end
   end
 
-  describe "deliver expired" do
-    before(:each) do
-      @subscription = Factory.stub(:expired_subscription, :id => 1)
-      @response = SubscriptionMailer.deliver_expired(@subscription)
-    end
-
-    # TODO: More
-    it_should_behave_like "an email with an unsubscribe link"
-  end
-
   describe "deliver suspended" do
     before(:each) do
       @subscription = Factory.build(:suspended_subscription, :id => 1)
