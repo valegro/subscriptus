@@ -65,8 +65,7 @@ gem 'enumerated_attribute'
 gem 'ruby-debug'
 
 group :development, :test, :cucmber do
-  gem 'postgres-pr'
-  gem 'activerecord-postgresql-adapter'
+  gem 'pg'
   gem 'webmock', :require => false
   gem 'capybara', "0.4.0"
   gem 'database_cleaner'
