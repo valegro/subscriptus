@@ -4,7 +4,6 @@ gem "ruby-debug"
 
 # Postgres support
 group :postgres do
-  #gem 'pg'
   gem 'postgres-pr'
 end
 
@@ -66,6 +65,7 @@ gem 'enumerated_attribute'
 gem 'ruby-debug'
 
 group :development, :test, :cucmber do
+  gem 'postgres-pr'
   gem 'webmock', :require => false
   gem 'capybara', "0.4.0"
   gem 'database_cleaner'
