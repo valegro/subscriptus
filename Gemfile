@@ -3,9 +3,9 @@ gem "rails", "2.3.9"
 gem "ruby-debug"
 
 # Postgres support
-group :postgres do
-  gem 'postgres-pr'
-end
+#group :postgres do
+  gem 'pg'
+#end
 
 group :production do
   gem 'mysql'
