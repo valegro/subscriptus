@@ -42,10 +42,6 @@ describe Subscription do
   end
 
   describe "upon expire!" do
-    before(:each) do
-      SubscriptionMailer.expects(:send_later).with(:deliver_expired, @subscription)
-    end
-
     it "should create a log entry" do
       expect {
         @subscription.expire!

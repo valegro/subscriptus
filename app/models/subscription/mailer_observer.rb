@@ -13,10 +13,6 @@ class Subscription::MailerObserver < ActiveRecord::Observer
     SubscriptionMailer.send_later(:deliver_cancelation, subscription)
   end
 
-  on(:active, :squatter) do |subscription|
-    SubscriptionMailer.send_later(:deliver_expired, subscription)
-  end
-
   on(:active, :suspended) do |subscription|
     SubscriptionMailer.send_later(:deliver_suspended, subscription)
   end
