@@ -509,3 +509,65 @@ dd {
   margin-top:20px;
   text-align:right;
 }
+
+/* New styles for activity feed -- Author: Tom Bryan, 2011 */
+
+ul.activity-list {
+	list-style:none;
+	margin-left:none;
+}
+
+ul.activity-list li {
+	margin-bottom:10px;
+	padding:20px;
+	position:relative;
+}
+
+ul.activity-list li:nth-child(even) {
+	background:#ececec;
+	text-shadow:1px 1px 0 #fff;
+}
+
+ul.activity-list li.new-sub {
+	background-image:url(/images/admin/tick.png);
+	background-repeat:no-repeat;
+	background-position:36px 42px;
+}
+
+ul.activity-list li.renew {
+	background-image:url(/images/admin/renew.png);
+	background-repeat:no-repeat;
+	background-position:36px 42px;
+}
+
+ul.activity-list li .value {
+	font-size:28px;
+	font-weight:bold;
+	letter-spacing:-1.5px;
+}
+
+ul.activity-list li .timestamp {
+	font-family:Georgia,serif;
+	font-style:italic;
+	font-size:14px;
+	position:absolute;
+	right:20px;
+	top:20px;
+	color:#666;
+}
+
+ul.activity-list li .description {
+	display:block;
+	margin-left:90px;
+}
+
+ul.activity-list li .term {
+	margin-left:90px;
+	margin-right:20px;
+}
+
+ul.activity-list li .type {
+	position:relative;
+	top:-5px;
+	margin-left:10px;
+}
