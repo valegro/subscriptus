@@ -1,3 +1,0 @@
-[submodule "vendor/plugins/active_report"]
-	path = vendor/plugins/active_report
-	url = git@github.com:codefire/active_report.git
