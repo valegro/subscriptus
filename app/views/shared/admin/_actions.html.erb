@@ -1,7 +1,7 @@
 <%= paginate(actions) %>
 <ul class="activity-list">
   <% actions.each do |action| %>
-    <li class="activity-item <%= action.renewal? ? 'renewal' : 'new-sub' %>">
+    <li class="activity-item <%= action.renewal? ? 'renew' : 'new-sub' %>">
     <span class="value"><%= action.payment.blank? ? "$0" : number_to_currency(action.payment.amount, :precision => 0) %></span>
     <span class="type"><strong><%= action.renewal? ? 'Renewal' : 'New Subscription' %>:</strong> <%= link_to("#{action.subscription.reference}: #{action.subscription.publication.name}", admin_subscription_path(action.subscription)) %></span>
       <span class="timestamp"><%= action.applied_at.strftime("%I:%M%p on %B %d, %Y") %></span>

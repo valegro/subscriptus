@@ -27,7 +27,14 @@ Email of missing user = culkoff.sandy@abc.net.au
 Email of missing user = timothyjforster@gmail.com
 
 
+Next File
+Email of missing user = emily_bogue@tac.vic.gov.au
+Email of missing user = dafduck@dodo.com.au
+Email of missing user = ismale@blueglider.co
+
+
 Crikey Daily Mail,53,23/05/2011 11:26,Active,NotStarted,15/07/2011 17:37,15/07/2012 17:37,Mr ,John,O'Sullivan,john.o'sullivan@credit-suisse.com,2 Nelson Avenue,,Bronte ,NSW,2024,Australia,
 Crikey Daily Mail,53,23/05/2011 11:41,Active,NotStarted,15/08/2011 0:00,15/08/2012 0:00,Mr,Kerry,O''Brien,Judge.O'Brien@courts.qld.gov.au,23 Cavell Tce.,,Ashgrove,QLD,4060,Australia,
-
-Also, the applied_at timestamp should be set to the payment_at time but for some reason its setting to Time.now - this is probably because of a before filter or the apply action??
+Crikey Daily Mail,53,6/06/2011 18:12,Active,Subscribed,6/06/2011,6/06/2012,Ms,Clare,ONeil,clare.o'neil@accc.gov.au,Level 20,175 Pitt Street  ,Sydney,NSW,2000,Australia,
+Crikey Daily Mail,53,7/06/2011 15:04,Active,NotStarted,21/06/2011,21/06/2012,Ms,Clare,O'Reilly,clare.o'reilly@acma.gov.au,PO BOX Q500  ,Queen Victoria Building  ,,NSW,1230,Australia,
+Crikey Daily Mail,34,7/06/2011 19:52,Active,Subscribed,8/06/2011,8/06/2012,Mr,Kevin,O'Brien,petero24@bigpond.net.au,Unit 2 ,1 Delacey St ,Toowoomba,QLD,,Australia,

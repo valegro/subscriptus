@@ -119,10 +119,10 @@ GEM
     paperclip (2.3.11)
       activerecord (>= 2.3.0)
       activesupport (>= 2.3.2)
+    pg (0.11.0)
     pickle (0.4.7)
       cucumber (>= 0.8)
       rake
-    postgres-pr (0.6.3)
     rack (1.1.0)
     rack-test (0.5.4)
       rack (>= 1.0)
@@ -206,8 +206,8 @@ DEPENDENCIES
   mover!
   mysql
   navigasmic
+  pg
   pickle
-  postgres-pr
   rack (= 1.1.0)
   rack-test (= 0.5.4)
   rails (= 2.3.9)

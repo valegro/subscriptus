@@ -8,12 +8,12 @@ e = 0 #users_that_do_not_exist_but_and_cmaile_state_is_future = 0
 
 def create_action(subscription, starts_at, expires_at, payment_at, offer_name)
   begin
-    term_length = ((DateTime.strptime(expires_at, '%d/%m/%Y %H:%M') - DateTime.strptime(starts_at, '%d/%m/%Y %H:%M'))/30).to_i
+    term_length = ((DateTime.strptime(expires_at, '%d/%m/%Y') - DateTime.strptime(starts_at, '%d/%m/%Y'))/30).to_i
     # First clear any actions made today - not nec unless we are running several times
     #subscription.actions.find(:all, :conditions => "applied_at > '2011-06-07 16:00'").each(&:delete)
     subscription.actions.create!(
       :offer_name => offer_name,
-      :applied_at => DateTime.strptime(payment_at, '%d/%m/%Y %H:%M'),
+      :applied_at => DateTime.strptime(payment_at, '%d/%m/%Y'),
       :term_length => term_length
     )
   rescue
@@ -71,11 +71,12 @@ CSV.foreach(ARGV[0]) do |row|
 
     if subscription
       # Extend/activate depending on state
-      subscription.state       = 'active'
-      subscription.expires_at  = DateTime.strptime(expires_at, '%d/%m/%Y %H:%M')
+      subscription.expires_at  = DateTime.strptime(expires_at, '%d/%m/%Y')
       subscription.offer_id    = offer_id
       subscription.save!
       create_action(subscription, starts_at, expires_at, payment_at, offer.name)
+      # Ensure active
+      subscription.update_attributes!(:state => 'active')
     else
       b += 1
       c += 1 if cmailer_state =~ /started/i
@@ -84,9 +85,11 @@ CSV.foreach(ARGV[0]) do |row|
         :publication => publication,
         :offer_id => offer_id,
         :state => 'active',
-        :expires_at => DateTime.strptime(expires_at, '%d/%m/%Y %H:%M')
+        :expires_at => DateTime.strptime(expires_at, '%d/%m/%Y')
       )
       create_action(subscription, starts_at, expires_at, payment_at, offer.name)
+      # Ensure active
+      subscription.update_attributes!(:state => 'active')
     end
   else
     d += 1
