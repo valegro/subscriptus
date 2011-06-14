@@ -1,6 +1,7 @@
 <div class="title">
   <%= content_tag :h2, @subscription.reference %>
   <div class="actions">
+    <%= link_to("Activate", activate_admin_subscription_path(@subscription), :confirm => "Are you sure you want to make this subscription active?") unless @subscription.active? %>
     <%= link_to("Unsubscribe", unsubscribe_admin_subscription_path(@subscription), :confirm => "Are you sure you want to unsubscribe this subscription?") unless @subscription.unsubscribed? %>
     <%= link_to 'Renew', new_renew_path(:for => @subscription.id) %>
     <%= link_to_remote 'Set Expiry Date', { :url => set_expiry_admin_subscription_path(@subscription), :method => :get }, { :class => 'set-expiry' } %>
@@ -10,7 +11,9 @@
 <div class="grid">
   <div class="frame span_3">
     <dl>
-      <dt>Subscriber</dt><dd><%= link_to(@subscription.user.name, admin_subscriber_url(@subscription.user)) %></dd>
+      <% unless @subscription.user.blank? %>
+        <dt>Subscriber</dt><dd><%= link_to(@subscription.user.name, admin_subscriber_url(@subscription.user)) %></dd>
+      <% end %>
       <dt>Current State</dt><dd><%= @subscription.state.capitalize %></dd>
       <dt>Started</dt><dd><%= format_timestamp(@subscription.created_at) %></dd>
       <dt>Current Offer</dt><dd><%= @subscription.offer ? link_to(@subscription.offer.name, admin_catalogue_offer_url(@subscription.offer)) : '-' %></dd>

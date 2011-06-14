@@ -3,7 +3,7 @@ class Admin::SubscriptionsController < AdminController
   helper 'admin'
   include Admin::SubscriptionsHelper
   
-  before_filter :find_subscription, :only => [ :verify, :cancel, :suspend, :unsuspend, :show, :set_expiry, :unsubscribe ]
+  before_filter :find_subscription, :only => [ :verify, :cancel, :suspend, :unsuspend, :show, :set_expiry, :unsubscribe, :activate ]
 
   rescue_from(Exceptions::PaymentTokenMissing) do
     flash[:error] = "The User has no payment gateway token - the payment will need to processed manually"
@@ -47,6 +47,12 @@ class Admin::SubscriptionsController < AdminController
     flash[:error] = "Already Unsubscribed"
   ensure
     redirect_to :action => :show
+  end
+
+  def activate
+    @subscription.activate!
+    flash[:notice] = "Activated Subscription"
+    redirect_to admin_subscription_path(@subscription)
   end
 
   def verify
