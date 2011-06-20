@@ -62,6 +62,60 @@ describe User do
     end
   end
 
+  describe "add_or_reset_trial" do
+    before(:each) do
+      @user = Factory.create(:user)
+      @publication = Factory.create(:publication)
+    end
+
+    describe "a user that has no sub to given publication" do
+      it "should create a trial and return the sub" do
+        expect {
+          @user.add_or_reset_trial(@publication, 10, 'refer', true)
+        }.to change { @user.subscriptions(true).count }.by(1)
+      end
+    end
+
+    describe "a user that has a trial sub to given publication" do
+      before(:each) do
+        @subscription = Factory.create(:subscription, :state => 'trial', :user => @user, :publication => @publication)
+      end
+
+      it "should raise an error" do
+        lambda {
+          @user.add_or_reset_trial(@publication, 10, 'refer', true)
+        }.should raise_exception(Exceptions::AlreadyHadTrial)
+      end
+    end
+
+    describe "a user that has a squatter sub to given publication that is less than 12 months in that state" do
+      before(:each) do
+        @subscription = Factory.create(:subscription, :state => 'squatter', :user => @user, :publication => @publication)
+      end
+
+      it "should raise an error" do
+        lambda {
+          @user.add_or_reset_trial(@publication, 10, 'refer', true)
+        }.should raise_exception(Exceptions::AlreadyHadTrial)
+      end
+    end
+
+    describe "a user that has a squatter sub to given publication that is MORE than 12 months in that state" do
+      before(:each) do
+        @subscription = Factory.create(:subscription, :state => 'squatter', :user => @user, :publication => @publication)
+      end
+
+      it "should create a trial and return the sub" do
+        Timecop.travel(13.months.from_now) do
+          expect {
+            @user.add_or_reset_trial(@publication, 10, 'refer', true)
+          }.to change { @user.subscriptions(true).count }.by(0)
+          Subscription.find(@subscription.id).trial?.should be(true)
+        end
+      end
+    end
+  end
+
   describe "webhook" do
     before(:each) do
       @publication = Factory.create(:publication)
@@ -118,10 +172,9 @@ describe User do
     @user.subscriptions.create(:publication => publication)
     @user.subscriptions.count.should == 1
     @user.has_active_subscriptions?.should_not == true
-    # Add an active
-    @user.subscriptions.create(:publication => publication, :state => 'active')
-    @user.subscriptions.count.should == 2
-    @user.has_active_subscriptions?.should == true
+    lambda {
+      @user.subscriptions.create(:publication => publication, :state => 'active')
+    }.should raise_exception(Exceptions::DuplicateSubscription)
   end
 
   describe "class def" do
@@ -506,7 +559,7 @@ describe User do
   describe "deliver password reset instructions" do
     it "should send me a password reset email" do
       @user = Factory.create(:subscriber)
-      UserMailer.expects(:send_later).with(:deliver_password_reset_instructions, @user)
+      UserMailer.expects(:deliver_password_reset_instructions).with(@user)
       @user.deliver_password_reset_instructions!
     end
   end

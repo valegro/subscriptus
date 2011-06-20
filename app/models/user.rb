@@ -8,7 +8,7 @@ class User < ActiveRecord::Base
   end
 
   has_many :audit_log_entries
-  has_many :subscriptions, :before_add => :only_one_trial_allowed, :dependent => :destroy
+  has_many :subscriptions, :before_add => :check_duplicate_subscription, :dependent => :destroy
   has_many :payments, :through => :subscriptions
   
   has_many :orders
@@ -87,16 +87,11 @@ class User < ActiveRecord::Base
     solus = user_attributes.fetch(:options, {})[:solus]
     #solus = !user_attributes.fetch(:options, []).select { |s| /advertisers/i === s }.empty?
     weekender = user_attributes.fetch(:options, {})[:weekender]
-    #weekender = !user_attributes.fetch(:options, []).select { |s| /weekender/i === s }.empty?
     # Add weekender
     user.add_weekender_to_subs if weekender
-    # Add the subscription
-    sub = user.subscriptions.create!(
-      :publication => publication,
-      :expires_at => trial_period_in_days.days.from_now,
-      :referrer => referrer,
-      :solus => solus
-    )
+    # Add or reset trial
+    sub = user.add_or_reset_trial(publication, trial_period_in_days, referrer, solus)
+    # Reset the password
     sub.temp_password = user.password
     SubscriptionMailer.deliver_new_trial(sub)
     return sub
@@ -116,12 +111,26 @@ class User < ActiveRecord::Base
     )
     user
   end
-
-  # TODO: I suspect this is no longer relevant
-  def only_one_trial_allowed(subscription)
-    return if subscription.active?
-    if self.subscriptions.detect { |s| s.publication_id == subscription.publication_id }
-      raise Exceptions::DuplicateSubscription
+ 
+  # TODO: Could make this an association extension
+  def add_or_reset_trial(publication, trial_period_in_days, referrer, solus)
+    # Does the user have a sub to the pub?
+    if subscription = self.subscriptions.find(:first, :conditions => { :publication_id => publication.id })
+      if subscription.trial? || (subscription.squatter? && subscription.state_updated_at > 12.months.ago)
+        raise Exceptions::AlreadyHadTrial
+      else
+        returning(subscription) do |s|
+          s.new_trial!
+          s.update_attributes!(:solus => solus, :referrer => referrer)
+        end
+      end
+    else
+      self.subscriptions.create!(
+        :publication => publication,
+        :expires_at => trial_period_in_days.days.from_now,
+        :referrer => referrer,
+        :solus => solus
+      )
     end
   end
 
@@ -234,5 +243,11 @@ class User < ActiveRecord::Base
   private
     def self.random_password
       (0...7).map { ('a'..'z').to_a[rand(26)] }.join << rand(9).to_s
+    end
+
+    def check_duplicate_subscription(subscription)
+      raise Exceptions::DuplicateSubscription if self.subscriptions.detect do |s|
+        s.publication_id == subscription.publication_id
+      end
     end
 end
