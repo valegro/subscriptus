@@ -25,7 +25,8 @@ class SubscriptionObserver < ActiveRecord::Observer
     subscription.state_expires_at = nil
   end
 
-  def before_create(subscription)
+  def before_save(subscription)
+    # Ensure state expiry is set
     if %w(trial active).include?(subscription.state)
       subscription.state_expires_at = subscription.expires_at
     end

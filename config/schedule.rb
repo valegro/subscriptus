@@ -20,5 +20,5 @@
 # Learn more: http://github.com/javan/whenever
 
 every 1.hour do
-#  runner "Subscription.expire_states"
+  runner "Subscription.expire_states"
 end
