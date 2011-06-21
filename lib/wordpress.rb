@@ -1,5 +1,6 @@
 class Wordpress
   class Error < StandardError; end
+  class PrimaryKeyMismatch < Error; end
 
   class << self
     attr_accessor :enabled

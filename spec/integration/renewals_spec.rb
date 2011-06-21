@@ -16,6 +16,7 @@ describe "Renewals", :type => :integration do
         @offer.offer_terms.create(Factory.attributes_for(:offer_term, :concession => true, :months => 3))
         @user = Factory.create(:admin, :firstname => 'Daniel')
         @subscriber = Factory.create(:subscriber)
+        @subscriber.subscriptions.clear
         @subscription = Factory.build(:active_subscription)
         @subscription.publication = @publication
         @subscription.user = @subscriber

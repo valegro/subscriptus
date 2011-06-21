@@ -34,6 +34,13 @@ class Admin::SubscribersController < AdminController
     end
   end
 
+  def sync
+    @subscriber.sync_to_wordpress
+    @subscriber.sync_to_campaign_master
+    flash[:notice] = "Synchronised User"
+    redirect_to :action => :show
+  end
+
   private
     def find_subscriber
       @subscriber = User.subscribers.find(params[:id])

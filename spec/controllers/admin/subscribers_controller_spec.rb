@@ -24,4 +24,26 @@ describe Admin::SubscribersController, "as admin" do
       end
     end
   end
+
+  describe "on sync" do
+    before(:each) do
+      @user = stub(:id => 100)
+      subscribers_proxy = mock()
+      subscribers_proxy.stubs(:find).with('100').returns(@user)
+      User.stubs(:subscribers).returns(subscribers_proxy)
+    end
+
+    it "should sync to Campaign Master and Wordpress" do
+      @user.expects(:sync_to_wordpress)
+      @user.expects(:sync_to_campaign_master)
+      post(:sync, :id => 100)
+    end
+
+    it "should redirect to the show page" do
+      @user.expects(:sync_to_wordpress)
+      @user.expects(:sync_to_campaign_master)
+      post(:sync, :id => 100)
+      response.should redirect_to(:action => :show, :id => 100)
+    end
+  end
 end

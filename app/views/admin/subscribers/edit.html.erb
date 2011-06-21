@@ -25,7 +25,7 @@
         <h3>Advanced</h3>
       </div>
       <%= form.check_box :valid_concession_holder, :label => "Concession Holder" %>
-      <%= form.text_field :login, :label => "Wordpress ID" %>
+      <%= form.text_field :login, :label => "Wordpress ID", :help => "Only change this if you know what you're doing" %>
       <%= form.submit "Update" %>
     <% end %>
   </div>

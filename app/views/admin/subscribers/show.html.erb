@@ -2,6 +2,7 @@
 <div class="title">
   <%= content_tag :h2, "Subscriber" %>
   <div class="actions">
+    <%= link_to("Sync", sync_admin_subscriber_path(@subscription)) %>
     <%= link_to 'Edit', edit_admin_subscriber_path(@subscriber), :class => 'edit' %>
   </div>
 </div>

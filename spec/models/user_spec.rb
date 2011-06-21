@@ -420,21 +420,6 @@ describe User do
       @user.save!
     end
 
-    it "should not allow us to change our login" do
-      @user.login = 'anotherlogin'
-      lambda {
-        @user.save!
-      }.should raise_exception(ActiveRecord::RecordInvalid)
-    end
-
-    it "should not allow us to change our login UNLESS it was blank" do
-      puts "\n\nAAAA"
-      @user = Factory.create(:user, :login => 'nil')
-      lambda {
-        @user.save!
-      }.should_not raise_exception(ActiveRecord::RecordInvalid)
-    end
-
     describe "Wordpress" do
       it "should update Wordpress if role is subscriber and email or name changes" do
         @user.email = 'another@example.com'
@@ -553,6 +538,21 @@ describe User do
       @user.save!
       Wordpress.expects(:create).with(has_entry(:premium, true))
       @user.sync_to_wordpress(@user.password)
+    end
+
+    describe "if a user exists in WP with my email but the logins are different" do
+      before(:each) do
+        @user.save!
+        Wordpress.stubs(:exists?).with(:email => @user.email).returns(true)
+        Wordpress.stubs(:exists?).with(:login => @user.login).returns(false)
+        Wordpress.stubs(:exists?).with(:login => 'new_login').returns(true)
+      end
+
+      it "should change the subscriptus user's login to match WP then sync" do
+        lambda {
+          @user.sync_to_wordpress
+        }.should raise_exception(Wordpress::PrimaryKeyMismatch)
+      end
     end
   end
 

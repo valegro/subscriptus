@@ -10,7 +10,7 @@ class UnsubscribeController < ApplicationController
   end
 
   rescue_from ActiveRecord::RecordNotFound do
-    # Can't find matchin user account
+    # Can't find matching user account
     render :action => 'no_user'
   end
 
@@ -29,6 +29,7 @@ class UnsubscribeController < ApplicationController
     def load_user
       # TODO: Take the email address too?
       puts "Looking for user id = #{params[:user_id]}"
+      puts "\n\n#{User.all.inspect}"
       @user = User.find(params[:user_id])
       @subscriptions = @user.subscriptions.not_unsubscribed
     end

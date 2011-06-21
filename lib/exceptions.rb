@@ -17,6 +17,7 @@ module  Exceptions
   class CannotStoreCard                      < StandardError; end
   class DuplicateSubscription                < StandardError; end
   class AlreadyHadTrial                      < StandardError; end
+  class PrimaryKeyMismatch                   < StandardError; end
 
   class GiftNotAvailable                     < StandardError
     def initialize(gift_id)

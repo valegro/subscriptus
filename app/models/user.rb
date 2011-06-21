@@ -51,9 +51,6 @@ class User < ActiveRecord::Base
     if user.email_changed? && Wordpress.exists?(:email => user.email)
       user.errors.add(:email, "is already taken")
     end
-    if user.login_changed? && !user.login_was.blank?
-      user.errors.add(:login, "cannot be changed after initial creation")
-    end
   end
 
   # Used for search controller
@@ -182,8 +179,10 @@ class User < ActiveRecord::Base
       :premium     => self.premium?
     }
     options[:pword] = password unless password.blank?
-    if Wordpress.exists?(:login => self.login) || Wordpress.exists?(:email => self.email)
+    if Wordpress.exists?(:login => self.login)
       Wordpress.update(options)
+    elsif Wordpress.exists?(:email => self.email)
+      raise Wordpress::PrimaryKeyMismatch.new("The login stored in subscriptus does not match that stored in Wordpress. You will need to manually update the user's details in Subscriptus so that the logins match.")
     else
       # Can't create a WP user if we don't have a password - so we will create a random one!
       options[:pword] = User.random_password if options[:pword].blank?
