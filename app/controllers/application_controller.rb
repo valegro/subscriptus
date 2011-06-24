@@ -5,6 +5,7 @@ class ApplicationController < ActionController::Base
   helper :all # include all helpers, all the time
   helper_method :current_user_session, :current_user, :sort_order
   protect_from_forgery # See ActionController::RequestForgeryProtection for details
+  before_filter :require_ssl
 
   # Scrub sensitive parameters from your log
   filter_parameter_logging :password, :card_number
@@ -52,5 +53,9 @@ class ApplicationController < ActionController::Base
 
     def sort_order(default)
       "#{(params[:c] || default.to_s).gsub(/[\s;'\"]/,'')} #{params[:d] == 'down' ? 'DESC' : 'ASC'}"
+    end
+
+    def require_ssl
+      redirect_to :protocol => "https://" unless (request.ssl? or local_request?)  
     end
 end
