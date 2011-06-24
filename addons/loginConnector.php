@@ -148,9 +148,6 @@ class Connector{
         return false; 
       }
 
-      if(!array_key_exists('premium', $this->meta) || !$this->meta['premium']){
-        return false;
-      }
 
       // Hash the password
       $this->data['user_pass'] = wp_hash_password($this->data['user_pass']);
@@ -161,8 +158,11 @@ class Connector{
       $this->data['user_email'] = apply_filters('pre_user_email', $this->data['user_email']);
       
       $this->data['user_registered'] = gmdate('Y-m-d H:i:s');
-      $this->data['user_nicename'] = $this->data['user_login'];
-      $this->data['display_name'] = $this->data['user_login'];
+      //$this->data['user_nicename'] = $this->data['user_login'];
+      //$this->data['display_name'] = $this->data['user_login'];
+
+      $this->data['user_nicename'] = $this->meta['first_name'] . " " . $this->meta['last_name'];
+      $this->data['display_name'] = $this->meta['first_name'] . " " . $this->meta['last_name'];
 
       $this->data = stripslashes_deep( $this->data );
  
@@ -176,6 +176,7 @@ class Connector{
     //  update_usermeta( $user_id, 'first_name', $this->meta['first_name']);
     //  update_usermeta( $user_id, 'last_name', $this->meta['last_name']);
 
+
       $user = new WP_User($user_id);
       $user->set_role('subscriber');
 
@@ -188,8 +189,13 @@ class Connector{
         return false;//'user not created';
       }
       else{
-        $myrows = $wpdb->query( $wpdb->prepare( "INSERT INTO cmanager_users (ContactId, ContactListId, ContactList, FirstName, LastName, Email, ContactStatus, SubStatus  ) VALUES(%s,%s,%s,%s,%s,%s,%d,%d)", array($this->data['user_login'],'b6745460-d848-4f7c-8dd8-425a5ee6e66b','Free/Contra - standard',$this->meta['first_name'], $this->meta['last_name'], $this->data['user_email'],1,0)));
- 
+        if(!array_key_exists('premium', $this->meta) || !$this->meta['premium']){
+          //First delete any entries for this users email address
+          $result = $wpdb->query( $wpdb->prepare("DELETE FROM cmanager_users WHERE Email = %s", $this->data['user_email']) ); 
+          
+          //Insert the new user record.
+          $result = $wpdb->query( $wpdb->prepare( "INSERT INTO cmanager_users (ContactId, ContactListId, ContactList, FirstName, LastName, Email, ContactStatus, SubStatus  ) VALUES(%s,%s,%s,%s,%s,%s,%d,%d)", array($this->data['user_login'],'b6745460-d848-4f7c-8dd8-425a5ee6e66b','Free/Contra - standard',$this->meta['first_name'], $this->meta['last_name'], $this->data['user_email'],1,0)));
+        } 
         return  $user->user_login;
       }
     }
@@ -214,12 +220,11 @@ class Connector{
       return false;//'User does not exists!';
     }
     else{
-
-      if(!array_key_exists('premium', $this->meta) || !$this->meta['premium']){       
+     // if(!array_key_exists('premium', $this->meta) || !$this->meta['premium']){       
        
-        $wpdb->query( "DELETE FROM cmanager_users WHERE ContactID ='" . $this->data['user_login'] . "'"); 
+     //   $wpdb->query( "DELETE FROM cmanager_users WHERE ContactID ='" . $this->data['user_login'] . "'"); 
 
-      }
+     // }
  
 
 
@@ -239,24 +244,34 @@ class Connector{
         return false;//'';
       }
       else{
-         $query = 'UPDATE cmanager_users SET ';
+        $query = "SELECT COUNT(1) FROM cmanager_users WHERE ContactID ='" . $this->data['user_login'] . "'"; 
 
-         $sets = array();
-         if(array_key_exists('user_email', $this->data)){
+        $user_count = $wpdb->get_var($wpdb->prepare($query));
+
+        if($user_count == 0){
+          $result = $wpdb->query( $wpdb->prepare( "INSERT INTO cmanager_users (ContactId, ContactListId, ContactList, FirstName, LastName, 
+Email, ContactStatus, SubStatus  ) VALUES(%s,%s,%s,%s,%s,%s,%d,%d)", array($this->data['user_login'],'b6745460-d848-4f7c-8dd8-425a5ee6e66b'
+,'Free/Contra - standard',$this->meta['first_name'], $this->meta['last_name'], $this->data['user_email'],1,0)));
+        }
+        else{
+          $query = 'UPDATE cmanager_users SET ';
+
+          $sets = array();
+          if(array_key_exists('user_email', $this->data)){
             array_push($sets, "user_email = '" . $this->data['user_email'] . "'");
-         }    
+          }    
 
-         if(array_key_exists('first_name', $this->meta)){
-           array_push( $sets , "first_name = '" . $this->meta['first_name'] . "'");
-         }
+          if(array_key_exists('first_name', $this->meta)){
+            array_push( $sets , "first_name = '" . $this->meta['first_name'] . "'");
+          }
 
-         if(array_key_exists('last_name', $this->meta)){
-           array_push($sets, " last_name = '" . $this->meta['last_name'] . "'");
-         }
+          if(array_key_exists('last_name', $this->meta)){
+            array_push($sets, " last_name = '" . $this->meta['last_name'] . "'");
+          }
 
-         $wpdb->query($query . " " . join(",",$sets));
- 
-         return $user->user_login;
+          $wpdb->query($query . " " . join(",",$sets));
+        } 
+        return $user->user_login;
       }
     }
   }
