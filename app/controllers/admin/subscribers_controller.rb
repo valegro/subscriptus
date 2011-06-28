@@ -1,11 +1,28 @@
 class Admin::SubscribersController < AdminController
   layout 'admin/subscriptions'
-  before_filter :find_subscriber
+  before_filter :find_subscriber, :except => [ :new, :create ]
 
   rescue_from Wordpress::Error do |error|
     flash[:error] = "Wordpress Error: #{error.message}"
     notify_hoptoad(error)
     render :action => :edit
+  end
+
+  def new
+    @subscriber = User.new(:role => 'subscriber')
+  end
+
+  def create
+    @subscriber = User.new(params[:user])
+    @subscriber.overide_wordpress = true
+    @subscriber.role = :subscriber
+    if @subscriber.save
+      flash[:notice] = "Subscriber Details Updated"
+      @subscriber.sync_to_wordpress(@subscriber.password)
+      redirect_to admin_subscriber_path(@subscriber)
+    else
+      render :action => :new
+    end
   end
 
   def show

@@ -1,5 +1,8 @@
 <div class="title">
   <%= content_tag :h2, "Recent Activity" %>
+  <div class="actions">
+    <%= link_to 'Create Subscriber', new_admin_subscriber_path, :class => 'create' %>
+  </div>
 </div>
 
 <%= render :partial => "shared/admin/actions", :object => @actions %>

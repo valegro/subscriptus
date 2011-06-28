@@ -14,6 +14,10 @@ class User < ActiveRecord::Base
   has_many :orders
   attr_accessor :email_confirmation
 
+  # If true, any account in WP will be ignored on create or update
+  # thus clobbering any matching accounts in WP (use with caution)
+  attr_accessor :overide_wordpress
+
   enum_attr :role, %w(admin subscriber)
   enum_attr :title, %w(Mr Sir Fr Mrs Ms Miss Lady)
   
@@ -41,7 +45,7 @@ class User < ActiveRecord::Base
   validates_confirmation_of :email #, :on => :create, :unless => Proc.new { |user| user.admin? }
 
   validate_on_create do |user|
-    unless user.admin?
+    unless user.admin? || user.overide_wordpress
       user.errors.add(:login, "is already taken") if Wordpress.exists?(:login => user.login)
       user.errors.add(:email, "is already taken") if Wordpress.exists?(:email => user.email)
     end

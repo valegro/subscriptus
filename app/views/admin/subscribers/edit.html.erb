@@ -8,23 +8,7 @@
 <div class="grid">
   <div class="frame span_6">
     <% form_for [:admin, @subscriber], :url => admin_subscriber_path(@subscriber), :builder => Reform::Builder, :html => { :class => "form" } do |form| %>
-      <%= form.error_messages %>
-      <%= form.enum_select :title, :include_blank => true %>
-      <%= form.text_field :firstname %>
-      <%= form.text_field :lastname %>
-      <%= form.text_field :email %>
-      <%= form.text_field :company %>
-      <%= form.text_field :phone_number %>
-      <%= form.text_field :address_1 %>
-      <%= form.text_field :address_2 %>
-      <%= form.text_field :city %>
-      <%= form.enum_select :state, :include_blank => true %>
-      <%= form.text_field :postcode %>
-      <%= form.country_select :country %>
-      <div class="field">
-        <h3>Advanced</h3>
-      </div>
-      <%= form.check_box :valid_concession_holder, :label => "Concession Holder" %>
+      <%= render :partial => "form", :object => form %>
       <%= form.text_field :login, :label => "Wordpress ID", :help => "Only change this if you know what you're doing" %>
       <%= form.submit "Update" %>
     <% end %>

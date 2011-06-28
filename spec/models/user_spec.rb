@@ -264,38 +264,49 @@ describe User do
         @user = Factory.create(:admin, :login => "daniel")
       end
 
-      it "should not be valid if the login exists in Wordpress" do
-        Wordpress.stubs(:exists?).returns(true)
-        user = Factory.build(:user)
-        user.valid?.should == false
-      end
-      
-      it "should be valid even though the login exists in Wordpress if we are an admin" do
-        Wordpress.stubs(:exists?).returns(true)
-        user = Factory.build(:admin, :login => 'daniel')
-        user.valid?.should == true
+      describe "if the email exists in WP" do
+        before(:each) do
+          Wordpress.stubs(:exists?).with(:email => 'daniel@netfox.com').returns(true)
+        end
+
+        it "should not be valid if the login exists in Wordpress" do
+          user = Factory.build(:user, :email => 'daniel@netfox.com')
+          user.valid?.should == false
+        end
+        
+        it "should not create a trial user" do
+          lambda {
+            User.create_trial_user(:first_name => 'Daniel', :last_name => 'Draper', :email => 'daniel@netfox.com')
+          }.should raise_exception(ActiveRecord::RecordInvalid)
+        end
+
+        it "should not create a user" do
+          lambda {
+            Factory.create(:user, :email => 'daniel@netfox.com')
+          }.should raise_exception(ActiveRecord::RecordInvalid)
+        end
+
+        it "should create a user if we set the overide_wordpress flag to true" do
+          lambda {
+            Factory.create(:user, :email => 'daniel@netfox.com', :overide_wordpress => true)
+          }.should_not raise_exception
+        end
       end
 
-      it "should not create a trial user if the email exists in Wordpress" do
-        Wordpress.stubs(:exists?).with(:email => 'daniel@netfox.com').returns(true)
-        lambda {
-          User.create_trial_user(:first_name => 'Daniel', :last_name => 'Draper', :email => 'daniel@netfox.com')
-        }.should raise_exception(ActiveRecord::RecordInvalid)
-      end
+      describe "if the login already exists in WP" do
+        it "should be valid even though the login exists in Wordpress if we are an admin" do
+          Wordpress.stubs(:exists?).returns(true)
+          user = Factory.build(:admin, :login => 'daniel')
+          user.valid?.should == true
+        end
 
-      it "should not create a user if the email exists in Wordpress" do
-        Wordpress.stubs(:exists?).with(:email => 'daniel@netfox.com').returns(true)
-        lambda {
-          Factory.create(:user, :email => 'daniel@netfox.com')
-        }.should raise_exception(ActiveRecord::RecordInvalid)
-      end
-
-      it "should not create a user if the login exists in Wordpress" do
-        Wordpress.stubs(:exists?).with(:login => @stubbed_login).returns(true)
-        UserObserver.any_instance.stubs(:generate_unique_id).returns(@stubbed_login)
-        lambda {
-          Factory.create(:user)
-        }.should raise_exception(ActiveRecord::RecordInvalid)
+        it "should not create a user if the login exists in Wordpress" do
+          Wordpress.stubs(:exists?).with(:login => @stubbed_login).returns(true)
+          UserObserver.any_instance.stubs(:generate_unique_id).returns(@stubbed_login)
+          lambda {
+            Factory.create(:user)
+          }.should raise_exception(ActiveRecord::RecordInvalid)
+        end
       end
 
       it "should not create a user if no login is provided and the generated login already exists in Wordpress" do

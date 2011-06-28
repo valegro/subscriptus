@@ -6,6 +6,7 @@ describe UnsubscribeController do
 
   before(:each) do
     stub_wordpress
+    https!
   end
 
   describe "if no user is provided" do
@@ -22,8 +23,6 @@ describe UnsubscribeController do
     describe "and the user has no subscriptions" do
       before(:each) do
         @user = User.create!(Factory.attributes_for(:subscriber))
-        puts "AAAA userid = #{@user.id}"
-        puts User.all.inspect
         get :show, :user_id => @user.id
       end
 

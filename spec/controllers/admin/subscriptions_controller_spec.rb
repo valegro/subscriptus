@@ -4,6 +4,7 @@ describe Admin::SubscriptionsController, "as admin" do
   before(:each) do
     stub_wordpress
     admin_login
+    https!
   end
 
   it "should have search" do
@@ -41,7 +42,7 @@ describe Admin::SubscriptionsController, "as admin" do
       end
 
       it "should show me the subscription page" do
-        response.should redirect_to("http://test.host/admin/subscriptions/#{@subscription.id}")
+        response.should redirect_to(:action => :show, :id => @subscription.id)
       end
     end
 
@@ -56,7 +57,7 @@ describe Admin::SubscriptionsController, "as admin" do
       end
 
       it "should show me the subscription page" do
-        response.should redirect_to("http://test.host/admin/subscriptions/#{@subscription.id}")
+        response.should redirect_to(:action => :show, :id => @subscription.id)
       end
     end
   end
@@ -115,6 +116,7 @@ describe Admin::SubscriptionsController, "as user" do
   before(:each) do
     stub_wordpress
     user_login
+    https!
   end
   it "should not show index" do
     get :index
@@ -131,6 +133,10 @@ describe Admin::SubscriptionsController, "as user" do
 end
 
 describe Admin::SubscriptionsController, "not logged in" do
+  before(:each) do
+    https!
+  end
+
   it "should not show index" do
     get :index
     response.should redirect_to login_url

@@ -17,6 +17,7 @@ describe SubscribeController do
     CM::Recipient.stubs(:update)
     CM::Recipient.stubs(:create!)
     stub_wordpress
+    https!
   end
 
   describe "on create" do

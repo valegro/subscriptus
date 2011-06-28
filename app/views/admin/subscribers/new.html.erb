@@ -1,0 +1,17 @@
+<div class="title">
+  <%= content_tag :h2, "Add Subscriber" %>
+  <div class="actions">
+    <%= link_to 'Back to Activity', admin_subscriptions_path, :class => 'back' %>
+  </div>
+</div>
+
+<div class="grid">
+  <div class="frame span_6">
+    <% form_for [:admin, @subscriber], :url => admin_subscribers_path, :builder => Reform::Builder, :html => { :class => "form" } do |form| %>
+      <%= render :partial => "form", :object => form %>
+      <%= form.password_field :password, :required => true %>
+      <%= form.password_field :password_confirmation, :required => true %>
+      <%= form.submit "Create" %>
+    <% end %>
+  </div>
+</div>

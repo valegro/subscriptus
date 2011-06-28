@@ -10,6 +10,7 @@ describe Webhooks::UnbouncesController do
     CM::Recipient.stubs(:update)
     CM::Recipient.stubs(:create!)
     stub_wordpress
+    https!
   end
 
   it "should create a new trial subscription" do
@@ -67,7 +68,7 @@ describe Webhooks::UnbouncesController do
 
     it "should return an error" do
       post 'create', { "data.json"=>"{\"ip_address\":\"150.101.226.181\",\"email\":[\"example@example.com\"],\"last_name\":[\"Draper\"],\"first_name\":[\"Daniel\"]}", "page_url"=>"http://unbouncepages.com/bf43f31e-e55b-11df-82d5-12313e003591", "page_id"=>"bf43f31e-e55b-11df-82d5-12313e003591", "variant"=>"a", "publication_id" => @publication.id }
-      response.body.should == "{\"message\":\"Trial within last 12 months\",\"success\":false}"
+      response.body.should == "{\"success\":false,\"message\":\"Trial within last 12 months\"}"
     end
   end
 
@@ -79,7 +80,7 @@ describe Webhooks::UnbouncesController do
 
     it "should return an error" do
       post 'create', { "data.json"=>"{\"ip_address\":\"150.101.226.181\",\"email\":[\"example@example.com\"],\"last_name\":[\"Draper\"],\"first_name\":[\"Daniel\"]}", "page_url"=>"http://unbouncepages.com/bf43f31e-e55b-11df-82d5-12313e003591", "page_id"=>"bf43f31e-e55b-11df-82d5-12313e003591", "variant"=>"a", "publication_id" => @publication.id }
-      response.body.should == "{\"message\":\"Trial within last 12 months\",\"success\":false}"
+      response.body.should == "{\"success\":false,\"message\":\"Trial within last 12 months\"}"
     end
   end
 

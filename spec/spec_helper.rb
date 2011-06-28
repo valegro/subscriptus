@@ -108,6 +108,10 @@ def admin_login
   login_as( Factory.create(:admin) )
 end
 
+def https!
+  ActionController::TestRequest.any_instance.stubs(:ssl?).returns(true)
+end
+
 def stub_wordpress
   Wordpress.stubs(:exists?).returns(false)
   
