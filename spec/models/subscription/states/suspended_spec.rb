@@ -16,7 +16,9 @@ describe Subscription do
     @subscription.state.should == 'suspended'
     @subscription.state_expires_at.should == 25.days.from_now
     Timecop.travel(26.days.from_now) do
-      Subscription.expire_states
+      User.validate_as(:system) do
+        Subscription.expire_states
+      end
       @subscription.reload
       @subscription.state.should == 'active'
     end
@@ -39,6 +41,41 @@ describe Subscription do
       SubscriptionMailer.expects(:send_later).with(:deliver_unsuspended, @subscription)
       @subscription.unsuspend!
       @subscription.state.should == 'active'
+    end
+  end
+
+  describe "an active subscription" do
+    before(:each) do
+      @subscription = Factory.build(:subscription, :state => 'active', :expires_at => 25.days.from_now)
+      @subscription.save!
+    end
+
+    describe "that is suspended" do
+      before(:each) do
+        @subscription.suspend!(10)
+      end
+
+      it "should set the state to suspended" do
+        @subscription.state.should == 'suspended'
+      end
+
+      it "should increase the expiry date" do
+        @subscription.expires_at.should == 35.days.from_now
+      end
+
+      describe "and then unsuspended" do
+        before(:each) do
+          @subscription.unsuspend!
+        end
+
+        it "should be active" do
+          @subscription.active?.should be(true)
+        end
+
+        it "should have the right expiry date" do
+          @subscription.expires_at.should == 35.days.from_now
+        end
+      end
     end
   end
 end

@@ -39,8 +39,11 @@ class User < ActiveRecord::Base
   end
 
   validates_format_of :email, :with => /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i
-  validates_presence_of :login, :firstname, :lastname, :email, :role, :unless => Proc.new { |user| user.auto_created? }, :if => Proc.new { |user| user.admin? }
-  validates_presence_of :firstname, :lastname, :email, :phone_number, :address_1, :city, :postcode, :state, :country, :role, :unless => Proc.new { |user| (user.auto_created? && user.new_record?) or user.admin? }
+  validates_presence_of :login, :if => Proc.new { |user| User.validate_as == :admin }
+  validates_presence_of :phone_number, :address_1, :city, :postcode, :state, :country, :if => Proc.new { |user| p User.validate_as; User.validate_as == :subscriber }
+  validates_presence_of :firstname, :lastname, :email, :role
+
+
   validates_uniqueness_of :email
   validates_confirmation_of :email #, :on => :create, :unless => Proc.new { |user| user.admin? }
 
@@ -73,11 +76,32 @@ class User < ActiveRecord::Base
      find_by_login(login) || find_by_email(login)
   end
 
+  # TODO: Put these in a module
+  def self.validate_as=(sym)
+    Thread.current[:validate_as] = sym
+  end
+
+  def self.validate_as(as = nil)
+    if block_given?
+      self.validate_as = as
+      begin
+        yield
+      rescue
+        raise $!
+      ensure
+        self.validate_as = nil
+      end
+    else
+      Thread.current[:validate_as] || :subscriber
+    end
+  end
+
   # Used by the Unbounce Webhook
   def self.find_or_create_with_trial(publication, trial_period_in_days, referrer, user_attributes)
     user_attributes.symbolize_keys!
     user = self.find_by_email(user_attributes[:email].to_s)
     user ||= self.create_trial_user(user_attributes)
+    p user
     # Reset the password
     if user.password.blank?
       user.password = random_password
@@ -100,17 +124,20 @@ class User < ActiveRecord::Base
 
   # Used for creating new users from trial forms
   def self.create_trial_user(attributes)
-    r_password = random_password
-    user = self.create!(
-      :firstname => attributes[:first_name].to_s,
-      :lastname => attributes[:last_name].to_s,
-      :email => attributes[:email].to_s,
-      :email_confirmation => attributes[:email].to_s,
-      :password => r_password,
-      :password_confirmation => r_password,
-      :auto_created => true
-    )
-    user
+    self.validate_as(:system) do
+      attributes.symbolize_keys!
+      p attributes
+      r_password = random_password
+      self.create!(
+        :firstname => (attributes[:first_name] || attributes[:firstname]).to_s,
+        :lastname => (attributes[:last_name] || attributes[:lastname]).to_s,
+        :email => attributes[:email].to_s,
+        :email_confirmation => attributes[:email].to_s,
+        :password => r_password,
+        :password_confirmation => r_password,
+        :auto_created => true
+      )
+    end
   end
  
   # TODO: Could make this an association extension

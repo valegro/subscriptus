@@ -68,7 +68,8 @@ describe Webhooks::UnbouncesController do
 
     it "should return an error" do
       post 'create', { "data.json"=>"{\"ip_address\":\"150.101.226.181\",\"email\":[\"example@example.com\"],\"last_name\":[\"Draper\"],\"first_name\":[\"Daniel\"]}", "page_url"=>"http://unbouncepages.com/bf43f31e-e55b-11df-82d5-12313e003591", "page_id"=>"bf43f31e-e55b-11df-82d5-12313e003591", "variant"=>"a", "publication_id" => @publication.id }
-      response.body.should == "{\"success\":false,\"message\":\"Trial within last 12 months\"}"
+      body_json = JSON.parse(response.body)
+      body_json.should == { "success" => false, "message" => "Trial within last 12 months" }
     end
   end
 
@@ -80,7 +81,8 @@ describe Webhooks::UnbouncesController do
 
     it "should return an error" do
       post 'create', { "data.json"=>"{\"ip_address\":\"150.101.226.181\",\"email\":[\"example@example.com\"],\"last_name\":[\"Draper\"],\"first_name\":[\"Daniel\"]}", "page_url"=>"http://unbouncepages.com/bf43f31e-e55b-11df-82d5-12313e003591", "page_id"=>"bf43f31e-e55b-11df-82d5-12313e003591", "variant"=>"a", "publication_id" => @publication.id }
-      response.body.should == "{\"success\":false,\"message\":\"Trial within last 12 months\"}"
+      body_json = JSON.parse(response.body)
+      body_json.should == { "success" => false, "message" => "Trial within last 12 months" }
     end
   end
 

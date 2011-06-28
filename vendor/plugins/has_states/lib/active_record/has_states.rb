@@ -221,10 +221,12 @@ module ActiveRecord
             self.send(value.named_scope_name).find_in_batches do |group|
               group.each do |record|
                 record.send(value.expire_state_method_name)
+                puts "DONE AA"
               end
             end
           end
         end
+        puts "DONE"
       end
       
       module InstanceMethods

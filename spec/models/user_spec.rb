@@ -244,9 +244,11 @@ describe User do
       }.should raise_error(ActiveRecord::RecordInvalid)
     end
 
-    it "should allow blank :phone_number, :address_1, :city, :postcode, :state, :country, :role if auto_created is true" do
+    it "should allow blank :phone_number, :address_1, :city, :postcode, :state, :country, :role if validates_as :system" do
       lambda {
-        User.create!(:firstname => 'Dan', :lastname => 'Draper', :email => 'daniel@netfox.com', :auto_created => true, :password => 'test', :password_confirmation => 'test')
+        User.validate_as(:system) do
+          User.create!(:firstname => 'Dan', :lastname => 'Draper', :email => 'daniel@netfox.com', :auto_created => true, :password => 'test', :password_confirmation => 'test')
+        end
       }.should_not raise_error
     end
 

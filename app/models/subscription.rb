@@ -111,8 +111,6 @@ class Subscription < ActiveRecord::Base
     expires :active => :squatter
     expires :suspended => :active
   end
-  # TODO: Should go into an observer
-  after_exit_suspended :restore_subscription_expiry
 
   def expired?
     Time.now > self.expires_at
@@ -124,17 +122,6 @@ class Subscription < ActiveRecord::Base
       action.subscription = self
       action.apply
       self.actions << action # TODO: Maybe apply is called as a callback on the association??
-    end
-  end
-
-  def restore_subscription_expiry
-    if self.state_expires_at
-      days_to_restore = (Date.yesterday - self.state_expires_at.to_date).to_i
-      if (days_to_restore < 0)
-        self.expires_at = self.expires_at.advance(:days => days_to_restore).to_datetime
-      end
-      self.state_expires_at = nil
-      self.save
     end
   end
 
