@@ -159,4 +159,10 @@ module CM
   end
 end
 
+# See http://rhnh.net/2008/04/19/testing-flash-now-with-rspec
+module DisableFlashSweeping
+  def sweep
+  end
+end
+
 Wordpress.enabled = true

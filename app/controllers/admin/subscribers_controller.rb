@@ -16,12 +16,14 @@ class Admin::SubscribersController < AdminController
     @subscriber = User.new(params[:user])
     @subscriber.overide_wordpress = true
     @subscriber.role = :subscriber
-    if @subscriber.save
-      flash[:notice] = "Subscriber Details Updated"
-      @subscriber.sync_to_wordpress(@subscriber.password)
-      redirect_to admin_subscriber_path(@subscriber)
-    else
-      render :action => :new
+    User.validate_as(:admin) do
+      if @subscriber.save
+        flash[:notice] = "Subscriber Details Updated"
+        @subscriber.sync_to_wordpress(@subscriber.password)
+        redirect_to admin_subscriber_path(@subscriber)
+      else
+        render :action => :new
+      end
     end
   end
 

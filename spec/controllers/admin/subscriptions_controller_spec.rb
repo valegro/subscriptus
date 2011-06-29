@@ -1,6 +1,9 @@
 require File.dirname(__FILE__) + '/../../spec_helper'
 
 describe Admin::SubscriptionsController, "as admin" do
+
+  integrate_views
+
   before(:each) do
     stub_wordpress
     admin_login
@@ -10,6 +13,58 @@ describe Admin::SubscriptionsController, "as admin" do
   it "should have search" do
     get :search
     response.should be_success
+  end
+
+  describe "create new subscription" do
+    before(:each) do
+      @user = Factory.create(:subscriber)
+      @pub_a = Factory.create(:publication)
+      @pub_b = Factory.create(:publication)
+      @attrs = { :subscriber_id => @user.id, :subscription => { :state => 'active', :expires_at => 2.weeks.from_now.to_s, :publication_id => @pub_a.id }}
+    end
+
+    describe "visit the form" do
+      it "should show me the publications in a drop down"
+    end
+
+    describe "provide all correct data" do
+      it "should add the subscription to the user" do
+        expect {
+          post :create, @attrs
+        }.to change { @user.subscriptions(true).count }.by(1)
+      end
+
+      it "should NOT send an email" do
+        SubscriptionMailer.any_instance.expects(:deliver!).never
+        SubscriptionMailer.any_instance.expects(:send_later).never
+      end
+    end
+
+    describe "try to add a publication for which there is already a subscription" do
+      before(:each) do
+        @user.subscriptions.create(:publication => @pub_a, :expires_at => 2.weeks.from_now, :state => 'active')
+      end
+
+      it "should show me an error" do
+        # See http://rhnh.net/2008/04/19/testing-flash-now-with-rspec
+        @controller.instance_eval { flash.extend(DisableFlashSweeping) }
+        post :create, @attrs
+        flash.now[:error].should == 'The subscriber already has a subscription to that publication'
+      end
+
+      it "should not add the subscription" do
+        expect {
+          post :create, @attrs
+        }.to change { @user.subscriptions(true).count }.by(0)
+      end
+    end
+
+    describe "invalid or missing data" do
+      it "should show me the new page again" do
+        post :create, {:subscriber_id => @user.id}
+        response.should render_template("new")
+      end
+    end
   end
 
   describe "searching" do
@@ -23,7 +78,6 @@ describe Admin::SubscriptionsController, "as admin" do
     it "should assign results and count" do
       Subscription.expects(:per_page).returns( 20 )
       get :search, :page => 2, :search => { :publication_id => 1 }
-      puts response.body
       assigns[:results].should_not be_nil
       assigns[:count].should_not be_nil
     end

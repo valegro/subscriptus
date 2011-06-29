@@ -24,7 +24,7 @@ describe Subscription do
       Timecop.travel(t) do
         # TODO: This a User create but returns a subscription! Eeek! Maybe move to the association? Or return the user? Or rename the method? Or move to subscription?
         @subscription = User.find_or_create_with_trial(@publication, Publication::DEFAULT_TRIAL_EXPIRY, @referrer, @json_hash)
-        @subscription.user.subscriptions.size.should == 1
+        @subscription.user.subscriptions(true).count.should == 1
         @subscription.user.lastname.should == 'Draper'
         @subscription.user.firstname.should == 'Daniel'
         @subscription.user.email.should == 'example@example.com'

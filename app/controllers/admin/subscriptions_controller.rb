@@ -4,6 +4,8 @@ class Admin::SubscriptionsController < AdminController
   include Admin::SubscriptionsHelper
   
   before_filter :find_subscription, :only => [ :verify, :cancel, :suspend, :unsuspend, :show, :set_expiry, :unsubscribe, :activate ]
+  before_filter :find_subscriber, :only => [ :new, :create ]
+  before_filter :load_publications_and_states, :only => [ :new, :create ]
 
   rescue_from(Exceptions::PaymentTokenMissing) do
     flash[:error] = "The User has no payment gateway token - the payment will need to processed manually"
@@ -15,12 +17,32 @@ class Admin::SubscriptionsController < AdminController
     render :action => action_name
   end
 
+  rescue_from(Exceptions::DuplicateSubscription) do
+    flash.now[:error] = "The subscriber already has a subscription to that publication"
+    @subscription = Subscription.new(params[:subscription])
+    render :action => :new
+  end
+
   def index
     @actions = SubscriptionAction.recent.paginate(:page => params[:page] || 1)
   end
 
   def show
     @log_entries = @subscription.log_entries.recent.paginate(:page => params[:page] || 1)
+  end
+
+  def new
+    @subscription = @subscriber.subscriptions.build
+  end
+
+  def create
+    @subscription = @subscriber.subscriptions.build(params[:subscription])
+    if @subscription.save
+      flash[:notice] = "Added subscription"
+      redirect_to :action => :show, :id => @subscription.id
+    else
+      render :action => :new
+    end
   end
 
   def search
@@ -139,7 +161,16 @@ class Admin::SubscriptionsController < AdminController
 
   protected
   
-  def find_subscription
-    @subscription = Subscription.find(params[:id])
-  end
+    def find_subscription
+      @subscription = Subscription.find(params[:id])
+    end
+
+    def find_subscriber
+      @subscriber = User.find(params[:subscriber_id])
+    end
+
+    def load_publications_and_states
+      @publications = Publication.all
+      @states = %w(active squatter trial)
+    end
 end

@@ -25,7 +25,7 @@ describe Subscription do
     u = Factory.create(:user)
     u.subscriptions << Factory.create(:subscription, :publication => mypub)
     lambda {
-      u.subscriptions << Factory.create(:subscription, :publication => mypub)
+      u.subscriptions << Factory.build(:subscription, :publication => mypub)
     }.should raise_exception
   end
 
