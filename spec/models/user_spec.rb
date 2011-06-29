@@ -138,7 +138,7 @@ describe User do
           :first_name => 'Daniel', :last_name => 'Draper', :email => 'daniel2@netfox.com', :options => { :weekender => true }
         })
         @sub.state.should == 'trial'
-        @sub.user.subscriptions.size.should == 2
+        @sub.user.subscriptions(true).count.should == 2
         @sub.user.has_weekender?.should be(true)
       }.to change { User.count }.by(1)
     end

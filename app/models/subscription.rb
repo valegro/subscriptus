@@ -48,6 +48,16 @@ class Subscription < ActiveRecord::Base
     end
   end
 
+  def validate
+    unless self.user.blank?
+      puts "HERE"
+      p self.user.subscriptions.map { |s| s.publication.id }
+      raise Exceptions::DuplicateSubscription if self.user.subscriptions.detect do |s|
+        s.publication_id == self.publication_id && s.id != self.id
+      end
+    end
+  end
+
   # Used to specify what the pending state is waiting on
   enum_attr :pending, %w(payment concession_verification student_verification)
   

@@ -1,0 +1,18 @@
+<div class="title">
+  <%= content_tag :h2, "Add Subscription" %>
+  <div class="actions">
+    <%= link_to 'Back to Subscriber', admin_subscriber_path(@subscriber), :class => 'back' %>
+  </div>
+</div>
+
+<div class="grid">
+  <div class="frame span_6">
+    <h3>Adding Subscription for <%= @subscriber.name %></h3>
+    <% form_for @subscription, :url => admin_subscriber_subscriptions_path(@subscriber), :builder => Reform::Builder, :html => { :class => "form" } do |form| %>
+      <%= form.select :publication_id, @publications.map { |p| [ p.name, p.id ] } %>
+      <%= form.select :state, @states.map { |s| [ s.capitalize, s ] } %>
+      <%= form.date_select :expires_at %>
+      <%= form.submit "Create" %>
+    <% end %>
+  </div>
+</div>
