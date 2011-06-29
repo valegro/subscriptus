@@ -13,7 +13,7 @@ describe UserMailer do
     end
 
     it "should include the reset link" do
-      @response.body.should include_text("http://example.com/password_resets/abcdefg/edit")
+      @response.body.should include_text("https://example.com/password_resets/abcdefg/edit")
     end
 
     it "should have the right contact details" do
