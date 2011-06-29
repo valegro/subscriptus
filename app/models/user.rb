@@ -135,7 +135,8 @@ class User < ActiveRecord::Base
         :email_confirmation => attributes[:email].to_s,
         :password => r_password,
         :password_confirmation => r_password,
-        :auto_created => true
+        :auto_created => true,
+        :overide_wordpress => attributes[:overide_wordpress]
       )
     end
   end
