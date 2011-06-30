@@ -26,8 +26,8 @@ class SubscribeFormBuilder < ActionView::Helpers::FormBuilder
       label << "<span class='mandatory'>*</span>" if options[:required]
       returning("") do |s|
         s << "<div class='form-row'>"
-        s << yield
         s << label(method, label)
+        s << yield
         s << "<span class='instructions'>#{options[:help]}</span>" if options.has_key?(:help)
         s << "</div>"
       end
