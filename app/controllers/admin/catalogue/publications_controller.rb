@@ -1,6 +1,6 @@
 class Admin::Catalogue::PublicationsController < Admin::CatalogueController
   before_filter :find_publication, :only => [ :destroy, :edit, :show, :update ]
-  before_filter :load_offers, :only => [ :new, :edit, :create, :update ]
+  before_filter :load_offers, :only => [ :edit, :create, :update ]
 
   def index
     @publications = Publication.paginate(:page => params[:page] || 1, :order => sort_order('name'))
@@ -8,6 +8,7 @@ class Admin::Catalogue::PublicationsController < Admin::CatalogueController
 
   def new
     @publication = Publication.new
+    @offers = @publication.offers
   end
 
   def show
