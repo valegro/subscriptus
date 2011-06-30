@@ -3,13 +3,19 @@ require 'spec_helper'
 describe Subscription do
 
   before(:each) do
-    @subscription = Subscription.new()
+    stub_wordpress
+    @start_time = "2011-01-01".to_time
+    Timecop.freeze(@start_time)
+    @subscription = Factory.create(:subscription)
     cm_return = stub(:success? => true)
     CM::Recipient.stubs(:exists?).returns(true)
     CM::Recipient.stubs(:find_all).returns(cm_return)
     CM::Recipient.stubs(:update)
     CM::Recipient.stubs(:create!)
-    stub_wordpress
+  end
+
+  after(:each) do
+    Timecop.return
   end
 
   describe "upon save" do
@@ -102,7 +108,10 @@ describe Subscription do
   end
 
   describe "apply_action" do
+    # TODO: describe "to an active subscription" do - its different for new subs and renewals
     before(:each) do
+      @subscription = Factory.create(:active_subscription, :expires_at => Time.now)
+      puts "GGG: #{@subscription.inspect}"
       @payment = Factory.build(:payment)
       @action = Factory.build(:subscription_action, :term_length => 5)
       @action.payment = @payment
@@ -116,6 +125,18 @@ describe Subscription do
     it "should increment the expiry date" do
       Subscription.any_instance.expects(:increment_expires_at).with(5)
       @subscription.apply_action(@action)
+    end
+
+    it "should set the old expiry_date" do
+      puts "AAAAA"
+      @subscription.apply_action(@action)
+      @action.old_expires_at.should == @start_time
+    end
+
+    it "should set the new expiry_date" do
+      puts "AAAAA2"
+      @subscription.apply_action(@action)
+      @action.new_expires_at.should == @start_time + 5.months
     end
 
     it "should add the action to the actions list" do

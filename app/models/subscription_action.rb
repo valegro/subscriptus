@@ -19,6 +19,9 @@ class SubscriptionAction < ActiveRecord::Base
     raise "No Subscription Set" if self.subscription.blank?
     self.class.transaction do
       self.subscription.increment_expires_at(self.term_length)
+      if self.subscription.changes.has_key?('expires_at')
+        self.old_expires_at, self.new_expires_at = self.subscription.changes['expires_at']
+      end
       payment.process!(:token => subscription.user.try(:payment_gateway_token))
       subscription.save!
       callback(:after_apply)

@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110608082038) do
+ActiveRecord::Schema.define(:version => 20110630131222) do
 
   create_table "archived_publications", :id => false, :force => true do |t|
     t.integer  "id"
@@ -43,19 +43,18 @@ ActiveRecord::Schema.define(:version => 20110608082038) do
     t.datetime "expires_at"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.datetime "deleted_at"
+    t.string   "order_num"
     t.integer  "source_id"
     t.text     "referrer"
-    t.boolean  "solus",             :default => false
-    t.boolean  "weekender",         :default => true
+    t.boolean  "solus"
+    t.boolean  "weekender"
+    t.datetime "deleted_at"
     t.string   "pending"
     t.datetime "state_expires_at"
     t.integer  "term_length"
     t.boolean  "concession",        :default => false
     t.integer  "pending_action_id"
   end
-
-  add_index "archived_subscriptions", ["id"], :name => "index_archived_subscriptions_on_id"
 
   create_table "audit_log_entries", :force => true do |t|
     t.integer  "user_id"
@@ -203,6 +202,8 @@ ActiveRecord::Schema.define(:version => 20110608082038) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.boolean  "renewal",         :default => false
+    t.datetime "old_expires_at"
+    t.datetime "new_expires_at"
   end
 
   create_table "subscription_gifts", :force => true do |t|
@@ -210,7 +211,7 @@ ActiveRecord::Schema.define(:version => 20110608082038) do
     t.integer  "gift_id"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.boolean  "included",               :default => false
+    t.boolean  "included"
   end
 
   create_table "subscription_invoices", :force => true do |t|
@@ -260,6 +261,7 @@ ActiveRecord::Schema.define(:version => 20110608082038) do
     t.datetime "expires_at"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "order_num"
     t.integer  "source_id"
     t.text     "referrer"
     t.boolean  "solus",             :default => false
@@ -312,6 +314,7 @@ ActiveRecord::Schema.define(:version => 20110608082038) do
     t.datetime "updated_at"
     t.string   "role"
     t.boolean  "admin"
+    t.string   "recurrent_id"
     t.boolean  "auto_created"
     t.string   "hear_about"
     t.string   "company"
