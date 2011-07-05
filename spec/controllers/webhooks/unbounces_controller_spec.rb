@@ -13,90 +13,106 @@ describe Webhooks::UnbouncesController do
     https!
   end
 
-  it "should create a new trial subscription" do
-    User.expects(:find_or_create_with_trial).with(
-      instance_of(Publication),
-      Publication::DEFAULT_TRIAL_EXPIRY,
-      "http://unbouncepages.com/bf43f31e-e55b-11df-82d5-12313e003591",
-      { :first_name => 'Daniel', :last_name => 'Draper', :email => 'example@example.com', :ip_address => '150.101.226.181',
-        :options => { :solus => nil, :weekender => nil }
-      }
-    )
-    post 'create', { "data.json"=>"{\"ip_address\":\"150.101.226.181\",\"email\":[\"example@example.com\"],\"last_name\":[\"Draper\"],\"first_name\":[\"Daniel\"]}", "page_url"=>"http://unbouncepages.com/bf43f31e-e55b-11df-82d5-12313e003591", "page_id"=>"bf43f31e-e55b-11df-82d5-12313e003591", "variant"=>"a", "publication_id" => @publication.id }
-    response.body.should == "{\"success\":true}"
-  end
-
-  it "should create a new trial subscription with weekender" do
-    User.expects(:find_or_create_with_trial).with(
-      instance_of(Publication),
-      Publication::DEFAULT_TRIAL_EXPIRY,
-      "http://unbouncepages.com/bf43f31e-e55b-11df-82d5-12313e003591",
-      { :first_name => 'Daniel', :last_name => 'Draper', :email => 'example@example.com', :ip_address => '150.101.226.181',
-        :options => { :solus => false, :weekender => true }
-      }
-    )
-
-    post('create', {
-      "data.json"=>"{\"ip_address\":\"150.101.226.181\",\"email\":[\"example@example.com\"],\"last_name\":[\"Draper\"],\"first_name\":[\"Daniel\"],\"options\":[\"Yes - send me Your Weekender\"]}",
-      "page_url"=>"http://unbouncepages.com/bf43f31e-e55b-11df-82d5-12313e003591",
-      "page_id"=>"bf43f31e-e55b-11df-82d5-12313e003591",
-      "variant"=>"a",
-      "publication_id" => @publication.id 
-    })
-    response.body.should == "{\"success\":true}"
-  end
-
-  it "should create a new trial subscription with solus" do
-    User.expects(:find_or_create_with_trial).with(
-      instance_of(Publication),
-      Publication::DEFAULT_TRIAL_EXPIRY,
-      "http://unbouncepages.com/bf43f31e-e55b-11df-82d5-12313e003591",
-      { :first_name => 'Daniel', :last_name => 'Draper', :email => 'example@example.com', :ip_address => '150.101.226.181',
-        :options => { :solus => true, :weekender => false }
-      }
-    )
-
-    post 'create', { "data.json"=>"{\"ip_address\":\"150.101.226.181\",\"email\":[\"example@example.com\"],\"last_name\":[\"Draper\"],\"first_name\":[\"Daniel\"],\"options\":[\"Tick this box if you want to receive carefully selected offers by email from advertisers screened by Crikey\"]}", "page_url"=>"http://unbouncepages.com/bf43f31e-e55b-11df-82d5-12313e003591", "page_id"=>"bf43f31e-e55b-11df-82d5-12313e003591", "variant"=>"a", "publication_id" => @publication.id }
-    response.body.should == "{\"success\":true}"
-  end
-
-  describe "if the exists with a trial subscription" do
-    before(:each) do
-      @user = Factory.create(:user, :email => 'example@example.com')
-      @subscription = Factory.create(:subscription, :state => 'trial', :user => @user, :publication => @publication)
+  shared_examples_for "an unbounce webhook" do
+    it "should create a new trial subscription" do
+      User.expects(:find_or_create_with_trial).with(
+        instance_of(Publication),
+        Publication::DEFAULT_TRIAL_EXPIRY,
+        "http://unbouncepages.com/bf43f31e-e55b-11df-82d5-12313e003591",
+        { :first_name => 'Daniel', :last_name => 'Draper', :email => 'example@example.com', :ip_address => '150.101.226.181',
+          :options => { :solus => nil, :weekender => nil }
+        }
+      )
+      self.send(@_method, 'create', { "data.json"=>"{\"ip_address\":\"150.101.226.181\",\"email\":[\"example@example.com\"],\"last_name\":[\"Draper\"],\"first_name\":[\"Daniel\"]}", "page_url"=>"http://unbouncepages.com/bf43f31e-e55b-11df-82d5-12313e003591", "page_id"=>"bf43f31e-e55b-11df-82d5-12313e003591", "variant"=>"a", "publication_id" => @publication.id })
+      response.body.should == "{\"success\":true}"
     end
 
-    it "should return an error" do
-      post 'create', { "data.json"=>"{\"ip_address\":\"150.101.226.181\",\"email\":[\"example@example.com\"],\"last_name\":[\"Draper\"],\"first_name\":[\"Daniel\"]}", "page_url"=>"http://unbouncepages.com/bf43f31e-e55b-11df-82d5-12313e003591", "page_id"=>"bf43f31e-e55b-11df-82d5-12313e003591", "variant"=>"a", "publication_id" => @publication.id }
-      body_json = JSON.parse(response.body)
-      body_json.should == { "success" => false, "message" => "Trial within last 12 months" }
-    end
-  end
+    it "should create a new trial subscription with weekender" do
+      User.expects(:find_or_create_with_trial).with(
+        instance_of(Publication),
+        Publication::DEFAULT_TRIAL_EXPIRY,
+        "http://unbouncepages.com/bf43f31e-e55b-11df-82d5-12313e003591",
+        { :first_name => 'Daniel', :last_name => 'Draper', :email => 'example@example.com', :ip_address => '150.101.226.181',
+          :options => { :solus => false, :weekender => true }
+        }
+      )
 
-  describe "if the exists with a squatter subscription that has been that way for less than 12 months" do
-    before(:each) do
-      @user = Factory.create(:user, :email => 'example@example.com')
-      @subscription = Factory.create(:subscription, :state => 'squatter', :user => @user, :publication => @publication)
-    end
-
-    it "should return an error" do
-      post 'create', { "data.json"=>"{\"ip_address\":\"150.101.226.181\",\"email\":[\"example@example.com\"],\"last_name\":[\"Draper\"],\"first_name\":[\"Daniel\"]}", "page_url"=>"http://unbouncepages.com/bf43f31e-e55b-11df-82d5-12313e003591", "page_id"=>"bf43f31e-e55b-11df-82d5-12313e003591", "variant"=>"a", "publication_id" => @publication.id }
-      body_json = JSON.parse(response.body)
-      body_json.should == { "success" => false, "message" => "Trial within last 12 months" }
-    end
-  end
-
-  describe "if the exists with a squatter subscription that has been that way for MORE than 12 months" do
-    before(:each) do
-      @user = Factory.create(:user, :email => 'example@example.com')
-      @subscription = Factory.create(:subscription, :state => 'squatter', :user => @user, :publication => @publication)
+      post('create', {
+        "data.json"=>"{\"ip_address\":\"150.101.226.181\",\"email\":[\"example@example.com\"],\"last_name\":[\"Draper\"],\"first_name\":[\"Daniel\"],\"options\":[\"Yes - send me Your Weekender\"]}",
+        "page_url"=>"http://unbouncepages.com/bf43f31e-e55b-11df-82d5-12313e003591",
+        "page_id"=>"bf43f31e-e55b-11df-82d5-12313e003591",
+        "variant"=>"a",
+        "publication_id" => @publication.id 
+      })
+      response.body.should == "{\"success\":true}"
     end
 
-    it "should make the subscription a trial again" do
-      Timecop.travel(13.months.from_now) do
+    it "should create a new trial subscription with solus" do
+      User.expects(:find_or_create_with_trial).with(
+        instance_of(Publication),
+        Publication::DEFAULT_TRIAL_EXPIRY,
+        "http://unbouncepages.com/bf43f31e-e55b-11df-82d5-12313e003591",
+        { :first_name => 'Daniel', :last_name => 'Draper', :email => 'example@example.com', :ip_address => '150.101.226.181',
+          :options => { :solus => true, :weekender => false }
+        }
+      )
+
+      post 'create', { "data.json"=>"{\"ip_address\":\"150.101.226.181\",\"email\":[\"example@example.com\"],\"last_name\":[\"Draper\"],\"first_name\":[\"Daniel\"],\"options\":[\"Tick this box if you want to receive carefully selected offers by email from advertisers screened by Crikey\"]}", "page_url"=>"http://unbouncepages.com/bf43f31e-e55b-11df-82d5-12313e003591", "page_id"=>"bf43f31e-e55b-11df-82d5-12313e003591", "variant"=>"a", "publication_id" => @publication.id }
+      response.body.should == "{\"success\":true}"
+    end
+
+    describe "if the exists with a trial subscription" do
+      before(:each) do
+        @user = Factory.create(:user, :email => 'example@example.com')
+        @subscription = Factory.create(:subscription, :state => 'trial', :user => @user, :publication => @publication)
+      end
+
+      it "should return an error" do
         post 'create', { "data.json"=>"{\"ip_address\":\"150.101.226.181\",\"email\":[\"example@example.com\"],\"last_name\":[\"Draper\"],\"first_name\":[\"Daniel\"]}", "page_url"=>"http://unbouncepages.com/bf43f31e-e55b-11df-82d5-12313e003591", "page_id"=>"bf43f31e-e55b-11df-82d5-12313e003591", "variant"=>"a", "publication_id" => @publication.id }
-        Subscription.find(@subscription.id).trial?.should be(true)
+        body_json = JSON.parse(response.body)
+        body_json.should == { "success" => false, "message" => "Trial within last 12 months" }
       end
     end
+
+    describe "if the exists with a squatter subscription that has been that way for less than 12 months" do
+      before(:each) do
+        @user = Factory.create(:user, :email => 'example@example.com')
+        @subscription = Factory.create(:subscription, :state => 'squatter', :user => @user, :publication => @publication)
+      end
+
+      it "should return an error" do
+        post 'create', { "data.json"=>"{\"ip_address\":\"150.101.226.181\",\"email\":[\"example@example.com\"],\"last_name\":[\"Draper\"],\"first_name\":[\"Daniel\"]}", "page_url"=>"http://unbouncepages.com/bf43f31e-e55b-11df-82d5-12313e003591", "page_id"=>"bf43f31e-e55b-11df-82d5-12313e003591", "variant"=>"a", "publication_id" => @publication.id }
+        body_json = JSON.parse(response.body)
+        body_json.should == { "success" => false, "message" => "Trial within last 12 months" }
+      end
+    end
+
+    describe "if the exists with a squatter subscription that has been that way for MORE than 12 months" do
+      before(:each) do
+        @user = Factory.create(:user, :email => 'example@example.com')
+        @subscription = Factory.create(:subscription, :state => 'squatter', :user => @user, :publication => @publication)
+      end
+
+      it "should make the subscription a trial again" do
+        Timecop.travel(13.months.from_now) do
+          post 'create', { "data.json"=>"{\"ip_address\":\"150.101.226.181\",\"email\":[\"example@example.com\"],\"last_name\":[\"Draper\"],\"first_name\":[\"Daniel\"]}", "page_url"=>"http://unbouncepages.com/bf43f31e-e55b-11df-82d5-12313e003591", "page_id"=>"bf43f31e-e55b-11df-82d5-12313e003591", "variant"=>"a", "publication_id" => @publication.id }
+          Subscription.find(@subscription.id).trial?.should be(true)
+        end
+      end
+    end
+  end
+
+  describe "when the method is post" do
+    before(:each) do
+      @_method = :post
+    end
+    it_should_behave_like "an unbounce webhook"
+  end
+
+  describe "when the method is get" do
+    before(:each) do
+      @_method = :get
+    end
+    it_should_behave_like "an unbounce webhook"
   end
 end

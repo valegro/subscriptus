@@ -64,7 +64,8 @@ ActionController::Routing::Routes.draw do |map|
 
   # Webhooks
   map.namespace :webhooks do |webhooks|
-    webhooks.resource :unbounce
+    webhooks.connect "unbounce", :action => "create", :controller => "unbounce"
+    #webhooks.resource :unbounce, :collection => { :index => [ :get, :post ] }
   end
   
   # The priority is based upon order of creation: first created -> highest priority.
