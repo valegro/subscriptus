@@ -8,3 +8,4 @@ public/system/*
 *.swp
 capybara-*.html
 .bundle/
+.rvmrc
