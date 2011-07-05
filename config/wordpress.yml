@@ -3,6 +3,7 @@ common: &common
   key: '$P$B2CNRpY/MCdmoNenQKrtdRyD8H8LG9.'
   
 development:
+  endpoint: 'http://localhost:3000/login_connector'
   <<: *common
 test:
   <<: *common

@@ -66,6 +66,8 @@ gem 'enumerated_attribute'
 
 gem 'ruby-debug'
 
+gem 'liquid'
+
 group :development, :test, :cucmber do
   gem 'pg'
   gem 'webmock', :require => false

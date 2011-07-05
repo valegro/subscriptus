@@ -101,6 +101,7 @@ GEM
       configuration (>= 0.0.5)
       rake (>= 0.8.1)
     linecache (0.43)
+    liquid (2.2.2)
     mechanize (1.0.0)
       nokogiri (>= 1.2.1)
     meta_programming (0.2.2)
@@ -200,6 +201,7 @@ DEPENDENCIES
   jrails
   json_pure
   launchy
+  liquid
   mechanize
   mocha (~> 0.9.8)
   mover!

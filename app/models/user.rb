@@ -6,6 +6,8 @@ class User < ActiveRecord::Base
   acts_as_authentic do |c|
     c.validate_login_field = false
   end
+  
+  liquid_methods :firstname, :email
 
   has_many :audit_log_entries
   has_many :subscriptions, :before_add => :check_duplicate_subscription, :dependent => :destroy

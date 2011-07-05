@@ -30,7 +30,7 @@ class SubscriptionMailer < ActionMailer::Base
     recipients subscription.user.email
     subject "New Trial Subscription"
     from NO_REPLY
-    body :user => subscription.user, :password => subscription.temp_password
+    body :user => subscription.user, :password => subscription.temp_password, :unsubscribe_url => unsubscribe_url(:user_id => subscription.user.id)
     content_type 'text/html'
   end
   
@@ -96,5 +96,17 @@ class SubscriptionMailer < ActionMailer::Base
     from NO_REPLY
     body :subscription => subscription, :user => subscription.user
     content_type 'text/html'
+  end
+  
+  def render_message(template, body)
+    liquid_template_path = File.join('public', 'templates', 'crikey')
+    Liquid::Template.file_system = Liquid::LocalFileSystem.new(liquid_template_path)
+    liquid_template = File.join(mailer_name, template)
+    
+    unless File.exists?(Liquid::Template.file_system.full_path(liquid_template))
+      super
+    else
+      Liquid::Template.parse(Liquid::Template.file_system.read_template_file(liquid_template)).render(HashWithIndifferentAccess.new(body).to_hash)
+    end
   end
 end
