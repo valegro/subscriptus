@@ -99,14 +99,25 @@ class SubscriptionMailer < ActionMailer::Base
   end
   
   def render_message(template, body)
-    liquid_template_path = File.join('public', 'templates', 'crikey')
-    Liquid::Template.file_system = Liquid::LocalFileSystem.new(liquid_template_path)
+    return super unless self.respond_to?(:liquid_template_path)
+    Liquid::Template.file_system = Liquid::LocalFileSystem.new(File.join('public', 'templates', liquid_template_path))
     liquid_template = File.join(mailer_name, template)
     
     unless File.exists?(Liquid::Template.file_system.full_path(liquid_template))
       super
     else
-      Liquid::Template.parse(Liquid::Template.file_system.read_template_file(liquid_template)).render(HashWithIndifferentAccess.new(body).to_hash)
+ Liquid::Template.parse(Liquid::Template.file_system.read_template_file(liquid_template)).render(HashWithIndifferentAccess.new(body).to_hash)
+    end
+  end
+  
+  def self.with_template(_liquid_template_path)
+    mailer = Class.new(self) do
+      cattr_accessor :liquid_template_path
+    end
+    
+    mailer.tap do |m|
+      m.liquid_template_path = _liquid_template_path
+      m.mailer_name = self.name.underscore
     end
   end
 end
