@@ -22,6 +22,8 @@ class Subscription < ActiveRecord::Base
   has_many :log_entries, :class_name => "SubscriptionLogEntry", :dependent => :destroy
   has_many :orders
   
+  delegate :template_name, :to => :publication
+  
   attr_accessor :temp_password # Used for sending password to new trialers
   attr_accessor :note # Used to save notes to the subscription
   attr_accessor :terms

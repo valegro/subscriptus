@@ -30,7 +30,10 @@ User.create!(:login => "netfox",
 p = Publication.create!(
   :name => "Test Publication",
   :description => "This is a test publication.",
-  :forgot_password_link => "http://example.com"
+  :forgot_password_link => "http://example.com",
+  :custom_domain => "crikey.com.au",
+  :template_name => "crikey"
+  
 )
 #<Offer id: 1, publication_id: 1, name: "Test Offer", expires: "2012-06-30 00:00:00", auto_renews: true, created_at: "2011-06-30 02:43:58", updated_at: "2011-06-30 02:43:58", trial: true, primary_offer: false> 
 
