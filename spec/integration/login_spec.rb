@@ -3,6 +3,7 @@ require 'spec_helper'
 describe "Sessions", :type => :integration do
   before(:each) do
     stub_wordpress
+    https!
     @offer = Factory.create(:offer, :id => 10)
     @user = Factory.create(:user, :email => 'daniel@codefire.com.au')
   end
@@ -10,7 +11,6 @@ describe "Sessions", :type => :integration do
   describe "when I visit the login page" do
     before(:each) do
       visit "/login"
-      p cookies
     end
 
     it "should prompt me for my email and password" do
@@ -47,7 +47,7 @@ describe "Sessions", :type => :integration do
         end
 
         it "should take me to the admin console" do
-          current_url.should == 'http://www.example.com/admin/subscriptions'
+          current_url.should == 'https://www.example.com/admin/subscriptions'
         end
       end
 
