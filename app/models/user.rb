@@ -120,7 +120,7 @@ class User < ActiveRecord::Base
     sub = user.add_or_reset_trial(publication, trial_period_in_days, referrer, solus)
     # Reset the password
     sub.temp_password = user.password
-    SubscriptionMailer.deliver_new_trial(sub)
+    SubscriptionMailer.with_template(sub.template_name).deliver_new_trial(sub)
     return sub
   end
 

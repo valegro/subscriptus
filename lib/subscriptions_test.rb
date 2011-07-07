@@ -92,7 +92,7 @@ logger.warn("Starting import at #{Time.now}")
 start_time = Time.now
 
 CmailerUser.find_each(:include => [:subscriptions, :address]) do |u|
-  puts u.email
+  # puts u.email
   begin
     Rails.logger.silence do
       User.transaction do

@@ -54,7 +54,6 @@ class Subscription < ActiveRecord::Base
 
   def validate
     unless self.user.blank?
-      puts "HERE"
       p self.user.subscriptions.map { |s| s.publication.id }
       raise Exceptions::DuplicateSubscription if self.user.subscriptions.detect do |s|
         s.publication_id == self.publication_id && s.id != self.id

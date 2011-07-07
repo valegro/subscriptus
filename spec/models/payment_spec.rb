@@ -186,7 +186,7 @@ describe Payment do
     it "should NOT be delivered after processing if there is a NO subscription attached" do
       stub_wordpress
       payment = Factory.build(:payment, :subscription_action => nil)
-      SubscriptionMailer.expects(:send_later).never
+      stub_mailer(SubscriptionMailer).expects(:send_later).never
       payment.process!
     end
 
@@ -196,7 +196,7 @@ describe Payment do
       action = Factory.create(:subscription_action, :subscription => subscription)
       subscription.actions << action
       payment = Factory.build(:payment, :subscription_action => action)
-      SubscriptionMailer.expects(:send_later).with(:deliver_activation, subscription).never
+      stub_mailer(SubscriptionMailer).expects(:send_later).with(:deliver_activation, subscription).never
       payment.save!
     end
   end

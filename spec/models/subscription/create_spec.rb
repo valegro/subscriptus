@@ -22,7 +22,7 @@ describe Subscription do
         :options => { :solus => false }
       }
       @publication = Factory.create(:publication)
-      SubscriptionMailer.expects(:deliver_new_trial).with(instance_of(Subscription))
+      stub_mailer(SubscriptionMailer).expects(:deliver_new_trial).with(instance_of(Subscription))
       Subscription.any_instance.expects(:temp_password=)
       User.find_or_create_with_trial(@publication, Publication::DEFAULT_TRIAL_EXPIRY, 'referrer', @json_hash)
     end
@@ -49,19 +49,19 @@ describe Subscription do
 
     it "should deliver a pending email for new pending student subscriptions" do
       @subscription = Factory.build(:pending_subscription, :pending => 'student_verification')
-      SubscriptionMailer.expects(:send_later).with(:deliver_pending_student_verification, @subscription)
+      stub_mailer(SubscriptionMailer).expects(:send_later).with(:deliver_pending_student_verification, @subscription)
       @subscription.save!
     end
 
     it "should deliver a pending email for new pending ceoncession subscriptions" do
       @subscription = Factory.build(:pending_subscription, :pending => 'concession_verification')
-      SubscriptionMailer.expects(:send_later).with(:deliver_pending_concession_verification, @subscription)
+      stub_mailer(SubscriptionMailer).expects(:send_later).with(:deliver_pending_concession_verification, @subscription)
       @subscription.save!
     end
 
     it "should deliver a pending email for new pending payment subscriptions" do
       @subscription = Factory.build(:pending_subscription, :pending => 'payment')
-      SubscriptionMailer.expects(:send_later).with(:deliver_pending_payment, @subscription)
+      stub_mailer(SubscriptionMailer).expects(:send_later).with(:deliver_pending_payment, @subscription)
       @subscription.save!
     end
 

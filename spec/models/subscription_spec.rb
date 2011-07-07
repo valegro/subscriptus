@@ -111,7 +111,6 @@ describe Subscription do
     # TODO: describe "to an active subscription" do - its different for new subs and renewals
     before(:each) do
       @subscription = Factory.create(:active_subscription, :expires_at => Time.now)
-      puts "GGG: #{@subscription.inspect}"
       @payment = Factory.build(:payment)
       @action = Factory.build(:subscription_action, :term_length => 5)
       @action.payment = @payment
@@ -128,13 +127,11 @@ describe Subscription do
     end
 
     it "should set the old expiry_date" do
-      puts "AAAAA"
       @subscription.apply_action(@action)
       @action.old_expires_at.should == @start_time
     end
 
     it "should set the new expiry_date" do
-      puts "AAAAA2"
       @subscription.apply_action(@action)
       @action.new_expires_at.should == @start_time + 5.months
     end

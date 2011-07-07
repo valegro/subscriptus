@@ -40,7 +40,7 @@ describe Subscription do
 
     describe "upon verify" do
       before(:each) do
-        SubscriptionMailer.stubs(:deliver_verified).returns(true)
+        # SubscriptionMailer.stubs(:deliver_verified).returns(true)
       end
 
       it "should be active" do
@@ -65,8 +65,8 @@ describe Subscription do
       end
 
       it "should deliver an email" do
-        SubscriptionMailer.expects(:send_later).with(:deliver_verified, @subscription)
-        SubscriptionMailer.expects(:send_later).with(:deliver_activation, instance_of(Subscription))
+        stub_mailer(SubscriptionMailer).expects(:send_later).with(:deliver_verified, @subscription)
+        stub_mailer(SubscriptionMailer).expects(:send_later).with(:deliver_activation, @subscription)
         @subscription.verify!
       end
 

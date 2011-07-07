@@ -126,8 +126,9 @@ def stub_wordpress
 end
 
 def stub_mailer(klass)
-  mailer_stub = stub(klass.name, :deliver_pending_expired => true)
-  klass.stubs(:with_template).returns(mailer_stub)
+  @mailer_stub ||= stub(klass.name) #, :deliver_new_trial => true, :deliver_pending_expired => true, :deliver_verified => true)
+  klass.stubs(:with_template).returns(@mailer_stub)
+  @mailer_stub
 end
 
 

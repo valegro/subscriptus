@@ -2,15 +2,18 @@ require 'spec_helper'
 
 describe SubscriptionFactory, "renewals" do
   shared_examples_for "An active subscription" do
+    before(:each) do
+      stub_mailer(SubscriptionMailer).expects(:send_later).with(:deliver_activation, instance_of(Subscription))
+
+    end
+    
     it "should set the state to active" do
-      SubscriptionMailer.expects(:send_later).with(:deliver_activation, instance_of(Subscription))
       factory = SubscriptionFactory.new(@offer, :attributes => @attributes, :payment_attributes => @payment_attributes)
       factory.update(@subscription)
       @subscription.state.should == 'active'
     end
 
     it "should add a subscription action" do
-      SubscriptionMailer.expects(:send_later).with(:deliver_activation, instance_of(Subscription))
       expect {
         factory = SubscriptionFactory.new(@offer, :attributes => @attributes, :payment_attributes => @payment_attributes)
         factory.update(@subscription)
@@ -25,7 +28,6 @@ describe SubscriptionFactory, "renewals" do
     # TODO: Payments are missing here
 
     it "should deliver an activation email" do
-      SubscriptionMailer.expects(:send_later).with(:deliver_activation, instance_of(Subscription))
       factory = SubscriptionFactory.new(@offer, :attributes => @attributes, :payment_attributes => @payment_attributes)
       factory.update(@subscription)
     end
@@ -33,9 +35,10 @@ describe SubscriptionFactory, "renewals" do
 
   shared_examples_for "A pending subscription" do
     before(:each) do
+      stub_mailer(SubscriptionMailer).expects(:send_later).with(:deliver_pending_student_verification, instance_of(Subscription))
+      
       @concession_term = Factory.create(:offer_term, :concession => true)
       @offer.offer_terms << @concession_term
-      SubscriptionMailer.expects(:send_later).with(:deliver_pending_student_verification, instance_of(Subscription))
       factory = SubscriptionFactory.new(
         @offer,
         :term_id => @concession_term.id,
@@ -155,7 +158,7 @@ describe SubscriptionFactory, "renewals" do
   # Scenario
   describe "active subscription is renewed but will require verifcation" do
     before(:each) do
-      #SubscriptionMailer.expects(:send_later).with(:deliver_pending, instance_of(Subscription))
+      #stub_mailer(SubscriptionMailer).expects(:send_later).with(:deliver_pending, instance_of(Subscription))
     end
 
     it "should keep the state active until the end of the current term" # How? What else?
@@ -195,7 +198,7 @@ describe SubscriptionFactory, "renewals" do
     before(:each) do
       @subscription = Factory.create(:pending_subscription, :user => Factory.create(:user_with_token))
       # They actually wern't verified!
-      SubscriptionMailer.expects(:send_later).with(:deliver_verified, instance_of(Subscription)) #.never (#TODO: Not sure this is really the correct behaviour!)
+      stub_mailer(SubscriptionMailer).expects(:send_later).with(:deliver_verified, instance_of(Subscription)) #.never (#TODO: Not sure this is really the correct behaviour!)
     end
 
     it_should_behave_like "An active subscription"

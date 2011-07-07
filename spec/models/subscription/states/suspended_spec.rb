@@ -38,7 +38,7 @@ describe Subscription do
     end
 
     it "should set the state to active" do
-      SubscriptionMailer.expects(:send_later).with(:deliver_unsuspended, @subscription)
+      stub_mailer(SubscriptionMailer).expects(:send_later).with(:deliver_unsuspended, @subscription)
       @subscription.unsuspend!
       @subscription.state.should == 'active'
     end

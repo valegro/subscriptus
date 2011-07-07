@@ -138,7 +138,6 @@ describe "Renewals", :type => :integration do
           @user = Factory.create(:subscriber)
           @subscription = Factory.create(:active_subscription, :user => @user, :publication => @publication)
           SubscribeController.any_instance.stubs(:current_user).returns(@user)
-          puts "Publication = #{@publication.inspect}"
           visit "/renew?publication_id=#{@publication.id}"
           page.should have_content("1 month")
         end

@@ -35,8 +35,8 @@ describe Admin::SubscriptionsController, "as admin" do
       end
 
       it "should NOT send an email" do
-        SubscriptionMailer.any_instance.expects(:deliver!).never
-        SubscriptionMailer.any_instance.expects(:send_later).never
+        stub_mailer(SubscriptionMailer).expects(:deliver!).never
+        stub_mailer(SubscriptionMailer).expects(:send_later).never
       end
     end
 
