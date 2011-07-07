@@ -35,7 +35,7 @@ describe SubscriptionFactory, "renewals" do
 
   shared_examples_for "A pending subscription" do
     before(:each) do
-      stub_mailer(SubscriptionMailer).expects(:send_later).with(:deliver_pending_student_verification, instance_of(Subscription))
+      stub_mailer(SubscriptionMailer).stubs(:send_later).with(:deliver_pending_student_verification, instance_of(Subscription))
       
       @concession_term = Factory.create(:offer_term, :concession => true)
       @offer.offer_terms << @concession_term

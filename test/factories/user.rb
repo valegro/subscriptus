@@ -13,7 +13,6 @@ Factory.define :user do |f| # Dont use this factory. Use either an admin or a su
   f.title :Mr
   f.country 'Australia'
   f.role 'subscriber'
-  f.overide_wordpress true
 end
 
 Factory.define :admin, :parent => :user do |a|
