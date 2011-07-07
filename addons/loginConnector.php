@@ -53,6 +53,10 @@
       $con->addUserMetaData('premium',false);
     }
   }
+
+  if(isset($_GET['category'])){
+    $con->addMetaData('cn_capabilities',$_GET['category']);
+  }
   
   switch($_GET['func']) {
     case 'create':
