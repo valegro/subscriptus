@@ -104,7 +104,7 @@ describe SubscriptionFactory do
     end
 
     it "should deliver an activation email" do
-      stub_mailer(SubscriptionMailer).expects(:send_later).with(:deliver_activation, instance_of(Subscription))
+      stub_mailer(SubscriptionMailer).expects(:deliver_activation).with(instance_of(Subscription))
       subscription = SubscriptionFactory.build(@offer, :payment_attributes => @payment_attrs, :attributes => @attributes)
     end
   end
@@ -454,7 +454,7 @@ describe SubscriptionFactory do
     end
 
     it "should deliver a pending email" do
-      stub_mailer(SubscriptionMailer).expects(:send_later).with(:deliver_pending_concession_verification, instance_of(Subscription))
+      stub_mailer(SubscriptionMailer).expects(:deliver_pending_concession_verification).with(instance_of(Subscription))
       factory = SubscriptionFactory.new(
         @offer,
         :term_id => @concession_term,

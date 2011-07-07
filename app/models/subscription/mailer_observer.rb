@@ -46,7 +46,7 @@ class Subscription::MailerObserver < ActiveRecord::Observer
   
   private
   def self.send_email(method, subscription)
-    SubscriptionMailer.with_template(subscription.template_name).send_later(method, subscription)
+    SubscriptionMailer.with_template(subscription.template_name).delay.send(method, subscription)
   end
   
   def send_email(method, subscription)

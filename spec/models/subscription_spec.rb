@@ -21,7 +21,7 @@ describe Subscription do
   describe "upon save" do
     it "should create a recipient in Campaign Master" do
       s = Factory.create(:subscription)
-      s.expects(:send_later).with(:sync_to_campaign_master)
+      s.delay.expects(:sync_to_campaign_master)
       s.save!
     end
   end

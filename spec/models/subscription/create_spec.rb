@@ -49,19 +49,19 @@ describe Subscription do
 
     it "should deliver a pending email for new pending student subscriptions" do
       @subscription = Factory.build(:pending_subscription, :pending => 'student_verification')
-      stub_mailer(SubscriptionMailer).expects(:send_later).with(:deliver_pending_student_verification, @subscription)
+      stub_mailer(SubscriptionMailer).expects(:deliver_pending_student_verification).with(@subscription)
       @subscription.save!
     end
 
     it "should deliver a pending email for new pending ceoncession subscriptions" do
       @subscription = Factory.build(:pending_subscription, :pending => 'concession_verification')
-      stub_mailer(SubscriptionMailer).expects(:send_later).with(:deliver_pending_concession_verification, @subscription)
+      stub_mailer(SubscriptionMailer).expects(:deliver_pending_concession_verification).with(@subscription)
       @subscription.save!
     end
 
     it "should deliver a pending email for new pending payment subscriptions" do
       @subscription = Factory.build(:pending_subscription, :pending => 'payment')
-      stub_mailer(SubscriptionMailer).expects(:send_later).with(:deliver_pending_payment, @subscription)
+      stub_mailer(SubscriptionMailer).expects(:deliver_pending_payment).with(@subscription)
       @subscription.save!
     end
 
@@ -82,7 +82,7 @@ describe Subscription do
 
     it "should create a recipient in Campaign Master" do
       s = Factory.build(:subscription)
-      s.expects(:send_later).with(:sync_to_campaign_master)
+      s.delay.expects(:sync_to_campaign_master)
       s.save!
     end
 

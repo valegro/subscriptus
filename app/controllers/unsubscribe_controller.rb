@@ -28,8 +28,6 @@ class UnsubscribeController < ApplicationController
   private
     def load_user
       # TODO: Take the email address too?
-      puts "Looking for user id = #{params[:user_id]}"
-      puts "\n\n#{User.all.inspect}"
       @user = User.find(params[:user_id])
       @subscriptions = @user.subscriptions.not_unsubscribed
     end

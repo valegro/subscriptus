@@ -301,8 +301,9 @@ describe "Subscribes" do
         end
 
         it "should update the user in wordpress" do
-          User.any_instance.expects(:send_later).with(:sync_to_wordpress, 'Password1')
-          User.any_instance.expects(:send_later).with(:sync_to_campaign_master)
+          User.any_instance.stubs(:delay).returns(delay=mock('delay'))
+          delay.expects(:sync_to_wordpress).with('Password1')
+          delay.expects(:sync_to_campaign_master)
           click_link_or_button "btnSubmit"
         end
       end

@@ -33,7 +33,7 @@ describe Subscription do
       end
 
       it "should deliver an email" do
-        stub_mailer(SubscriptionMailer).expects(:send_later).with(:deliver_pending_expired, @subscription)
+        stub_mailer(SubscriptionMailer).expects(:deliver_pending_expired).with(@subscription)
         @subscription.cancel!
       end
     end
@@ -65,8 +65,8 @@ describe Subscription do
       end
 
       it "should deliver an email" do
-        stub_mailer(SubscriptionMailer).expects(:send_later).with(:deliver_verified, @subscription)
-        stub_mailer(SubscriptionMailer).expects(:send_later).with(:deliver_activation, @subscription)
+        stub_mailer(SubscriptionMailer).expects(:deliver_verified).with(@subscription)
+        stub_mailer(SubscriptionMailer).expects(:deliver_activation).with(@subscription)
         @subscription.verify!
       end
 

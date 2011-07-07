@@ -128,6 +128,7 @@ end
 def stub_mailer(klass)
   @mailer_stub ||= stub(klass.name) #, :deliver_new_trial => true, :deliver_pending_expired => true, :deliver_verified => true)
   klass.stubs(:with_template).returns(@mailer_stub)
+  @mailer_stub.stubs(:delay).returns(@mailer_stub)
   @mailer_stub
 end
 

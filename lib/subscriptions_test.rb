@@ -5,8 +5,9 @@ require 'ruby-prof'
 
 # Ignore DJ
 class Object
-  def send_later(*args)
+  def delay(*args)
     # Do nothing
+    mock('delay')
   end
 end
 
