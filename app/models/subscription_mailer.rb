@@ -108,7 +108,6 @@ class SubscriptionMailer < ActionMailer::Base
     unless File.exists?(Liquid::Template.file_system.full_path(liquid_template))
       super
     else
-      debugger
       Liquid::Template.parse(Liquid::Template.file_system.read_template_file(liquid_template)).render(HashWithIndifferentAccess.new(body).to_hash)
     end
   end
