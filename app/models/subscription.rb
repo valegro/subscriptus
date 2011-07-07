@@ -34,6 +34,8 @@ class Subscription < ActiveRecord::Base
   named_scope :expired, lambda { { :conditions => [ "expires_at < ?", Time.now ] } }
   named_scope :not_unsubscribed, :conditions => "state != 'unsubscribed'"
 
+  liquid_methods :reference, :updated_at
+
   validates_presence_of :publication, :state
   validates_acceptance_of :terms
 
