@@ -26,5 +26,7 @@ class Publication < ActiveRecord::Base
   validates_format_of :forgot_password_link, :with => URI::regexp(%w(http https))
   default_scope :order => "name"
 
+  named_scope :for_domain, proc { |domain| { :conditions => { :custom_domain => domain } } }
+
   DEFAULT_TRIAL_EXPIRY = 21 #days
 end

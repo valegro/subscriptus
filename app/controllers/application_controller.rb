@@ -41,6 +41,11 @@ class ApplicationController < ActionController::Base
       return @current_user if defined?(@current_user)
       @current_user = current_user_session && current_user_session.user
     end
+    
+    def current_domain
+      @current_domain ||= Domainatrix.parse(request.url).domain_with_public_suffix
+      
+    end
 
     def store_location
       session[:return_to] = request.request_uri

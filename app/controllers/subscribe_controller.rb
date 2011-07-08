@@ -147,9 +147,13 @@ class SubscribeController < ApplicationController
       @offer = if params[:offer_id]
         Offer.find(params[:offer_id])
       end
+      
       @publication = if params[:publication_id]
         Publication.find(params[:publication_id])
+      else
+        Publication.for_domain(current_domain).first
       end
+
       @publication = @subscription.publication if @subscription
 
       if !@offer && @publication

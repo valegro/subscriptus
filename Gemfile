@@ -67,6 +67,7 @@ gem 'enumerated_attribute'
 gem 'ruby-debug'
 
 gem 'liquid'
+gem 'domainatrix'
 
 group :development, :test, :cucmber do
   gem 'pg'

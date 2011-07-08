@@ -18,6 +18,7 @@ describe SubscribeController do
     CM::Recipient.stubs(:create!)
     stub_wordpress
     https!
+    SubscribeController.any_instance.stubs(:current_domain).returns('example.com')
   end
 
   describe "on create" do
