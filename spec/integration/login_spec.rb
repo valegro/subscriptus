@@ -47,7 +47,7 @@ describe "Sessions", :type => :integration do
         end
 
         it "should take me to the admin console" do
-          current_url.should == 'https://www.example.com/admin/subscriptions'
+          current_url.should == 'http://www.example.com/admin/subscriptions'
         end
       end
 
