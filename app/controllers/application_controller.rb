@@ -56,6 +56,6 @@ class ApplicationController < ActionController::Base
     end
 
     def require_ssl
-      redirect_to :protocol => "https://" unless (request.ssl?) # or local_request?)  
+      redirect_to :protocol => "https://" unless (request.ssl? or local_request? or RAILS_ENV == 'test')  
     end
 end

@@ -2,6 +2,7 @@ require 'spec_helper'
 
 describe User do
   before(:each) do
+    # User.any_instance.stubs(:delay).returns(stub('delay'))
     stub_wordpress
     @user = Factory.build(:subscriber)
     @user.stubs(
@@ -18,6 +19,7 @@ describe User do
                      :password => 'password',
                      :password_confirmation => 'password'
                )
+
     cm_return = stub(:success? => true)
   end
 
@@ -219,14 +221,16 @@ describe User do
     end
 
     it "should call update_cm with :create" do
-      @user.stubs(:send_later).with(:sync_to_wordpress, 'password')
-      @user.expects(:send_later).with(:sync_to_campaign_master)
+      @user.stubs(:delay).returns(mock('delay'))
+      @user.delay.stubs(:sync_to_wordpress).with('password')
+      @user.delay.expects(:sync_to_campaign_master)
       @user.save!
     end
 
     it "should NOT call update_cm if admin" do
       @user = Factory.build(:admin, :login => 'daniel')
-      @user.expects(:send_later).with(:sync_to_campaign_master).never
+      @user.stubs(:delay).returns(mock('delay'))
+      @user.delay.expects(:sync_to_campaign_master).never
       @user.save!
     end
 
@@ -256,13 +260,16 @@ describe User do
       it "should create a user in Wordpress" do
         @stubbed_login = '12345'
         UserObserver.any_instance.stubs(:generate_unique_id).returns(@stubbed_login)
-        User.any_instance.expects(:send_later).with(:sync_to_wordpress, 'password')
-        User.any_instance.expects(:send_later).with(:sync_to_campaign_master)
+        delay = mock('delay')
+        delay.expects(:sync_to_wordpress).with('password')
+        delay.expects(:sync_to_campaign_master)
+        User.any_instance.stubs(:delay).returns(delay)
         Factory.create(:user, :firstname => 'Daniel', :lastname => 'Draper', :email => 'daniel@netfox.com', :password => 'password',:password_confirmation => 'password')
       end
 
       it "should NOT create a user in Wordpress if admin" do
-        Wordpress.expects(:send_later).never
+        Wordpress.stubs(:delay).returns(mock('delay'))
+        Wordpress.delay.expects(:create).never
         @user = Factory.create(:admin, :login => "daniel")
       end
 
@@ -410,11 +417,13 @@ describe User do
   describe "upon update" do
     before(:each) do
       @user.save!
+      Wordpress.stubs(:delay).returns(mock('delay'))
     end
 
     it "should call sync_to_campaign_master" do
-      @user.expects(:send_later).with(:sync_to_campaign_master)
-      @user.expects(:send_later).with(:sync_to_wordpress, 'password')
+      User.any_instance.stubs(:delay).returns(mock('delay'))
+      @user.delay.expects(:sync_to_campaign_master)
+      @user.delay.expects(:sync_to_wordpress).with('password')
       @user.firstname = "Changed"
       @user.save!
     end
@@ -422,29 +431,32 @@ describe User do
     it "should NOT call sync_to_campaign_master if only last_request_at was changed" do
       user2 = Factory.create(:user)
       user2 = User.find(user2.id)
-      user2.expects(:send_later).with(:sync_to_campaign_master).never
+      user2.stubs(:delay).returns(mock('delay'))
+      user2.delay.expects(:sync_to_campaign_master).never
       user2.last_request_at = Time.now
       user2.save!
     end
 
     it "should NOT call sync_to_campaign_master if admin" do
       @user = Factory.create(:admin, :login => 'daniel')
-      @user.expects(:send_later).with(:sync_to_campaign_master).never
+      @user.stubs(:delay).returns(mock('delay'))
+      @user.delay.expects(:sync_to_campaign_master).never
       @user.save!
     end
 
     describe "Wordpress" do
       it "should update Wordpress if role is subscriber and email or name changes" do
+        User.any_instance.stubs(:delay).returns(mock('delay'))
         @user.email = 'another@example.com'
         @user.email_confirmation = 'another@example.com'
-        @user.expects(:send_later).with(:sync_to_campaign_master)
-        @user.expects(:send_later).with(:sync_to_wordpress, 'password')
+        @user.delay.expects(:sync_to_campaign_master)
+        @user.delay.expects(:sync_to_wordpress).with('password')
         @user.save!
       end
 
       it "should NOT update Wordpress if role is subscriber and anything but email or name changes" do
         @user.last_request_at = Time.now
-        Wordpress.expects(:send_later).with(
+        Wordpress.delay.expects(:update).with(
           :update,
           :email => @user.email,
           :login => @user.login,
@@ -456,14 +468,14 @@ describe User do
 
       it "should NOT update Wordpress if user is an admin" do
         @user = Factory.create(:admin, :login => 'daniel')
-        Wordpress.expects(:send_later).never
+        Wordpress.delay.expects(:create).never
         @user.save!
       end
 
       it "should not update the user if we change our email but that email has been taken" do
         @user.email = 'foo@bar.com'
         Wordpress.stubs(:exists?).with(:email => 'foo@bar.com').returns(true)
-        Wordpress.expects(:send_later).with(
+        Wordpress.delay.expects(:update).with(
           :update,
           :email => @user.email,
           :login => @user.login,

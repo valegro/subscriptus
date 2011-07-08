@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110630131222) do
+ActiveRecord::Schema.define(:version => 20110706054406) do
 
   create_table "archived_publications", :id => false, :force => true do |t|
     t.integer  "id"
@@ -24,6 +24,8 @@ ActiveRecord::Schema.define(:version => 20110630131222) do
     t.datetime "deleted_at"
     t.string   "forgot_password_link"
     t.integer  "default_renewal_offer_id"
+    t.string   "template_name"
+    t.string   "custom_domain"
   end
 
   add_index "archived_publications", ["id"], :name => "index_archived_publications_on_id"
@@ -43,18 +45,19 @@ ActiveRecord::Schema.define(:version => 20110630131222) do
     t.datetime "expires_at"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "order_num"
+    t.datetime "deleted_at"
     t.integer  "source_id"
     t.text     "referrer"
-    t.boolean  "solus"
-    t.boolean  "weekender"
-    t.datetime "deleted_at"
+    t.boolean  "solus",             :default => false
+    t.boolean  "weekender",         :default => true
     t.string   "pending"
     t.datetime "state_expires_at"
     t.integer  "term_length"
     t.boolean  "concession",        :default => false
     t.integer  "pending_action_id"
   end
+
+  add_index "archived_subscriptions", ["id"], :name => "index_archived_subscriptions_on_id"
 
   create_table "audit_log_entries", :force => true do |t|
     t.integer  "user_id"
@@ -171,6 +174,8 @@ ActiveRecord::Schema.define(:version => 20110630131222) do
     t.datetime "updated_at"
     t.string   "forgot_password_link"
     t.integer  "default_renewal_offer_id"
+    t.string   "template_name"
+    t.string   "custom_domain"
   end
 
   add_index "publications", ["name"], :name => "index_publications_on_name", :unique => true
@@ -211,7 +216,7 @@ ActiveRecord::Schema.define(:version => 20110630131222) do
     t.integer  "gift_id"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.boolean  "included"
+    t.boolean  "included",               :default => false
   end
 
   create_table "subscription_invoices", :force => true do |t|
@@ -261,7 +266,6 @@ ActiveRecord::Schema.define(:version => 20110630131222) do
     t.datetime "expires_at"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "order_num"
     t.integer  "source_id"
     t.text     "referrer"
     t.boolean  "solus",             :default => false
@@ -314,7 +318,6 @@ ActiveRecord::Schema.define(:version => 20110630131222) do
     t.datetime "updated_at"
     t.string   "role"
     t.boolean  "admin"
-    t.string   "recurrent_id"
     t.boolean  "auto_created"
     t.string   "hear_about"
     t.string   "company"

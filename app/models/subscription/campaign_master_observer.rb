@@ -2,7 +2,7 @@ class Subscription::CampaignMasterObserver < ActiveRecord::Observer
   observe :subscription
 
   def after_save(subscription)
-    subscription.send_later :sync_to_campaign_master
+    subscription.delay.sync_to_campaign_master
   end
 
   # TODO: Putting this here instead of in subscription_observer because right now state_callbacks does not allow

@@ -125,6 +125,13 @@ def stub_wordpress
     }
 end
 
+def stub_mailer(klass)
+  @mailer_stub ||= stub(klass.name) #, :deliver_new_trial => true, :deliver_pending_expired => true, :deliver_verified => true)
+  klass.stubs(:with_template).returns(@mailer_stub)
+  @mailer_stub.stubs(:delay).returns(@mailer_stub)
+  @mailer_stub
+end
+
 
 # In odre to test Campaign Master lib, comment out below.
 # WARNING:  it will erase all of your Campaign Master records.

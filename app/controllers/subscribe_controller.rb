@@ -183,7 +183,7 @@ class SubscribeController < ApplicationController
     end
 
     def store_subscription_in_session
-      session[:subscription_id] = @subscription.try(:id)
+      session[:subscription_id] = @subscription.id if @subscription.is_a?(Subscription)
     end
 
     def clear_session

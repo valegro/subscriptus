@@ -5,8 +5,9 @@ require 'ruby-prof'
 
 # Ignore DJ
 class Object
-  def send_later(*args)
+  def delay(*args)
     # Do nothing
+    mock('delay')
   end
 end
 
@@ -92,7 +93,7 @@ logger.warn("Starting import at #{Time.now}")
 start_time = Time.now
 
 CmailerUser.find_each(:include => [:subscriptions, :address]) do |u|
-  puts u.email
+  # puts u.email
   begin
     Rails.logger.silence do
       User.transaction do

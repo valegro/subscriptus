@@ -42,7 +42,7 @@ class User < ActiveRecord::Base
 
   validates_format_of :email, :with => /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i
   validates_presence_of :login, :if => Proc.new { |user| User.validate_as == :admin }
-  validates_presence_of :phone_number, :address_1, :city, :postcode, :state, :country, :if => Proc.new { |user| p User.validate_as; User.validate_as == :subscriber }
+  validates_presence_of :phone_number, :address_1, :city, :postcode, :state, :country, :if => Proc.new { |user| User.validate_as == :subscriber }
   validates_presence_of :firstname, :lastname, :email, :role
 
 
@@ -103,7 +103,7 @@ class User < ActiveRecord::Base
     user_attributes.symbolize_keys!
     user = self.find_by_email(user_attributes[:email].to_s)
     user ||= self.create_trial_user(user_attributes)
-    p user
+    
     # Reset the password
     if user.password.blank?
       user.password = random_password
@@ -120,7 +120,7 @@ class User < ActiveRecord::Base
     sub = user.add_or_reset_trial(publication, trial_period_in_days, referrer, solus)
     # Reset the password
     sub.temp_password = user.password
-    SubscriptionMailer.deliver_new_trial(sub)
+    SubscriptionMailer.with_template(sub.template_name).deliver_new_trial(sub)
     return sub
   end
 
@@ -128,7 +128,6 @@ class User < ActiveRecord::Base
   def self.create_trial_user(attributes)
     self.validate_as(:system) do
       attributes.symbolize_keys!
-      p attributes
       r_password = random_password
       self.create!(
         :firstname => (attributes[:first_name] || attributes[:firstname]).to_s,
