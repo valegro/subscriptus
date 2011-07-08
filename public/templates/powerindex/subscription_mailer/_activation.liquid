@@ -1,1 +1,56 @@
-<strong>Power Index activation</strong>
+<body style="font-family: arial; text-align: left;">
+
+	<p style="padding-bottom: 10px"><strong>Dear {{ user.firstname }} {{ user.lastname }}</strong></p>
+	<p style="padding-bottom: 10px">Thank you for subscribing to Crikey.</p>
+	<p style="padding-bottom: 5px"><strong>Your Order Details</strong></p>
+
+    <h2>TAX INVOICE</h2>
+    <p>
+    Blimey Holdings (trading as Crikey)<br/>
+    ABN 98 101 558 847
+    </p>
+
+	<p>
+		Supplier: Crikey<br/>
+		Order Number: {{ subscription.reference }}<br/>
+		Order Date: {{ order_date }}<br/>
+		Payment Method: Credit Card<br/>
+    Payment Cost: {{ cost }} (includes {{ gst }} GST)<br/>
+		(Please note: Blimey Holdings will appear as the transaction detail on your statement)<br/>
+	</p>
+
+	<p style="padding: 10px 0px 10px 0px"><strong>Your Subscription Details</strong></p>
+	<p style="padding-bottom: 5px">Publication Name: {{ publication_name }}</p>
+	<p style="padding-bottom: 5px">
+		Subscription Ends: {{ expiration_date }}
+	</p>
+
+  {% if has_gifts %}
+    <p style="padding: 10pt;">
+      <strong>Included Gifts:</strong><br/>
+      {% for gift in gifts %}
+        {{ gift.name }}
+      {% endfor %}
+    </p>
+  {% endif %}
+
+	<p style="padding: 10px 0px 10px 0px">
+		<strong>Your Address Details:</strong><br/>
+		Address 1: {{ user.address_1 }}<br/>
+		Address 2: {{ user.address_2 }}<br/>
+		City: {{ user.city }}<br/>
+		Postcode: {{ user.postcode }}<br/>
+		State: {{ user.state }}<br/>
+		Country: {{ user.country }}<br/>
+	</p>
+
+	<p style="padding: 5px 0px 5px 0px">Please send email through to our subscriptions team at subs@crikey.com.au if you have any problems.</p>
+
+	<p>
+		The Crikey Crew<br/>
+		<a target='_blank' href="http://www.crikey.com.au/">www.crikey.com.au</a><br/><br/>
+	</p>
+
+	<p style="padding: 5px 0px 5px 0px"><strong>Copyright © 2010 Private Media Pty Ltd. All rights reserved</strong></p>
+  <p>Your email address is registered as {{ user.email }} - you can unsubscribe here: {{ unsubscribe_url }}</p>
+</body>
