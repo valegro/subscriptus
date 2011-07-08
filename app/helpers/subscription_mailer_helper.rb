@@ -1,5 +1,5 @@
 module SubscriptionMailerHelper
-  include ActionController::UrlWriter
+
   def extract_liquid_variables(subscription, more_variables={})
     { :subscription => subscription,
       :user => subscription.user,

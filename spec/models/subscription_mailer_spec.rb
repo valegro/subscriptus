@@ -11,6 +11,12 @@ describe SubscriptionMailer do
       @response.body.should include_text("Your email address is registered as #{@subscription.user.email}")
     end
   end
+  
+  shared_examples_for "an email for a publication" do
+    it "should include the publication name in the subject" do
+      @response.subject.should include_text(@subscription.publication.name)
+    end
+  end
 
   before(:each) do
     stub_wordpress
@@ -37,7 +43,7 @@ describe SubscriptionMailer do
 
     it "should successfully deliver the email containing the correct subscription details to the activated user" do
       @response.should_not      be_nil
-      @response.subject.should  == "Crikey Online Order #{@subscription.reference}"
+      @response.subject.should  == "[#{@subscription.publication.name}] Online Order #{@subscription.reference}"
       @response.to.should       == [@subscription.user.email]
       @response.from.should     == [SubscriptionMailer::NO_REPLY]
       @response.body.should     include_text(@subscription.user.firstname)
@@ -48,6 +54,7 @@ describe SubscriptionMailer do
 
     # Every Email should have an unsubscribe
     it_should_behave_like "an email with an unsubscribe link"
+    it_should_behave_like "an email for a publication"
   end
 
   describe "if the user is invalid" do

@@ -11,7 +11,7 @@ class SubscriptionMailer < ActionMailer::Base
     raise Exceptions::EmailDataError.new("nil subscription") unless !subscription.blank?
     raise Exceptions::EmailDataError.new("nil user/ email") unless !subscription.user.blank? && !subscription.user.email.blank?
     recipients     "#{subscription.user.email}"
-    subject        "Crikey Online Order #{subscription.reference}"
+    subject(publication_subject(subscription, "Online Order #{subscription.reference}"))
     from           NO_REPLY
     body           extract_liquid_variables(subscription,
                      :order_date => subscription.updated_at.try(:strftime, "%d/%m/%Y"),
@@ -28,7 +28,7 @@ class SubscriptionMailer < ActionMailer::Base
     raise Exceptions::EmailDataError.new("nil subscription") unless !subscription.blank?
     raise Exceptions::EmailDataError.new("nil user/ email") unless !subscription.user.blank? && !subscription.user.email.blank?
     recipients     "#{subscription.user.email}"
-    subject        "Crikey Online Cancelation"
+    subject(publication_subject(subscription, "Online Cancelation"))
     from           NO_REPLY
     body           extract_liquid_variables(subscription,
                      :squatter => subscription.state == :squatter,
@@ -39,7 +39,7 @@ class SubscriptionMailer < ActionMailer::Base
 
   def new_trial(subscription)
     recipients subscription.user.email
-    subject "New Trial Subscription"
+    subject(publication_subject(subscription, "New Trial Subscription"))
     from NO_REPLY
     body extract_liquid_variables(subscription, :password => subscription.temp_password)
     content_type 'text/html'
@@ -47,7 +47,7 @@ class SubscriptionMailer < ActionMailer::Base
   
   def pending_student_verification(subscription)
     recipients subscription.user.email
-    subject "Your subscription is pending verification"
+    subject(publication_subject(subscription, "Your subscription is pending verification"))
     from NO_REPLY
     body extract_liquid_variables(subscription,
            :creation_date => subscription.created_at.try(:strftime, "%d/%m/%Y")
@@ -57,7 +57,7 @@ class SubscriptionMailer < ActionMailer::Base
 
   def pending_concession_verification(subscription)
     recipients subscription.user.email
-    subject "Your subscription is pending verification"
+    subject(publication_subject(subscription, "Your subscription is pending verification"))
     from NO_REPLY
     body extract_liquid_variables(subscription,
            :creation_date => subscription.created_at.try(:strftime, "%d/%m/%Y")
@@ -67,7 +67,7 @@ class SubscriptionMailer < ActionMailer::Base
 
   def pending_payment(subscription)
     recipients subscription.user.email
-    subject "Your subscription is pending payment"
+    subject(publication_subject(subscription, "Your subscription is pending payment"))
     from NO_REPLY
     body extract_liquid_variables(subscription,
            :subscription_date => subscription.created_at.strftime("%d/%m/%Y")
@@ -77,7 +77,7 @@ class SubscriptionMailer < ActionMailer::Base
 
   def pending_expired(subscription)
     recipients subscription.user.email
-    subject "Your pending subscription has expired"
+    subject(publication_subject(subscription, "Your pending subscription has expired"))
     from NO_REPLY
     body extract_liquid_variables(subscription)
     content_type 'text/html'
@@ -85,7 +85,7 @@ class SubscriptionMailer < ActionMailer::Base
 
   def verified(subscription)
     recipients subscription.user.email
-    subject "Your pending subscription has been verified"
+    subject(publication_subject(subscription, "Your pending subscription has been verified"))
     from NO_REPLY
     body extract_liquid_variables(subscription,
            :forgot_password_url => subscription.publication.forgot_password_link,
@@ -97,7 +97,7 @@ class SubscriptionMailer < ActionMailer::Base
 
   def suspended(subscription)
     recipients subscription.user.email
-    subject "Your subscription has been suspended"
+    subject(publication_subject(subscription, "Your subscription has been suspended"))
     from NO_REPLY
     body extract_liquid_variables(subscription,
            :suspended_from => subscription.state_updated_at.strftime("%d/%m/%Y"),
@@ -108,13 +108,17 @@ class SubscriptionMailer < ActionMailer::Base
 
   def unsuspended(subscription)
     recipients subscription.user.email
-    subject "Your subscription has been reactivated"
+    subject(publication_subject(subscription, "Your subscription has been reactivated"))
     from NO_REPLY
     body extract_liquid_variables(subscription,
            :suspended_from => subscription.state_updated_at.strftime("%d/%m/%Y"),
            :suspended_to => subscription.state_expires_at.strftime("%d/%m/%Y")
          )
     content_type 'text/html'
+  end
+  
+  def publication_subject(subscription, subject_text)
+    "[#{subscription.publication.try(:name)}] #{subject_text}"
   end
   
   def render_message(template, body)
