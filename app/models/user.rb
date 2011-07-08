@@ -7,7 +7,7 @@ class User < ActiveRecord::Base
     c.validate_login_field = false
   end
   
-  liquid_methods :firstname, :lastname, :email, :address_1, :address_2, :city, :postcode, :state, :country, :fullname
+  liquid_methods :firstname, :lastname, :fullname, :email, :address_1, :address_2, :city, :postcode, :state, :country
 
   has_many :audit_log_entries
   has_many :subscriptions, :before_add => :check_duplicate_subscription, :dependent => :destroy

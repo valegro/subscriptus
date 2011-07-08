@@ -42,6 +42,14 @@ Rails::Initializer.run do |config|
   # The default locale is :en and all translations from config/locales/*.rb,yml are auto loaded.
   # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}')]
   # config.i18n.default_locale = :de
+
+  # This is for rendering Liquid templates. A user's state is returned as a symbol
+  # and we want to put it in an email template, so we'll convert it to a string.
+  Symbol.class_eval do
+    def to_liquid
+      to_s.upcase
+    end
+  end
 end
 
 # TODO: Make confir options

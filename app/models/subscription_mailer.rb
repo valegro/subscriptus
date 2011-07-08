@@ -1,5 +1,6 @@
 class SubscriptionMailer < ActionMailer::Base
   include ActionView::Helpers::NumberHelper
+  include SubscriptionMailerHelper
   
   SEND_TO = nil
   NO_REPLY = "noreply@crikey.com.au"
@@ -12,7 +13,13 @@ class SubscriptionMailer < ActionMailer::Base
     recipients     "#{subscription.user.email}"
     subject        "Crikey Online Order #{subscription.reference}"
     from           NO_REPLY
-    body           :subscription => subscription, :user => subscription.user, :gifts => subscription.try(:actions).try(:first).try(:gifts), :cost => number_to_currency(subscription.try(:actions).try(:first).try(:payment).try(:amount), :unit => "AUD $"), :gst => number_to_currency(subscription.try(:actions).try(:first).try(:payment).try(:amount).try(:/, 11.0)), :publication_name => subscription.publication.name, :expiration_date => subscription.try(:expires_at).try(:strftime, "%d/%m/%Y"), :unsubscribe_url => unsubscribe_url(:user_id => subscription.user.id), :has_gifts => (!subscription.actions.empty? && !subscription.actions.first.gifts.blank?), :address1 => subscription.user.try(:address_1), :address2 => subscription.user.try(:address_2), :city => subscription.user.try(:city), :postcode => subscription.user.try(:postcode), :state => subscription.user.try(:state).try(:to_s).try(:upcase), :country => subscription.user.try(:country)
+    body           extract_liquid_variables(subscription,
+                     :order_date => subscription.updated_at.try(:strftime, "%d/%m/%Y"),
+                     :gifts => subscription.try(:actions).try(:first).try(:gifts),
+                     :has_gifts => (!subscription.actions.empty? && !subscription.actions.first.gifts.blank?),
+                     :cost => number_to_currency(subscription.try(:actions).try(:first).try(:payment).try(:amount), :unit => "AUD $"),
+                     :gst => number_to_currency(subscription.try(:actions).try(:first).try(:payment).try(:amount).try(:/, 11.0))
+                   )
     content_type   'text/html'
   end
 
@@ -23,7 +30,10 @@ class SubscriptionMailer < ActionMailer::Base
     recipients     "#{subscription.user.email}"
     subject        "Crikey Online Cancelation"
     from           NO_REPLY
-    body           :subscription => subscription, :user => subscription.user, :squatter => subscription.state == :squatter, :publication_name => subscription.publication.name, :gifts => subscription.try(:offer).try(:gifts), :address1 => subscription.user.try(:address_1), :address2 => subscription.user.try(:address_2), :city => subscription.user.try(:city), :postcode => subscription.user.try(:postcode), :state => subscription.user.try(:state).try(:to_s).try(:upcase), :country => subscription.user.try(:country)
+    body           extract_liquid_variables(subscription,
+                     :squatter => subscription.state == :squatter,
+                     :gifts => subscription.try(:offer).try(:gifts)
+                   )
     content_type   'text/html'
   end
 
@@ -31,7 +41,7 @@ class SubscriptionMailer < ActionMailer::Base
     recipients subscription.user.email
     subject "New Trial Subscription"
     from NO_REPLY
-    body :user => subscription.user, :password => subscription.temp_password, :unsubscribe_url => unsubscribe_url(:user_id => subscription.user.id)
+    body extract_liquid_variables(subscription, :password => subscription.temp_password)
     content_type 'text/html'
   end
   
@@ -39,8 +49,9 @@ class SubscriptionMailer < ActionMailer::Base
     recipients subscription.user.email
     subject "Your subscription is pending verification"
     from NO_REPLY
-    body :subscription => subscription, :user => subscription.user, :unsubscribe_url => unsubscribe_url(:user_id => subscription.user.id), :creation_date => subscription.created_at.try(:strftime, "%d/%m/%Y")
-
+    body extract_liquid_variables(subscription,
+           :creation_date => subscription.created_at.try(:strftime, "%d/%m/%Y")
+         )
     content_type 'text/html'
   end
 
@@ -48,7 +59,9 @@ class SubscriptionMailer < ActionMailer::Base
     recipients subscription.user.email
     subject "Your subscription is pending verification"
     from NO_REPLY
-    body :subscription => subscription, :user => subscription.user, :unsubscribe_url => unsubscribe_url(:user_id => subscription.user.id), :creation_date => subscription.created_at.try(:strftime, "%d/%m/%Y")
+    body extract_liquid_variables(subscription,
+           :creation_date => subscription.created_at.try(:strftime, "%d/%m/%Y")
+         )
     content_type 'text/html'
   end
 
@@ -56,7 +69,9 @@ class SubscriptionMailer < ActionMailer::Base
     recipients subscription.user.email
     subject "Your subscription is pending payment"
     from NO_REPLY
-    body :subscription => subscription, :user => subscription.user, :subscription_date => subscription.created_at.strftime("%d/%m/%Y"), :unsubscribe_url => unsubscribe_url(:user_id => subscription.user.id)
+    body extract_liquid_variables(subscription,
+           :subscription_date => subscription.created_at.strftime("%d/%m/%Y")
+         )
     content_type 'text/html'
   end
 
@@ -64,7 +79,7 @@ class SubscriptionMailer < ActionMailer::Base
     recipients subscription.user.email
     subject "Your pending subscription has expired"
     from NO_REPLY
-    body :subscription => subscription
+    body extract_liquid_variables(subscription)
     content_type 'text/html'
   end  
 
@@ -72,23 +87,22 @@ class SubscriptionMailer < ActionMailer::Base
     recipients subscription.user.email
     subject "Your pending subscription has been verified"
     from NO_REPLY
-    body :subscription => subscription, :user => subscription.user, :forgot_password_url => subscription.publication.forgot_password_link, :subscription_starts => subscription.state_updated_at.try(:strftime, "%d/%m/%Y"), :subscription_ends => subscription.expires_at.try(:strftime, "%d/%m/%Y"), :unsubscribe_url => unsubscribe_url(:user_id => subscription.user.id)
+    body extract_liquid_variables(subscription,
+           :forgot_password_url => subscription.publication.forgot_password_link,
+           :subscription_starts => subscription.state_updated_at.try(:strftime, "%d/%m/%Y"),
+           :subscription_ends => subscription.expires_at.try(:strftime, "%d/%m/%Y")
+         )
     content_type 'text/html'
   end
 
-  def expired(subscription)
-    recipients subscription.user.email
-    subject "Your subscription has expired"
-    from NO_REPLY
-    body :subscription => subscription, :user => subscription.user
-    content_type 'text/html'
-  end
-  
   def suspended(subscription)
     recipients subscription.user.email
     subject "Your subscription has been suspended"
     from NO_REPLY
-    body :subscription => subscription, :user => subscription.user, :unsubscribe_url => unsubscribe_url(:user_id => subscription.user.id), :suspended_from => subscription.state_updated_at.strftime("%d/%m/%Y"), :suspended_to => subscription.state_expires_at.strftime("%d/%m/%Y")
+    body extract_liquid_variables(subscription,
+           :suspended_from => subscription.state_updated_at.strftime("%d/%m/%Y"),
+           :suspended_to => subscription.state_expires_at.strftime("%d/%m/%Y")
+         )
     content_type 'text/html'
   end
 
@@ -96,7 +110,10 @@ class SubscriptionMailer < ActionMailer::Base
     recipients subscription.user.email
     subject "Your subscription has been reactivated"
     from NO_REPLY
-    body :subscription => subscription, :user => subscription.user, :unsubscribe_url => unsubscribe_url(:user_id => subscription.user.id), :suspended_from => subscription.state_updated_at.strftime("%d/%m/%Y"), :suspended_to => subscription.state_expires_at.strftime("%d/%m/%Y")
+    body extract_liquid_variables(subscription,
+           :suspended_from => subscription.state_updated_at.strftime("%d/%m/%Y"),
+           :suspended_to => subscription.state_expires_at.strftime("%d/%m/%Y")
+         )
     content_type 'text/html'
   end
   
