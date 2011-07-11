@@ -4,7 +4,7 @@
   
   <div class='content'>
 
-    <h2>Thanks for subscribing to Crikey! We hope you enjoy it.</h2>
+    <h2>Thanks for subscribing to <%= @publication.try(:name) %> We hope you enjoy it.</h2>
 
     <h3>Invoice</h3>
 
@@ -18,14 +18,14 @@
     
     <h2>Complete your registration</h2>
     
-    <% unless @has_weekender %>
-      <h3>Crikey Weekender</h3>
-      <p>Have you signed up for Crikey Weekender yet? It's our weekly arts and culture wrap &mdash; delivered direct to your inbox every Friday morning. You'll love it.</p>
+    <% if @publication.weekend_edition? && !@has_weekender %>
+      <h3><%= @publication.try(:name) %> Weekender</h3>
+      <p>Have you signed up for <%= @publication.try(:name) %> Weekender yet? It's our weekly arts and culture wrap &mdash; delivered direct to your inbox every Friday morning. You'll love it.</p>
     <% end %>
     
     <% form_for @subscription, :url => complete_path do |form| %>
 
-      <% unless @has_weekender %>
+      <% if @publication.weekend_edition? && !@has_weekender %>
         <%= check_box_tag :weekender, "1", true %>
         <label for="weekender">Yes &mdash; send me your Weekender</label>
       <% end %>
@@ -33,7 +33,7 @@
       <h3>Promotional Materials</h3>
       
       <%= form.check_box :solus %>
-      <label for="subscription_solus">Tick this box if you want to receive carefully selected offers by email from advertisers screened by Crikey</label>
+      <label for="subscription_solus">Tick this box if you want to receive carefully selected offers by email from advertisers screened by <%= @publication.try(:name) %></label>
       
       <div id="">
       <%= image_submit_tag "/images/completerego.png", :disable_with => "Processing...", :id => "btnSubmit" %>

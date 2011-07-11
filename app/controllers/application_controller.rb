@@ -43,8 +43,11 @@ class ApplicationController < ActionController::Base
     end
     
     def current_domain
-      @current_domain ||= Domainatrix.parse(request.url).domain_with_public_suffix
-      
+      @current_domain ||= begin
+        Domainatrix.parse(request.url).domain_with_public_suffix
+      rescue
+        request.domain
+      end
     end
 
     def store_location

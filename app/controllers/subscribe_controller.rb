@@ -4,6 +4,7 @@ class SubscribeController < ApplicationController
   before_filter :load_subscription_from_session,    :only   => [ :thanks, :invoice, :complete ]
   before_filter :load_subscription_from_for,        :only   => [ :edit, :update ]
   before_filter :load_offer_and_publication,        :except => [ :thanks, :complete ]
+  before_filter :load_publication,                  :only   => [ :thanks, :complete ]
   before_filter :load_source,                       :except => [ :thanks, :complete ]
   before_filter :load_gifts,                        :except => [ :thanks, :complete ]
   before_filter :load_tab,                          :except => [ :thanks, :complete ]
@@ -142,18 +143,24 @@ class SubscribeController < ApplicationController
         @subscription = Subscription.find(params[:for])
       end
     end
+    
+    def load_publication
+      @publication = if params[:publication_id]
+        Rails.logger.info "Finding publication with id: #{params[:publication_id]}"
+        Publication.find(params[:publication_id])
+      else
+        Rails.logger.info "Finding publication for domain: #{current_domain}"
+        Publication.for_domain(current_domain).first
+      end
+      Rails.logger.info "Current publication: #{@publication.inspect}"      
+    end
 
     def load_offer_and_publication
       @offer = if params[:offer_id]
         Offer.find(params[:offer_id])
       end
       
-      @publication = if params[:publication_id]
-        Publication.find(params[:publication_id])
-      else
-        Publication.for_domain(current_domain).first
-      end
-
+      load_publication
       @publication = @subscription.publication if @subscription
 
       if !@offer && @publication

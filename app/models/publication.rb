@@ -1,4 +1,8 @@
 class Publication < ActiveRecord::Base
+  include FlagShihTzu
+  
+  has_flags 1 => :concession, 2 => :trial, 3 => :direct_debit, 4 => :weekend_edition, :column => 'capabilities'
+  
   acts_as_archive :indexes => :id
   has_many :subscriptions
   has_many :offers do

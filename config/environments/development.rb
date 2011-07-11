@@ -36,7 +36,7 @@ CAMPAIGNMASTER_USERNAME = 'ddraperaaa'
 CAMPAIGNMASTER_PASSWORD = 'netfox'
 CAMPAIGNMASTER_CLIENT_ID = '5032'
 
-Wordpress.enabled = true
+Wordpress.enabled = false
 
 config.action_mailer.smtp_settings = {
   :address        => "localhost",
