@@ -26,7 +26,7 @@ class Publication < ActiveRecord::Base
     :bucket => 'crikeystaging'
 
   validates_presence_of :name, :description, :forgot_password_link
-  validates_uniqueness_of :name
+  validates_uniqueness_of :name, :template_name, :custom_domain
   validates_format_of :forgot_password_link, :with => URI::regexp(%w(http https))
   default_scope :order => "name"
 
