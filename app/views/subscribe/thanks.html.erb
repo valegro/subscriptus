@@ -36,7 +36,7 @@
       <label for="subscription_solus">Tick this box if you want to receive carefully selected offers by email from advertisers screened by <%= @publication.try(:name) %></label>
       
       <div id="">
-      <%= image_submit_tag "/images/completerego.png", :disable_with => "Processing...", :id => "btnSubmit" %>
+      <%= image_submit_tag template_image_path('completerego.png'), :disable_with => "Processing...", :id => "btnSubmit" %>
       </div>
       
     <% end %>

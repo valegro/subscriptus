@@ -222,6 +222,7 @@ DEPENDENCIES
   ruby-debug
   ruby-prof
   searchlogic
+  selenium-webdriver (= 2.0.1)
   shoulda
   soap4r
   spork

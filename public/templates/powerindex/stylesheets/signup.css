@@ -206,7 +206,7 @@ a#print-page {
 	display:block;
 	width:243px;
 	height:50px;
-	background:url(images/print-page.png) no-repeat;
+	background:url(templates/powerindex/images/print-page.png) no-repeat;
 	margin:0 auto;
 	padding-bottom:20px;
   cursor:pointer;

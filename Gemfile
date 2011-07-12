@@ -72,6 +72,7 @@ gem 'domainatrix'
 group :development, :test, :cucmber do
   gem 'pg'
   gem 'webmock', :require => false
+  gem 'selenium-webdriver', '2.0.1'
   gem 'capybara', "0.4.1.2"
   gem 'database_cleaner'
   gem 'spork'

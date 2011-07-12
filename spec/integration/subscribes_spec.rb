@@ -33,9 +33,10 @@ describe "Subscribes" do
     describe "when I choose the direct debit option" do
       it "I should see the right content", :js => true do
         visit new_subscribe_path(:offer_id => @offer.id)
-        page.choose("Direct Transfer/Direct Debit")
-        page.find('#payment-radio-direct-debit').click
-        page.find('#payment_by_direct_debit').visible?.should be(true)
+        debugger
+        choose("Direct Transfer/Direct Debit")
+        find('#payment-radio-direct-debit').click
+        find('#payment_by_direct_debit').visible?.should be(true)
         page.should have_content("Click the FINISH button below once you’ve chosen your payment option:")
         page.should have_content("BSB: 083 026")
       end
