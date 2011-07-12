@@ -29,7 +29,7 @@
         <p class='phone'>
           1800 985 502
         </p>
-        <% if @publication.direct_debit? %>
+        <% if @publication.try(:direct_debit?) %>
           <p class='other'>
             Want to pay by fax or mail? <a href='/forms/crikey_directdebit_bank.pdf' target="_blank">Download the Subscription form</a>
           </p>
@@ -39,9 +39,7 @@
       <div class='clear'></div>
 
       <div id='header'>
-        <%= image_tag(template_image_path('logo.png'), :alt => @publication.name) %>
-        
-      
+        <%= image_tag(template_image_path('logo.png'), :alt => @publication.try(:name)) %>
       </div>
       
       <%= yield %>

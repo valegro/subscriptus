@@ -139,7 +139,7 @@
             <% if @direct_debit_allowed %>
               <input type='radio' class="payment-radio" name='payment_option' value="direct_debit" id='payment-radio-direct-debit' <%= 'checked="true"' if @payment_option == 'direct_debit' %> />
               <label for='payment-radio-direct-debit'>
-                Direct Debit
+                Direct Transfer/Direct Debit
               </label>                  
             <% end %>
               
@@ -161,10 +161,10 @@
 
             <% if @tab.blank? || @tab == 'subscriptions' %>
               <div class="payment-option" id="payment_by_direct_debit" style="<%= 'display:none;' unless @payment_option == 'direct_debit' %>">
-                <h4>Direct Debit</h4>
+                <h4>Direct Transfer/Direct Debit</h4>
                 <h4>Click the FINISH button below once you’ve chosen your payment option:</h4>
                 <ol>
-                  <% if @publication.direct_debit? %>
+                  <% if @publication.try(:direct_debit?) %>
                     <li>Download our <%= link_to("subscription form", "/forms/crikey_directdebit_bank.pdf", :target => :new) %> and fax it to 03 8623 9975 or mail it to Crikey, Level 6, 22 William Street, Melbourne VIC 3000; or</li>
                   <% end %>
                   <li>You can do a direct transfer into our bank account – make sure you include your name in the reference so we can match up your payment:</li>
@@ -179,7 +179,7 @@
             
             <div id='terms'>
               <%= f.check_box :terms, :label => "I agree to the " %>
-              <%= link_to('Terms and Conditions', @publication.terms_url, :target => '_blank') %>
+              <%= link_to('Terms and Conditions', @publication.try(:terms_url), :target => '_blank') %>
             </div>
 
             <div id='bottom-right'>

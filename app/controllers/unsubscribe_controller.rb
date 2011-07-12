@@ -2,6 +2,7 @@ class UnsubscribeController < ApplicationController
   layout 'signup'
 
   before_filter :load_user, :except => :no_user
+  before_filter :load_publication
 
   rescue_from ActiveRecord::RecordInvalid do
     # Already unsubscribed
@@ -30,5 +31,9 @@ class UnsubscribeController < ApplicationController
       # TODO: Take the email address too?
       @user = User.find(params[:user_id])
       @subscriptions = @user.subscriptions.not_unsubscribed
+    end
+    
+    def load_publication
+      @publication = Publication.for_domain(current_domain).first
     end
 end

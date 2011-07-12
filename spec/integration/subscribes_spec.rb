@@ -3,7 +3,10 @@ require 'spec_helper'
 describe "Subscribes" do
   describe "as a visitor to the subscribe page" do
     before(:each) do
-      @offer = Factory.create(:offer)
+      @publication = Factory.create(:publication, :custom_domain => 'example.com', :name => 'Crikey!')
+      SubscribeController.any_instance.stubs(:current_domain).returns('example.com')
+      @offer = Factory.create(:offer, :publication => @publication)
+      
       @term1 = @offer.offer_terms.create(:price => 10, :months => 3)
       @source = Factory.create(:source)
     end
@@ -30,8 +33,9 @@ describe "Subscribes" do
     describe "when I choose the direct debit option" do
       it "I should see the right content", :js => true do
         visit new_subscribe_path(:offer_id => @offer.id)
-        choose("Direct Debit")
-        find('#payment_by_direct_debit').visible?.should be(true)
+        page.choose("Direct Transfer/Direct Debit")
+        page.find('#payment-radio-direct-debit').click
+        page.find('#payment_by_direct_debit').visible?.should be(true)
         page.should have_content("Click the FINISH button below once you’ve chosen your payment option:")
         page.should have_content("BSB: 083 026")
       end
@@ -145,7 +149,9 @@ describe "Subscribes" do
 
   describe "when I visit the subscribe page and choose student concession" do
     before(:each) do
-      @offer = Factory.create(:offer)
+      @publication = Factory.create(:publication, :custom_domain => 'example.com', :name => 'Crikey!')
+      SubscribeController.any_instance.stubs(:current_domain).returns('example.com')
+      @offer = Factory.create(:offer, :publication => @publication)
       @term = @offer.offer_terms.create(:price => 10, :months => 3, :concession => true)
       @source = Factory.create(:source)
       GATEWAY.expects(:purchase).never
@@ -232,7 +238,9 @@ describe "Subscribes" do
 
   describe "when I visit the subscribe page" do
     before(:each) do
-      @offer = Factory.create(:offer)
+      @publication = Factory.create(:publication, :custom_domain => 'example.com', :name => 'Crikey!')
+      SubscribeController.any_instance.stubs(:current_domain).returns('example.com')
+      @offer = Factory.create(:offer, :publication => @publication)
       @term = @offer.offer_terms.create(:price => 10, :months => 3, :concession => true)
       @term2 = @offer.offer_terms.create(:price => 20, :months => 3)
       @source = Factory.create(:source)
@@ -349,7 +357,7 @@ describe "Subscribes" do
         fill_in "Password confirmation", :with => "Password1"
         choose "offer_term_#{@term2.id}"
         check "subscription_terms"
-        choose("Direct Debit")
+        choose("Direct Transfer/Direct Debit")
       end
 
       it "should create a pending subscription with a pending action" do
@@ -379,7 +387,7 @@ describe "Subscribes" do
         fill_in "Last Name",             :with => "Draper"
         fill_in "Email",                 :with => "daniel@codefire.com.au"
         check "subscription_terms"
-        choose("Direct Debit")
+        choose("Direct Transfer/Direct Debit")
       end
 
       it "should take me back to the form" do
@@ -447,7 +455,9 @@ describe "Subscribes" do
 
     describe "and I visit the subscribe page" do
       before(:each) do
-        @offer = Factory.create(:offer)
+        @publication = Factory.create(:publication, :custom_domain => 'example.com', :name => 'Crikey!')
+        SubscribeController.any_instance.stubs(:current_domain).returns('example.com')
+        @offer = Factory.create(:offer, :publication => @publication)
         @term = @offer.offer_terms.create(:price => 10, :months => 3, :concession => true)
         @term2 = @offer.offer_terms.create(:price => 20, :months => 3)
         @source = Factory.create(:source)

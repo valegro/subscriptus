@@ -72,7 +72,7 @@ gem 'domainatrix'
 group :development, :test, :cucmber do
   gem 'pg'
   gem 'webmock', :require => false
-  gem 'capybara', "0.4.0"
+  gem 'capybara', "0.4.1.2"
   gem 'database_cleaner'
   gem 'spork'
   gem 'launchy'    # So you can do Then show me the page

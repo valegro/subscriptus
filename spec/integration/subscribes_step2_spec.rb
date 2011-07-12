@@ -3,7 +3,9 @@ require 'spec_helper'
 describe "Subscribes", "step 2" do
   describe "when I have subscribed and I am on the thanks page" do
     before(:each) do
-      @offer = Factory.create(:offer)
+      @publication = Factory.create(:publication, :custom_domain => 'example.com', :name => 'Crikey!', :weekend_edition => true)
+      SubscribeController.any_instance.stubs(:current_domain).returns('example.com')
+      @offer = Factory.create(:offer, :publication => @publication)
       @gift = Factory.create(:gift)
       @offer.gifts << @gift
       @term = @offer.offer_terms.create(:price => 10, :months => 3, :concession => true)

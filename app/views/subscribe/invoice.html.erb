@@ -5,7 +5,7 @@
 		
 		<meta http-equiv="X-UA-Compatible" content="IE=8" />
 		
-		<title>Crikey Subscription form</title>
+		<title><%= @publication.try(:name) %> - Your Invoice</title>
 		
 		<style type='text/css'>
 		
@@ -245,10 +245,10 @@
 		<div id="page" class="activation-message">
 
 			<div id="logo">
-				<img src="/images/logo.gif" alt="Crikey" />
+				<%= image_tag(template_image_path('logo.png'), :alt => @publication.name) %>
 			</div>
 
-		<h1>Thank you for subscribing to Crikey.</h1>
+		<h1>Thank you for subscribing to <%= @publication.try(:name) %>.</h1>
 		
 		<hr />
 
