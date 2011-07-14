@@ -5,7 +5,7 @@ describe Subscription do
   before(:each) do
     Timecop.freeze("2011-01-10".to_time)
     stub_wordpress
-    @subscription = Factory.create(:subscription, :state => 'suspended', :expires_at => 25.days.from_now, :state_expires_at => 25.days.from_now)
+    @subscription = Factory.create(:subscription, :state => 'suspended', :expires_at => 25.days.from_now, :state_expires_at => 15.days.from_now)
   end
 
   after(:each) do
@@ -14,8 +14,8 @@ describe Subscription do
 
   it "should automatically unsuspend a subscription that has passed its state expiry date" do
     @subscription.state.should == 'suspended'
-    @subscription.state_expires_at.should == 25.days.from_now
-    Timecop.travel(26.days.from_now) do
+    @subscription.state_expires_at.should == 15.days.from_now
+    Timecop.travel(16.days.from_now) do
       User.validate_as(:system) do
         Subscription.expire_states
       end
@@ -26,7 +26,7 @@ describe Subscription do
 
   describe "upon unsuspend" do
     before(:each) do
-      @subscription.state_expires_at.should == 25.days.from_now
+      @subscription.state_expires_at.should == 15.days.from_now
     end
 
     it "should create a log entry" do
