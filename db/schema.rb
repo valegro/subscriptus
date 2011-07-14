@@ -283,11 +283,8 @@ ActiveRecord::Schema.define(:version => 20110711044557) do
     t.datetime "expires_at"
     t.datetime "created_at"
     t.datetime "updated_at"
-<<<<<<< HEAD
-=======
     t.string   "recurrent_id"
     t.string   "order_num"
->>>>>>> master
     t.integer  "source_id"
     t.text     "referrer"
     t.boolean  "solus",             :default => false
