@@ -4,7 +4,7 @@
 <%= form.file_field :publication_image %>
 <%= form.select :default_renewal_offer_id, [ [ 'None', nil ] ].concat(@offers.map { |o| [ o.name, o.id ] }) %>
 <%= form.text_field :custom_domain %>
-<%= form.text_field :template_name %>
+<%= form.select :template_name, [['The Power Index', 'powerindex'],['Crikey','crikey']] %>
 <%= form.text_field :terms_url, :label => "T &amp; C's link"%>
 <%= form.text_field :forgot_password_link %>
 <%= form.check_box :concession, :label => 'Allow Concession signups' %>
