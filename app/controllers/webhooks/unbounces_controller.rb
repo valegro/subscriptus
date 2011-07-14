@@ -17,6 +17,7 @@ class Webhooks::UnbouncesController < ApplicationController
       @attributes[:options] = { :weekender => weekender, :solus => solus }
       @subscription = User.find_or_create_with_trial(@publication, Publication::DEFAULT_TRIAL_EXPIRY, @referrer, @attributes)
     end
+    response.headers["Access-Control-Allow-Origin"] = "*" 
     render :json => { :success => true }
   end
 end
