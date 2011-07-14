@@ -31,6 +31,61 @@ describe SubscriptionMailer do
     Timecop.return
   end
 
+  describe "class method" do
+    describe "with_template" do
+      it "should return a subclass of the mailer" do
+        SubscriptionMailer.with_template('foo').superclass.should == SubscriptionMailer
+      end
+      
+      it "should set the liquid template path" do
+        SubscriptionMailer.with_template('foo').liquid_template_path.should == 'foo'
+      end
+      
+      it "should use the liquid template path if one is set" do
+        
+        File.expects(:exists?).at_least_once.with('public/templates/foo/subscription_mailer/_activation.liquid').returns(true)
+
+        Liquid::Template.expects(:parse).returns(mock('parsed_template', :render => 'text'))
+        Liquid::Template.stubs(:file_system).returns(fs = mock('filesystem'))
+        fs.stubs(:full_path).returns('public/templates/foo/subscription_mailer/_activation.liquid')
+        fs.stubs(:read_template_file).at_least_once.with('subscription_mailer/activation').returns(mock('template'))
+
+        @subscription = Factory.create(:subscription)        
+        SubscriptionMailer.with_template('foo').deliver_activation(@subscription)
+      end
+      
+      it "should fall back to erb views if no liquid template is found" do
+        Liquid::Template.stubs(:file_system).returns(fs = mock('filesystem'))
+        fs.stubs(:full_path).returns('public/templates/foo/subscription_mailer/_activation.liquid')
+
+        File.expects(:exists?).at_least_once.with('public/templates/foo/subscription_mailer/_activation.liquid').returns(false)
+        Liquid::Template.expects(:parse).never
+        @subscription = Factory.create(:subscription)        
+        action = Factory.create(:subscription_action, :payment => Factory.create(:payment), :subscription => @subscription)
+        @subscription.actions << action
+        @subscription.save!
+        SubscriptionMailer.with_template('foo').deliver_activation(@subscription)
+      end
+      
+      it "should dump for DJ with the template path" do
+        SubscriptionMailer.with_template('foo').dump_for_delayed_job.should include_text('foo')
+      end
+      
+      it "should load a subclass for DJ" do
+        SubscriptionMailer.load_for_delayed_job('foo').superclass.should == SubscriptionMailer
+      end
+      
+      it "should load for DJ and restore the liquid template path" do
+        SubscriptionMailer.load_for_delayed_job('foo').liquid_template_path.should == 'foo'
+      end
+      
+      it "should load for DJ and not restore the liquid template path if there is no path" do
+        SubscriptionMailer.load_for_delayed_job(nil).superclass.should_not == SubscriptionMailer
+      end
+      
+    end
+  end
+
   # tests on activation method ----------------
   describe "deliver activation" do
     before(:each) do

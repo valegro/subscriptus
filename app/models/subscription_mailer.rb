@@ -125,7 +125,6 @@ class SubscriptionMailer < ActionMailer::Base
     return super unless self.respond_to?(:liquid_template_path)
     Liquid::Template.file_system = Liquid::LocalFileSystem.new(File.join('public', 'templates', liquid_template_path))
     liquid_template = File.join(mailer_name, template)
-    
     unless File.exists?(Liquid::Template.file_system.full_path(liquid_template))
       super
     else
@@ -136,11 +135,18 @@ class SubscriptionMailer < ActionMailer::Base
   def self.with_template(_liquid_template_path)
     mailer = Class.new(self) do
       cattr_accessor :liquid_template_path
+      def self.dump_for_delayed_job
+        "#{superclass.name};#{liquid_template_path}"
+      end
     end
-    
+
     mailer.tap do |m|
       m.liquid_template_path = _liquid_template_path
       m.mailer_name = self.name.underscore
     end
+  end
+  
+  def self.load_for_delayed_job(obj)
+    obj.blank? ? self : self.with_template(obj)
   end
 end

@@ -39,6 +39,6 @@ class Offer < ActiveRecord::Base
   end
 
   def self.primary_offer
-    self.find(:first, :conditions => { :primary_offer => true }) || self.first
+    find(:first, :conditions => { :primary_offer => true }) || self.first
   end
 end
