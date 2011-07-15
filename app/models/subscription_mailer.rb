@@ -100,8 +100,8 @@ class SubscriptionMailer < ActionMailer::Base
     subject(publication_subject(subscription, "Your subscription has been suspended"))
     from NO_REPLY
     body extract_liquid_variables(subscription,
-           :suspended_from => subscription.state_updated_at.strftime("%d/%m/%Y"),
-           :suspended_to => subscription.state_expires_at.strftime("%d/%m/%Y")
+           :suspended_from => subscription.try(:state_updated_at).try(:strftime, "%d/%m/%Y"),
+           :suspended_to => subscription.try(:state_expires_at).try(:strftime, "%d/%m/%Y")
          )
     content_type 'text/html'
   end
@@ -111,8 +111,8 @@ class SubscriptionMailer < ActionMailer::Base
     subject(publication_subject(subscription, "Your subscription has been reactivated"))
     from NO_REPLY
     body extract_liquid_variables(subscription,
-           :suspended_from => subscription.state_updated_at.strftime("%d/%m/%Y"),
-           :suspended_to => subscription.state_expires_at.strftime("%d/%m/%Y")
+           :suspended_from => subscription.try(:state_updated_at).try(:strftime, "%d/%m/%Y"),
+           :suspended_to => subscription.try(:state_expires_at).try(:strftime, "%d/%m/%Y")
          )
     content_type 'text/html'
   end

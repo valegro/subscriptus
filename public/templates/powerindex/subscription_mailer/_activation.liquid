@@ -1,17 +1,17 @@
 <body style="font-family: arial; text-align: left;">
 
 	<p style="padding-bottom: 10px"><strong>Dear {{ user.firstname }} {{ user.lastname }}</strong></p>
-	<p style="padding-bottom: 10px">Thank you for subscribing to Crikey.</p>
+	<p style="padding-bottom: 10px">Thank you for subscribing to The Power Index reports.</p>
 	<p style="padding-bottom: 5px"><strong>Your Order Details</strong></p>
 
     <h2>TAX INVOICE</h2>
     <p>
-    Blimey Holdings (trading as Crikey)<br/>
+    Blimey Holdings (trading as The Power Index)<br/>
     ABN 98 101 558 847
     </p>
 
 	<p>
-		Supplier: Crikey<br/>
+		Supplier: The Power Index<br/>
 		Order Number: {{ subscription.reference }}<br/>
 		Order Date: {{ order_date }}<br/>
 		Payment Method: Credit Card<br/>
@@ -44,13 +44,13 @@
 		Country: {{ user.country }}<br/>
 	</p>
 
-	<p style="padding: 5px 0px 5px 0px">Please send email through to our subscriptions team at subs@crikey.com.au if you have any problems.</p>
+	<p style="padding: 5px 0px 5px 0px">Please send email through to our subscriptions team at subs@thepowerindex.com.au if you have any problems.</p>
 
 	<p>
-		The Crikey Crew<br/>
-		<a target='_blank' href="http://www.crikey.com.au/">www.crikey.com.au</a><br/><br/>
+		The Power Index Team<br/>
+		<a target='_blank' href="http://www.thepowerindex.com.au/">www.thepowerindex.com.au</a><br/><br/>
 	</p>
 
-	<p style="padding: 5px 0px 5px 0px"><strong>Copyright © 2010 Private Media Pty Ltd. All rights reserved</strong></p>
+	<p style="padding: 5px 0px 5px 0px"><strong>Copyright © 2011 Private Media Pty Ltd. All rights reserved</strong></p>
   <p>Your email address is registered as {{ user.email }} - you can unsubscribe here: {{ unsubscribe_url }}</p>
 </body>
