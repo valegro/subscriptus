@@ -13,7 +13,7 @@ task :to_staging do
   set :db_hostname, "localhost"
   set :db_port, 3306
 
-  set :branch, "refctoring-mutator"
+  set :branch, "liquidify"
 
   role :app, "deploy@zebra.crikey.com.au"
   role :web, "deploy@zebra.crikey.com.au"
