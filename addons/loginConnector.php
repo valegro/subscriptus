@@ -5,7 +5,6 @@
   require('./wp-load.php');
 
   $msg_reject = 'Unauthorized access! No key specified';
-
 #  $_GET['key'] = trim( file_get_contents('connector.props') );
 #  $_GET['func'] = 'authenticate';
 #  $_GET['login'] = 'mtuck@codefire.com.au';
@@ -54,9 +53,34 @@
     }
   }
 
-  if(isset($_GET['category'])){
-    $con->addMetaData('cn_capabilities',$_GET['category']);
-  }
+   if(isset($_GET['publications'])){
+
+    $val = $_GET['publications'];
+    $data = explode("|", $val);
+
+    $pubs = 'a:' . count($data) . '{';
+    $pubstatus = 'a:' . count($data) . '{';
+
+
+    $pubData = explode(",",$data[0]);
+
+    foreach ($pubData as &$pub) {
+      $pubs .= 's:' . strlen($pub) . ':"' . $pub . '";';
+    }
+
+    $statData = explode(",",$data[1]);
+    foreach ($statData as &$stat) {
+      $pubstatus .= 's:' . strlen($stat) . ':"' . $stat . '";';
+    }
+
+    $pubs .= '}';
+    $pubstatus .= '}';
+
+    $con->addUserMetaData('publications',$pubs);
+    $con->addUserMetaData('pulication_status',$pubstatus);
+ 
+ }
+
   
   switch($_GET['func']) {
     case 'create':
@@ -143,9 +167,10 @@ class Connector{
     */
   function create(){
     global $wpdb;
+    
 
-    if(!$this->exists())
-{
+  if(!$this->exists())
+  {
    
    //Validate user data for create
       if( !( array_key_exists('user_login', $this->data) && array_key_exists('user_pass', $this->data) && array_key_exists('user_email', $this->data) ) ){
