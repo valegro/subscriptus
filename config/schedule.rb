@@ -5,7 +5,6 @@
 
 # Example:
 #
-# set :output, "/path/to/my/cron_log.log"
 #
 # every 2.hours do
 #   command "/usr/bin/some_great_command"
@@ -19,6 +18,10 @@
 
 # Learn more: http://github.com/javan/whenever
 
+set :output, "log/cron.log"
+
+job_type :bundle_rake, "cd :path && RAILS_ENV=:environment bundle exec rake :task --silent :output"
+
 every 1.hour do
-  rake "states:expire"
+  bundle_rake "states:expire"
 end
