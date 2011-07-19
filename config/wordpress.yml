@@ -8,5 +8,8 @@ development:
 test:
   <<: *common
   key: 'testkey'
+staging:
+  <<: *common
+  endpoint: 'http://www.crikey.com.au/loginConnector.php'
 production:
   <<: *common

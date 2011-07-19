@@ -7,6 +7,7 @@ set :shared_dir, "shared"
 set :use_sudo, false
 
 task :to_staging do 
+  set :rails_env, "staging"
   set :user, "root"
   set :password, "zxnm9014"
   set :prod_db, "subscriptus"
@@ -56,8 +57,8 @@ task :after_setup do
 end
 
 before "deploy:symlink" do
-  run "sudo monit stop delayed_job"
-  sleep(15) # monit stop is non-blocking so this is a kludge ...
+  # run "sudo monit stop delayed_job"
+  # sleep(15) # monit stop is non-blocking so this is a kludge ...
 end
 
 after "deploy:symlink" do
@@ -70,7 +71,7 @@ after "deploy:symlink" do
 
   #run("cd #{deploy_to}/current; /usr/bin/rake db:migrate RAILS_ENV=production")
 
-  run "sudo monit start delayed_job"
+  # run "sudo monit start delayed_job"
 end
 
 after "deploy:symlink", "deploy:update_crontab"
