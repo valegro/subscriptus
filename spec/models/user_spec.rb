@@ -587,20 +587,37 @@ describe User do
   describe "upon call to publications_for_wordpress" do
     before(:each) do
       @user = Factory.create(:subscriber)
-
-      @sub1 = Factory.create(:active_subscription, 
-        :user => @user, 
-        :publication => Factory.create(:publication))
-
-      @sub2 = Factory.create(:expired_subscription, 
-        :user => @user,  
-        :publication => Factory.create(:powerindex_publication))
-      @user.reload
-      
-      @user.subscriptions.any?.should == true
     end
-    it "should return the publications and their states" do
-      @user.publications_for_wordpress.should == "crikey,powerindex|active,squatter"
+    
+    describe "with a crikey subscription" do
+      before(:each) do
+        @sub1 = Factory.create(:active_subscription, 
+          :user => @user, 
+          :publication => Factory.create(:publication))
+        @user.reload
+        @user.subscriptions.size.should == 1
+      end
+      
+      it "should return the publication and its state" do
+        @user.publications_for_wordpress.should == "crikey|active"
+      end
+      
+      describe "and a powerindex subscription" do
+        before(:each) do 
+          @sub2 = Factory.create(:expired_subscription, 
+            :user => @user,  
+            :publication => Factory.create(:powerindex_publication))
+          @user.reload
+          @user.subscriptions.size.should == 2
+        end
+        it "should return the publications and their states" do
+          @user.publications_for_wordpress.should == "crikey,powerindex|active,squatter"
+        end
+      end
+    end
+    
+    it "should return an empty string" do
+      @user.publications_for_wordpress.should == ""
     end
   end
 
