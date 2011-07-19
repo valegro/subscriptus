@@ -517,7 +517,8 @@ describe User do
             :lastname    => @user.lastname,
             :email       => @user.email,
             :pword       => @user.password,
-            :premium     => false
+            :premium     => false,
+            :publications => ''
           })
           @user.sync_to_wordpress(@user.password)
         end
@@ -532,7 +533,8 @@ describe User do
             :firstname   => @user.firstname,
             :lastname    => @user.lastname,
             :email       => @user.email,
-            :premium     => false
+            :premium     => false,
+            :publications => ''
           })
           @user.sync_to_wordpress
         end
@@ -551,7 +553,8 @@ describe User do
             :lastname    => @user.lastname,
             :email       => @user.email,
             :premium     => false,
-            :pword       => '12345'
+            :pword       => '12345',
+            :publications => ''
           })
           @user.sync_to_wordpress
         end
@@ -578,6 +581,26 @@ describe User do
           @user.sync_to_wordpress
         }.should raise_exception(Wordpress::PrimaryKeyMismatch)
       end
+    end
+  end
+  
+  describe "upon call to publications_for_wordpress" do
+    before(:each) do
+      @user = Factory.create(:subscriber)
+
+      @sub1 = Factory.create(:active_subscription, 
+        :user => @user, 
+        :publication => Factory.create(:publication))
+
+      @sub2 = Factory.create(:expired_subscription, 
+        :user => @user,  
+        :publication => Factory.create(:powerindex_publication))
+      @user.reload
+      
+      @user.subscriptions.any?.should == true
+    end
+    it "should return the publications and their states" do
+      @user.publications_for_wordpress.should == "crikey,powerindex|active,squatter"
     end
   end
 

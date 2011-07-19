@@ -24,4 +24,13 @@ class SubscriptionObserver < ActiveRecord::Observer
   on(:active, :squatter, :when => :before) do |subscription|
     subscription.state_expires_at = nil
   end
+  
+  def after_save(subscription)
+    if subscription.state_changed?
+      if user = subscription.try(:user)
+        user.delay.sync_to_wordpress
+        # user.sync_to_wordpress
+      end
+    end
+  end
 end

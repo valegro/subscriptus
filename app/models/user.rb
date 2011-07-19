@@ -205,11 +205,12 @@ class User < ActiveRecord::Base
 
   def sync_to_wordpress(password = nil)
     options = {
-      :login       => self.login,
-      :firstname   => self.firstname,
-      :lastname    => self.lastname,
-      :email       => self.email,
-      :premium     => self.premium?
+      :login        => self.login,
+      :firstname    => self.firstname,
+      :lastname     => self.lastname,
+      :email        => self.email,
+      :premium      => self.premium?,
+      :publications => self.publications_for_wordpress
     }
     options[:pword] = password unless password.blank?
     if Wordpress.exists?(:login => self.login)
@@ -221,6 +222,12 @@ class User < ActiveRecord::Base
       options[:pword] = User.random_password if options[:pword].blank?
       Wordpress.create(options)
     end
+  end
+  
+  # Return a string of publications and their states in the format of
+  # "publication1,publication2|publication1_state,publication2_state" etc.
+  def publications_for_wordpress
+    subscriptions.map { |s| [s.publication.try(:template_name) , s.state] }.transpose.map { |a| "#{a.join(',')}" }.join('|')
   end
 
   def premium?

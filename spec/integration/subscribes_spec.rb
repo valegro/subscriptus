@@ -3,7 +3,7 @@ require 'spec_helper'
 describe "Subscribes" do
   describe "as a visitor to the subscribe page" do
     before(:each) do
-      @publication = Factory.create(:publication, :custom_domain => 'example.com', :name => 'Crikey!')
+      @publication = Factory.create(:publication, :custom_domain => 'example.com', :name => 'Crikey!', :direct_debit => true)
       SubscribeController.any_instance.stubs(:current_domain).returns('example.com')
       @offer = Factory.create(:offer, :publication => @publication)
       
@@ -33,7 +33,6 @@ describe "Subscribes" do
     describe "when I choose the direct debit option" do
       it "I should see the right content", :js => true do
         visit new_subscribe_path(:offer_id => @offer.id)
-        debugger
         choose("Direct Transfer/Direct Debit")
         find('#payment-radio-direct-debit').click
         find('#payment_by_direct_debit').visible?.should be(true)
@@ -531,13 +530,14 @@ describe "Subscribes" do
   describe "when I visit the subscribe page but I don't provide an offer" do
     before(:each) do
       @source = Factory.create(:source)
+      @publication = Factory.create(:publication, :custom_domain => 'example.com')
       stub_wordpress
     end
 
     it "should use the primary offer if one is set" do
-      @offer1 = Factory.create(:offer)
+      @offer1 = Factory.create(:offer, :publication => @publication)
       @offer1.offer_terms << Factory.create(:offer_term, :months => 1)
-      @offer2 = Factory.create(:offer)
+      @offer2 = Factory.create(:offer, :publication => @publication)
       @offer2.offer_terms << Factory.create(:offer_term, :months => 2)
       @offer1.offer_terms.size.should == 1
 
@@ -548,9 +548,9 @@ describe "Subscribes" do
     end
 
     it "should just use the first offer found if there is no primary offer" do
-      @offer1 = Factory.create(:offer, :name => "ABC")
+      @offer1 = Factory.create(:offer, :name => "ABC", :publication => @publication)
       @offer1.offer_terms << Factory.create(:offer_term, :months => 1)
-      @offer2 = Factory.create(:offer, :name => "BAC")
+      @offer2 = Factory.create(:offer, :name => "BAC", :publication => @publication)
       @offer2.offer_terms << Factory.create(:offer_term, :months => 2)
       @offer1.offer_terms.size.should == 1
 
