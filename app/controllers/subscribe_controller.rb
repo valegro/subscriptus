@@ -135,6 +135,9 @@ class SubscribeController < ApplicationController
     def load_subscription_from_session
       if session[:subscription_id]
         @subscription = Subscription.find(session[:subscription_id])
+      else
+        redirect_to login_url
+        return false
       end
     end
 
