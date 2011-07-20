@@ -271,6 +271,7 @@ class User < ActiveRecord::Base
     save!
   end
 
+  # Authenticate non-admin users against the wordpress database
   def valid_password?(password)
     if role == :admin
       super

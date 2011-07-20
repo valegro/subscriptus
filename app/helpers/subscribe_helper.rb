@@ -40,6 +40,6 @@ module SubscribeHelper
   end
   
   def template_image_path(image)
-    File.join('/', 'templates', @publication.try(:template_name) || '', 'images', image)
+    File.join('/', 'templates', @publication.try(:template_name) || '..', 'images', image)
   end
 end
