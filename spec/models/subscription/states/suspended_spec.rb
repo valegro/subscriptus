@@ -73,7 +73,7 @@ describe Subscription do
         end
 
         it "should have the right expiry date" do
-          @subscription.expires_at.should == 35.days.from_now
+          @subscription.expires_at.should == 25.days.from_now
         end
       end
     end

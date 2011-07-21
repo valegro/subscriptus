@@ -25,6 +25,10 @@ class SubscriptionObserver < ActiveRecord::Observer
     subscription.state_expires_at = nil
   end
   
+  on(:suspended, :active, :when => :before) do |subscription|
+    subscription.state_expires_at = subscription.expires_at = subscription.expires_at.advance(:days => -1 * subscription.state_expiry_period_in_days)
+  end
+  
   def after_save(subscription)
     # This is copied from StateCallbacks 
     # overriding a method like after_save in a module that isn't immediately obvious to other 

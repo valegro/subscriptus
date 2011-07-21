@@ -100,7 +100,7 @@ describe SubscriptionMailer do
       @response.should_not      be_nil
       @response.subject.should  == "[#{@subscription.publication.name}] Online Order #{@subscription.reference}"
       @response.to.should       == [@subscription.user.email]
-      @response.from.should     == [SubscriptionMailer::NO_REPLY]
+      @response.from.should     == [@subscription.publication.from_email_address]
       @response.body.should     include_text(@subscription.user.firstname)
       @response.body.should     include_text(@subscription.user.lastname)
       # TODO: More body includes checks -> eg; gifts, end date etc
@@ -129,7 +129,7 @@ describe SubscriptionMailer do
     end
 
     it "should set the correct start and end dates for the subscription" do
-      @response.from.should     == [SubscriptionMailer::NO_REPLY]
+      @response.from.should     == [@subscription.publication.from_email_address]
       @response.body.should     include_text(@subscription.user.firstname)
       @response.body.should     include_text(@subscription.user.lastname)
       @response.body.should     include_text(@subscription.user.email)
@@ -223,7 +223,7 @@ describe SubscriptionMailer do
     end
 
     it "should include the right email and name" do
-      @response.from.should     == [SubscriptionMailer::NO_REPLY]
+      @response.from.should     == [@subscription.publication.from_email_address]
       @response.body.should     include_text(@subscription.user.firstname)
       @response.body.should     include_text(@subscription.user.lastname)
       @response.body.should     include_text(@subscription.user.email)
@@ -251,7 +251,7 @@ describe SubscriptionMailer do
     end
 
     it "should include the right email and name" do
-      @response.from.should     == [SubscriptionMailer::NO_REPLY]
+      @response.from.should     == [@subscription.publication.from_email_address]
       @response.body.should     include_text(@subscription.user.firstname)
       @response.body.should     include_text(@subscription.user.lastname)
       @response.body.should     include_text(@subscription.user.email)
@@ -279,7 +279,7 @@ describe SubscriptionMailer do
     end
 
     it "should include the right email and name" do
-      @response.from.should     == [SubscriptionMailer::NO_REPLY]
+      @response.from.should     == [@subscription.publication.from_email_address]
       @response.body.should     include_text(@subscription.user.firstname)
       @response.body.should     include_text(@subscription.user.lastname)
       @response.body.should     include_text(@subscription.user.email)
