@@ -58,26 +58,12 @@
     $val = $_GET['publications'];
     $data = explode("|", $val);
 
-    $pubs = 'a:' . count($data) . '{';
-    $pubstatus = 'a:' . count($data) . '{';
-
-
     $pubData = explode(",",$data[0]);
 
-    foreach ($pubData as &$pub) {
-      $pubs .= 's:' . strlen($pub) . ':"' . $pub . '";';
-    }
-
     $statData = explode(",",$data[1]);
-    foreach ($statData as &$stat) {
-      $pubstatus .= 's:' . strlen($stat) . ':"' . $stat . '";';
-    }
 
-    $pubs .= '}';
-    $pubstatus .= '}';
-
-    $con->addUserMetaData('publications',$pubs);
-    $con->addUserMetaData('pulication_status',$pubstatus);
+    $con->addUserMetaData('publications', $pubData );
+    $con->addUserMetaData('publication_status', $statData );
  
  }
 
@@ -200,11 +186,8 @@ class Connector{
 
       //Add user meta data
       foreach($this->meta as $meta_key => $meta_value){
-        $wpdb->insert($wpdb->usermeta, compact('user_id', 'meta_key', 'meta_value') );
+        add_user_meta( $user_id, $meta_key, $meta_value); 
       }
-    //  update_usermeta( $user_id, 'first_name', $this->meta['first_name']);
-    //  update_usermeta( $user_id, 'last_name', $this->meta['last_name']);
-
 
       $user = new WP_User($user_id);
       $user->set_role('subscriber');
