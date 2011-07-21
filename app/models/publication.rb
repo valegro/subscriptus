@@ -28,6 +28,7 @@ class Publication < ActiveRecord::Base
   validates_presence_of :name, :description, :forgot_password_link
   validates_uniqueness_of :name
   validates_format_of :forgot_password_link, :with => URI::regexp(%w(http https))
+  validates_format_of :from_email_address, :with => /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i
   default_scope :order => "name"
 
   named_scope :for_domain, proc { |domain| { :conditions => { :custom_domain => domain } } }

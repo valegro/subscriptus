@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110711044557) do
+ActiveRecord::Schema.define(:version => 20110721051229) do
 
   create_table "archived_publications", :id => false, :force => true do |t|
     t.integer  "id"
@@ -28,6 +28,7 @@ ActiveRecord::Schema.define(:version => 20110711044557) do
     t.string   "custom_domain"
     t.integer  "capabilities",                   :default => 0, :null => false
     t.string   "terms_url"
+    t.string   "from_email_address"
   end
 
   add_index "archived_publications", ["id"], :name => "index_archived_publications_on_id"
@@ -180,6 +181,7 @@ ActiveRecord::Schema.define(:version => 20110711044557) do
     t.string   "custom_domain"
     t.integer  "capabilities",                   :default => 0, :null => false
     t.string   "terms_url"
+    t.string   "from_email_address"
   end
 
   add_index "publications", ["name"], :name => "index_publications_on_name", :unique => true
