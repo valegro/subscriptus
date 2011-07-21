@@ -593,25 +593,25 @@ describe User do
       before(:each) do
         @sub1 = Factory.create(:active_subscription, 
           :user => @user, 
-          :publication => Factory.create(:publication))
+          :publication => Factory.create(:publication, :id => 999))
         @user.reload
         @user.subscriptions.size.should == 1
       end
       
-      it "should return the publication and its state" do
-        @user.publications_for_wordpress.should == "crikey|active"
+      it "should return the publication id and its state" do
+        @user.publications_for_wordpress.should == "999|active"
       end
       
       describe "and a powerindex subscription" do
         before(:each) do 
           @sub2 = Factory.create(:expired_subscription, 
             :user => @user,  
-            :publication => Factory.create(:powerindex_publication))
+            :publication => Factory.create(:powerindex_publication, :id => 888))
           @user.reload
           @user.subscriptions.size.should == 2
         end
         it "should return the publications and their states" do
-          @user.publications_for_wordpress.should == "crikey,powerindex|active,squatter"
+          @user.publications_for_wordpress.should == "999,888|active,squatter"
         end
       end
     end
