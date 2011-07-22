@@ -284,6 +284,7 @@ describe "Subscribes" do
         click_link_or_button "btnSubmit"
         page.should have_content("Thanks for subscribing to Crikey! We hope you enjoy it.")
       end
+      
 
       describe "but I already registered a trial for this publication" do
         before(:each) do
@@ -441,6 +442,62 @@ describe "Subscribes" do
 
         describe "and I fill in the missing data and submit again" do
           it "should upgrade my subscription to active"
+        end
+      end
+    end
+  
+    describe "and I pass a return_to address in the params" do
+      before(:each) do
+        visit new_subscribe_path(:source_id => @source.id, :offer_id => @offer.id, :return_to => (@return_to_url = 'http://example.com/redirect'))
+      end
+      
+      describe "and I fill in the information correctly" do
+        before(:each) do
+          fill_in "First Name",            :with => "Daniel"
+          fill_in "Last Name",             :with => "Draper"
+          fill_in "Email",                 :with => "daniel@codefire.com.au"
+          fill_in "Email confirmation",    :with => "daniel@codefire.com.au"
+          fill_in "Phone number",          :with => "09090909"
+          fill_in "Street Address Line 1", :with => "1 That Pl"
+          fill_in "City",                  :with => "Adelaide"
+          fill_in "Postcode",              :with => "5000"
+          fill_in "Nominate your password",              :with => "Password1"
+          fill_in "Password confirmation", :with => "Password1"
+          fill_in "Name on Card",          :with => "Daniel Draper"
+          fill_in "Card number",           :with => "4444333322221111"
+          fill_in "Card Verification (CVV Number)", :with => "123"
+          choose "offer_term_#{@term2.id}"
+          check "subscription_terms"
+        end
+
+        it "should create a subscription" do
+          GATEWAY.expects(:purchase).returns(stub(:success? => true))
+          expect {
+            click_link_or_button "btnSubmit"
+          }.to change { Subscription.count }.by(1)
+          s = Subscription.last
+          s.state.should == 'active'
+          s.pending_action.should be(nil)
+          s.actions.size.should == 1
+          s.actions.last.payment.should be_an_instance_of(Payment)
+        end
+
+        describe "after I click through from the thanks page" do 
+          before(:each) do
+            GATEWAY.expects(:purchase).returns(stub(:success? => true))
+            # Click the button on the subscribe form
+            click_link_or_button "btnSubmit"
+            # Click the button on the Thanks page
+            click_link_or_button "btnSubmit"
+          end
+          
+          it "should not display the complete page" do
+            page.should_not have_content("Thanks for subscribing to Crikey! We hope you enjoy it.")
+          end
+        
+          it "should redirect to the return_to url" do
+            page.current_url.should == @return_to_url
+          end
         end
       end
     end

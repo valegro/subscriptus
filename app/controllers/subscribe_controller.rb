@@ -10,6 +10,8 @@ class SubscribeController < ApplicationController
   before_filter :load_tab,                          :except => [ :thanks, :complete ]
   before_filter :require_user,                      :only => [ :edit, :update ]
   before_filter :load_user,                         :only => [ :edit, :update ]
+  before_filter :store_return_to_in_session,        :only => [ :new ]
+  before_filter :load_return_to_from_session,       :only => [ :complete ]
 
   rescue_from(Exceptions::PaymentFailedException, Exceptions::GiftNotAvailable, Exceptions::CannotStoreCard) do |exception|
     Rails.logger.info("Payment Failed")
@@ -103,6 +105,7 @@ class SubscribeController < ApplicationController
 
   def thanks
     @has_weekender = @subscription.user.has_weekender?
+    
   end
 
   def complete
@@ -112,6 +115,7 @@ class SubscribeController < ApplicationController
       @user.add_weekender_to_subs
     end
     clear_session
+    redirect_to @return_to unless @return_to.nil?
   end
 
   def invoice
@@ -199,7 +203,16 @@ class SubscribeController < ApplicationController
     def store_subscription_in_session
       session[:subscription_id] = @subscription.id if @subscription.is_a?(Subscription)
     end
-
+    
+    def store_return_to_in_session
+      session[:return_to] = params[:return_to] if params.has_key?(:return_to)
+    end
+    
+    def load_return_to_from_session
+      @return_to = session[:return_to]
+      session[:return_to] = nil
+    end
+    
     def clear_session
       session[:subscription_id] = nil
     end
