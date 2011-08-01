@@ -8,7 +8,7 @@ describe "Renewals", :type => :integration do
   describe "when I visit the renewals page" do
     describe "and I am an admin" do
       before(:each) do
-        @publication = Factory.create(:publication)
+        @publication = Factory.create(:publication, :custom_domain => 'example.com')
         @offer = Offer.new(Factory.attributes_for(:offer))
         @offer.publication = @publication
         @offer.save!
@@ -23,6 +23,7 @@ describe "Renewals", :type => :integration do
         @subscription.save!
         @subscriber.subscriptions << @subscription
         SubscribeController.any_instance.stubs(:current_user).returns(@user)
+        SubscribeController.any_instance.stubs(:current_domain).returns('example.com')
         Admin::SubscriptionsController.any_instance.stubs(:current_user).returns(@user)
       end
 
@@ -138,7 +139,6 @@ describe "Renewals", :type => :integration do
           @user = Factory.create(:subscriber)
           @subscription = Factory.create(:active_subscription, :user => @user, :publication => @publication)
           SubscribeController.any_instance.stubs(:current_user).returns(@user)
-          puts "Publication = #{@publication.inspect}"
           visit "/renew?publication_id=#{@publication.id}"
           page.should have_content("1 month")
         end

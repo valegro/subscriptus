@@ -1,6 +1,8 @@
 class UserSessionsController < ApplicationController
   skip_before_filter :require_user, :only => [:new, :create]
   before_filter :require_user, :only => :destroy
+  before_filter :load_publication
+  
   layout "login_page"
 
   def new
@@ -27,5 +29,11 @@ class UserSessionsController < ApplicationController
     current_user_session.destroy
     flash[:notice] = "Logout successful!"
     redirect_back_or_default login_url
+  end
+  
+  private
+  
+  def load_publication
+    @publication = Publication.for_domain(current_domain).first
   end
 end

@@ -18,6 +18,7 @@ describe SubscribeController do
     CM::Recipient.stubs(:create!)
     stub_wordpress
     https!
+    SubscribeController.any_instance.stubs(:current_domain).returns('example.com')
   end
 
   describe "on create" do
@@ -365,5 +366,49 @@ describe SubscribeController do
     # Invalid gift
     # check error messages
     # Direct Debit
+  end
+
+  describe "when the session contains a completed subscription id" do
+    before(:each) do
+      @publication = Factory.create(:publication)
+      @offer = Factory.create(:offer, :publication => @publication)
+      @subscription = Factory.create(:active_subscription, :offer => @offer, :publication => @publication)
+      @subscription_action = Factory.create(:subscription_action, :subscription => @subscription)
+
+      controller.session[:subscription_id] = @subscription.id
+      session[:subscription_id].should_not be_nil
+    end
+
+    it "should render the thanks page" do
+      get :thanks
+      response.should render_template("thanks")
+    end
+    
+    it "should render the complete page" do
+      get :complete
+      response.should render_template("complete")
+    end
+    
+    it "should render the invoice page" do
+      get :invoice
+      response.should render_template("invoice")
+    end
+  end
+
+  describe "when the session does not contain the subscription id" do
+    it "the thanks page should redirect to login" do
+      get :thanks
+      response.should redirect_to(login_url)
+    end
+    
+    it "the complete page should redirect to login" do
+      get :complete
+      response.should redirect_to(login_url)
+    end
+    
+    it "the invoice page should redirect to login" do
+      get :invoice
+      response.should redirect_to(login_url)
+    end
   end
 end

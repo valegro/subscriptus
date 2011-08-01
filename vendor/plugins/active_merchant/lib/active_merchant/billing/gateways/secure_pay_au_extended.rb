@@ -79,7 +79,6 @@ module ActiveMerchant #:nodoc:
       end
       
       def purchase(money, credit_card, options = {})
-        puts "Parhcasinf: #{test?}"
         commit :purchase, build_purchase_request(test? ? TEST_AMOUNT : money, credit_card, options)
       end                       
     

@@ -22,6 +22,8 @@ class Subscription < ActiveRecord::Base
   has_many :log_entries, :class_name => "SubscriptionLogEntry", :dependent => :destroy
   has_many :orders
   
+  delegate :template_name, :to => :publication
+  
   attr_accessor :temp_password # Used for sending password to new trialers
   attr_accessor :note # Used to save notes to the subscription
   attr_accessor :terms
@@ -33,6 +35,8 @@ class Subscription < ActiveRecord::Base
   named_scope :recent, :order => "updated_at desc"
   named_scope :expired, lambda { { :conditions => [ "expires_at < ?", Time.now ] } }
   named_scope :not_unsubscribed, :conditions => "state != 'unsubscribed'"
+
+  liquid_methods :reference, :updated_at
 
   validates_presence_of :publication, :state
   validates_acceptance_of :terms
@@ -50,8 +54,6 @@ class Subscription < ActiveRecord::Base
 
   def validate
     unless self.user.blank?
-      puts "HERE"
-      p self.user.subscriptions.map { |s| s.publication.id }
       raise Exceptions::DuplicateSubscription if self.user.subscriptions.detect do |s|
         s.publication_id == self.publication_id && s.id != self.id
       end

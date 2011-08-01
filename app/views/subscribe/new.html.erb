@@ -43,13 +43,13 @@
 <% form_for @subscription, :url => get_subscribe_submit_path(@offer, @source, @tab, @renewing, @for), :builder => SubscribeFormBuilder do |f| %>
 
   <div class='section' id='step1'>
-    <img src="/images/step1.png" class='step' alt='step 1' />
+    <%= image_tag(template_image_path('step1.png'), :class => 'step', :alt => 'step 1')%>
     <div class='content'>
 
       <% if @renewing %>
         <h2>Renew your Subscription</h2>
       <% else %>
-        <h2>Subscribe to Crikey</h2>
+        <h2 class="step">Subscribe to <%= @offer.publication.try(:name) %></h2>
       <% end %>
 
       <h3><%= h(@offer.publication.try(:name)) %></h3>
@@ -57,12 +57,12 @@
 
       <!-- Error Messages -->
       <div id="form-errors">
-			<%= error_messages(@errors) %>
+      <%= error_messages(@errors) %>
       <% unless flash[:error].blank? %>
         <div id="flash"><%= flash[:error] %></div>
       <% end %>
-			</div> <!-- closes #form-errors -->
-			
+      </div> <!-- closes #form-errors -->
+      
       <ul id='subscription-tabs'>
         <li id="subscriptions-tab" class='<%= "active" if @tab == 'subscriptions' || @tab.blank? %>'>
           <%= link_to("SUBSCRIPTIONS", tab_path('subscriptions')) %>
@@ -73,7 +73,7 @@
           </li>
           <li id="concessions-tab" class='<%= "active" if @tab == 'concessions' %>'>
             <%= link_to("SENIOR / CONCESSIONS", tab_path('concessions')) %>
-          </li>	
+          </li> 
           <li id="groups-tab" class='<%= "active" if @tab == 'groups' %> last'>
             <%= link_to("DISCOUNT GROUP", tab_path('groups')) %>
           </li>
@@ -89,16 +89,20 @@
 
   <% unless @tab == 'groups' %>
     <div class='section' id='step2'>
-      <img src="/images/step2.png" class='step' alt='step 2'   />
-      <div class='content'>	
-        <h2><%= 'Confirm ' unless @user.new_record? %>Your Details</h2>
+      <%= image_tag(template_image_path('step2.png'), :class => 'step', :alt => 'step 2')%>
+      <div class='content'> 
+        <% if @user.new_record? %>
+          <h2 class="step">Your Details</h2>
+        <% else %>
+          <h2>Confirm Your Details</h2>
+        <% end %>
 
         <div id='new-user' class="login-option">
           <% fields_for :user, @user, :builder => SubscribeFormBuilder do |u| %>
             <%= u.select :title, %w(Mr Mrs Ms Miss) %>
             <%= u.text_field :firstname, :required => true, :label => "First Name" %>
             <%= u.text_field :lastname, :required => true, :label => "Last Name" %>
-            <%= u.text_field :email, :help => "This is the email address Crikey will be sent to", :required => true %>
+            <%= u.text_field :email, :help => "This is the email address #{@offer.publication.try(:name)} will be sent to", :required => true %>
             <%= u.text_field :email_confirmation, :required => true %>
             <%= u.text_field :phone_number, :help => "If there are problems with email delivery this is how we contact you", :required => true %>
             <%= u.text_field :company %>
@@ -120,10 +124,10 @@
     </div> <!-- Step 2 -->
 
     <div class='section' id='step3'>
-      <img src="/images/step3.png"  class='step' alt='step 3' />
-      <div class='content'>			
+      <%= image_tag(template_image_path('step3.png'), :class => 'step', :alt => 'step 3')%>
+      <div class='content'>     
         <div id='payment' class='form-section'>
-          <h2>Choose your Payment method</h2>
+          <h2 class="step">Choose your Payment method</h2>
 
           <img id='securepay' src="/images/securepay.png" alt="Powered by Secure Pay" />
           <div id='payment-options'>
@@ -135,12 +139,12 @@
             <% if @direct_debit_allowed %>
               <input type='radio' class="payment-radio" name='payment_option' value="direct_debit" id='payment-radio-direct-debit' <%= 'checked="true"' if @payment_option == 'direct_debit' %> />
               <label for='payment-radio-direct-debit'>
-                Direct Debit
-              </label>									
+                Direct Transfer/Direct Debit
+              </label>                  
             <% end %>
               
             <label for='payment-radio-credit-card'>
-              <img src='/images/cc.png' alt='Credit Cards' />	
+              <img src='/images/cc.png' alt='Credit Cards' /> 
             </label>
           </div>
 
@@ -157,11 +161,13 @@
 
             <% if @tab.blank? || @tab == 'subscriptions' %>
               <div class="payment-option" id="payment_by_direct_debit" style="<%= 'display:none;' unless @payment_option == 'direct_debit' %>">
-                <h4>Direct Debit</h4>
+                <h4>Direct Transfer/Direct Debit</h4>
                 <h4>Click the FINISH button below once you’ve chosen your payment option:</h4>
                 <ol>
-                  <li>Download our <%= link_to("subscription form", "/forms/crikey_directdebit_bank.pdf", :target => :new) %> and fax it to 03 8623 9975 or mail it to Crikey, Level 6, 22 William Street, Melbourne VIC 3000.</li>
-                  <li>Or you can do a direct transfer into our bank account – make sure you include your name in the reference so we can match up your payment:</li>
+                  <% if @publication.try(:direct_debit?) %>
+                    <li>Download our <%= link_to("subscription form", "/forms/crikey_directdebit_bank.pdf", :target => :new) %> and fax it to 03 8623 9975 or mail it to Crikey, Level 6, 22 William Street, Melbourne VIC 3000; or</li>
+                  <% end %>
+                  <li>You can do a direct transfer into our bank account – make sure you include your name in the reference so we can match up your payment:</li>
                 </ol>
                 <p>
                 BSB: 083 026<br/>
@@ -172,8 +178,8 @@
             <% end %>
             
             <div id='terms'>
-              <%= f.check_box :terms, :label => "I agree to the Crikey " %>
-              <%= link_to('Terms and Conditions', "http://www.crikey.com.au/about/terms-conditions/", :target => '_blank') %>
+              <%= f.check_box :terms, :label => "I agree to the " %>
+              <%= link_to('Terms and Conditions', @publication.try(:terms_url), :target => '_blank') %>
             </div>
 
             <div id='bottom-right'>
@@ -182,7 +188,7 @@
               </p>
             </div>
                 
-            <%= image_submit_tag "/images/nextstep.png", :disable_with => "Processing...", :id => "btnSubmit" %>
+            <%= image_submit_tag template_image_path('nextstep.png'), :disable_with => "Processing...", :id => "btnSubmit" %>
             <div class='clear'></div>
           </div>
 

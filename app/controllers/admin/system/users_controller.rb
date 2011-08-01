@@ -13,11 +13,13 @@ class Admin::System::UsersController < Admin::SystemController
     @user = User.new(params[:user])
     @user.admin = true
     @user.role = 'admin'
-    if @user.save
-      flash[:notice] = "Created Admin '#{h(@user.name)}'."
-      redirect_to :action => :index
-    else
-      render :action => :new
+    User.validate_as(:admin) do
+      if @user.save
+        flash[:notice] = "Created Admin '#{h(@user.name)}'."
+        redirect_to :action => :index
+      else
+        render :action => :new
+      end
     end
   end
 

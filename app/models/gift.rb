@@ -23,6 +23,8 @@ class Gift < ActiveRecord::Base
   named_scope :optional, :conditions => { "gift_offers.included" => false }
   named_scope :included, :conditions => { "gift_offers.included" => true }
 
+  liquid_methods :name
+
   after_destroy do |gi55|
     # TODO: Admin Audit Log
     # TODO: Remove gift from all offers (or does this happen anyway?)

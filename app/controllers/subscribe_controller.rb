@@ -4,11 +4,14 @@ class SubscribeController < ApplicationController
   before_filter :load_subscription_from_session,    :only   => [ :thanks, :invoice, :complete ]
   before_filter :load_subscription_from_for,        :only   => [ :edit, :update ]
   before_filter :load_offer_and_publication,        :except => [ :thanks, :complete ]
+  before_filter :load_publication,                  :only   => [ :thanks, :complete ]
   before_filter :load_source,                       :except => [ :thanks, :complete ]
   before_filter :load_gifts,                        :except => [ :thanks, :complete ]
   before_filter :load_tab,                          :except => [ :thanks, :complete ]
   before_filter :require_user,                      :only => [ :edit, :update ]
   before_filter :load_user,                         :only => [ :edit, :update ]
+  before_filter :store_return_to_in_session,        :only => [ :new ]
+  before_filter :load_return_to_from_session,       :only => [ :complete ]
 
   rescue_from(Exceptions::PaymentFailedException, Exceptions::GiftNotAvailable, Exceptions::CannotStoreCard) do |exception|
     Rails.logger.info("Payment Failed")
@@ -102,6 +105,7 @@ class SubscribeController < ApplicationController
 
   def thanks
     @has_weekender = @subscription.user.has_weekender?
+    
   end
 
   def complete
@@ -111,6 +115,7 @@ class SubscribeController < ApplicationController
       @user.add_weekender_to_subs
     end
     clear_session
+    redirect_to @return_to unless @return_to.nil?
   end
 
   def invoice
@@ -134,6 +139,9 @@ class SubscribeController < ApplicationController
     def load_subscription_from_session
       if session[:subscription_id]
         @subscription = Subscription.find(session[:subscription_id])
+      else
+        redirect_to login_url
+        return false
       end
     end
 
@@ -142,21 +150,31 @@ class SubscribeController < ApplicationController
         @subscription = Subscription.find(params[:for])
       end
     end
+    
+    def load_publication
+      @publication = if params[:publication_id]
+        Rails.logger.info "Finding publication with id: #{params[:publication_id]}"
+        Publication.find(params[:publication_id])
+      else
+        Rails.logger.info "Finding publication for domain: #{current_domain}"
+        Publication.for_domain(current_domain).first
+      end
+      Rails.logger.info "Current publication: #{@publication.inspect}"      
+    end
 
     def load_offer_and_publication
       @offer = if params[:offer_id]
         Offer.find(params[:offer_id])
       end
-      @publication = if params[:publication_id]
-        Publication.find(params[:publication_id])
-      end
+      
+      load_publication
       @publication = @subscription.publication if @subscription
 
       if !@offer && @publication
         @offer = (@publication.offers.default_for_renewal || @publication.offers.first)
       end
       if !@offer
-        @offer = Offer.primary_offer
+        @offer = Offer.for_publication(@publication).primary_offer
       end
     end
 
@@ -183,9 +201,18 @@ class SubscribeController < ApplicationController
     end
 
     def store_subscription_in_session
-      session[:subscription_id] = @subscription.try(:id)
+      session[:subscription_id] = @subscription.id if @subscription.is_a?(Subscription)
     end
-
+    
+    def store_return_to_in_session
+      session[:return_to] = params[:return_to] if params.has_key?(:return_to)
+    end
+    
+    def load_return_to_from_session
+      @return_to = session[:return_to]
+      session[:return_to] = nil
+    end
+    
     def clear_session
       session[:subscription_id] = nil
     end

@@ -11,6 +11,12 @@ describe SubscriptionMailer do
       @response.body.should include_text("Your email address is registered as #{@subscription.user.email}")
     end
   end
+  
+  shared_examples_for "an email for a publication" do
+    it "should include the publication name in the subject" do
+      @response.subject.should include_text(@subscription.publication.name)
+    end
+  end
 
   before(:each) do
     stub_wordpress
@@ -25,6 +31,61 @@ describe SubscriptionMailer do
     Timecop.return
   end
 
+  describe "class method" do
+    describe "with_template" do
+      it "should return a subclass of the mailer" do
+        SubscriptionMailer.with_template('foo').superclass.should == SubscriptionMailer
+      end
+      
+      it "should set the liquid template path" do
+        SubscriptionMailer.with_template('foo').liquid_template_path.should == 'foo'
+      end
+      
+      it "should use the liquid template path if one is set" do
+        
+        File.expects(:exists?).at_least_once.with('public/templates/foo/subscription_mailer/_activation.liquid').returns(true)
+
+        Liquid::Template.expects(:parse).returns(mock('parsed_template', :render => 'text'))
+        Liquid::Template.stubs(:file_system).returns(fs = mock('filesystem'))
+        fs.stubs(:full_path).returns('public/templates/foo/subscription_mailer/_activation.liquid')
+        fs.stubs(:read_template_file).at_least_once.with('subscription_mailer/activation').returns(mock('template'))
+
+        @subscription = Factory.create(:subscription)        
+        SubscriptionMailer.with_template('foo').deliver_activation(@subscription)
+      end
+      
+      it "should fall back to erb views if no liquid template is found" do
+        Liquid::Template.stubs(:file_system).returns(fs = mock('filesystem'))
+        fs.stubs(:full_path).returns('public/templates/foo/subscription_mailer/_activation.liquid')
+
+        File.expects(:exists?).at_least_once.with('public/templates/foo/subscription_mailer/_activation.liquid').returns(false)
+        Liquid::Template.expects(:parse).never
+        @subscription = Factory.create(:subscription)        
+        action = Factory.create(:subscription_action, :payment => Factory.create(:payment), :subscription => @subscription)
+        @subscription.actions << action
+        @subscription.save!
+        SubscriptionMailer.with_template('foo').deliver_activation(@subscription)
+      end
+      
+      it "should dump for DJ with the template path" do
+        SubscriptionMailer.with_template('foo').dump_for_delayed_job.should include_text('foo')
+      end
+      
+      it "should load a subclass for DJ" do
+        SubscriptionMailer.load_for_delayed_job('foo').superclass.should == SubscriptionMailer
+      end
+      
+      it "should load for DJ and restore the liquid template path" do
+        SubscriptionMailer.load_for_delayed_job('foo').liquid_template_path.should == 'foo'
+      end
+      
+      it "should load for DJ and not restore the liquid template path if there is no path" do
+        SubscriptionMailer.load_for_delayed_job(nil).superclass.should_not == SubscriptionMailer
+      end
+      
+    end
+  end
+
   # tests on activation method ----------------
   describe "deliver activation" do
     before(:each) do
@@ -37,9 +98,9 @@ describe SubscriptionMailer do
 
     it "should successfully deliver the email containing the correct subscription details to the activated user" do
       @response.should_not      be_nil
-      @response.subject.should  == "Crikey Online Order #{@subscription.reference}"
+      @response.subject.should  == "[#{@subscription.publication.name}] Online Order #{@subscription.reference}"
       @response.to.should       == [@subscription.user.email]
-      @response.from.should     == [SubscriptionMailer::NO_REPLY]
+      @response.from.should     == [@subscription.publication.from_email_address]
       @response.body.should     include_text(@subscription.user.firstname)
       @response.body.should     include_text(@subscription.user.lastname)
       # TODO: More body includes checks -> eg; gifts, end date etc
@@ -48,6 +109,7 @@ describe SubscriptionMailer do
 
     # Every Email should have an unsubscribe
     it_should_behave_like "an email with an unsubscribe link"
+    it_should_behave_like "an email for a publication"
   end
 
   describe "if the user is invalid" do
@@ -67,7 +129,7 @@ describe SubscriptionMailer do
     end
 
     it "should set the correct start and end dates for the subscription" do
-      @response.from.should     == [SubscriptionMailer::NO_REPLY]
+      @response.from.should     == [@subscription.publication.from_email_address]
       @response.body.should     include_text(@subscription.user.firstname)
       @response.body.should     include_text(@subscription.user.lastname)
       @response.body.should     include_text(@subscription.user.email)
@@ -161,7 +223,7 @@ describe SubscriptionMailer do
     end
 
     it "should include the right email and name" do
-      @response.from.should     == [SubscriptionMailer::NO_REPLY]
+      @response.from.should     == [@subscription.publication.from_email_address]
       @response.body.should     include_text(@subscription.user.firstname)
       @response.body.should     include_text(@subscription.user.lastname)
       @response.body.should     include_text(@subscription.user.email)
@@ -189,7 +251,7 @@ describe SubscriptionMailer do
     end
 
     it "should include the right email and name" do
-      @response.from.should     == [SubscriptionMailer::NO_REPLY]
+      @response.from.should     == [@subscription.publication.from_email_address]
       @response.body.should     include_text(@subscription.user.firstname)
       @response.body.should     include_text(@subscription.user.lastname)
       @response.body.should     include_text(@subscription.user.email)
@@ -217,7 +279,7 @@ describe SubscriptionMailer do
     end
 
     it "should include the right email and name" do
-      @response.from.should     == [SubscriptionMailer::NO_REPLY]
+      @response.from.should     == [@subscription.publication.from_email_address]
       @response.body.should     include_text(@subscription.user.firstname)
       @response.body.should     include_text(@subscription.user.lastname)
       @response.body.should     include_text(@subscription.user.email)

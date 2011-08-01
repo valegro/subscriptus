@@ -20,6 +20,17 @@ Factory.define :admin, :parent => :user do |a|
   a.role { 'admin' }
 end
 
+Factory.define :admin_attributes, :class => User do |a|
+  a.firstname { Faker::Name.first_name }
+  a.lastname { Faker::Name.last_name }
+  a.email { @email= Faker::Internet.email }
+  a.email_confirmation { |x| x.email }
+  a.password "password"
+  a.password_confirmation { |x| x.password }
+  a.login { Faker::Name.name.downcase }
+  a.role { 'admin' }
+end
+
 Factory.define :subscriber, :parent => :user do |a|
   a.role { 'subscriber' }
 end

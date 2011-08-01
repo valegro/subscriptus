@@ -7,6 +7,8 @@ describe UnsubscribeController do
   before(:each) do
     stub_wordpress
     https!
+    Factory.create(:publication, :custom_domain => 'example.com')
+    UnsubscribeController.any_instance.stubs(:current_domain).returns('example.com')
   end
 
   describe "if no user is provided" do

@@ -69,7 +69,7 @@ describe Subscription do
 
   describe "upon suspend!" do
     before(:each) do
-      SubscriptionMailer.expects(:send_later).with(:deliver_suspended, @subscription)
+      stub_mailer(SubscriptionMailer).expects(:deliver_suspended).with(@subscription)
     end
 
     it "should create a log entry" do
@@ -102,7 +102,7 @@ describe Subscription do
   describe "on postpone" do
     before(:each) do
       @subscription.pending = :payment
-      SubscriptionMailer.expects(:send_later).with(:deliver_pending_payment, @subscription)
+      stub_mailer(SubscriptionMailer).expects(:deliver_pending_payment).with(@subscription)
     end
 
     it "should set the state to suspended" do

@@ -39,6 +39,6 @@ config.after_initialize do
 end
 
 
-CAMPAIGNMASTER_USERNAME = 'ddraper'
+CAMPAIGNMASTER_USERNAME = 'ddraperaaa'
 CAMPAIGNMASTER_PASSWORD = 'netfox'
 CAMPAIGNMASTER_CLIENT_ID = '5032'

@@ -7,9 +7,9 @@ class Wordpress
   end
 
   # Force it to be enabled
-  def self.enabled
-    true
-  end
+  # def self.enabled
+  #   true
+  # end
   
   def self.config
     @@config ||= YAML.load_file(File.join(RAILS_ROOT, 'config', 'wordpress.yml'))[RAILS_ENV].symbolize_keys

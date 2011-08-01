@@ -3,7 +3,10 @@ require 'spec_helper'
 describe "Subscribes" do
   describe "as a visitor to the subscribe page" do
     before(:each) do
-      @offer = Factory.create(:offer)
+      @publication = Factory.create(:publication, :custom_domain => 'example.com', :name => 'Crikey!', :direct_debit => true)
+      SubscribeController.any_instance.stubs(:current_domain).returns('example.com')
+      @offer = Factory.create(:offer, :publication => @publication)
+      
       @term1 = @offer.offer_terms.create(:price => 10, :months => 3)
       @source = Factory.create(:source)
     end
@@ -30,7 +33,8 @@ describe "Subscribes" do
     describe "when I choose the direct debit option" do
       it "I should see the right content", :js => true do
         visit new_subscribe_path(:offer_id => @offer.id)
-        choose("Direct Debit")
+        choose("Direct Transfer/Direct Debit")
+        find('#payment-radio-direct-debit').click
         find('#payment_by_direct_debit').visible?.should be(true)
         page.should have_content("Click the FINISH button below once you’ve chosen your payment option:")
         page.should have_content("BSB: 083 026")
@@ -145,7 +149,9 @@ describe "Subscribes" do
 
   describe "when I visit the subscribe page and choose student concession" do
     before(:each) do
-      @offer = Factory.create(:offer)
+      @publication = Factory.create(:publication, :custom_domain => 'example.com', :name => 'Crikey!')
+      SubscribeController.any_instance.stubs(:current_domain).returns('example.com')
+      @offer = Factory.create(:offer, :publication => @publication)
       @term = @offer.offer_terms.create(:price => 10, :months => 3, :concession => true)
       @source = Factory.create(:source)
       GATEWAY.expects(:purchase).never
@@ -232,7 +238,9 @@ describe "Subscribes" do
 
   describe "when I visit the subscribe page" do
     before(:each) do
-      @offer = Factory.create(:offer)
+      @publication = Factory.create(:publication, :custom_domain => 'example.com', :name => 'Crikey!')
+      SubscribeController.any_instance.stubs(:current_domain).returns('example.com')
+      @offer = Factory.create(:offer, :publication => @publication)
       @term = @offer.offer_terms.create(:price => 10, :months => 3, :concession => true)
       @term2 = @offer.offer_terms.create(:price => 20, :months => 3)
       @source = Factory.create(:source)
@@ -276,6 +284,7 @@ describe "Subscribes" do
         click_link_or_button "btnSubmit"
         page.should have_content("Thanks for subscribing to Crikey! We hope you enjoy it.")
       end
+      
 
       describe "but I already registered a trial for this publication" do
         before(:each) do
@@ -301,8 +310,9 @@ describe "Subscribes" do
         end
 
         it "should update the user in wordpress" do
-          User.any_instance.expects(:send_later).with(:sync_to_wordpress, 'Password1')
-          User.any_instance.expects(:send_later).with(:sync_to_campaign_master)
+          User.any_instance.stubs(:delay).returns(delay=mock('delay'))
+          delay.expects(:sync_to_wordpress).with('Password1')
+          delay.expects(:sync_to_campaign_master)
           click_link_or_button "btnSubmit"
         end
       end
@@ -348,7 +358,7 @@ describe "Subscribes" do
         fill_in "Password confirmation", :with => "Password1"
         choose "offer_term_#{@term2.id}"
         check "subscription_terms"
-        choose("Direct Debit")
+        choose("Direct Transfer/Direct Debit")
       end
 
       it "should create a pending subscription with a pending action" do
@@ -378,7 +388,7 @@ describe "Subscribes" do
         fill_in "Last Name",             :with => "Draper"
         fill_in "Email",                 :with => "daniel@codefire.com.au"
         check "subscription_terms"
-        choose("Direct Debit")
+        choose("Direct Transfer/Direct Debit")
       end
 
       it "should take me back to the form" do
@@ -435,6 +445,62 @@ describe "Subscribes" do
         end
       end
     end
+  
+    describe "and I pass a return_to address in the params" do
+      before(:each) do
+        visit new_subscribe_path(:source_id => @source.id, :offer_id => @offer.id, :return_to => (@return_to_url = 'http://example.com/redirect'))
+      end
+      
+      describe "and I fill in the information correctly" do
+        before(:each) do
+          fill_in "First Name",            :with => "Daniel"
+          fill_in "Last Name",             :with => "Draper"
+          fill_in "Email",                 :with => "daniel@codefire.com.au"
+          fill_in "Email confirmation",    :with => "daniel@codefire.com.au"
+          fill_in "Phone number",          :with => "09090909"
+          fill_in "Street Address Line 1", :with => "1 That Pl"
+          fill_in "City",                  :with => "Adelaide"
+          fill_in "Postcode",              :with => "5000"
+          fill_in "Nominate your password",              :with => "Password1"
+          fill_in "Password confirmation", :with => "Password1"
+          fill_in "Name on Card",          :with => "Daniel Draper"
+          fill_in "Card number",           :with => "4444333322221111"
+          fill_in "Card Verification (CVV Number)", :with => "123"
+          choose "offer_term_#{@term2.id}"
+          check "subscription_terms"
+        end
+
+        it "should create a subscription" do
+          GATEWAY.expects(:purchase).returns(stub(:success? => true))
+          expect {
+            click_link_or_button "btnSubmit"
+          }.to change { Subscription.count }.by(1)
+          s = Subscription.last
+          s.state.should == 'active'
+          s.pending_action.should be(nil)
+          s.actions.size.should == 1
+          s.actions.last.payment.should be_an_instance_of(Payment)
+        end
+
+        describe "after I click through from the thanks page" do 
+          before(:each) do
+            GATEWAY.expects(:purchase).returns(stub(:success? => true))
+            # Click the button on the subscribe form
+            click_link_or_button "btnSubmit"
+            # Click the button on the Thanks page
+            click_link_or_button "btnSubmit"
+          end
+          
+          it "should not display the complete page" do
+            page.should_not have_content("Thanks for subscribing to Crikey! We hope you enjoy it.")
+          end
+        
+          it "should redirect to the return_to url" do
+            page.current_url.should == @return_to_url
+          end
+        end
+      end
+    end
   end
 
   describe "when a squatter user with my email address exists" do
@@ -446,7 +512,9 @@ describe "Subscribes" do
 
     describe "and I visit the subscribe page" do
       before(:each) do
-        @offer = Factory.create(:offer)
+        @publication = Factory.create(:publication, :custom_domain => 'example.com', :name => 'Crikey!')
+        SubscribeController.any_instance.stubs(:current_domain).returns('example.com')
+        @offer = Factory.create(:offer, :publication => @publication)
         @term = @offer.offer_terms.create(:price => 10, :months => 3, :concession => true)
         @term2 = @offer.offer_terms.create(:price => 20, :months => 3)
         @source = Factory.create(:source)
@@ -519,13 +587,14 @@ describe "Subscribes" do
   describe "when I visit the subscribe page but I don't provide an offer" do
     before(:each) do
       @source = Factory.create(:source)
+      @publication = Factory.create(:publication, :custom_domain => 'example.com')
       stub_wordpress
     end
 
     it "should use the primary offer if one is set" do
-      @offer1 = Factory.create(:offer)
+      @offer1 = Factory.create(:offer, :publication => @publication)
       @offer1.offer_terms << Factory.create(:offer_term, :months => 1)
-      @offer2 = Factory.create(:offer)
+      @offer2 = Factory.create(:offer, :publication => @publication)
       @offer2.offer_terms << Factory.create(:offer_term, :months => 2)
       @offer1.offer_terms.size.should == 1
 
@@ -536,9 +605,9 @@ describe "Subscribes" do
     end
 
     it "should just use the first offer found if there is no primary offer" do
-      @offer1 = Factory.create(:offer, :name => "ABC")
+      @offer1 = Factory.create(:offer, :name => "ABC", :publication => @publication)
       @offer1.offer_terms << Factory.create(:offer_term, :months => 1)
-      @offer2 = Factory.create(:offer, :name => "BAC")
+      @offer2 = Factory.create(:offer, :name => "BAC", :publication => @publication)
       @offer2.offer_terms << Factory.create(:offer_term, :months => 2)
       @offer1.offer_terms.size.should == 1
 

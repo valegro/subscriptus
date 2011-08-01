@@ -10,7 +10,7 @@ class SubscriptionActionObserver < ActiveRecord::Observer
     end
     # Invoice
     if action.subscription && action.payment
-      SubscriptionMailer.send_later(:deliver_activation, action.subscription)
+      SubscriptionMailer.with_template(action.subscription.template_name).delay.deliver_activation(action.subscription)
     end
   end
 end

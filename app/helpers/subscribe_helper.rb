@@ -38,4 +38,8 @@ module SubscribeHelper
       subscribe_path(:offer_id => offer.id, :source_id => source.try(:id), :tab => tab)
     end
   end
+  
+  def template_image_path(image)
+    File.join('/', 'templates', @publication.try(:template_name) || '..', 'images', image)
+  end
 end
