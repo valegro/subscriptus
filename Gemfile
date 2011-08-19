@@ -22,7 +22,7 @@ gem 'rack', '1.1.0'
 gem 'authlogic'
 gem 'searchlogic'
 gem 'navigasmic'
-gem 'will_paginate'
+gem 'will_paginate', "2.3.15"
 gem 'json_pure'
 gem 'capistrano'
 

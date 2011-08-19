@@ -87,9 +87,27 @@ describe "Renewals", :type => :integration do
 
     describe "and I provide a for option but I am not an admin" do
       before(:each) do
+        @subscriber = Factory.create(:subscriber)
+        @publication = Factory.create(:publication, :custom_domain => 'example.com')
+        ApplicationController.any_instance.stubs(:current_user).returns(@subscriber)
+        SubscribeController.any_instance.stubs(:current_user).returns(@subscriber)
+        Admin::SubscriptionsController.any_instance.stubs(:current_user).returns(@subscriber)
+        SubscribeController.any_instance.stubs(:current_domain).returns('example.com')
+        @offer = Factory.create(:offer, :publication => @publication)
+        @publication.offers.default_for_renewal = @offer
+      end
+
+      it "should ignore the for option and give me my renew page" do
+        visit "/renew?for=123"
+        page.should have_xpath("//input[@value='#{@subscriber.firstname}' and @id='user_firstname']")
+      end
+    end
+
+    describe "and I provide a for option but I am not logged in" do
+      before(:each) do
+        ApplicationController.any_instance.stubs(:current_user).returns(nil)
         SubscribeController.any_instance.stubs(:current_user).returns(nil)
         Admin::SubscriptionsController.any_instance.stubs(:current_user).returns(nil)
-        @offer = Factory.create(:offer)
       end
 
       it "should redirect me to the login page" do

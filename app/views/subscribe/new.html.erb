@@ -32,6 +32,8 @@
   </script>
 <% end %>
 
+<pre><%= current_user.inspect %></pre>
+
 <% if @for && current_user.admin? %>
   <p id="admin-renew">
     Renewing subscription to <%= link_to(@subscription.publication.try(:name), admin_catalogue_publication_path(@subscription.publication)) %> for <%= link_to(@user.name, admin_subscriber_path(@user)) %><br/>

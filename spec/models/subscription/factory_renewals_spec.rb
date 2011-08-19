@@ -1,10 +1,13 @@
 require 'spec_helper'
 
 describe SubscriptionFactory, "renewals" do
+  before(:each) do
+    stub_gateway_purchase
+  end
+
   shared_examples_for "An active subscription" do
     before(:each) do
       stub_mailer(SubscriptionMailer).expects(:deliver_activation).with(instance_of(Subscription))
-
     end
     
     it "should set the state to active" do

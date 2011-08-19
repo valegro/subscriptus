@@ -38,6 +38,7 @@ describe SubscribeController do
     end
 
     it "should create a subscription" do
+      stub_gateway_purchase
       expect {
         post('create', {
           :offer_id => @offer.id,

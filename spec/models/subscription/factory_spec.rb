@@ -1,6 +1,9 @@
 require 'spec_helper'
 
 describe SubscriptionFactory do
+  before(:each) do
+    stub_gateway_purchase
+  end
 
   before(:each) do
     cm_return = stub(:success? => true)

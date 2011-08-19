@@ -70,12 +70,14 @@ describe Payment do
     end
 
     it "should save the record" do
+      stub_gateway_purchase
       payment = Factory.build(:payment)
       payment.expects(:save!)
       payment.process!
     end
 
     it "should set processed_at on save" do
+      stub_gateway_purchase
       Timecop.freeze(Time.now) do
         payment = Factory.build(:payment)
         payment.expects(:save!)
@@ -85,6 +87,7 @@ describe Payment do
     end
 
     it "should set the reference to the secure pay order id" do
+      stub_gateway_purchase
       Payment.any_instance.stubs(:generate_unique_id).returns('1234')
       payment = Factory.build(:payment, :payment_type => 'credit_card')
       payment.process!
@@ -176,6 +179,7 @@ describe Payment do
   describe "activation email" do
     it "should be delivered after processing if there is a subscription attached" do
       stub_wordpress
+      stub_gateway_purchase
       subscription = Factory.create(:subscription)
       action = Factory.create(:subscription_action, :subscription => subscription)
       subscription.actions << action
@@ -184,6 +188,7 @@ describe Payment do
     end
 
     it "should NOT be delivered after processing if there is a NO subscription attached" do
+      stub_gateway_purchase
       stub_wordpress
       payment = Factory.build(:payment, :subscription_action => nil)
       stub_mailer(SubscriptionMailer).expects(:deliver!).never

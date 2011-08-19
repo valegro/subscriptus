@@ -1,6 +1,7 @@
 class SubscribeController < ApplicationController
   layout 'signup', :except => :invoice
 
+  before_filter :require_user,                      :only => [ :edit, :update ]
   before_filter :load_subscription_from_session,    :only   => [ :thanks, :invoice, :complete ]
   before_filter :load_subscription_from_for,        :only   => [ :edit, :update ]
   before_filter :load_offer_and_publication,        :except => [ :thanks, :complete ]
@@ -8,7 +9,6 @@ class SubscribeController < ApplicationController
   before_filter :load_source,                       :except => [ :thanks, :complete ]
   before_filter :load_gifts,                        :except => [ :thanks, :complete ]
   before_filter :load_tab,                          :except => [ :thanks, :complete ]
-  before_filter :require_user,                      :only => [ :edit, :update ]
   before_filter :load_user,                         :only => [ :edit, :update ]
   before_filter :store_return_to_in_session,        :only => [ :new ]
   before_filter :load_return_to_from_session,       :only => [ :complete ]

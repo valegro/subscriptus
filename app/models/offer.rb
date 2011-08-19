@@ -31,6 +31,7 @@ class Offer < ActiveRecord::Base
     self.trial
   end
 
+  # TODO: Deprecate and remove
   def make_primary!
     self.class.transaction do
       self.class.update_all "primary_offer = 'false'"

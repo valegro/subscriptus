@@ -112,6 +112,11 @@ def https!
   ActionController::TestRequest.any_instance.stubs(:ssl?).returns(true)
 end
 
+def stub_gateway_purchase
+  response = stub(:success? => true)
+  GATEWAY.stubs(:purchase).returns(response)
+end
+
 def stub_wordpress
   Wordpress.stubs(:exists?).returns(false)
   
