@@ -79,11 +79,11 @@ group :development, :test, :cucmber do
   gem 'launchy'    # So you can do Then show me the page
   gem 'cucumber', "0.8.5"
   gem 'cucumber-rails'
-  gem 'pickle'
+  gem 'pickle', "0.4.4"
   gem 'factory_girl'
   gem 'faker'
   gem 'shoulda'
-  gem 'gherkin'
+  gem 'gherkin', '2.1.4'
   gem 'rack-test', "0.5.4"
   gem 'rspec', '1.3.1'
   gem 'rspec-rails', '1.3.3'

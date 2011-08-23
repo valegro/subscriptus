@@ -17,6 +17,14 @@ class SubscriptionObserver < ActiveRecord::Observer
     subscription.state_expires_at = subscription.expires_at
   end
 
+  on(:renewal_pending, :active, :when => :before) do |subscription|
+    subscription.pending = nil
+  end
+
+  on(:renewal_pending, :pending, :when => :before) do |subscription|
+    subscription.state_expires_at = nil
+  end
+
   on(:trial, :squatter, :when => :before) do |subscription|
     subscription.state_expires_at = nil
   end

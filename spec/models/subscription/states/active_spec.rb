@@ -1,6 +1,5 @@
 require 'spec_helper'
 
-# TODO: Timed state changes using expire_states!
 # TODO: Test invalid state transitions - probably in subscription_spec.rb as its generic
 describe Subscription do
 
@@ -107,7 +106,21 @@ describe Subscription do
 
     it "should set the state to suspended" do
       @subscription.postpone!
-      @subscription.state.should == 'pending'
+      @subscription.state.should == 'renewal_pending'
     end
+
+    it "should not change state_expires_at" do
+      expect {
+        @subscription.postpone!
+      }.to_not change { @subscription.state_expires_at }
+    end
+
+    it "should not change expires_at" do
+      expect {
+        @subscription.postpone!
+      }.to_not change { @subscription.expires_at }
+    end
+
+    it "should have a pending action"
   end
 end

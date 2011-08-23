@@ -118,11 +118,13 @@ describe Admin::SubscriptionsController, "as admin" do
   describe "pending" do
     before(:each) do
       @subscription = Factory.create(:pending_subscription)
+      @renewal_pending = Factory.create(:pending_subscription, :state => 'renewal_pending')
     end
 
     it "should list all pending subscriptions" do
       get :pending
       assigns[:subscriptions].empty?.should be_false
+      assigns[:subscriptions].size.should == 2
     end
 
     it "should create log entry on verify with payment" do
@@ -137,6 +139,14 @@ describe Admin::SubscriptionsController, "as admin" do
       success = stub(:success? => true, :params => { 'ponum' => '1234' })
       GATEWAY.expects(:trigger_recurrent).returns(success)
       post :verify, :id => @subscription.id, :subscription => { :note => "A note about verification" }
+      flash[:notice].should == "Verified Subscription"
+      response.should redirect_to :action => :pending
+    end
+
+    it "should verify if payment is successful for a subscription that is renewal_pending" do
+      success = stub(:success? => true, :params => { 'ponum' => '1234' })
+      GATEWAY.expects(:trigger_recurrent).returns(success)
+      post :verify, :id => @renewal_pending.id, :subscription => { :note => "A note about verification" }
       flash[:notice].should == "Verified Subscription"
       response.should redirect_to :action => :pending
     end

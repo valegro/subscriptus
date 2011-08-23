@@ -108,7 +108,6 @@ describe Subscription do
   end
 
   describe "apply_action" do
-    # TODO: describe "to an active subscription" do - its different for new subs and renewals
     before(:each) do
       @subscription = Factory.create(:active_subscription, :expires_at => Time.now)
       @payment = Factory.build(:payment)
@@ -199,8 +198,13 @@ describe Subscription do
 
   describe "with named scopes" do
     before(:each) do
-      a = Factory.create(:subscription)
-      b = Factory.create(:subscription)
+      a = Factory.create(:pending_subscription)
+      b = Factory.create(:pending_subscription, :state => 'renewal_pending')
+    end
+
+    it "should show both subscriptions for any_pending" do
+      subs = Subscription.any_pending
+      subs.size.should == 2
     end
 
     it "should have named_scope ascend_by_name" do
