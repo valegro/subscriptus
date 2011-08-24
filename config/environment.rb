@@ -53,7 +53,7 @@ Rails::Initializer.run do |config|
 end
 
 # TODO: Make confir options
-STANDARD_TIME_FORMAT = '%d/%m/%Y %Z'
+STANDARD_TIME_FORMAT = '%d/%m/%Y %H:%M %Z'
 APP_TIMEZONE = 'Melbourne'
 
 require 'delayed_job'
