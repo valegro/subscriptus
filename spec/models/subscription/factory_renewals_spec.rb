@@ -167,7 +167,6 @@ describe SubscriptionFactory, "renewals" do
     end
 
     it "should have a state of renewal_pending" do
-      begin
       factory = SubscriptionFactory.new(
         @offer,
         :term_id => @concession_term.id,
@@ -176,10 +175,6 @@ describe SubscriptionFactory, "renewals" do
         :payment_attributes => @payment_attributes
       )
       factory.update(@subscription)
-    rescue
-      p $!.errors
-      puts $!.backtrace
-    end
       @subscription.state.should == 'renewal_pending'
     end
 
