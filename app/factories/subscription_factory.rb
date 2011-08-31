@@ -129,7 +129,8 @@ class SubscriptionFactory
       if @concession.try(:to_s) == 'concession' && @subscription.user.try(:valid_concession_holder)
         'active'
       else
-        ((@concession || @payment_option == 'direct_debit') ? 'pending' : 'active')
+        pending_state = @subscription.active? ? 'renewal_pending' : 'pending'
+        ((@concession || @payment_option == 'direct_debit') ? pending_state : 'active')
       end
     end
 end

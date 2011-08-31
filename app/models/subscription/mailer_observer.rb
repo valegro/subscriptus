@@ -25,7 +25,11 @@ class Subscription::MailerObserver < ActiveRecord::Observer
     send_email(:deliver_verified, subscription)
   end
 
-  on(:active, :pending) do |subscription|
+  on(:renewal_pending, :active) do |subscription|
+    send_email(:deliver_verified, subscription)
+  end
+
+  on(:active, :renewal_pending) do |subscription|
     send_email("deliver_pending_#{subscription.pending}".to_sym, subscription)
   end
 
