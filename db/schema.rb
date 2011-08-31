@@ -48,6 +48,7 @@ ActiveRecord::Schema.define(:version => 20110721051229) do
     t.datetime "expires_at"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "recurrent_id"
     t.string   "order_num"
     t.integer  "source_id"
     t.text     "referrer"
@@ -63,6 +64,13 @@ ActiveRecord::Schema.define(:version => 20110721051229) do
 
   create_table "audit_log_entries", :force => true do |t|
     t.integer  "user_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "carrots", :force => true do |t|
+    t.string   "state"
+    t.datetime "state_updated_at"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -100,6 +108,11 @@ ActiveRecord::Schema.define(:version => 20110721051229) do
     t.integer  "on_hand"
     t.datetime "created_at"
     t.datetime "updated_at"
+  end
+
+  create_table "gifts_offers", :force => true do |t|
+    t.integer "gift_id"
+    t.integer "offer_id"
   end
 
   create_table "offer_terms", :force => true do |t|
@@ -221,7 +234,7 @@ ActiveRecord::Schema.define(:version => 20110721051229) do
     t.integer  "gift_id"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.boolean  "included"
+    t.boolean  "included",               :default => false
   end
 
   create_table "subscription_invoices", :force => true do |t|
@@ -271,6 +284,7 @@ ActiveRecord::Schema.define(:version => 20110721051229) do
     t.datetime "expires_at"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "recurrent_id"
     t.string   "order_num"
     t.integer  "source_id"
     t.text     "referrer"
@@ -310,7 +324,7 @@ ActiveRecord::Schema.define(:version => 20110721051229) do
     t.string   "postcode"
     t.string   "country"
     t.string   "title"
-    t.string   "login",                                      :null => false
+    t.string   "login"
     t.string   "crypted_password",                           :null => false
     t.string   "password_salt",                              :null => false
     t.string   "persistence_token",                          :null => false

@@ -1,25 +1,26 @@
-Codefire kickstart Rails App
+Subscriptus
 
-Before you start:
-Make sure the project repo has been setup on Github and your account has been added as a collaborator.
+Pre-requisites
 
-Usage:
-1. $ git clone git@github.com:codefire/kickstart.git $APP_NAME
-2. $ cd $APP_NAME; bundle install
-3. $ sed s/kickstart/$APP_NAME/g < config/database.yml.example > config/database.yml 
-4. edit config/database.yml username/password to suit your dev setup.
-5. $ sed s/kickstart/$APP_NAME/g < config/initializers/session_store.rb > config/initializers/session_store.rb
-NOTE: The next step assumes you have git v1.7 or later.
-6. $ git remote set-url origin git@github.com:codefire/$APP_NAME.git 
-7. $ git push origin master
+* Postgresql or Mysql (Postgres preferred)
+* RVM
+* Git (and git-flow)
 
-If you've done all that right, you should have your new kickstart app committed to the project repo. You can now go ahead and edit the deploy.rb file for Capistrano.
+Installation
 
- $ sed s/kickstart/$APP_NAME/g < config/deploy.rb.example > config/deploy.rb
- 
-Deployment (both staging and production):
+* Clone from the Git Repo
+* rvm install
+* gem install bundler
 
-1. Install git on the server: $ apt-get install git-core
-2. Install bundler: $ gem install bundler
-3. Install nokogiri dependencies: $ apt-get install libxslt1-dev libxml2-dev
-4. Copy deploy user's ssh pubkey and add it as a "Deploy Key" under the github repo: https://github.com/codefire/$APP_NAME/edit (Must be done under the codefire github account)
+On the Mac the pg gem needs to be installed manually by doing the following (if using Macports)
+
+export PATH=/opt/local/lib/postgresql83/bin:${PATH}
+env ARCHFLAGS="-arch x86_64" gem install pg
+
+Next install the bundle:
+
+bundle install
+
+Finally, set up the database (some seed data will be created):
+
+rake db:setup
