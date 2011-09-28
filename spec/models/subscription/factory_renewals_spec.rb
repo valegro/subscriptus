@@ -161,10 +161,29 @@ describe SubscriptionFactory, "renewals" do
   # Scenario
   describe "active subscription is renewed but will require verifcation" do
     before(:each) do
-      #stub_mailer(SubscriptionMailer).expects(:deliver_pending).with(instance_of(Subscription))
+      @subscription = Factory.create(:active_subscription)
+      @concession_term = Factory.create(:offer_term, :concession => true)
+      @offer.offer_terms << @concession_term
     end
 
-    it "should keep the state active until the end of the current term" # How? What else?
+    it "should have a state of renewal_pending" do
+      begin
+      factory = SubscriptionFactory.new(
+        @offer,
+        :term_id => @concession_term.id,
+        :attributes => @attributes,
+        :concession => :student,
+        :payment_attributes => @payment_attributes
+      )
+      factory.update(@subscription)
+    rescue
+      p $!.errors
+      puts $!.backtrace
+    end
+      @subscription.state.should == 'renewal_pending'
+    end
+
+    it "should have a pending action"
   end
 
   # Scenario

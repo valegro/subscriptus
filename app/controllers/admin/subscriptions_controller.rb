@@ -59,7 +59,11 @@ class Admin::SubscriptionsController < AdminController
   end
 
   def pending
-    @subscriptions = Subscription.pending.paginate(:page => params[:page], :per_page => Subscription.per_page, :order => 'updated_at') 
+    @subscriptions = Subscription.any_pending.paginate(
+      :page => params[:page],
+      :per_page => Subscription.per_page,
+      :order => 'updated_at'
+    )
   end
 
   def unsubscribe

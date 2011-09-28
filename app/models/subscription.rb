@@ -35,6 +35,8 @@ class Subscription < ActiveRecord::Base
   named_scope :recent, :order => "updated_at desc"
   named_scope :expired, lambda { { :conditions => [ "expires_at < ?", Time.now ] } }
   named_scope :not_unsubscribed, :conditions => "state != 'unsubscribed'"
+  # Pending and Renewal Pending
+  named_scope :any_pending, :conditions => { :state => %w(pending renewal_pending) }
 
   liquid_methods :reference, :updated_at
 
@@ -64,8 +66,7 @@ class Subscription < ActiveRecord::Base
   enum_attr :pending, %w(payment concession_verification student_verification)
   
   # Subscription States
-  # TODO: Do something with unsubscribed
-  has_states :trial, :squatter, :active, :suspended, :pending, :renewal_due, :payment_failed, :unsubscribed, :init => :trial do
+  has_states :trial, :squatter, :active, :suspended, :pending, :renewal_pending, :renewal_due, :payment_failed, :unsubscribed, :init => :trial do
     on :new_trial do
       transition :squatter => :trial
       transition :unsubscribed => :trial
@@ -79,15 +80,17 @@ class Subscription < ActiveRecord::Base
     on :postpone do
       transition :trial => :pending
       transition :squatter => :pending
-      transition :active => :pending # Renewal but goes into pending state
+      transition :active => :renewal_pending # Renewal but goes into pending state
       transition :unsubscribed => :pending
     end
     on :verify do
       transition :pending => :active
+      transition :renewal_pending => :active
     end
     on :expire do
       transition :trial => :squatter
       transition :active => :squatter
+      transition :renewal_pending => :pending
     end
     on :enqueue_for_renewal do
       transition :active => :renewal_due
@@ -122,6 +125,7 @@ class Subscription < ActiveRecord::Base
     expires :trial => :squatter, :after => Publication::DEFAULT_TRIAL_EXPIRY.days
     expires :active => :squatter
     expires :suspended => :active
+    expires :renewal_pending => :pending
   end
 
   def expired?
@@ -140,7 +144,7 @@ class Subscription < ActiveRecord::Base
   # TODO: No longer need to have an argument to verify - so can move to an observer
   def verify_with_params!(object = nil)
     self.class.transaction do
-      if pending.to_sym == :concession_verification
+      if pending.try(:to_sym) == :concession_verification
         self.user.valid_concession_holder = true
       end
       self.apply_action(self.pending_action) if self.pending_action
