@@ -15,9 +15,9 @@ When(/^I log in as #{capture_model}$/) do |name|
   password = 'password'
   
   When %{I go to the login page}
-  And %{I fill in "Login" with "#{login}"}
+  And %{I fill in "Email" with "#{login}"}
   And %{I fill in "Password" with "#{password}"}
-  And %{I press "Login"}
+  And %{I press "submit"}
 end
 
 Then(/#{capture_model} can view (.+)$/) do |name, page_name|

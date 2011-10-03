@@ -3,6 +3,7 @@ gem "rails", "2.3.9"
 gem "ruby-debug"
 
 gem "rake", "0.9.2"
+gem 'i18n', '0.5.0'
 
 # Postgres support
 #group :postgres do
@@ -72,16 +73,16 @@ gem 'domainatrix'
 group :development, :test, :cucmber do
   gem 'pg'
   gem 'webmock', :require => false
-  gem 'selenium-webdriver', '2.0.1'
+  gem 'selenium-webdriver'
   gem 'capybara', "0.4.1.2"
   gem 'database_cleaner'
   gem 'spork'
   gem 'launchy'    # So you can do Then show me the page
   gem 'cucumber', "0.8.5"
   gem 'cucumber-rails'
-  gem 'pickle', "0.4.4"
+  gem 'pickle', "0.4.10"
   gem 'factory_girl'
-  gem 'faker'
+  gem 'faker', '0.9.5'
   gem 'shoulda'
   gem 'gherkin', '2.1.4'
   gem 'rack-test', "0.5.4"
