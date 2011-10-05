@@ -1,6 +1,7 @@
 <div id='suspend-dialog'>
-  <% form_for :subscription, :url => suspend_admin_subscription_path(@subscription), :builder => Reform::Builder, :html => { :id => "suspend-form", :class => "form" } do |f| %>
-    <%= f.text_field :state_expiry_period_in_days, :label => 'Number of days to suspend subscription', :size => 4 %>
+  <% form_for :scheduled_suspension, :url => suspend_admin_subscription_path(@subscription), :builder => Reform::Builder, :html => { :id => "suspend-form", :class => "form" } do |f| %>
+    <%= f.date_select :start_date, :label => "Start date", :order => [:day, :month, :year], :start_year => Time.now.year, :end_year => Time.now.year + 1 %>
+    <%= f.text_field :duration, :label => 'Number of days to suspend subscription', :size => 4 %>
   <% end %>
 </div>
 <script>

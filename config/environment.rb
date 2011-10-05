@@ -54,6 +54,7 @@ end
 
 # TODO: Make confir options
 STANDARD_TIME_FORMAT = '%d/%m/%Y %H:%M %Z'
+STANDARD_DATE_FORMAT = '%d/%m/%Y'
 APP_TIMEZONE = 'Melbourne'
 
 require 'delayed_job'

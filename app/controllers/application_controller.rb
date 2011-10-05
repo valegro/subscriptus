@@ -2,6 +2,9 @@
 # Likewise, all the methods added will be available for all controllers.
 
 class ApplicationController < ActionController::Base
+  rescue_from ActionController::RedirectBackError do |e|
+    redirect_to root_url
+  end
   helper :all # include all helpers, all the time
   helper_method :current_user_session, :current_user, :sort_order
   protect_from_forgery # See ActionController::RequestForgeryProtection for details

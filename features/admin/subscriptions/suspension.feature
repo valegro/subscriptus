@@ -41,6 +41,35 @@ Feature: Suspend a subscription
       | f01 l01 | suspended | 3/03/2011   |
 
   @javascript
+  Scenario: An admin can schedule a suspension in the future
+     When I go to admin subscription search page
+      And I press "Search"
+     Then I should see the following table rows in any order:
+     | Name    | State     | Renewal Due |
+     | f01 l01 | active    | 31/01/2011  |
+     | f02 l02 | suspended | 3/03/2011   |
+
+     When I follow "Suspend"
+      And I fill in "Start Date" with "2011-01-10"
+      And I fill in "Number of days to suspend subscription" with "31"
+      And I press "Suspend"
+     Then I should see "Subscription to publication 01 for f01 l01 will be suspended for 31 days starting on 10/01/2011"
+      And I should be on admin subscription search page
+      And I should see the following table rows in any order:
+      | Name    | State     | Renewal Due |
+      | f01 l01 | active    | 31/01/2011  |
+      | f02 l02 | suspended | 3/03/2011   |
+
+     When the date is "2011-01-10"
+      And I go to admin subscription search page
+      And I press "Search"
+
+     Then I should see the following table rows:
+     | Name    | State     | Renewal Due  |
+     | f02 l02 | suspended | 3/03/2011    |
+     | f01 l01 | suspended | 13/03/2011   |
+
+  @javascript
   Scenario: An admin cannot suspend an already suspended subscription
      When I go to admin subscription search page
       And I press "Search"
