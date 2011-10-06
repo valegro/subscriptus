@@ -5,6 +5,6 @@ task :cron => :environment do
   puts "done."
 
   puts "Processing scheduled suspensions..."
-  ScheduledSuspension.process
+  ScheduledSuspension.process!
   puts "done."
 end
