@@ -9,6 +9,7 @@ class ScheduledSuspension < ActiveRecord::Base
   named_scope :queued, :conditions => ['state = ?', 'queued']
   named_scope :active, :conditions => ['state = ?', 'active']
   named_scope :complete, :conditions => ['state = ?', 'complete']
+  named_scope :incomplete, :conditions => ['state != ?', 'complete']
 
   has_states :queued, :active, :complete, :init => :queued do
     on :activate do
@@ -16,11 +17,7 @@ class ScheduledSuspension < ActiveRecord::Base
     end
 
     on :deactivate do
-      transition :active => :complete
-    end
-
-    on :dismiss do
-      transition :queued => :complete
+      transition [:queued, :active] => :complete
     end
 
     expires :active => :complete
@@ -42,7 +39,7 @@ class ScheduledSuspension < ActiveRecord::Base
     suspensions = queued.select { |ss|
       ss.start_date <= Date.today && ss.end_date > Date.today
     }
-    missed = queued.select { |ss|
+    missed = incomplete.select { |ss|
       ss.end_date < Date.today
     }
 
@@ -51,7 +48,7 @@ class ScheduledSuspension < ActiveRecord::Base
     end
 
     missed.each do |ss|
-      ss.dismiss!
+      ss.deactivate!
     end
 
     nil
