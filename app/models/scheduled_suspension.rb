@@ -17,7 +17,8 @@ class ScheduledSuspension < ActiveRecord::Base
     end
 
     on :deactivate do
-      transition [:queued, :active] => :complete
+      transition :queued => :complete
+      transition :active => :complete
     end
 
     expires :active => :complete
