@@ -1,7 +1,7 @@
 class ScheduledSuspension < ActiveRecord::Base
   belongs_to :subscription
 
-  validates_presence_of :start_date, :duration, :state
+  validates_presence_of :start_date, :duration
   validates_numericality_of :duration
   validate :no_overlap
 
