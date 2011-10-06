@@ -40,7 +40,7 @@ Feature: Suspend a subscription
       | f02 l02 | suspended | 3/03/2011   |
       | f01 l01 | suspended | 3/03/2011   |
 
-  @javascript
+  @javascript @wip
   Scenario: An admin can schedule a suspension in the future
      When I go to admin subscription search page
       And I press "Search"
@@ -50,7 +50,7 @@ Feature: Suspend a subscription
      | f02 l02 | suspended | 3/03/2011   |
 
      When I follow "Suspend"
-      And I fill in "Start Date" with "2011-01-10"
+      And I fill in "Start date" with "2011-01-10"
       And I fill in "Number of days to suspend subscription" with "31"
       And I press "Suspend"
      Then I should see "Subscription to publication 01 for f01 l01 will be suspended for 31 days starting on 10/01/2011"

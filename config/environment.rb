@@ -33,7 +33,7 @@ Rails::Initializer.run do |config|
   # config.frameworks -= [ :active_record, :active_resource, :action_mailer ]
 
   # Activate observers that should always be running
-  config.active_record.observers = :subscription_observer, :subscription_action_observer, :user_observer, "subscription/logging_observer", "subscription/mailer_observer", "subscription/campaign_master_observer"
+  config.active_record.observers = :subscription_observer, :subscription_action_observer, :user_observer, "subscription/logging_observer", "subscription/mailer_observer", "subscription/campaign_master_observer", "subscription/scheduled_suspension_observer"
 
   # Set Time.zone default to the specified zone and make Active Record auto-convert to this zone.
   # Run "rake -D time" for a list of tasks for finding time zone names.
