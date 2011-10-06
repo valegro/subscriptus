@@ -106,4 +106,20 @@ describe ScheduledSuspension do
     ss.subscription.should_not be_suspended
     ss.should be_complete
   end
+
+  it "should deactivate if it's queued and obsolete" do
+    ss = nil
+    Timecop.freeze(Date.today - 10) do
+      ss = Factory.create(:scheduled_suspension, :start_date => Date.today, :duration => 2)
+      ss.should be_queued
+      ss.subscription.should_not be_suspended
+    end
+    Subscription.expire_states
+    ScheduledSuspension.expire_states
+    ScheduledSuspension.process!
+    ss.reload
+    ss.subscription.should_not be_suspended
+    ss.should be_complete
+  end
+
 end
