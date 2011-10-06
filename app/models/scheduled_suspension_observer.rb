@@ -18,7 +18,7 @@ class ScheduledSuspensionObserver < ActiveRecord::Observer
 
   def after_enter_active(ss)
     ss.subscription.suspend!(ss.duration) unless ss.subscription.suspended?
-    ss.state_expires_at = ss.end_date
+    ss.update_attribute(:state_expires_at, ss.end_date)
   end
 
 end
