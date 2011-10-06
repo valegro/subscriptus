@@ -56,22 +56,44 @@ describe ScheduledSuspension do
     end
   end
 
-  it "should activate if it spans today" do
+  it "should activate and suspend if it spans today and the subscription is active" do
     Timecop.freeze(Date.today)
     ss = Factory.create(:scheduled_suspension, :start_date => Date.today, :duration => 1)
+    ss.should be_queued
     ss.subscription.should_not be_suspended
-    ss.should_not be_active
     ScheduledSuspension.process!
     ss.reload
-    ss.subscription.should be_suspended
     ss.should be_active
+    ss.subscription.should be_suspended
   end
 
+  it "should activate but not suspend if it spans today and the subscription is already suspended" do
+    Timecop.freeze(Date.today)
+    ss = Factory.create(:scheduled_suspension, :start_date => Date.today, :duration => 1)
+    ss.should be_queued
+    ss.subscription.should_not be_suspended
+    ss.subscription.suspend!(10)
+    ss.subscription.should be_suspended
+    ScheduledSuspension.process!
+    ss.reload
+    ss.should be_active
+    ss.subscription.should be_suspended
+    ss.subscription.state_expires_at.should be > (Date.today + 1)
+    Timecop.freeze(Date.today + 3) do
+      Subscription.expire_states
+      ScheduledSuspension.expire_states
+      ScheduledSuspension.process!
+      ss.reload
+      ss.should be_complete
+      ss.subscription.should be_suspended
+    end
+  end
 
   it "should deactivate if it's active and expired" do
     ss = nil
     Timecop.freeze(Date.today - 3) do
       ss = Factory.create(:scheduled_suspension, :start_date => Date.today, :duration => 2)
+      ss.should be_queued
       ScheduledSuspension.process!
       ss.reload
       ss.subscription.should be_suspended
@@ -82,6 +104,6 @@ describe ScheduledSuspension do
     ScheduledSuspension.expire_states
     ss.reload
     ss.subscription.should_not be_suspended
-    ss.should_not be_active
+    ss.should be_complete
   end
 end
