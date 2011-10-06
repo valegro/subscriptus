@@ -27,5 +27,5 @@ every 1.hour do
 end
 
 every 1.day do
-  ScheduledSuspension.process!
+  runner "ScheduledSuspension.process!"
 end
