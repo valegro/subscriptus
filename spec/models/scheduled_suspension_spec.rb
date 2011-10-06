@@ -47,7 +47,7 @@ describe ScheduledSuspension do
 
       # no overlap because it's for a different subscription
       subscription2 = Factory.create(:active_subscription)
-      ss8 = ScheduledSuspension.new(:start_date => Date.today + 4, :duration => 5, :subscription_id => subscription2.id)
+      ss8 = ScheduledSuspension.new(:start_date => Date.today, :duration => 3, :subscription_id => subscription2.id)
       ss8.should be_valid
     end
   end
