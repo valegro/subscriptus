@@ -57,3 +57,7 @@ Then /^the "([^"]*)" field(?: within "([^"]*)")? should be a url: "([^"]*)"$/ do
     end
   end
 end
+
+When /^I confirm the javascript alert$/ do
+  page.driver.browser.switch_to.alert.accept    
+end
