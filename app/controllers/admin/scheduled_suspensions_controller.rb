@@ -1,11 +1,11 @@
 class Admin::ScheduledSuspensionsController < AdminController
   layout 'admin/subscriptions'
   def index
-    @scheduled_suspensions = ScheduledSuspension.all
+    @scheduled_suspensions = ScheduledSuspension.queued
   end
 
   def destroy
-    @ss = ScheduledSuspension.find(params[:id])
+    @ss = ScheduledSuspension.queued.find(params[:id])
     subscription = @ss.subscription
     if @ss.destroy!
       flash[:notice] = "Scheduled suspension to #{subscription.publication.name} for #{subscription.user.name} has been cancelled."
