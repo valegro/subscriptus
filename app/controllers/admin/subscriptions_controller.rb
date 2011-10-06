@@ -146,6 +146,8 @@ class Admin::SubscriptionsController < AdminController
             end
           elsif suspension.start_date < Date.today
             flash[:error] = "Cannot schedule a suspension in the past."
+          elsif suspension.duration < 1
+            flash[:error] = "Cannot schedule a suspension for less than one day."
           else
             if suspension.save
               flash[:notice] = "Subscription to #{@subscription.publication.name} for #{@subscription.user.name} will be suspended for #{suspension.duration} days starting on #{suspension.start_date.strftime(STANDARD_DATE_FORMAT)}"

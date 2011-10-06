@@ -3,4 +3,8 @@ task :cron => :environment do
   puts "Expiring states..."
   Subscription.expire_states
   puts "done."
+
+  puts "Processing scheduled suspensions..."
+  ScheduledSuspension.process
+  puts "done."
 end
