@@ -70,13 +70,14 @@ describe ScheduledSuspension do
 
   it "should deactivate if it's active and expired" do
     ss = nil
-    Timecop.freeze(Date.today - 2) do
+    Timecop.freeze(Date.today - 3) do
       ss = Factory.create(:scheduled_suspension, :start_date => Date.today, :duration => 2)
       ScheduledSuspension.process!
       ss.reload
       ss.subscription.should be_suspended
       ss.should be_active
     end
+
     Subscription.expire_states
     ScheduledSuspension.expire_states
     ss.reload
