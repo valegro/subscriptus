@@ -29,26 +29,30 @@ describe ScheduledSuspension do
       ss3 = ScheduledSuspension.new(:start_date => Date.today + 1, :duration => 1, :subscription_id => subscription.id)
       ss3.should_not be_valid
 
-      # overlap on the left
-      ss4 = ScheduledSuspension.new(:start_date => Date.today - 1, :duration => 3, :subscription_id => subscription.id)
+      # overlap outside
+      ss4 = ScheduledSuspension.new(:start_date => Date.today - 1, :duration => 5, :subscription_id => subscription.id)
       ss4.should_not be_valid
 
-      # adjacent on the left
-      ss5 = ScheduledSuspension.new(:start_date => Date.today - 3, :duration => 3, :subscription_id => subscription.id)
+      # overlap on the left
+      ss5 = ScheduledSuspension.new(:start_date => Date.today - 1, :duration => 3, :subscription_id => subscription.id)
       ss5.should_not be_valid
 
-      # adjacent on the right
-      ss6 = ScheduledSuspension.new(:start_date => Date.today + 3, :duration => 5, :subscription_id => subscription.id)
+      # adjacent on the left
+      ss6 = ScheduledSuspension.new(:start_date => Date.today - 3, :duration => 3, :subscription_id => subscription.id)
       ss6.should_not be_valid
 
+      # adjacent on the right
+      ss7 = ScheduledSuspension.new(:start_date => Date.today + 3, :duration => 5, :subscription_id => subscription.id)
+      ss7.should_not be_valid
+
       # no overlap
-      ss7 = ScheduledSuspension.new(:start_date => Date.today + 4, :duration => 5, :subscription_id => subscription.id)
-      ss7.should be_valid
+      ss8 = ScheduledSuspension.new(:start_date => Date.today + 4, :duration => 5, :subscription_id => subscription.id)
+      ss8.should be_valid
 
       # no overlap because it's for a different subscription
       subscription2 = Factory.create(:active_subscription)
-      ss8 = ScheduledSuspension.new(:start_date => Date.today, :duration => 3, :subscription_id => subscription2.id)
-      ss8.should be_valid
+      ss9 = ScheduledSuspension.new(:start_date => Date.today, :duration => 3, :subscription_id => subscription2.id)
+      ss9.should be_valid
     end
   end
 
