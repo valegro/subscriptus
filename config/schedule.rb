@@ -25,3 +25,7 @@ job_type :bundle_rake, "cd :path && RAILS_ENV=:environment bundle exec rake :tas
 every 1.hour do
   bundle_rake "states:expire"
 end
+
+every 1.day do
+  ScheduledSuspension.process!
+end

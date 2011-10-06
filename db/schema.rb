@@ -9,7 +9,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110721051229) do
+ActiveRecord::Schema.define(:version => 20111006104012) do
 
   create_table "archived_publications", :id => false, :force => true do |t|
     t.integer  "id"
@@ -48,7 +48,6 @@ ActiveRecord::Schema.define(:version => 20110721051229) do
     t.datetime "expires_at"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "recurrent_id"
     t.string   "order_num"
     t.integer  "source_id"
     t.text     "referrer"
@@ -64,13 +63,6 @@ ActiveRecord::Schema.define(:version => 20110721051229) do
 
   create_table "audit_log_entries", :force => true do |t|
     t.integer  "user_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  create_table "carrots", :force => true do |t|
-    t.string   "state"
-    t.datetime "state_updated_at"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -108,11 +100,6 @@ ActiveRecord::Schema.define(:version => 20110721051229) do
     t.integer  "on_hand"
     t.datetime "created_at"
     t.datetime "updated_at"
-  end
-
-  create_table "gifts_offers", :force => true do |t|
-    t.integer "gift_id"
-    t.integer "offer_id"
   end
 
   create_table "offer_terms", :force => true do |t|
@@ -198,6 +185,17 @@ ActiveRecord::Schema.define(:version => 20110721051229) do
 
   add_index "publications", ["name"], :name => "index_publications_on_name", :unique => true
 
+  create_table "scheduled_suspensions", :force => true do |t|
+    t.date     "start_date"
+    t.integer  "duration"
+    t.integer  "subscription_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.string   "state",            :null => false
+    t.datetime "state_updated_at"
+    t.datetime "state_expires_at"
+  end
+
   create_table "sessions", :force => true do |t|
     t.string   "session_id", :null => false
     t.text     "data"
@@ -234,7 +232,7 @@ ActiveRecord::Schema.define(:version => 20110721051229) do
     t.integer  "gift_id"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.boolean  "included",               :default => false
+    t.boolean  "included"
   end
 
   create_table "subscription_invoices", :force => true do |t|
@@ -284,7 +282,6 @@ ActiveRecord::Schema.define(:version => 20110721051229) do
     t.datetime "expires_at"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "recurrent_id"
     t.string   "order_num"
     t.integer  "source_id"
     t.text     "referrer"
@@ -324,7 +321,7 @@ ActiveRecord::Schema.define(:version => 20110721051229) do
     t.string   "postcode"
     t.string   "country"
     t.string   "title"
-    t.string   "login"
+    t.string   "login",                                      :null => false
     t.string   "crypted_password",                           :null => false
     t.string   "password_salt",                              :null => false
     t.string   "persistence_token",                          :null => false

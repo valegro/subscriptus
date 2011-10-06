@@ -28,6 +28,7 @@ ActionController::Routing::Routes.draw do |map|
       :unsuspend => [ :post ],
       :unsubscribe => :get
     }
+    admin.resources :scheduled_suspensions, :only => [:index, :destroy]
     admin.resources :orders, :member => { :fulfill => [:get, :post], :postpone => [:get, :post] }, :collection => { :delayed => :get, :completed => :get }
     admin.resources :subscribers, :member => { :sync => :get }, :has_many => :subscriptions
     admin.namespace :catalogue do |catalogue|

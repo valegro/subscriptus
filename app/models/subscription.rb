@@ -21,6 +21,7 @@ class Subscription < ActiveRecord::Base
 
   has_many :log_entries, :class_name => "SubscriptionLogEntry", :dependent => :destroy
   has_many :orders
+  has_many :scheduled_suspensions, :dependent => :destroy
   
   delegate :template_name, :to => :publication
   

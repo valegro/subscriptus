@@ -3,6 +3,7 @@ namespace :states do
   task :expire => :environment do
     User.validate_as(:system) do
       Subscription.expire_states
+      ScheduledSuspension.expire_states
     end
   end
 end

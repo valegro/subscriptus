@@ -133,15 +133,34 @@ class Admin::SubscriptionsController < AdminController
         }
       else
         format.html {
-        if period = params[:subscription][:state_expiry_period_in_days]
-          unless @subscription.suspended?
-            @subscription.suspend!(period.to_i)
-            flash[:notice] = "Subscription to #{@subscription.publication.name} for #{@subscription.user.name} suspended for #{period} days"
+          suspension = ScheduledSuspension.new params[:scheduled_suspension]
+          suspension.subscription_id = @subscription.id
+          if suspension.start_date == Date.today
+            if period = suspension.duration
+              unless @subscription.suspended?
+                @subscription.suspend!(period.to_i)
+                flash[:notice] = "Subscription to #{@subscription.publication.name} for #{@subscription.user.name} suspended for #{period} days"
+              else
+                flash[:error] = "Subscription to #{@subscription.publication.name} for #{@subscription.user.name} is already suspended!"
+              end
+            end
+          elsif suspension.start_date < Date.today
+            flash[:error] = "Cannot schedule a suspension in the past."
+          elsif suspension.duration < 1
+            flash[:error] = "Cannot schedule a suspension for less than one day."
           else
-            flash[:error] = "Subscription to #{@subscription.publication.name} for #{@subscription.user.name} is already suspended!"
+            if suspension.save
+              flash[:notice] = "Subscription to #{@subscription.publication.name} for #{@subscription.user.name} will be suspended for #{suspension.duration} days starting on #{suspension.start_date.strftime(STANDARD_DATE_FORMAT)}"
+            else
+              flash[:error] = "Suspension could not be scheduled."
+            end
           end
-          redirect_to :back
-        end
+
+          begin
+            redirect_to :back
+          rescue ActionController::RedirectBackError
+            redirect_to admin_subscriptions_url
+          end
         }
       end
     end
