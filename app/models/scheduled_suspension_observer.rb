@@ -1,5 +1,8 @@
-class Subscription::ScheduledSuspensionObserver < ActiveRecord::Observer
-  observe :scheduled_suspension
+require 'state_callbacks'
+
+class ScheduledSuspensionObserver < ActiveRecord::Observer
+  extend StateCallbacks
+  observe_state :state
 
   def after_save(scheduled_suspension)
     subscription = scheduled_suspension.subscription
@@ -15,7 +18,7 @@ class Subscription::ScheduledSuspensionObserver < ActiveRecord::Observer
 
   def after_enter_active(ss)
     ss.subscription.suspend!(ss.duration) unless ss.subscription.suspended?
-    ss.subscription.state_expires_at = ss.end_date
+    ss.state_expires_at = ss.end_date
   end
 
 end

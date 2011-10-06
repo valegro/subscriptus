@@ -6,6 +6,9 @@ class ScheduledSuspension < ActiveRecord::Base
   validate :no_overlap
 
   named_scope :for_subscription, lambda { |subscription_id| { :conditions => ['subscription_id = ?', subscription_id] } }
+  named_scope :queued, :conditions => ['state = ?', 'queued']
+  named_scope :active, :conditions => ['state = ?', 'active']
+  named_scope :complete, :conditions => ['state = ?', 'complete']
 
   has_states :queued, :active, :complete, :init => :queued do
     on :activate do
@@ -15,6 +18,12 @@ class ScheduledSuspension < ActiveRecord::Base
     on :deactivate do
       transition :active => :complete
     end
+
+    on :dismiss do
+      transition :queued => :complete
+    end
+
+    expires :active => :complete
   end
 
   def no_overlap
@@ -33,20 +42,16 @@ class ScheduledSuspension < ActiveRecord::Base
     suspensions = queued.select { |ss|
       ss.start_date <= Date.today && ss.end_date > Date.today
     }
-    unsuspensions = active.select { |ss|
-      ss.end_date <= Date.today
+    missed = queued.select { |ss|
+      ss.end_date < Date.today
     }
 
-    queued.each do |ss|
+    suspensions.each do |ss|
       ss.activate!
-      #ss.subscription.suspend!(ss.duration) if !ss.subscription.suspended?
-      #ss.update_attribute(:active, true)
     end
 
-    active.each do |ss|
-      ss.complete!
-      #ss.subscription.unsuspend! if ss.subscription.suspended?
-      #ss.update_attribute(:active, false)
+    missed.each do |ss|
+      ss.dismiss!
     end
 
     nil
