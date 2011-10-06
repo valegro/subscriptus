@@ -1,13 +1,21 @@
 class ScheduledSuspension < ActiveRecord::Base
   belongs_to :subscription
 
-  validates_presence_of :start_date, :duration
+  validates_presence_of :start_date, :duration, :state
   validates_numericality_of :duration
   validate :no_overlap
 
-  named_scope :active, { :conditions => ['active = ?', true] }
-  named_scope :inactive, { :conditions => ['active = ?', false] }
   named_scope :for_subscription, lambda { |subscription_id| { :conditions => ['subscription_id = ?', subscription_id] } }
+
+  has_states :queued, :active, :complete, :init => :queued do
+    on :activate do
+      transition :queued => :active
+    end
+
+    on :deactivate do
+      transition :active => :complete
+    end
+  end
 
   def no_overlap
     found = false
@@ -22,36 +30,30 @@ class ScheduledSuspension < ActiveRecord::Base
   end
 
   def self.process!
-    suspensions = inactive.select { |ss|
+    suspensions = queued.select { |ss|
       ss.start_date <= Date.today && ss.end_date > Date.today
     }
     unsuspensions = active.select { |ss|
       ss.end_date <= Date.today
     }
 
-    suspensions.each do |ss|
-      ss.subscription.suspend!(ss.duration) if !ss.subscription.suspended?
-      ss.update_attribute(:active, true)
+    queued.each do |ss|
+      ss.activate!
+      #ss.subscription.suspend!(ss.duration) if !ss.subscription.suspended?
+      #ss.update_attribute(:active, true)
     end
 
-    unsuspensions.each do |ss|
-      ss.subscription.unsuspend! if ss.subscription.suspended?
-      ss.update_attribute(:active, false)
+    active.each do |ss|
+      ss.complete!
+      #ss.subscription.unsuspend! if ss.subscription.suspended?
+      #ss.update_attribute(:active, false)
     end
 
     nil
   end
 
-  def active?
-    active
-  end
-
   def end_date
     start_date + duration
-  end
-
-  def complete?
-    end_date < Date.today
   end
 
   def overlaps?(ss)

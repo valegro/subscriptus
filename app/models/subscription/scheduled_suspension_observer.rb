@@ -12,4 +12,10 @@ class Subscription::ScheduledSuspensionObserver < ActiveRecord::Observer
     description = "Removed scheduled suspension (for #{scheduled_suspension.duration} days starting on #{scheduled_suspension.start_date.strftime(STANDARD_DATE_FORMAT)})"
     subscription.log_entries.create({ :old_state => subscription.state, :new_state => subscription.state, :description => description })
   end
+
+  def after_enter_active(ss)
+    ss.subscription.suspend!(ss.duration) unless ss.subscription.suspended?
+    ss.subscription.state_expires_at = ss.end_date
+  end
+
 end
