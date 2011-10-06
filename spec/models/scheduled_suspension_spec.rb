@@ -77,6 +77,7 @@ describe ScheduledSuspension do
       ss.subscription.should be_suspended
       ss.should be_active
     end
+    Subscription.expire_states
     ScheduledSuspension.expire_states
     ss.reload
     ss.subscription.should_not be_suspended
