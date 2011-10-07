@@ -5,7 +5,12 @@ class Webhooks::UnbouncesController < ApplicationController
     render :json => { :success => false, :message => "Trial within last 12 months" }
   end
 
+  rescue_from ActiveRecord::RecordInvalid do |ex|
+    render :json => { :success => false, :message => "Validation Failed: #{ex.message}" }
+  end
+
   def create
+    response.headers["Access-Control-Allow-Origin"] = "*" 
     if params['data.json']
       @json = JSON.parse(params['data.json'])
       @publication = Publication.find(params[:publication_id])
@@ -16,8 +21,9 @@ class Webhooks::UnbouncesController < ApplicationController
       @attributes = @json.each { |k, v| @json[k] = v.to_s }.symbolize_keys
       @attributes[:options] = { :weekender => weekender, :solus => solus }
       @subscription = User.find_or_create_with_trial(@publication, Publication::DEFAULT_TRIAL_EXPIRY, @referrer, @attributes)
+      render :json => { :success => true }
+    else
+      render :json => { :success => false, :message => "Please provide a data.json parameter" }
     end
-    response.headers["Access-Control-Allow-Origin"] = "*" 
-    render :json => { :success => true }
   end
 end

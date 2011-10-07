@@ -102,9 +102,11 @@ class User < ActiveRecord::Base
   def self.find_or_create_with_trial(publication, trial_period_in_days, referrer, user_attributes)
     user_attributes.symbolize_keys!
     user = self.find_by_email(user_attributes[:email].to_s)
+    puts "After find: #{user}"
     user ||= self.create_trial_user(user_attributes)
     
     # Reset the password
+    # TODO: If the password is blank but the user is invalid for some reason this will fail!
     if user.password.blank?
       user.password = random_password
       user.password_confirmation = user.password

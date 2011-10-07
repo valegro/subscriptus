@@ -61,6 +61,14 @@ describe Webhooks::UnbouncesController do
       response.body.should == "{\"success\":true}"
     end
 
+    describe "if no data is provided" do
+      it "should respond with an error" do
+        post "create",  {}
+        body_json = JSON.parse(response.body)
+        body_json.should == { "success" => false, "message" => "Please provide a data.json parameter" }
+      end
+    end
+
     describe "if the exists with a trial subscription" do
       before(:each) do
         @user = Factory.create(:user, :email => 'example@example.com')
@@ -98,6 +106,26 @@ describe Webhooks::UnbouncesController do
           post 'create', { "data.json"=>"{\"ip_address\":\"150.101.226.181\",\"email\":[\"example@example.com\"],\"last_name\":[\"Draper\"],\"first_name\":[\"Daniel\"]}", "page_url"=>"http://unbouncepages.com/bf43f31e-e55b-11df-82d5-12313e003591", "page_id"=>"bf43f31e-e55b-11df-82d5-12313e003591", "variant"=>"a", "publication_id" => @publication.id }
           Subscription.find(@subscription.id).trial?.should be(true)
         end
+      end
+    end
+
+    describe "if the subscription exists but is invalid and the password is blank" do
+      before(:each) do
+        @user = Factory.create(:user, :email => 'example@example.com')
+        #@subscription = Factory.create(:subscription, :state => 'squatter', :user => @user, :publication => @publication)
+        @user.phone_number = nil # Force to be invalid
+        @user.password = nil
+        @user.password_confirmation = nil
+        @user.save_with_validation(false)
+        #User.any_instance.expects(:save!).raises(ActiveRecord::RecordInvalid)
+      end
+
+      it "should return an error" do
+        puts "AAAAAA"
+        puts User.all.map(&:email).inspect
+        post 'create', { "data.json"=>"{\"ip_address\":\"150.101.226.181\",\"email\":[\"example@example.com\"],\"last_name\":[\"Draper\"],\"first_name\":[\"Daniel\"]}", "page_url"=>"http://unbouncepages.com/bf43f31e-e55b-11df-82d5-12313e003591", "page_id"=>"bf43f31e-e55b-11df-82d5-12313e003591", "variant"=>"a", "publication_id" => @publication.id }
+        body_json = JSON.parse(response.body)
+        body_json.should == { "success" => false, "message" => "Trial within last 12 months" }
       end
     end
   end
