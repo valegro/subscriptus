@@ -101,9 +101,20 @@ class User < ActiveRecord::Base
   # Used by the Unbounce Webhook
   def self.find_or_create_with_trial(publication, trial_period_in_days, referrer, user_attributes)
     user_attributes.symbolize_keys!
+    user_attributes[:lastname] = user_attributes.delete(:last_name) if user_attributes.has_key?(:last_name)
+    user_attributes[:firstname] = user_attributes.delete(:first_name) if user_attributes.has_key?(:first_name)
     user = self.find_by_email(user_attributes[:email].to_s)
-    puts "After find: #{user}"
-    user ||= self.create_trial_user(user_attributes)
+    if user
+      update_hash = {
+        :firstname     => user_attributes[:firstname],
+        :lastname      => user_attributes[:lastname],
+        :phone_number  => user_attributes[:phone_number]
+      }
+      update_hash.delete_if { |k,v| v.nil? }
+      user.update_attributes(update_hash)
+    else
+      user = self.create_trial_user(user_attributes)
+    end
     
     # Reset the password
     # TODO: If the password is blank but the user is invalid for some reason this will fail!

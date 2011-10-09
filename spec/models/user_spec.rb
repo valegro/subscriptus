@@ -56,6 +56,12 @@ describe User do
         }.to change { @user.subscriptions(true).size }.by(1)
       end
 
+      it "should update any new attributes" do
+        User.find_or_create_with_trial(@publication, 10, 'referrer', { :first_name => 'Daniel', :last_name => 'Draper', :email => 'guy@example.com' })
+        @user.reload
+        @user.firstname.should == 'Daniel'
+      end
+
       it "should reset the user's password" do
         User.stubs(:random_password).returns('password')
         Subscription.any_instance.expects(:temp_password=).with('password')
@@ -154,7 +160,6 @@ describe User do
         @sub.solus.should be(true)
         @sub.user.subscriptions.count.should == 1
       }.to change { User.count }.by(1)
-
     end
   end
     
