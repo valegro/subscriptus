@@ -159,7 +159,7 @@ class User < ActiveRecord::Base
   def add_or_reset_trial(publication, trial_period_in_days, referrer, solus)
     # Does the user have a sub to the pub?
     if subscription = self.subscriptions.find(:first, :conditions => { :publication_id => publication.id })
-      if subscription.trial? || (subscription.squatter? && subscription.state_updated_at > 12.months.ago)
+      if subscription.trial? || (subscription.squatter? && (subscription.state_updated_at.nil? || subscription.state_updated_at > 12.months.ago))
         raise Exceptions::AlreadyHadTrial
       else
         returning(subscription) do |s|
