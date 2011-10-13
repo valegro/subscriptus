@@ -79,15 +79,15 @@ class SubscriptionFactory
         end
 
         # TODO: Raise if price is >0 and no payment provided
-        # Apply the action
         # TODO: Transactions?
+        # Apply the action
         if subscription.active?
           action.build_payment(@payment_attributes)
           action.payment.amount = @term.price
           subscription.apply_action(action)
         end
 
-        if subscription.pending?
+        if subscription.pending? || subscription.renewal_pending?
           case subscription.pending
             when :payment
               action.create_payment(:payment_type => :direct_debit, :amount => @term.price)

@@ -1,9 +1,9 @@
 module Admin::SubscriptionsHelper
   def state_change(old, _new, subscription)
     if old
-      "#{old.capitalize} -> #{_new.capitalize}"
+      "#{old.humanize} -> #{_new.humanize}"
     elsif _new
-      "New #{_new.capitalize}"
+      "New #{_new.humanize}"
     else
       if subscription.active?
         "Renewal"
