@@ -181,7 +181,6 @@ describe SubscriptionFactory, "renewals" do
     end
 
     it "should have a pending action" do
-      @subscription.pending_action.should_not be(nil)
       @subscription.pending_action.should be_instance_of(SubscriptionAction)
     end
   end
