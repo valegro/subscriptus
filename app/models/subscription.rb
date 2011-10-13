@@ -73,10 +73,12 @@ class Subscription < ActiveRecord::Base
       transition :unsubscribed => :trial
     end
     on :activate do
-      transition :active => :active # when the subscriber extends their subscription while its still active
       transition :trial => :active
       transition :squatter => :active
       transition :unsubscribed => :active
+    end
+    on :renew do
+      transition :active => :active # when the subscriber extends their subscription while its still active
     end
     on :postpone do
       transition :trial => :pending

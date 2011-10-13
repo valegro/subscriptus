@@ -3,7 +3,7 @@ class Admin::SubscriptionsController < AdminController
   helper 'admin'
   include Admin::SubscriptionsHelper
   
-  before_filter :find_subscription, :only => [ :verify, :cancel, :suspend, :unsuspend, :show, :set_expiry, :unsubscribe, :activate ]
+  before_filter :find_subscription, :only => [ :verify, :cancel, :suspend, :unsuspend, :show, :set_expiry, :unsubscribe, :activate, :renew ]
   before_filter :find_subscriber, :only => [ :new, :create ]
   before_filter :load_publications_and_states, :only => [ :new, :create ]
 
@@ -79,6 +79,10 @@ class Admin::SubscriptionsController < AdminController
     @subscription.activate!
     flash[:notice] = "Activated Subscription"
     redirect_to admin_subscription_path(@subscription)
+  end
+
+  def renew
+    redirect_to new_renew_path(:for => @subscription.id)
   end
 
   def verify

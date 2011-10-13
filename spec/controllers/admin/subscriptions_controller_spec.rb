@@ -66,6 +66,25 @@ describe Admin::SubscriptionsController, "as admin" do
     end
   end
 
+  describe "activate a subscription" do
+    it "should activate" do
+      # Trial
+      @subscription = Factory.create(:subscription)
+      Subscription.any_instance.expects(:activate!)
+      get :activate, :id => @subscription.id
+      response.should redirect_to(:action => :show, :id => @subscription.id)
+    end
+  end
+
+  describe "renew a subscription" do
+    it "should redirect to the renew page" do
+      # Trial
+      @subscription = Factory.create(:active_subscription)
+      get :renew, :id => @subscription.id
+      response.should redirect_to("https://test.host:80#{new_renew_path(:for => @subscription.id)}")
+    end
+  end
+
   describe "searching" do
     it "should create an appropriate search object" do
       @s = Subscription.search

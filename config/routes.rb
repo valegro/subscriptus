@@ -21,6 +21,7 @@ ActionController::Routing::Routes.draw do |map|
     }, :member => {
       :expire => :get,
       :activate => :get,
+      :renew => :get,
       :cancel => :get,
       :verify => [ :get, :post, :put ],
       :suspend => [ :get, :post ],
