@@ -161,12 +161,11 @@ describe SubscriptionFactory, "renewals" do
   # Scenario
   describe "active subscription is renewed but will require verifcation" do
     before(:each) do
+      success = stub(:success? => true)
+      GATEWAY.stubs(:setup_recurrent).returns(success)
       @subscription = Factory.create(:active_subscription)
       @concession_term = Factory.create(:offer_term, :concession => true)
       @offer.offer_terms << @concession_term
-    end
-
-    it "should have a state of renewal_pending" do
       factory = SubscriptionFactory.new(
         @offer,
         :term_id => @concession_term.id,
@@ -175,10 +174,16 @@ describe SubscriptionFactory, "renewals" do
         :payment_attributes => @payment_attributes
       )
       factory.update(@subscription)
+    end
+
+    it "should have a state of renewal_pending" do
       @subscription.state.should == 'renewal_pending'
     end
 
-    it "should have a pending action"
+    it "should have a pending action" do
+      @subscription.pending_action.should_not be(nil)
+      @subscription.pending_action.should be_instance_of(SubscriptionAction)
+    end
   end
 
   # Scenario
@@ -233,6 +238,4 @@ describe SubscriptionFactory, "renewals" do
   end
 
   it "should raise if we try to renew a sub with an offer that has a publication other than the one we are subscribed to"
-
-  # TODO: More scenarios?
 end

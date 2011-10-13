@@ -17,7 +17,7 @@
       <% unless @subscription.user.blank? %>
         <dt>Subscriber</dt><dd><%= link_to(@subscription.user.name, admin_subscriber_url(@subscription.user)) %></dd>
       <% end %>
-      <dt>Current State</dt><dd><%= @subscription.state.capitalize %></dd>
+      <dt>Current State</dt><dd><%= @subscription.state.humanize %></dd>
       <dt>Started</dt><dd><%= format_timestamp(@subscription.created_at) %></dd>
       <dt>Current Offer</dt><dd><%= @subscription.offer ? link_to(@subscription.offer.name, admin_catalogue_offer_url(@subscription.offer)) : '-' %></dd>
       <dt>Expires</dt><dd><%= format_timestamp(@subscription.expires_at) %></dd>
@@ -26,7 +26,6 @@
   </div>
   <div class="frame span_10">
     <h2>Activity</h2>
-    <h3>TODO: Show ACTIONS</h3>
     <%= render :partial => "admin/subscriptions/activity", :object => @log_entries %>
   </div>
 </div>

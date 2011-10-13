@@ -10,7 +10,7 @@
     row.subscriber link_to(subscription.user.try(:fullname), admin_subscriber_path(subscription.user))
     row.from format_timestamp(subscription.created_at)
     row.to format_timestamp(subscription.expires_at)
-    row.status subscription.state.capitalize
+    row.status subscription.state.humanize
     row.actions subscription_event_links(subscription).join('&nbsp;')
   end
 end %>
