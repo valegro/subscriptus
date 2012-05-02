@@ -343,9 +343,9 @@ describe SubscribeController do
     # email but there is no subscriptus user with that email
     describe "when a wordpress user exists with the same email" do
       before(:each) do
-        Wordpress.stubs(:exists?).with({:email => "daniel@codefire.com.au"}).returns(true)
-        @user_attributes['email'] = 'daniel@codefire.com.au'
-        @user_attributes['email_confirmation'] = 'daniel@codefire.com.au'
+        Wordpress.stubs(:exists?).with({:email => "support@subscriptus.com.au"}).returns(true)
+        @user_attributes['email'] = 'support@subscriptus.com.au'
+        @user_attributes['email_confirmation'] = 'support@subscriptus.com.au'
       end
 
       it "should return to the new page and ask for a username and password" do

@@ -164,17 +164,17 @@ describe "Subscribes" do
 
     describe "and I fill in the information correctly" do
       before(:each) do
-        fill_in "First Name",            :with => "Daniel"
-        fill_in "Last Name",             :with => "Draper"
-        fill_in "Email",                 :with => "daniel@codefire.com.au"
-        fill_in "Email confirmation",    :with => "daniel@codefire.com.au"
-        fill_in "Phone number",          :with => "09090909"
-        fill_in "Street Address Line 1", :with => "1 That Pl"
-        fill_in "City",                  :with => "Adelaide"
-        fill_in "Postcode",              :with => "5000"
+        fill_in "First Name",            :with => "Subscriptus"
+        fill_in "Last Name",             :with => "Support"
+        fill_in "Email",                 :with => "support@subscriptus.com.au"
+        fill_in "Email confirmation",    :with => "support@subscriptus.com.au"
+        fill_in "Phone number",          :with => "03 9005 8310"
+        fill_in "Street Address Line 1", :with => "22 William Street"
+        fill_in "City",                  :with => "Melbourne"
+        fill_in "Postcode",              :with => "3000"
         fill_in "Nominate your password",:with => "Password1"
         fill_in "Password confirmation", :with => "Password1"
-        fill_in "Name on Card",          :with => "Daniel Draper"
+        fill_in "Name on Card",          :with => "Subscriptus Support"
         fill_in "Card number",           :with => "4444333322221111"
         fill_in "Card Verification (CVV Number)", :with => "123"
         choose "offer_term_#{@term.id}" 
@@ -204,13 +204,13 @@ describe "Subscribes" do
 
     describe "and I do not provide all data" do
       before(:each) do
-        fill_in "First Name",            :with => "Daniel"
-        fill_in "Last Name",             :with => "Draper"
-        fill_in "Email",                 :with => "daniel@codefire.com.au"
+        fill_in "First Name",            :with => "Subscriptus"
+        fill_in "Last Name",             :with => "Support"
+        fill_in "Email",                 :with => "support@subscriptus.com.au"
         fill_in "Phone number",          :with => "09090909"
-        fill_in "Street Address Line 1", :with => "1 That Pl"
-        fill_in "City",                  :with => "Adelaide"
-        fill_in "Postcode",              :with => "5000"
+        fill_in "Street Address Line 1", :with => "22 William Street"
+        fill_in "City",                  :with => "Melbourne"
+        fill_in "Postcode",              :with => "3000"
         fill_in "Password",              :with => "Password1"
         fill_in "Password confirmation", :with => "Password1"
       end
@@ -253,17 +253,17 @@ describe "Subscribes" do
 
     describe "and I fill in the information correctly" do
       before(:each) do
-        fill_in "First Name",            :with => "Daniel"
-        fill_in "Last Name",             :with => "Draper"
-        fill_in "Email",                 :with => "daniel@codefire.com.au"
-        fill_in "Email confirmation",    :with => "daniel@codefire.com.au"
+        fill_in "First Name",            :with => "Subscriptus"
+        fill_in "Last Name",             :with => "Support"
+        fill_in "Email",                 :with => "support@subscriptus.com.au"
+        fill_in "Email confirmation",    :with => "support@subscriptus.com.au"
         fill_in "Phone number",          :with => "09090909"
-        fill_in "Street Address Line 1", :with => "1 That Pl"
-        fill_in "City",                  :with => "Adelaide"
-        fill_in "Postcode",              :with => "5000"
+        fill_in "Street Address Line 1", :with => "22 William Str"
+        fill_in "City",                  :with => "Melbourne"
+        fill_in "Postcode",              :with => "3000"
         fill_in "Nominate your password",              :with => "Password1"
         fill_in "Password confirmation", :with => "Password1"
-        fill_in "Name on Card",          :with => "Daniel Draper"
+        fill_in "Name on Card",          :with => "Subscriptus Support"
         fill_in "Card number",           :with => "4444333322221111"
         fill_in "Card Verification (CVV Number)", :with => "123"
         choose "offer_term_#{@term2.id}"
@@ -291,7 +291,7 @@ describe "Subscribes" do
 
       describe "but I already registered a trial for this publication" do
         before(:each) do
-          @user_attrs = Factory.attributes_for(:user, :email => "daniel@codefire.com.au")
+          @user_attrs = Factory.attributes_for(:user, :email => "support@subscriptus.com.au")
           @subscription = User.find_or_create_with_trial(@offer.publication, 21, "test", @user_attrs)
           @user = @subscription.user
           GATEWAY.expects(:purchase).returns(stub(:success? => true))
@@ -308,8 +308,8 @@ describe "Subscribes" do
         it "should update my personal details with the ones I provided on the form" do
           click_link_or_button "btnSubmit"
           user = User.find(@user.id)
-          user.firstname.should == 'Daniel'
-          user.lastname.should == 'Draper'
+          user.firstname.should == 'Subscriptus'
+          user.lastname.should == 'Support'
         end
 
         it "should update the user in wordpress" do
@@ -336,7 +336,7 @@ describe "Subscribes" do
 
       describe "but I already have an active subscription to this publication" do
         before(:each) do
-          @user = Factory.create(:subscriber, :email => 'daniel@codefire.com.au')
+          @user = Factory.create(:subscriber, :email => 'support@subscriptus.com.au')
           @subscription = Factory.create(:active_subscription, :publication => @offer.publication, :user => @user)
           click_link_or_button "btnSubmit"
         end
@@ -349,14 +349,14 @@ describe "Subscribes" do
 
     describe "and I fill in the information correctly and choose direct debit as the payment method" do
       before(:each) do
-        fill_in "First Name",            :with => "Daniel"
-        fill_in "Last Name",             :with => "Draper"
-        fill_in "Email",                 :with => "daniel@codefire.com.au"
-        fill_in "Email confirmation",    :with => "daniel@codefire.com.au"
+        fill_in "First Name",            :with => "Subscriptus"
+        fill_in "Last Name",             :with => "Support"
+        fill_in "Email",                 :with => "support@subscriptus.com.au"
+        fill_in "Email confirmation",    :with => "support@subscriptus.com.au"
         fill_in "Phone number",          :with => "09090909"
-        fill_in "Street Address Line 1", :with => "1 That Pl"
-        fill_in "City",                  :with => "Adelaide"
-        fill_in "Postcode",              :with => "5000"
+        fill_in "Street Address Line 1", :with => "22 William Str"
+        fill_in "City",                  :with => "Melbourne"
+        fill_in "Postcode",              :with => "3000"
         fill_in "Nominate your password",              :with => "Password1"
         fill_in "Password confirmation", :with => "Password1"
         choose "offer_term_#{@term2.id}"
@@ -387,9 +387,9 @@ describe "Subscribes" do
 
     describe "and I do not provide all data and choose direct debit as the payment method" do
       before(:each) do
-        fill_in "First Name",            :with => "Daniel"
-        fill_in "Last Name",             :with => "Draper"
-        fill_in "Email",                 :with => "daniel@codefire.com.au"
+        fill_in "First Name",            :with => "Subscriptus"
+        fill_in "Last Name",             :with => "Support"
+        fill_in "Email",                 :with => "support@subscriptus.com.au"
         check "subscription_terms"
         choose("Direct Transfer/Direct Debit")
       end
@@ -407,15 +407,15 @@ describe "Subscribes" do
 
     describe "and I do not provide all data" do
       before(:each) do
-        fill_in "First Name",            :with => "Daniel"
-        fill_in "Last Name",             :with => "Draper"
+        fill_in "First Name",            :with => "Subscriptus"
+        fill_in "Last Name",             :with => "Support"
         fill_in "Phone number",          :with => "09090909"
-        fill_in "Street Address Line 1", :with => "1 That Pl"
-        fill_in "City",                  :with => "Adelaide"
-        fill_in "Postcode",              :with => "5000"
+        fill_in "Street Address Line 1", :with => "22 William Str"
+        fill_in "City",                  :with => "Melbourne"
+        fill_in "Postcode",              :with => "3000"
         fill_in "Password",              :with => "Password1"
         fill_in "Password confirmation", :with => "Password1"
-        fill_in "Name on Card",          :with => "Daniel Draper"
+        fill_in "Name on Card",          :with => "Subscriptus Support"
         fill_in "Card number",           :with => "4444333322221111"
         fill_in "Card Verification (CVV Number)", :with => "123"
         check "subscription_terms"
@@ -434,7 +434,7 @@ describe "Subscribes" do
 
       describe "but I already registered a trial for this publication" do
         before(:each) do
-          @user_attrs = Factory.attributes_for(:user, :email => "daniel@codefire.com.au")
+          @user_attrs = Factory.attributes_for(:user, :email => "support@subscriptus.com.au")
           @subscription = User.find_or_create_with_trial(@offer.publication, 21, "test", @user_attrs)
           @user = @subscription.user
           GATEWAY.expects(:purchase).returns(stub(:success? => true))
@@ -456,17 +456,17 @@ describe "Subscribes" do
       
       describe "and I fill in the information correctly" do
         before(:each) do
-          fill_in "First Name",            :with => "Daniel"
-          fill_in "Last Name",             :with => "Draper"
-          fill_in "Email",                 :with => "daniel@codefire.com.au"
-          fill_in "Email confirmation",    :with => "daniel@codefire.com.au"
+          fill_in "First Name",            :with => "Subscriptus"
+          fill_in "Last Name",             :with => "Support"
+          fill_in "Email",                 :with => "support@subscriptus.com.au"
+          fill_in "Email confirmation",    :with => "support@subscriptus.com.au"
           fill_in "Phone number",          :with => "09090909"
-          fill_in "Street Address Line 1", :with => "1 That Pl"
-          fill_in "City",                  :with => "Adelaide"
-          fill_in "Postcode",              :with => "5000"
+          fill_in "Street Address Line 1", :with => "22 William Str"
+          fill_in "City",                  :with => "Melbourne"
+          fill_in "Postcode",              :with => "3000"
           fill_in "Nominate your password",              :with => "Password1"
           fill_in "Password confirmation", :with => "Password1"
-          fill_in "Name on Card",          :with => "Daniel Draper"
+          fill_in "Name on Card",          :with => "Subscriptus Support"
           fill_in "Card number",           :with => "4444333322221111"
           fill_in "Card Verification (CVV Number)", :with => "123"
           choose "offer_term_#{@term2.id}"
@@ -526,17 +526,17 @@ describe "Subscribes" do
 
       describe "and I fill in the information correctly" do
         before(:each) do
-          fill_in "First Name",            :with => "Daniel"
-          fill_in "Last Name",             :with => "Draper"
-          fill_in "Email",                 :with => "daniel@codefire.com.au"
-          fill_in "Email confirmation",    :with => "daniel@codefire.com.au"
+          fill_in "First Name",            :with => "Subscriptus"
+          fill_in "Last Name",             :with => "Support"
+          fill_in "Email",                 :with => "support@subscriptus.com.au"
+          fill_in "Email confirmation",    :with => "support@subscriptus.com.au"
           fill_in "Phone number",          :with => "09090909"
-          fill_in "Street Address Line 1", :with => "1 That Pl"
-          fill_in "City",                  :with => "Adelaide"
-          fill_in "Postcode",              :with => "5000"
+          fill_in "Street Address Line 1", :with => "22 William Str"
+          fill_in "City",                  :with => "Melbourne"
+          fill_in "Postcode",              :with => "3000"
           fill_in "Nominate your password",              :with => "Password1"
           fill_in "Password confirmation", :with => "Password1"
-          fill_in "Name on Card",          :with => "Daniel Draper"
+          fill_in "Name on Card",          :with => "Subscriptus Support"
           fill_in "Card number",           :with => "4444333322221111"
           fill_in "Card Verification (CVV Number)", :with => "123"
           choose "offer_term_#{@term2.id}"
@@ -547,13 +547,13 @@ describe "Subscribes" do
       describe "and I do not provide all data" do
         before(:each) do
           choose "offer_term_#{@term2.id}"
-          fill_in "First Name",            :with => "Daniel"
-          fill_in "Last Name",             :with => "Draper"
+          fill_in "First Name",            :with => "Subscriptus"
+          fill_in "Last Name",             :with => "Support"
           fill_in "Phone number",          :with => "09090909"
-          fill_in "Street Address Line 1", :with => "1 That Pl"
-          fill_in "City",                  :with => "Adelaide"
-          fill_in "Postcode",              :with => "5000"
-          fill_in "Name on Card",          :with => "Daniel Draper"
+          fill_in "Street Address Line 1", :with => "22 William Str"
+          fill_in "City",                  :with => "Melbourne"
+          fill_in "Postcode",              :with => "3000"
+          fill_in "Name on Card",          :with => "Subscriptus Support"
           fill_in "Card number",           :with => "4444333322221111"
           fill_in "Card Verification (CVV Number)", :with => "123"
           check "subscription_terms"
@@ -567,11 +567,11 @@ describe "Subscribes" do
 
         describe "and I fill in the remaining data and resubmit" do
           before(:each) do
-            fill_in "Email",                 :with => "daniel@codefire.com.au"
-            fill_in "Email confirmation",    :with => "daniel@codefire.com.au"
-            fill_in "Street Address Line 1", :with => "1 That Pl"
-            fill_in "City",                  :with => "Adelaide"
-            fill_in "Postcode",              :with => "5000"
+            fill_in "Email",                 :with => "support@subscriptus.com.au"
+            fill_in "Email confirmation",    :with => "support@subscriptus.com.au"
+            fill_in "Street Address Line 1", :with => "22 William Str"
+            fill_in "City",                  :with => "Melbourne"
+            fill_in "Postcode",              :with => "3000"
             fill_in "Nominate your password",              :with => "Password1"
             fill_in "Password confirmation", :with => "Password1"
             choose "offer_term_#{@term2.id}"

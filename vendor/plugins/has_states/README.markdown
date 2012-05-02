@@ -74,5 +74,4 @@ You might like to put this in a cron job.
 ## Legal
 
 **Author:** S. Brent Faulkner <brentf@unwwwired.net>  
-**Updated:** D. Draper, K. Pitt, CodeFire <info@codefire.com.au>, 2010
 **License:** Copyright &copy; 2008 unwwwired.net, released under the MIT license

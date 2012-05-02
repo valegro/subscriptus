@@ -14,17 +14,17 @@ describe "Subscribes", "step 2" do
       stub_wordpress
       visit new_subscribe_path(:source_id => @source.id, :offer_id => @offer.id)
       choose "offer_term_#{@term2.id}" 
-      fill_in "First Name",            :with => "Daniel"
-      fill_in "Last Name",             :with => "Draper"
-      fill_in "Email",                 :with => "daniel@codefire.com.au"
-      fill_in "Email confirmation",    :with => "daniel@codefire.com.au"
+      fill_in "First Name",            :with => "Subscriptus"
+      fill_in "Last Name",             :with => "Support"
+      fill_in "Email",                 :with => "support@subscriptus.com.au"
+      fill_in "Email confirmation",    :with => "support@subscriptus.com.au"
       fill_in "Phone number",          :with => "09090909"
-      fill_in "Street Address Line 1", :with => "1 That Pl"
-      fill_in "City",                  :with => "Adelaide"
-      fill_in "Postcode",              :with => "5000"
+      fill_in "Street Address Line 1", :with => "22 William Street"
+      fill_in "City",                  :with => "Melbourne"
+      fill_in "Postcode",              :with => "3000"
       fill_in "Nominate your password",              :with => "Password1"
       fill_in "Password confirmation", :with => "Password1"
-      fill_in "Name on Card",          :with => "Daniel Draper"
+      fill_in "Name on Card",          :with => "Subscriptus Support"
       fill_in "Card number",           :with => "4444333322221111"
       fill_in "Card Verification (CVV Number)", :with => "123"
       check "subscription_terms"
@@ -109,8 +109,8 @@ describe "Subscribes", "step 2" do
       end
 
       it "should display my details" do
-        page.should have_content("Daniel Draper")
-        page.should have_content("daniel@codefire.com.au")
+        page.should have_content("Subscriptus Support")
+        page.should have_content("support@subscriptus.com.au")
       end
 
       it "should display the payment amount and order number" do

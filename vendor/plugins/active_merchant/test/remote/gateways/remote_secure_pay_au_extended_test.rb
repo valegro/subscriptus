@@ -1,6 +1,6 @@
 =begin
-  Author: Shamim Jahandideh
-  Email: sjahandideh@codefire.com.au
+  Author: Subscriptus Support
+  Email: support@subscriptus.com.au
   Description: This module uses SecurePeriodic which is an application that allows real time processing of recurring credit card or direct entry payments on specified dates that suit merchant requirements.
   URL: http://www.securepay.com.au/resources/Secure-XML-API/Integration-Guide-Periodic-and-Triggered-add-in-pg02.html#11
 =end

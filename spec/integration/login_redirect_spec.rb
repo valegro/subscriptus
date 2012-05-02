@@ -5,7 +5,7 @@ describe "Sessions", :type => :integration do
   before(:each) do
     stub_wordpress
     @offer = Factory.create(:offer, :id => 10)
-    @user = Factory.create(:user, :email => 'daniel@codefire.com.au')
+    @user = Factory.create(:user, :email => 'support@subscriptus.com.au')
   end
 
   describe "when I visit the renewal page with a specific offer" do
@@ -26,7 +26,7 @@ describe "Sessions", :type => :integration do
 
       describe "and I reset my password" do
         before(:each) do
-          fill_in "Email", :with => "daniel@codefire.com.au"
+          fill_in "Email", :with => "support@subscriptus.com.au"
           click_link_or_button "submit"
         end
 

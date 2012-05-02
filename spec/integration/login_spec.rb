@@ -5,7 +5,7 @@ describe "Sessions", :type => :integration do
     stub_wordpress
     https!
     @offer = Factory.create(:offer, :id => 10)
-    @user = Factory.create(:user, :email => 'daniel@codefire.com.au')
+    @user = Factory.create(:user, :email => 'support@subscriptus.com.au')
   end
 
   describe "when I visit the login page" do
@@ -22,7 +22,7 @@ describe "Sessions", :type => :integration do
     describe "when I enter my email and password correctly" do
       before(:each) do
         Wordpress.stubs(:authenticate).returns(true)
-        fill_in "Email", :with => "daniel@codefire.com.au"
+        fill_in "Email", :with => "support@subscriptus.com.au"
         fill_in "Password", :with => "password"
       end
 
@@ -96,7 +96,7 @@ describe "Sessions", :type => :integration do
 
       describe "and I enter my email address" do
         before(:each) do
-          fill_in "Email", :with => "daniel@codefire.com.au"
+          fill_in "Email", :with => "support@subscriptus.com.au"
         end
 
         it "should send me an email with a reset link" do

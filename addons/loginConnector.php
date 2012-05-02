@@ -7,8 +7,8 @@
   $msg_reject = 'Unauthorized access! No key specified';
 #  $_GET['key'] = trim( file_get_contents('connector.props') );
 #  $_GET['func'] = 'authenticate';
-#  $_GET['login'] = 'mtuck@codefire.com.au';
-#  $_GET['pword'] = 'mtuck';
+#  $_GET['login'] = 'support@subscriptus.com.au';
+#  $_GET['pword'] = 'support';
 
   //Simple authentication
   if(isset($_GET['key'])){

@@ -52,3 +52,14 @@ a:hover { color: #fff; background-color:#000; }*/
   list-style: square;
 }
 
+.field_container {
+	background-color: #F5F5F5; border-bottom: 1px solid #DDDDDD; padding: 10px;
+}
+	.field_container .field-label {
+		float: left;
+		margin-right: 10px;
+		padding-right: 10px;
+		text-align: right;
+		width: 140px;
+		font-weight: bold;
+	}
