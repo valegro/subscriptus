@@ -19,6 +19,16 @@ class Admin::OrdersController < AdminController
     find_orders(:completed)
   end
 
+  def approve
+	p params
+	if params["commit"] == "Approve Selected"
+		params["orders"].each { |order| Order.find(order).fulfill }
+	elsif params["commit"] == "Approve All"  
+		Order.pending.each { |order| order.fulfill }
+	end 
+	redirect_to admin_orders_path;
+  end 
+
   def delayed
     find_orders(:delayed)
   end

@@ -1,0 +1,30 @@
+<div id='set-state-dialog'>
+  <% form_for :subscription, :url => set_state_admin_subscription_path(@subscription), :builder => Reform::Builder, :html => { :id => "set-state-form", :class => "form" } do |f| %>
+
+    <%= f.select :state, Subscription.state_machines['state'].state_names %>
+
+  <% end %>
+</div>
+<script>
+  $('#set-state-dialog').dialog({
+    title: "Set State", 
+    autoOpen: false,
+    modal: true,
+    width: 450,
+    buttons: {
+      "Set": function() {
+        // Submit form
+        if (confirm("Are you sure you want to manually set the state of this subscription?")) {
+          $(this).find('#set-state-form').submit();
+          $(this).dialog('close');
+        }
+      },
+      "Cancel": function() { 
+        $(this).dialog('close'); 
+      }
+    },
+    close: function() {
+      $(this).remove();
+    }
+  });
+</script>

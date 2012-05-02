@@ -1,8 +1,56 @@
+<script type="text/javascript">
+$(document).ready(function() {
+    $("#header_checkbox").click(function() {
+        if (this.checked == true) {
+            $('input[type="checkbox"]').each(function() {
+                this.checked = true
+            })
+        } else {
+            $('input[type="checkbox"]').each(function() {
+                this.checked = false
+            })
+        }
+    });
+
+    $('#header_approve_selected').click(function(e) {
+	if($('#order-from input[type="checkbox"]:checked').length == 0)
+	{        
+		e.preventDefault();
+		alert('no records selected');
+    	} else {
+		$('#approve_selected').click();
+	}});
+
+    $('#header_approve_all').click(function(){
+		$('#approve_all').click();
+	});	
+
+});
+</script>
 <div class="title">
   <%= content_tag :h2, "Pending Orders" %>
   <div class="actions">
-    <%= link_to "Export as CSV", admin_orders_path(:format => :csv), :class => "download" %>
+	<%= link_to "Approve Selected","#", :id => "header_approve_selected",  :class => "download" %><%= link_to "Approve All","#", :class => "download", :id => "header_approve_all" %> <%= link_to "Export as CSV", admin_orders_path(:format => :csv), :class => "download" %>
   </div>
 </div>
+<% form_for :orders, :url => approve_admin_orders_path, :html => {:id => "order-from", :class => "form", :style => "border:none"} do |f| %>
+	<%= render_table @orders, :name => 'orders_table' do |t|
+		t.header :fullfill, :label => "<input id=\"header_checkbox\" type=\"checkbox\"/>"
+        	t.header :order_id, :label => "ID"
+        	t.header :recipient, :sort_by => :recipient
+        	t.header :items
+        	t.header :submitted, :sort_by => :created_at
+        	t.header :actions
 
-<%= render :partial => "orders", :object => @orders %>
+		t.rows do |row, order, index|
+                	row.fullfill check_box_tag "orders[]", order.id, false, :id => "order_#{order.id}"
+                	row.order_id order.id
+               		row.recipient order.user.try(:name)
+                	row.items order.gifts.count
+                	row.submitted "#{time_ago_in_words(order.created_at)} ago"
+                	row.actions link_to("View", admin_order_path(order), :class => "edit") + order_event_links(order, true, {:page => @orders.current_page, :order_scope => @order_scope}).join('&nbsp;')
+                end
+        end %>
+	<%= submit_tag "Approve Selected", :style => "display:none", :id => "approve_selected" %>
+        <%= submit_tag "Approve All", :style => "display:none", :confirm => "Are you sure?", :id => "approve_all"  %>
+<% end %>

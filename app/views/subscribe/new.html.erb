@@ -101,7 +101,7 @@
 
         <div id='new-user' class="login-option">
           <% fields_for :user, @user, :builder => SubscribeFormBuilder do |u| %>
-            <%= u.select :title, %w(Mr Mrs Ms Miss) %>
+	    <%= u.enum_select :title, :include_blank => false, :required => true %>
             <%= u.text_field :firstname, :required => true, :label => "First Name" %>
             <%= u.text_field :lastname, :required => true, :label => "Last Name" %>
             <%= u.text_field :email, :help => "This is the email address #{@offer.publication.try(:name)} will be sent to", :required => true %>

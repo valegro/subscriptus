@@ -26,11 +26,13 @@ ActionController::Routing::Routes.draw do |map|
       :verify => [ :get, :post, :put ],
       :suspend => [ :get, :post ],
       :set_expiry => [ :get, :post ],
+      :set_state => [ :get, :post ],
+      :set_offer => [ :get, :post ],
       :unsuspend => [ :post ],
       :unsubscribe => :get
     }
     admin.resources :scheduled_suspensions, :only => [:index, :destroy]
-    admin.resources :orders, :member => { :fulfill => [:get, :post], :postpone => [:get, :post] }, :collection => { :delayed => :get, :completed => :get }
+    admin.resources :orders, :member => { :fulfill => [:get, :post], :postpone => [:get, :post] }, :collection => {:approve => [:get, :post], :delayed => :get, :completed => :get }
     admin.resources :subscribers, :member => { :sync => :get }, :has_many => :subscriptions
     admin.namespace :catalogue do |catalogue|
       catalogue.resources :offers, :member => { :add_gift => :post, :remove_gift => :post, :make_primary => :get }, :has_many => [ :offer_terms ]
@@ -47,7 +49,15 @@ ActionController::Routing::Routes.draw do |map|
 
   # Subscriber
   map.namespace :s do |subscriptions|
-    subscriptions.resources :subscriptions, :member => { :payment => :get, :pay => :post, :direct_debit => :get, :cancel => :get }, :collection => { :download_pdf => :get }
+    subscriptions.resources :profile, :subscriptions, :member => { 
+		:payment => :get, 
+		:pay => :post, 
+		:direct_debit => :get, 
+		:cancel => :get,
+	}, 
+	:collection => { 
+		:download_pdf => :get 
+	}
   end
 
   # Signup

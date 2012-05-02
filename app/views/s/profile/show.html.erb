@@ -1,0 +1,17 @@
+<div class="title">
+  <%= content_tag :h2, "My Profile" %>
+</div>
+<form>
+<div class="field_container">
+	<div class="field-label">Title</div>
+	<div class="field-inner"><%= current_user.title %></div><br />
+	<div class="field-label">First Name</div>
+	<div class="field-inner"><%= current_user.firstname %></div>
+	<div class="field-label">Last Name</div>
+	<div class="field-inner"><%= current_user.lastname %></div>
+	<div class="field-label">Email</div>
+	<div class="field-inner"><%= current_user.email %></div>
+	<br />
+	<a href="<%= edit_s_profile_path %>">Update</a>
+</div>
+</form>

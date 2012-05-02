@@ -2,7 +2,7 @@ source 'http://rubygems.org'
 gem "rails", "2.3.9"
 gem "ruby-debug"
 
-gem "rake", "0.9.2"
+gem "rake", "0.8.7"
 gem 'i18n', '0.5.0'
 
 # Postgres support

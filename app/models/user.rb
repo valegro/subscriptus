@@ -104,6 +104,7 @@ class User < ActiveRecord::Base
     user_attributes[:lastname] = user_attributes.delete(:last_name) if user_attributes.has_key?(:last_name)
     user_attributes[:firstname] = user_attributes.delete(:first_name) if user_attributes.has_key?(:first_name)
     user = self.find_by_email(user_attributes[:email].to_s)
+    source_id = user_attributes[:source_id]
     if user
       update_hash = {
         :firstname     => user_attributes[:firstname],
@@ -130,7 +131,7 @@ class User < ActiveRecord::Base
     # Add weekender
     user.add_weekender_to_subs if weekender
     # Add or reset trial
-    sub = user.add_or_reset_trial(publication, trial_period_in_days, referrer, solus)
+    sub = user.add_or_reset_trial(publication, trial_period_in_days, referrer, solus, source_id)
     # Reset the password
     sub.temp_password = user.password
     SubscriptionMailer.with_template(sub.template_name).deliver_new_trial(sub)
@@ -156,7 +157,7 @@ class User < ActiveRecord::Base
   end
  
   # TODO: Could make this an association extension
-  def add_or_reset_trial(publication, trial_period_in_days, referrer, solus)
+  def add_or_reset_trial(publication, trial_period_in_days, referrer, solus, source_id)
     # Does the user have a sub to the pub?
     if subscription = self.subscriptions.find(:first, :conditions => { :publication_id => publication.id })
       if subscription.trial? || (subscription.squatter? && (subscription.state_updated_at.nil? || subscription.state_updated_at > 12.months.ago))
@@ -164,7 +165,7 @@ class User < ActiveRecord::Base
       else
         returning(subscription) do |s|
           s.new_trial!
-          s.update_attributes!(:solus => solus, :referrer => referrer)
+          s.update_attributes!(:solus => solus, :referrer => referrer, :expires_at =>  trial_period_in_days.days.from_now)
         end
       end
     else
@@ -172,6 +173,7 @@ class User < ActiveRecord::Base
         :publication => publication,
         :expires_at => trial_period_in_days.days.from_now,
         :referrer => referrer,
+	:source_id => source_id,
         :solus => solus
       )
     end

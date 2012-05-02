@@ -5,11 +5,6 @@
     <%= link_to("Unsubscribe", unsubscribe_admin_subscription_path(@subscription), :confirm => "Are you sure you want to unsubscribe this subscription?") unless @subscription.unsubscribed? %>
     <%= link_to 'Renew', new_renew_path(:for => @subscription.id) %>
     <%= link_to_remote 'Set Expiry Date', { :url => set_expiry_admin_subscription_path(@subscription), :method => :get }, { :class => 'set-expiry' } %>
-
-    <%= link_to_remote 'Set State', { :url => set_state_admin_subscription_path(@subscription), :method => :get }, { :class => 'set-state' } %>
-
-    <%= link_to_remote 'Set Offer', { :url => set_offer_admin_subscription_path(@subscription), :method => :get }, { :class => 'set-offer' } %>
-
     <% unless @subscription.user.blank? %>
       <%= link_to 'Back to Subscriber', admin_subscriber_path(@subscription.user), :class => 'back' %>
     <% end %>

@@ -1,0 +1,7 @@
+<div class="title">
+  <%= content_tag :h2, "My Profile" %>
+</div>
+ <% form_for [:admin, @current_user], :url => s_profile_path(@current_user), :builder => Reform::Builder, :html => { :class => "form" } do |form| %>
+      <%= render :partial => "form", :object => form %>
+      <%= form.submit "Update" %>
+    <% end %>

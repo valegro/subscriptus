@@ -3,7 +3,7 @@ class Admin::SubscriptionsController < AdminController
   helper 'admin'
   include Admin::SubscriptionsHelper
   
-  before_filter :find_subscription, :only => [ :verify, :cancel, :suspend, :unsuspend, :show, :set_expiry, :unsubscribe, :activate, :renew ]
+  before_filter :find_subscription, :only => [ :verify, :cancel, :suspend, :unsuspend, :show, :set_expiry, :set_state, :set_offer, :unsubscribe, :activate, :renew ]
   before_filter :find_subscriber, :only => [ :new, :create ]
   before_filter :load_publications_and_states, :only => [ :new, :create ]
 
@@ -33,6 +33,10 @@ class Admin::SubscriptionsController < AdminController
 
   def new
     @subscription = @subscriber.subscriptions.build
+ 
+    @publication = Publication.new
+    @offers = @publication.offers
+
   end
 
   def create
@@ -125,7 +129,101 @@ class Admin::SubscriptionsController < AdminController
       end
     end
   end
-  
+
+
+
+  def set_state
+    respond_to do |format|
+      unless request.post?
+        format.js {
+          render :update do |page|
+            page.insert_html :bottom, 'content', :partial => 'set_state_dialog'
+            page['set-state-dialog'].dialog('open')
+          end
+        }
+      else
+        format.html {
+          if @subscription.update_attributes(params[:subscription])
+            flash[:notice] = "State of #{@subscription.publication.name} for #{@subscription.user.name} set to #{@subscription.state}"
+          else
+            flash[:error] = @subscription.errors.full_messages.join("<br/>")
+          end
+          redirect_to :action => :show
+        }
+      end
+    end
+  end
+
+
+ 
+
+  def set_offer
+    respond_to do |format|
+      unless request.post?
+        format.js {
+          render :update do |page|
+            page.insert_html :bottom, 'content', :partial => 'set_offer_dialog'
+            page['set-offer-dialog'].dialog('open')
+          end
+        }
+      else
+
+	# check for optional gifts
+	if params[:subscription]['offer_id'].index(',') 
+		giftid = params[:subscription]['offer_id'][params[:subscription]['offer_id'].index(',')+1, 100]
+		params[:subscription]['offer_id'] = params[:subscription]['offer_id'][0,params[:subscription]['offer_id'].index(',')]
+	else
+		giftid = ""
+	end
+
+		format.html {
+
+			errnotice = ""
+			notice = ""
+
+                        if @subscription.update_attributes(params[:subscription])
+                                notice = "Offer on #{@subscription.publication.name} for #{@subscription.user.name} set to #{@subscription.offer.name}"
+                        else
+                                errnotice = @subscription.errors.full_messages.join("<br/>")
+                        end
+
+
+			# if there are gifts then we need to create an order	
+			if Offer.find(params[:subscription]['offer_id']).gifts.in_stock.any?
+	
+       			   	if order = @subscription.orders.create(:user => @subscription.user)
+            				notice += "<br/>Gifts are associated with this Offer so an order has been created.<br/>"
+			
+					# add gifts
+
+					if giftid != ""
+						order.gifts << @subscription.offer.gifts.optional.in_stock.find(giftid)
+					end
+
+					@subscription.offer.gifts.included.in_stock.each do |gift|
+        	  				order.gifts << gift
+	        			end
+	
+          			else
+        	    			errnotice = @subscription.errors.full_messages.join("<br/>")
+         			end
+			end
+
+			if errnotice != ""
+				flash[:error] = errnotice
+			else
+				flash[:notice] = notice
+			end
+
+			redirect_to :action => :show 
+		}
+
+      end
+    end
+  end
+
+
+ 
   def suspend
     respond_to do |format|
       unless request.post?
@@ -201,3 +299,4 @@ class Admin::SubscriptionsController < AdminController
       @states = %w(active squatter trial)
     end
 end
+

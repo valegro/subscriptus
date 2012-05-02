@@ -1,27 +1,59 @@
 <div id='suspend-dialog'>
-  <% form_for :scheduled_suspension, :url => suspend_admin_subscription_path(@subscription), :builder => Reform::Builder, :html => { :id => "suspend-form", :class => "form" } do |f| %>
+ <% form_for :scheduled_suspension, :url => suspend_admin_subscription_path(@subscription), :builder => Reform::Builder, :html => { :id => "suspend-form", :class => "form" } do |f| %>
     <%= f.date_select :start_date, :label => "Start date", :order => [:day, :month, :year], :start_year => Time.now.year, :end_year => Time.now.year + 1 %>
-    <%= f.text_field :duration, :label => 'Number of days to suspend subscription', :size => 4 %>
+    <%= f.hidden_field :duration, :label => 'Number of days to suspend subscription', :size => 4 %>
   <% end %>
+  <div style="background-color:#F5F5F5; border-width: 0 1px 1px 1px; border-style: solid; border-color: #DDDDDD; overflow:hidden; padding:10px;">
+	<div style="float: left; margin-right: 10px; padding-right: 10px; text-align: right; width: 140px;"><label style="color: #777777; font-size: 11px; font-weight: bold; text-align: right;">End Date</label></div>
+	<div>
+		<%= date_select('end_date','',:order => [:day, :month, :year], :end_year => Time.now.year, :end_year => Time.now.year + 1) %>
+	</div>
+	<div style="float: left; margin-top: 10px; margin-right: 10px; padding-right: 10px; text-align: right; width: 140px;"><label style="color: #777777; font-size: 11px; font-weight: bold; text-align: right;">Days Suspended</label></div>
+	<div id="suspended_days" style="margin-top: 10px; font-weight: bold;">0</div>
+  </div>
 </div>
 <script>
-  $('#suspend-dialog').dialog({
-    title: "Suspend Subscription", 
-    autoOpen: false,
-    modal: true,
-    width: 350,
-    buttons: {
-      "Suspend": function() {
-        // Submit form
-        $(this).find('#suspend-form').submit();
-        $(this).dialog('close');
-      },
-      "Cancel": function() { 
-        $(this).dialog('close'); 
-      }
-    },
-    close: function() {
-      $(this).remove();
-    }
-  });
+	$('#end_date__3i').change(function() {
+			update_days();
+	});
+	$('#end_date__2i').change(function() {
+			update_days();
+	});
+	$('#end_date__1i').change(function() {
+			update_days();
+	});
+	function update_days() {
+		end_day = parseInt($('#end_date__3i').val());
+		end_month = parseInt($('#end_date__2i').val());
+		end_year = parseInt($('#end_date__1i').val());
+		
+		start_day = parseInt($('#scheduled_suspension_start_date_3i').val());
+		start_month = parseInt($('#scheduled_suspension_start_date_2i').val());
+		start_year = parseInt($('#scheduled_suspension_start_date_1i').val());
+
+		diff = Math.floor((Date.parse(end_month + '/' + end_day + '/' + end_year) - Date.parse(start_month + '/' + start_day + '/' + start_year)) / 86400000);
+
+		$('#scheduled_suspension_duration').val(diff);
+		$('#suspended_days').html(diff);
+	}
+	$('#suspend-dialog').dialog({
+		title: "Suspend Subscription", 
+		autoOpen: false,
+		modal: true,
+		width: 450,
+		buttons: {
+		  "Suspend": function() {
+			// Submit form
+
+			$(this).find('#suspend-form').submit();
+			$(this).dialog('close');
+		  },
+		  "Cancel": function() { 
+			$(this).dialog('close'); 
+		  }, 
+		},
+		close: function() {
+		  $(this).remove();
+		}
+	});
 </script>

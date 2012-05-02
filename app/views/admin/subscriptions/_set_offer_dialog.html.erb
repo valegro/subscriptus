@@ -1,0 +1,46 @@
+<div id='set-offer-dialog'>
+
+<%
+        @a = Array.new()
+        @g = Array.new()
+        Publication.find(@subscription['publication_id']).offers.each do |offer|
+		if offer.gifts.in_stock.optional.count > 1
+                	offer.gifts.in_stock.optional.each do |gift|
+				@a << [offer['name'] + ' - GIFT OPTION : ' + gift['name'], offer['id'].to_s()   + ',' + gift['id'].to_s()]
+			end
+		else
+                	@a << [offer['name'], offer['id']]
+                end
+        end
+%>
+
+  <% form_for :subscription, :url => set_offer_admin_subscription_path(@subscription), :builder => Reform::Builder, :html => { :id => "set-offer-form", :class => "form" } do |f| %>
+
+	<%= f.select :offer_id, @a  %>
+
+  <% end %>
+</div>
+<script>
+  $('#set-offer-dialog').dialog({
+    title: "Set Offer", 
+    autoOpen: false,
+    modal: true,
+    width: 600,
+    buttons: {
+      "Set": function() {
+        // Submit form
+        if (confirm("Are you sure you want to manually set the offer of this subscription?")) {
+          $(this).find('#set-offer-form').submit();
+          $(this).dialog('close');
+        }
+      },
+      "Cancel": function() { 
+        $(this).dialog('close'); 
+      }
+    },
+    close: function() {
+      $(this).remove();
+    }
+  });
+</script>
+
