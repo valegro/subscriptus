@@ -41,7 +41,9 @@ ActionController::Routing::Routes.draw do |map|
     end
     admin.resources :sources
     admin.resources :payments
-    admin.resources :reports
+    admin.namespace :reports do |reports|
+      reports.resources :subscriptions, :collection => {:set_daterange => [:get, :post]}
+    end
     admin.namespace :system do |system|
       system.resources :users
     end

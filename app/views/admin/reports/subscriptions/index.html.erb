@@ -1,0 +1,51 @@
+
+<div class="title">
+  <%= content_tag :h2, "Subscriptions Report" %>
+  <div class="actions">
+    <%= link_to 'Refresh', admin_reports_subscriptions_path(:pending => "PEND"), :id => "refresh_action" %>
+    <%= link_to_remote 'Set Date Range', { :url => set_daterange_admin_reports_subscriptions_path(), :method => :get }, { :class => 'set-expiry' } %>
+  </div>
+</div>
+
+<div class='info'>
+  <h3><%= Publication.find(@pub_id).name %></h3>
+  <p><strong>Date Range: </strong> <%= @date_range %></p>
+  <p><strong>Including 'pending': </strong><input type='checkbox' <% if @pending != false %> checked='checked' <% end %> id='inc_pending' name='inc_pending' /></p>
+  <p><strong>Total Subscriptions: </strong><%=@subscriptions_count%></p>
+</div>
+
+<%= render_table @subscriptions, :name => 'subscriptions_table' do |t|
+   t.header :offer #, :sort_by => :name
+  t.header :new
+  t.header :renewed
+  t.header :total, :label => "Total Subscriptions" #, :sort_by => :number
+
+  t.rows do |row, subscription, index|
+    row.offer do
+	if  !subscription.offer_id
+		"None"
+	else
+		link_to(h(subscription.name), admin_catalogue_offer_path(Offer.find(subscription.offer_id)))
+    	end
+    end
+    row.new (subscription.count_total.to_i - subscription.count_renew.to_i).to_s
+    row.renewed subscription.count_renew
+    row.total subscription.count_total
+  end
+end %>
+
+
+
+<script>
+  $('#inc_pending').change(function() {
+    update_refresh_action();
+  });
+        
+  function update_refresh_action() {
+    $('#refresh_action').attr('href',  $('#refresh_action').attr('href').replace( /PEND|true|false/, $('#inc_pending').attr('checked')));
+  }
+
+  $(document).ready(function(){
+    update_refresh_action();
+  });
+</script>

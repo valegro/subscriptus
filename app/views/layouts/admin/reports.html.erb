@@ -1,1 +1,8 @@
+<% content_for :lower do %>
+  <% semantic_navigation :secondary, :html => { :class => "lower" } do |n| %>
+    <%= n.item 'Subscriptions', :link => admin_reports_subscriptions_path %>
+  <% end %>
+<% end %>
+
+
 <%= render :file => 'layouts/admin' %>
