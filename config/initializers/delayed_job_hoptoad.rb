@@ -5,7 +5,7 @@ module Delayed
     protected
       def handle_failed_job(job, error)
         say "Error Intercepted by Hoptoad..."
-        HoptoadNotifier.notify(error)
+#        HoptoadNotifier.notify(error)
         original_handle_failed_job(job,error)
       end
   end
