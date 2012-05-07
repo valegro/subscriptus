@@ -23,7 +23,7 @@ class Publication < ActiveRecord::Base
     :storage => :s3,
     :s3_credentials => "#{RAILS_ROOT}/config/s3.yml",
     :path => ":attachment/:id/:style.:extension",
-    :bucket => 'crikeystaging'
+    :bucket => 'crikey1'
 
   validates_presence_of :name, :description, :forgot_password_link
   validates_uniqueness_of :name
