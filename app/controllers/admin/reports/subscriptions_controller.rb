@@ -1,7 +1,5 @@
 class Admin::Reports::SubscriptionsController < Admin::ReportsController
 
-  #before_filter :set_daterange
-
   def new
 
   end
@@ -24,14 +22,9 @@ class Admin::Reports::SubscriptionsController < Admin::ReportsController
       state_where = "(state = 'active' OR state = 'pending')"
     end
 
+    @subscriptions = Array(Subscription.find_by_sql("select s.offer_id, o.name as offer_name, IFNULL(z.count_renew,0) as count_renew, IFNULL(y.count_new,0)+IFNULL(z.count_renew,0) as count_total, IFNULL(y.count_new,0) as count_new from subscriptions s left join (select s.offer_id, count(distinct s.id) as count_renew from subscriptions s, subscription_actions a where s.id = a.subscription_id and a.renewal =1 and " + state_where + " AND s.publication_id=" + @pub_id + " group by s.offer_id) z on z.offer_id = s.offer_id left join (select s.offer_id, count(distinct s.id) as count_new from subscriptions s, subscription_actions a where s.id = a.subscription_id and a.renewal =0 and " + state_where + " AND s.publication_id=" + @pub_id + " group by s.offer_id) y on y.offer_id = s.offer_id left join offers o on (s.offer_id = o.id) where " + state_where + " AND s.publication_id=" + @pub_id + " AND IFNULL(y.count_new,0)+IFNULL(z.count_renew,0)>0 group by s.offer_id order by o.name asc")).paginate(:page => params[:page])
 
-	@subscriptions = Array(Subscription.find_by_sql("select s.offer_id, o.name, z.count_renew, x.count_total from subscriptions s left join (select s.offer_id, count(1) as count_total from subscriptions s where " + state_where + "  AND s.publication_id=" + @pub_id + " group by s.offer_id) x on x.offer_id = s.offer_id left join (select s.offer_id, count(1) as count_renew from subscriptions s, subscription_actions a where s.id = a.subscription_id and a.renewal =1 and " + state_where + " AND s.publication_id=" + @pub_id + " and left(s.state_expires_at,10) = left(a.new_expires_at,10) group by s.offer_id) z on z.offer_id = s.offer_id left join offers o on (s.offer_id = o.id) where " + state_where + " AND s.publication_id=" + @pub_id + " group by s.offer_id order by o.name asc")).paginate(:page => params[:page])
-
-
-
-    #@subscriptions = Array(Subscription.find_by_sql("select offer_id, offers.name, count(1) as number from subscriptions left join offers on (subscriptions.offer_id = offers.id) where "+state_where+"  AND subscriptions.publication_id="+@pub_id+" group by offer_id order by number desc")).paginate(:page => params[:page]) 
-
-    @subscriptions_count = Subscription.count(:conditions => ["publication_id = ? AND " + state_where, @pub_id])
+    @subscriptions_count = Subscription.count(:conditions => ["publication_id = ? AND " + state_where, @pub_id]).to_s()  + " people are currenty subscribed"
 
   end 
 
@@ -48,28 +41,20 @@ class Admin::Reports::SubscriptionsController < Admin::ReportsController
 
 	start_date = params[:set_daterange]["start_date(1i)"] + "-" + params[:set_daterange]["start_date(2i)"] + "-" + params[:set_daterange]["start_date(3i)"] 
 	end_date = params[:set_daterange]["end_date(1i)"] + "-" + params[:set_daterange]["end_date(2i)"] + "-" + params[:set_daterange]["end_date(3i)"]
- 	date_where = " AND ( (state_updated_at >= '" + start_date + "' AND state_updated_at <= '" + end_date  + "') OR (s.created_at >= '" + start_date + "' AND s.created_at <= '" + end_date  + "') ) "
-	date_where_no_alias = " AND ( (state_updated_at >= '" + start_date + "' AND state_updated_at <= '" + end_date  + "') OR (subscriptions.created_at >= '" + start_date + "' AND subscriptions.created_at <= '" + end_date  + "') ) "
-
+ 	date_where = " AND applied_at >= '" + start_date + "' AND a.applied_at <= '" + end_date  + "'"
 
 	@date_range = Date.strptime(start_date, "%Y-%m-%d").strftime("%d/%m/%Y") + " to " + Date.strptime(end_date, "%Y-%m-%d").strftime("%d/%m/%Y")
 
     	@pub_id = "1"
+	
+	@pending = false
 
-    	if params[:set_daterange]["hdn_pending"] == "false"
-      	  @pending = false
-      	  state_where = "state = 'active'"
-    	else
-      	  @pending = true
-      	  state_where = "(state = 'active' OR state = 'pending')"
-    	end
-
-    	#@subscriptions = Array(Subscription.find_by_sql("select offer_id, offers.name, count(1) as number from subscriptions left join offers on (subscriptions.offer_id = offers.id) where " + state_where + date_where + "  AND subscriptions.publication_id="+@pub_id+" group by offer_id order by number desc")).paginate(:page => params[:page]) 
 
 	# no pagination because that uses 'get' and the dialog only allows date select with POST
-	@subscriptions = Array(Subscription.find_by_sql("select s.offer_id, o.name, z.count_renew, x.count_total from subscriptions s left join (select s.offer_id, count(1) as count_total from subscriptions s where " + state_where + date_where + "  AND s.publication_id=" + @pub_id + " group by s.offer_id) x on x.offer_id = s.offer_id left join (select s.offer_id, count(1) as count_renew from subscriptions s, subscription_actions a where s.id = a.subscription_id and a.renewal =1 and " + state_where + date_where + " AND s.publication_id=" + @pub_id + " and left(s.state_expires_at,10) = left(a.new_expires_at,10) group by s.offer_id) z on z.offer_id = s.offer_id left join offers o on (s.offer_id = o.id) where " + state_where + date_where + " AND s.publication_id=" + @pub_id + " group by s.offer_id order by o.name asc"))
+	@subscriptions = Array(Subscription.find_by_sql("select count(distinct subscription_id) as count_total, z.count_renew, y.count_new, a.offer_name from subscriptions s ,subscription_actions a left join (select a.offer_name, count(distinct subscription_id) as count_renew from subscription_actions a, subscriptions s where s.id = a.subscription_id and a.term_length > 0 and s.publication_id=1 AND a.renewal = 1 "+date_where+" group by a.offer_name) z on z.offer_name = a.offer_name left join (select a.offer_name, count(distinct subscription_id) as count_new from subscription_actions a, subscriptions s where s.id = a.subscription_id and a.term_length > 0 and s.publication_id=1 AND a.renewal = 0 "+date_where+" group by a.offer_name) y on y.offer_name = a.offer_name where s.id = a.subscription_id and a.term_length > 0 and s.publication_id=1 "+date_where+" group by a.offer_name"))
 
-	@subscriptions_count = Subscription.count(:conditions => ["publication_id = ? AND " + state_where + date_where_no_alias, @pub_id])
+	@subscriptions_count = Array(Subscription.find_by_sql("select count(distinct subscription_id) as count_total from subscription_actions a, subscriptions s where s.id = a.subscription_id and a.term_length > 0 and s.publication_id=1 " + date_where))
+	@subscriptions_count = @subscriptions_count[0]['count_total'].to_s + " people subscribed in this period"
 
         format.html { 
 	  render :action => :index

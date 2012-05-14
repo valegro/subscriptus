@@ -22,13 +22,13 @@
 
   t.rows do |row, subscription, index|
     row.offer do
-	if  !subscription.offer_id
+	if  !subscription.offer_name
 		"None"
 	else
-		link_to(h(subscription.name), admin_catalogue_offer_path(Offer.find(subscription.offer_id)))
+		subscription.offer_name
     	end
     end
-    row.new (subscription.count_total.to_i - subscription.count_renew.to_i).to_s
+    row.new subscription.count_new
     row.renewed subscription.count_renew
     row.total subscription.count_total
   end

@@ -1,6 +1,8 @@
 <% content_for :lower do %>
   <% semantic_navigation :secondary, :html => { :class => "lower" } do |n| %>
     <%= n.item 'Subscriptions', :link => admin_reports_subscriptions_path %>
+    <%= n.item 'Free Trials Overview', :link => admin_reports_free_trials_overview_index_path %>
+
   <% end %>
 <% end %>
 

@@ -1,10 +1,11 @@
 <div id='set-daterange-dialog'>
 
-  <% form_for :set_daterange, :url => set_daterange_admin_reports_subscriptions_path(), :builder => Reform::Builder, :html => {:id => "set-daterange-form", :class => "form" } do |f| %>
+  <p>NB: There is no historic data on Free Trials after May 17 2011</p>
+
+  <% form_for :set_daterange, :url => set_daterange_admin_reports_free_trials_overview_path(), :builder => Reform::Builder, :html => {:id => "set-daterange-form", :class => "form" } do |f| %>
     <% @defdate = Time.now.advance :months => -1 %>
     <%= f.date_select :start_date, :label => "Start date", :order => [:day, :month, :year], :default => @defdate, :start_year => 1999, :end_year => Time.now.year  %>
     <%= f.date_select :end_date, :label => "End date", :order => [:day, :month, :year], :default => Time.now, :start_year => Time.now.year - 10, :end_year => Time.now.year  %>
-    <%= f.hidden_field :hdn_pending %>
 
   <% end %>
 
@@ -33,12 +34,4 @@
     }
   });
   
-
-  function update_pending() {
-    $('#set_daterange_hdn_pending').attr('value',  $('#inc_pending').attr('checked'));
-  }
-
-  $(document).ready(function(){
-    update_pending();
-  });
 </script>

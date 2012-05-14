@@ -1,0 +1,26 @@
+
+<div class="title">
+  <%= content_tag :h2, "Free Trials Overview Report" %>
+  <div class="actions">
+    <%= link_to_remote 'Set Date Range', { :url => set_daterange_admin_reports_free_trials_overview_path(), :method => :get }, { :class => 'set-expiry' } %>
+  </div>
+</div>
+
+<div class='info'>
+  <h3><%= Publication.find(@pub_id).name %></h3>
+  <p><strong>Date Range: </strong> <%= @date_range %></p>
+  <p><strong>Total Free Trials: </strong><%=@subscriptions_count%></p>
+</div>
+
+<%= render_table @subscriptions, :name => 'subscriptions_table' do |t|
+  t.header :date, :label => "Date"
+  t.header :count, :label => "Number of trials", :width => "200"
+
+  t.rows do |row, subscription, index|
+    row.date link_to(subscription.date, admin_reports_free_trials_path(subscription.date, :date => subscription.date))
+    row.count subscription.count_total
+  end
+end %>
+
+
+
