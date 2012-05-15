@@ -105,7 +105,14 @@ class SubscribeController < ApplicationController
 
   def thanks
     @has_weekender = @subscription.user.has_weekender?
-    @offer_id =  @subscription.offer.id
+
+    @order = Order.all(:conditions => {:subscription_id => @subscription.id})
+    @orderitems = OrderItem.all(:conditions => {:order_id => @order.last.id})
+    @gifts = Array.new
+    @orderitems.each do |orderitem|
+      @gifts << orderitem.gift_id
+    end
+
   end
 
   def complete

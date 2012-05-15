@@ -4,6 +4,11 @@
   
   <div class='content'>
 
+    <% if @gifts.include?74 %>
+      <h2>You're nearly done!</h2>
+      <h3 style='margin:0 0 40px 140px'>Please select your Text Classic ebook <a style='font-size:1.0em; font-weight:normal' href='http://offers.crikey.com.au/text-classic-collection/'>here.</a></h3>
+    <% end %>
+
     <h2>Thanks for subscribing to <%= @publication.try(:name) %> We hope you enjoy it.</h2>
 
     <h3>Invoice</h3>
@@ -17,10 +22,6 @@
     <!-- Error Messages -->
     
     <h2>Complete your registration</h2>
-
-    <% if @offer_id==132 %>
-      You're nearly done! <a href='http://offers.crikey.com.au/text-classic-collection/'>Please select your Text Classic ebook here</a>
-    <% end %>
 
     <% if @publication.try(:weekend_edition?) && !@has_weekender %>
       <h3><%= @publication.try(:name) %> Weekender</h3>
