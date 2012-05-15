@@ -17,7 +17,11 @@
     <!-- Error Messages -->
     
     <h2>Complete your registration</h2>
-    
+
+    <% if @offer_id==132 %>
+      You're nearly done! <a href='http://offers.crikey.com.au/text-classic-collection/'>Please select your Text Classic ebook here</a>
+    <% end %>
+
     <% if @publication.try(:weekend_edition?) && !@has_weekender %>
       <h3><%= @publication.try(:name) %> Weekender</h3>
       <p>Have you signed up for <%= @publication.try(:name) %> Weekender yet? It's our weekly arts and culture wrap &mdash; delivered direct to your inbox every Friday morning. You'll love it.</p>

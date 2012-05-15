@@ -105,7 +105,7 @@ class SubscribeController < ApplicationController
 
   def thanks
     @has_weekender = @subscription.user.has_weekender?
-    
+    @offer_id =  @subscription.offer.id
   end
 
   def complete
