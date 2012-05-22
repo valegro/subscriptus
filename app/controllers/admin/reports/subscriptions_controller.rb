@@ -41,7 +41,9 @@ class Admin::Reports::SubscriptionsController < Admin::ReportsController
 
 	start_date = params[:set_daterange]["start_date(1i)"] + "-" + params[:set_daterange]["start_date(2i)"] + "-" + params[:set_daterange]["start_date(3i)"] 
 	end_date = params[:set_daterange]["end_date(1i)"] + "-" + params[:set_daterange]["end_date(2i)"] + "-" + params[:set_daterange]["end_date(3i)"]
- 	date_where = " AND applied_at >= '" + start_date + "' AND a.applied_at <= '" + end_date  + "'"
+        
+    # adjust for UTC on database
+    date_where = " AND a.applied_at >= DATE_SUB('" + start_date + " 14:00:00', INTERVAL 1 DAY) AND a.applied_at <= '" + end_date  + " 14:00:00'"
 
 	@date_range = Date.strptime(start_date, "%Y-%m-%d").strftime("%d/%m/%Y") + " to " + Date.strptime(end_date, "%Y-%m-%d").strftime("%d/%m/%Y")
 
