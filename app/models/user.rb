@@ -242,7 +242,7 @@ class User < ActiveRecord::Base
   # Return a string of publications and their states in the format of
   # "publication1_id,publication2_id|publication1_state,publication2_state" etc.
   def publications_for_wordpress
-    subscriptions.map { |s| [s.publication_id, s.state].map(&:to_s) }.transpose.map { |a| "#{a.join(',')}" }.join('|')
+    subscriptions.map { |s| [s.publication_id, s.state, s.expires_at].map(&:to_s) }.transpose.map { |a| "#{a.join(',')}" }.join('|')
   end
 
   def premium?
