@@ -1,4 +1,6 @@
 class Wordpress
+  require 'rest_client' 
+
   class Error < StandardError; end
   class PrimaryKeyMismatch < Error; end
 
@@ -18,7 +20,7 @@ class Wordpress
   def self.exists?(opts={})
     check_any_required(opts, :login, :email)
     Rails.logger.warn("Exists #{opts.inspect}")
-    res = make_request(opts.merge(:func => 'exists'))
+    res = make_request(opts.merge(:func => 'exists')).strip
     return !res.blank? && res != "-1"
   end
   
@@ -39,15 +41,15 @@ class Wordpress
     check_any_required(opts, :login, :email)
     Rails.logger.warn("Authentication #{opts.inspect}")
     check_required(opts, :pword)
-    res = make_request(opts.merge(:func => 'authenticate'))
+    res = make_request(opts.merge(:func => 'authenticate')).strip
     return !res.blank? && res != "-1"
   end
 
 private
   def self.make_request(opts)
     if self.enabled
-      res = RestClient.get(Wordpress.config[:endpoint], :params => opts.merge(:key => Wordpress.config[:key]), :accept => :text).to_str
-      Rails.logger.warn("Wordpress: Res = #{res.inspect}")
+      #res = RestClient.get(Wordpress.config[:endpoint], :params => opts.map{|k,v| "#{k}=#{v}"}.join('&'), :accept => :text).to_str
+      res = RestClient.get(Wordpress.config[:endpoint], :params => opts.merge(:key => Wordpress.config[:key], "subscriptus" => ""), :accept => :text).to_str
       res
     else
       ''
