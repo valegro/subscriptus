@@ -7,10 +7,7 @@ class Gift < ActiveRecord::Base
 
   has_attached_file :gift_image,
     :styles => { :medium => "350x350>", :thumb => "100>x100" },
-    :storage => :s3,
-    :s3_credentials => "#{RAILS_ROOT}/config/s3.yml",
-    :path => ":attachment/:id/:style.:extension",
-    :bucket => 'crikey1'
+    :storage => :filesystem
 
   validates_presence_of :name, :description, :on_hand
   validates_uniqueness_of :name

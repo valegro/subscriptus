@@ -47,8 +47,8 @@ class SubscribeController < ApplicationController
     @payment_option = params[:payment_option]
     Subscription.transaction do
       # First check if a user exists with the given email
-      @user = User.find_by_email(params[:user].try(:[], :email))
-      if @user
+     @user = User.find_by_email(params[:user].try(:[], :email))
+     if @user
         @subscription = @user.subscriptions.first(
           :conditions => { :publication_id => @offer.publication.id }
         )
@@ -105,12 +105,14 @@ class SubscribeController < ApplicationController
 
   def thanks
     @has_weekender = @subscription.user.has_weekender?
-
+    @gifts = []   
+ 
     @order = Order.all(:conditions => {:subscription_id => @subscription.id})
-    @orderitems = OrderItem.all(:conditions => {:order_id => @order.last.id})
-    @gifts = Array.new
-    @orderitems.each do |orderitem|
-      @gifts << orderitem.gift_id
+    if @order.last
+ 	@orderitems = OrderItem.all(:conditions => {:order_id => @order.last.id})
+    	@orderitems.each do |orderitem|
+        	@gifts << orderitem.gift_id
+        end
     end
 
   end

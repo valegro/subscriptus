@@ -1,5 +1,5 @@
 common: &common
-  endpoint: 'http://www.crikey.com.au/loginConnector.php'
+  endpoint: 'http://www.subscriptus.co'
   key: '$P$B2CNRpY/MCdmoNenQKrtdRyD8H8LG9.'
   
 development:
@@ -10,6 +10,6 @@ test:
   key: 'testkey'
 staging:
   <<: *common
-  endpoint: 'http://www.crikey.com.au/loginConnector.php'
+  endpoint: 'http://www.subscriptus.co/loginConnector.php'
 production:
   <<: *common

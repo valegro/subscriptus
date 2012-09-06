@@ -8,7 +8,7 @@ class ApplicationController < ActionController::Base
   helper :all # include all helpers, all the time
   helper_method :current_user_session, :current_user, :sort_order
   protect_from_forgery # See ActionController::RequestForgeryProtection for details
-  before_filter :require_ssl
+  #before_filter :require_ssl
 
   # Scrub sensitive parameters from your log
   filter_parameter_logging :password, :card_number

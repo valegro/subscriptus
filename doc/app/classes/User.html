@@ -1,0 +1,832 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Class: User</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Script-Type" content="text/javascript" />
+  <link rel="stylesheet" href=".././rdoc-style.css" type="text/css" media="screen" />
+  <script type="text/javascript">
+  // <![CDATA[
+
+  function popupCode( url ) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+
+  function toggleCode( id ) {
+    if ( document.getElementById )
+      elem = document.getElementById( id );
+    else if ( document.all )
+      elem = eval( "document.all." + id );
+    else
+      return false;
+
+    elemStyle = elem.style;
+    
+    if ( elemStyle.display != "block" ) {
+      elemStyle.display = "block"
+    } else {
+      elemStyle.display = "none"
+    }
+
+    return true;
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln( "<style type=\"text/css\">div.method-source-code { display: none }</style>" )
+  
+  // ]]>
+  </script>
+
+</head>
+<body>
+
+
+
+    <div id="classHeader">
+        <table class="header-table">
+        <tr class="top-aligned-row">
+          <td><strong>Class</strong></td>
+          <td class="class-name-in-header">User</td>
+        </tr>
+        <tr class="top-aligned-row">
+            <td><strong>In:</strong></td>
+            <td>
+                <a href="../files/app/models/user_rb.html">
+                app/models/user.rb
+                </a>
+        <br />
+            </td>
+        </tr>
+
+        <tr class="top-aligned-row">
+            <td><strong>Parent:</strong></td>
+            <td>
+                ActiveRecord::Base
+            </td>
+        </tr>
+        </table>
+    </div>
+  <!-- banner header -->
+
+  <div id="bodyContent">
+
+
+
+  <div id="contextContent">
+
+
+
+   </div>
+
+    <div id="method-list">
+      <h3 class="section-bar">Methods</h3>
+
+      <div class="name-list">
+      <a href="#M000035">add_or_reset_trial</a>&nbsp;&nbsp;
+      <a href="#M000047">add_weekender_to_subs</a>&nbsp;&nbsp;
+      <a href="#M000041">address_hash</a>&nbsp;&nbsp;
+      <a href="#M000040">admin?</a>&nbsp;&nbsp;
+      <a href="#M000029">after_initialize</a>&nbsp;&nbsp;
+      <a href="#M000034">create_trial_user</a>&nbsp;&nbsp;
+      <a href="#M000036">deliver_password_reset_instructions!</a>&nbsp;&nbsp;
+      <a href="#M000030">find_by_login_or_email</a>&nbsp;&nbsp;
+      <a href="#M000033">find_or_create_with_trial</a>&nbsp;&nbsp;
+      <a href="#M000039">fullname</a>&nbsp;&nbsp;
+      <a href="#M000037">has_active_subscriptions?</a>&nbsp;&nbsp;
+      <a href="#M000046">has_weekender?</a>&nbsp;&nbsp;
+      <a href="#M000038">name</a>&nbsp;&nbsp;
+      <a href="#M000045">premium?</a>&nbsp;&nbsp;
+      <a href="#M000044">publications_for_wordpress</a>&nbsp;&nbsp;
+      <a href="#M000048">store_credit_card_on_gateway</a>&nbsp;&nbsp;
+      <a href="#M000042">sync_to_campaign_master</a>&nbsp;&nbsp;
+      <a href="#M000043">sync_to_wordpress</a>&nbsp;&nbsp;
+      <a href="#M000049">valid_password?</a>&nbsp;&nbsp;
+      <a href="#M000032">validate_as</a>&nbsp;&nbsp;
+      <a href="#M000031">validate_as=</a>&nbsp;&nbsp;
+      </div>
+    </div>
+
+  </div>
+
+
+    <!-- if includes -->
+
+    <div id="section">
+
+
+    <div id="constants-list">
+      <h3 class="section-bar">Constants</h3>
+
+      <div class="name-list">
+        <table summary="Constants">
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">MAIL_SYSTEM_SYNC_COLUMNS</td>
+          <td>=</td>
+          <td class="context-item-value">%w(email firstname lastname country city state title phone_number postcode address_1 address_2)</td>
+        </tr>
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">CMS_SYNC_COLUMNS</td>
+          <td>=</td>
+          <td class="context-item-value">%w(firstname lastname email password)</td>
+        </tr>
+        </table>
+      </div>
+    </div>
+
+
+
+    <div id="attribute-list">
+      <h3 class="section-bar">Attributes</h3>
+
+      <div class="name-list">
+        <table>
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">email_confirmation</td>
+          <td class="context-item-value">&nbsp;[RW]&nbsp;</td>
+          <td class="context-item-desc"></td>
+        </tr>
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">overide_wordpress</td>
+          <td class="context-item-value">&nbsp;[RW]&nbsp;</td>
+          <td class="context-item-desc">
+If true, any account in WP will be ignored on create or update thus
+clobbering any matching accounts in WP (use with caution)
+
+</td>
+        </tr>
+        </table>
+      </div>
+    </div>
+      
+
+
+    <!-- if method_list -->
+    <div id="methods">
+      <h3 class="section-bar">Public Class methods</h3>
+
+      <div id="method-M000034" class="method-detail">
+        <a name="M000034"></a>
+
+        <div class="method-heading">
+          <a href="#M000034" class="method-signature">
+          <span class="method-name">create_trial_user</span><span class="method-args">(attributes)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Used for creating new users from trial forms
+</p>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000034-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000034-source">
+<pre>
+     <span class="ruby-comment cmt"># File app/models/user.rb, line 142</span>
+142:   <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">create_trial_user</span>(<span class="ruby-identifier">attributes</span>)
+143:     <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">validate_as</span>(<span class="ruby-identifier">:system</span>) <span class="ruby-keyword kw">do</span>
+144:       <span class="ruby-identifier">attributes</span>.<span class="ruby-identifier">symbolize_keys!</span>
+145:       <span class="ruby-identifier">r_password</span> = <span class="ruby-identifier">random_password</span>
+146:       <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">create!</span>(
+147:         <span class="ruby-identifier">:firstname</span> =<span class="ruby-operator">&gt;</span> (<span class="ruby-identifier">attributes</span>[<span class="ruby-identifier">:first_name</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">attributes</span>[<span class="ruby-identifier">:firstname</span>]).<span class="ruby-identifier">to_s</span>,
+148:         <span class="ruby-identifier">:lastname</span> =<span class="ruby-operator">&gt;</span> (<span class="ruby-identifier">attributes</span>[<span class="ruby-identifier">:last_name</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">attributes</span>[<span class="ruby-identifier">:lastname</span>]).<span class="ruby-identifier">to_s</span>,
+149:         <span class="ruby-identifier">:email</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">attributes</span>[<span class="ruby-identifier">:email</span>].<span class="ruby-identifier">to_s</span>,
+150:         <span class="ruby-identifier">:email_confirmation</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">attributes</span>[<span class="ruby-identifier">:email</span>].<span class="ruby-identifier">to_s</span>,
+151:         <span class="ruby-identifier">:password</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">r_password</span>,
+152:         <span class="ruby-identifier">:password_confirmation</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">r_password</span>,
+153:         <span class="ruby-identifier">:auto_created</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword kw">true</span>,
+154:         <span class="ruby-identifier">:overide_wordpress</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">attributes</span>[<span class="ruby-identifier">:overide_wordpress</span>]
+155:       )
+156:     <span class="ruby-keyword kw">end</span>
+157:   <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000030" class="method-detail">
+        <a name="M000030"></a>
+
+        <div class="method-heading">
+          <a href="#M000030" class="method-signature">
+          <span class="method-name">find_by_login_or_email</span><span class="method-args">(login)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Allow authlogic to find a user by login or email
+</p>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000030-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000030-source">
+<pre>
+    <span class="ruby-comment cmt"># File app/models/user.rb, line 77</span>
+77:   <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">find_by_login_or_email</span>(<span class="ruby-identifier">login</span>)
+78:      <span class="ruby-identifier">find_by_login</span>(<span class="ruby-identifier">login</span>) <span class="ruby-operator">||</span> <span class="ruby-identifier">find_by_email</span>(<span class="ruby-identifier">login</span>)
+79:   <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000033" class="method-detail">
+        <a name="M000033"></a>
+
+        <div class="method-heading">
+          <a href="#M000033" class="method-signature">
+          <span class="method-name">find_or_create_with_trial</span><span class="method-args">(publication, trial_period_in_days, referrer, user_attributes)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Used by the Unbounce Webhook
+</p>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000033-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000033-source">
+<pre>
+     <span class="ruby-comment cmt"># File app/models/user.rb, line 102</span>
+102:   <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">find_or_create_with_trial</span>(<span class="ruby-identifier">publication</span>, <span class="ruby-identifier">trial_period_in_days</span>, <span class="ruby-identifier">referrer</span>, <span class="ruby-identifier">user_attributes</span>)
+103:     <span class="ruby-identifier">user_attributes</span>.<span class="ruby-identifier">symbolize_keys!</span>
+104:     <span class="ruby-identifier">user_attributes</span>[<span class="ruby-identifier">:lastname</span>] = <span class="ruby-identifier">user_attributes</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">:last_name</span>) <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">user_attributes</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-identifier">:last_name</span>)
+105:     <span class="ruby-identifier">user_attributes</span>[<span class="ruby-identifier">:firstname</span>] = <span class="ruby-identifier">user_attributes</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">:first_name</span>) <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">user_attributes</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-identifier">:first_name</span>)
+106:     <span class="ruby-identifier">user</span> = <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">find_by_email</span>(<span class="ruby-identifier">user_attributes</span>[<span class="ruby-identifier">:email</span>].<span class="ruby-identifier">to_s</span>)
+107:     <span class="ruby-identifier">source_id</span> = <span class="ruby-identifier">user_attributes</span>[<span class="ruby-identifier">:source_id</span>]
+108:     <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">user</span>
+109:       <span class="ruby-identifier">update_hash</span> = {
+110:         <span class="ruby-identifier">:firstname</span>     =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">user_attributes</span>[<span class="ruby-identifier">:firstname</span>],
+111:         <span class="ruby-identifier">:lastname</span>      =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">user_attributes</span>[<span class="ruby-identifier">:lastname</span>],
+112:         <span class="ruby-identifier">:phone_number</span>  =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">user_attributes</span>[<span class="ruby-identifier">:phone_number</span>]
+113:       }
+114:       <span class="ruby-identifier">update_hash</span>.<span class="ruby-identifier">delete_if</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">k</span>,<span class="ruby-identifier">v</span><span class="ruby-operator">|</span> <span class="ruby-identifier">v</span>.<span class="ruby-identifier">nil?</span> }
+115:       <span class="ruby-identifier">user</span>.<span class="ruby-identifier">update_attributes</span>(<span class="ruby-identifier">update_hash</span>)
+116:     <span class="ruby-keyword kw">else</span>
+117:       <span class="ruby-identifier">user</span> = <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">create_trial_user</span>(<span class="ruby-identifier">user_attributes</span>)
+118:     <span class="ruby-keyword kw">end</span>
+119:     
+120:     <span class="ruby-comment cmt"># Reset the password</span>
+121:     <span class="ruby-comment cmt"># TODO: If the password is blank but the user is invalid for some reason this will fail!</span>
+122:     <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">user</span>.<span class="ruby-identifier">password</span>.<span class="ruby-identifier">blank?</span>
+123:       <span class="ruby-identifier">user</span>.<span class="ruby-identifier">password</span> = <span class="ruby-identifier">random_password</span>
+124:       <span class="ruby-identifier">user</span>.<span class="ruby-identifier">password_confirmation</span> = <span class="ruby-identifier">user</span>.<span class="ruby-identifier">password</span>
+125:       <span class="ruby-identifier">user</span>.<span class="ruby-identifier">save!</span>
+126:     <span class="ruby-keyword kw">end</span>
+127:     <span class="ruby-comment cmt"># Weekender &amp; Solus options</span>
+128:     <span class="ruby-identifier">solus</span> = <span class="ruby-identifier">user_attributes</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-identifier">:options</span>, {})[<span class="ruby-identifier">:solus</span>]
+129:     <span class="ruby-comment cmt">#solus = !user_attributes.fetch(:options, []).select { |s| /advertisers/i === s }.empty?</span>
+130:     <span class="ruby-identifier">weekender</span> = <span class="ruby-identifier">user_attributes</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-identifier">:options</span>, {})[<span class="ruby-identifier">:weekender</span>]
+131:     <span class="ruby-comment cmt"># Add weekender</span>
+132:     <span class="ruby-identifier">user</span>.<span class="ruby-identifier">add_weekender_to_subs</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">weekender</span>
+133:     <span class="ruby-comment cmt"># Add or reset trial</span>
+134:     <span class="ruby-identifier">sub</span> = <span class="ruby-identifier">user</span>.<span class="ruby-identifier">add_or_reset_trial</span>(<span class="ruby-identifier">publication</span>, <span class="ruby-identifier">trial_period_in_days</span>, <span class="ruby-identifier">referrer</span>, <span class="ruby-identifier">solus</span>, <span class="ruby-identifier">source_id</span>)
+135:     <span class="ruby-comment cmt"># Reset the password</span>
+136:     <span class="ruby-identifier">sub</span>.<span class="ruby-identifier">temp_password</span> = <span class="ruby-identifier">user</span>.<span class="ruby-identifier">password</span>
+137:     <span class="ruby-constant">SubscriptionMailer</span>.<span class="ruby-identifier">with_template</span>(<span class="ruby-identifier">sub</span>.<span class="ruby-identifier">template_name</span>).<span class="ruby-identifier">deliver_new_trial</span>(<span class="ruby-identifier">sub</span>)
+138:     <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">sub</span>
+139:   <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000032" class="method-detail">
+        <a name="M000032"></a>
+
+        <div class="method-heading">
+          <a href="#M000032" class="method-signature">
+          <span class="method-name">validate_as</span><span class="method-args">(as = nil) {|| ...}</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000032-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000032-source">
+<pre>
+    <span class="ruby-comment cmt"># File app/models/user.rb, line 86</span>
+86:   <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">validate_as</span>(<span class="ruby-identifier">as</span> = <span class="ruby-keyword kw">nil</span>)
+87:     <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">block_given?</span>
+88:       <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">validate_as</span> = <span class="ruby-identifier">as</span>
+89:       <span class="ruby-keyword kw">begin</span>
+90:         <span class="ruby-keyword kw">yield</span>
+91:       <span class="ruby-keyword kw">rescue</span>
+92:         <span class="ruby-identifier">raise</span> <span class="ruby-identifier">$!</span>
+93:       <span class="ruby-keyword kw">ensure</span>
+94:         <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">validate_as</span> = <span class="ruby-keyword kw">nil</span>
+95:       <span class="ruby-keyword kw">end</span>
+96:     <span class="ruby-keyword kw">else</span>
+97:       <span class="ruby-constant">Thread</span>.<span class="ruby-identifier">current</span>[<span class="ruby-identifier">:validate_as</span>] <span class="ruby-operator">||</span> <span class="ruby-identifier">:subscriber</span>
+98:     <span class="ruby-keyword kw">end</span>
+99:   <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000031" class="method-detail">
+        <a name="M000031"></a>
+
+        <div class="method-heading">
+          <a href="#M000031" class="method-signature">
+          <span class="method-name">validate_as=</span><span class="method-args">(sym)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+TODO: Put these in a module
+</p>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000031-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000031-source">
+<pre>
+    <span class="ruby-comment cmt"># File app/models/user.rb, line 82</span>
+82:   <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">validate_as=</span>(<span class="ruby-identifier">sym</span>)
+83:     <span class="ruby-constant">Thread</span>.<span class="ruby-identifier">current</span>[<span class="ruby-identifier">:validate_as</span>] = <span class="ruby-identifier">sym</span>
+84:   <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="section-bar">Public Instance methods</h3>
+
+      <div id="method-M000035" class="method-detail">
+        <a name="M000035"></a>
+
+        <div class="method-heading">
+          <a href="#M000035" class="method-signature">
+          <span class="method-name">add_or_reset_trial</span><span class="method-args">(publication, trial_period_in_days, referrer, solus, source_id)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+TODO: Could make this an association extension
+</p>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000035-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000035-source">
+<pre>
+     <span class="ruby-comment cmt"># File app/models/user.rb, line 160</span>
+160:   <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">add_or_reset_trial</span>(<span class="ruby-identifier">publication</span>, <span class="ruby-identifier">trial_period_in_days</span>, <span class="ruby-identifier">referrer</span>, <span class="ruby-identifier">solus</span>, <span class="ruby-identifier">source_id</span>)
+161:     <span class="ruby-comment cmt"># Does the user have a sub to the pub?</span>
+162:     <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">subscription</span> = <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">subscriptions</span>.<span class="ruby-identifier">find</span>(<span class="ruby-identifier">:first</span>, <span class="ruby-identifier">:conditions</span> =<span class="ruby-operator">&gt;</span> { <span class="ruby-identifier">:publication_id</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">publication</span>.<span class="ruby-identifier">id</span> })
+163:       <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">subscription</span>.<span class="ruby-identifier">trial?</span> <span class="ruby-operator">||</span> (<span class="ruby-identifier">subscription</span>.<span class="ruby-identifier">squatter?</span> <span class="ruby-operator">&amp;&amp;</span> (<span class="ruby-identifier">subscription</span>.<span class="ruby-identifier">state_updated_at</span>.<span class="ruby-identifier">nil?</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">subscription</span>.<span class="ruby-identifier">state_updated_at</span> <span class="ruby-operator">&gt;</span> <span class="ruby-value">12</span>.<span class="ruby-identifier">months</span>.<span class="ruby-identifier">ago</span>))
+164:         <span class="ruby-identifier">raise</span> <span class="ruby-constant">Exceptions</span><span class="ruby-operator">::</span><span class="ruby-constant">AlreadyHadTrial</span>
+165:       <span class="ruby-keyword kw">else</span>
+166:         <span class="ruby-identifier">returning</span>(<span class="ruby-identifier">subscription</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">s</span><span class="ruby-operator">|</span>
+167:           <span class="ruby-identifier">s</span>.<span class="ruby-identifier">new_trial!</span>
+168:           <span class="ruby-identifier">s</span>.<span class="ruby-identifier">update_attributes!</span>(<span class="ruby-identifier">:solus</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">solus</span>, <span class="ruby-identifier">:referrer</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">referrer</span>, <span class="ruby-identifier">:expires_at</span> =<span class="ruby-operator">&gt;</span>  <span class="ruby-identifier">trial_period_in_days</span>.<span class="ruby-identifier">days</span>.<span class="ruby-identifier">from_now</span>)
+169:         <span class="ruby-keyword kw">end</span>
+170:       <span class="ruby-keyword kw">end</span>
+171:     <span class="ruby-keyword kw">else</span>
+172:       <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">subscriptions</span>.<span class="ruby-identifier">create!</span>(
+173:         <span class="ruby-identifier">:publication</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">publication</span>,
+174:         <span class="ruby-identifier">:expires_at</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">trial_period_in_days</span>.<span class="ruby-identifier">days</span>.<span class="ruby-identifier">from_now</span>,
+175:         <span class="ruby-identifier">:referrer</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">referrer</span>,
+176:         <span class="ruby-identifier">:source_id</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">source_id</span>,
+177:         <span class="ruby-identifier">:solus</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">solus</span>
+178:       )
+179:     <span class="ruby-keyword kw">end</span>
+180:   <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000047" class="method-detail">
+        <a name="M000047"></a>
+
+        <div class="method-heading">
+          <a href="#M000047" class="method-signature">
+          <span class="method-name">add_weekender_to_subs</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000047-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000047-source">
+<pre>
+     <span class="ruby-comment cmt"># File app/models/user.rb, line 262</span>
+262:   <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">add_weekender_to_subs</span>
+263:     <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">has_weekender?</span>
+264:       <span class="ruby-identifier">weekender</span> = <span class="ruby-constant">Publication</span>.<span class="ruby-identifier">find_by_name</span>(<span class="ruby-value str">&quot;Crikey Weekender&quot;</span>)
+265:       <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">weekender</span>
+266:       <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">subscriptions</span>.<span class="ruby-identifier">create!</span>(
+267:         <span class="ruby-identifier">:publication</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">weekender</span>,
+268:         <span class="ruby-identifier">:expires_at</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword kw">nil</span>,
+269:         <span class="ruby-identifier">:state</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value str">'active'</span>
+270:       )
+271:     <span class="ruby-keyword kw">end</span>
+272:   <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000041" class="method-detail">
+        <a name="M000041"></a>
+
+        <div class="method-heading">
+          <a href="#M000041" class="method-signature">
+          <span class="method-name">address_hash</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Used by ActiveMerchant
+</p>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000041-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000041-source">
+<pre>
+     <span class="ruby-comment cmt"># File app/models/user.rb, line 206</span>
+206:   <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">address_hash</span>
+207:     {
+208:       <span class="ruby-identifier">:address1</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">address_1</span>,
+209:       <span class="ruby-identifier">:address2</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">address_2</span>,
+210:       <span class="ruby-identifier">:city</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">city</span>,
+211:       <span class="ruby-identifier">:country</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">country</span>,
+212:       <span class="ruby-identifier">:state</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">state</span>,
+213:       <span class="ruby-identifier">:zip</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">postcode</span>,
+214:     }
+215:   <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000040" class="method-detail">
+        <a name="M000040"></a>
+
+        <div class="method-heading">
+          <a href="#M000040" class="method-signature">
+          <span class="method-name">admin?</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000040-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000040-source">
+<pre>
+     <span class="ruby-comment cmt"># File app/models/user.rb, line 201</span>
+201:   <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">admin?</span>
+202:     <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">role</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">:admin</span>
+203:   <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000029" class="method-detail">
+        <a name="M000029"></a>
+
+        <div class="method-heading">
+          <a href="#M000029" class="method-signature">
+          <span class="method-name">after_initialize</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000029-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000029-source">
+<pre>
+    <span class="ruby-comment cmt"># File app/models/user.rb, line 71</span>
+71:   <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">after_initialize</span>
+72:     <span class="ruby-comment cmt"># Default to subscriber role</span>
+73:     <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">role</span> <span class="ruby-operator">||=</span> <span class="ruby-value str">'subscriber'</span>
+74:   <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000036" class="method-detail">
+        <a name="M000036"></a>
+
+        <div class="method-heading">
+          <a href="#M000036" class="method-signature">
+          <span class="method-name">deliver_password_reset_instructions!</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000036-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000036-source">
+<pre>
+     <span class="ruby-comment cmt"># File app/models/user.rb, line 182</span>
+182:   <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">deliver_password_reset_instructions!</span>
+183:     <span class="ruby-identifier">reset_perishable_token</span>
+184:     <span class="ruby-identifier">save_with_validation</span>(<span class="ruby-keyword kw">false</span>)
+185:     <span class="ruby-constant">UserMailer</span>.<span class="ruby-identifier">deliver_password_reset_instructions</span>(<span class="ruby-keyword kw">self</span>)
+186:   <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000039" class="method-detail">
+        <a name="M000039"></a>
+
+        <div class="method-heading">
+          <a href="#M000039" class="method-signature">
+          <span class="method-name">fullname</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000039-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000039-source">
+<pre>
+     <span class="ruby-comment cmt"># File app/models/user.rb, line 197</span>
+197:   <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">fullname</span>
+198:     <span class="ruby-identifier">name</span>
+199:   <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000037" class="method-detail">
+        <a name="M000037"></a>
+
+        <div class="method-heading">
+          <a href="#M000037" class="method-signature">
+          <span class="method-name">has_active_subscriptions?</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Returns true if user has at least one active sub
+</p>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000037-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000037-source">
+<pre>
+     <span class="ruby-comment cmt"># File app/models/user.rb, line 189</span>
+189:   <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">has_active_subscriptions?</span>
+190:     <span class="ruby-identifier">subscriptions</span>.<span class="ruby-identifier">any?</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">:active?</span>)
+191:   <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000046" class="method-detail">
+        <a name="M000046"></a>
+
+        <div class="method-heading">
+          <a href="#M000046" class="method-signature">
+          <span class="method-name">has_weekender?</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+TODO: Custom for Crikey
+</p>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000046-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000046-source">
+<pre>
+     <span class="ruby-comment cmt"># File app/models/user.rb, line 256</span>
+256:   <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">has_weekender?</span>
+257:     <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">subscriptions</span>.<span class="ruby-identifier">any?</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">sub</span><span class="ruby-operator">|</span>
+258:       <span class="ruby-identifier">sub</span>.<span class="ruby-identifier">publication</span>.<span class="ruby-identifier">name</span> <span class="ruby-operator">==</span> <span class="ruby-value str">'Crikey Weekender'</span>
+259:     <span class="ruby-keyword kw">end</span>
+260:   <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000038" class="method-detail">
+        <a name="M000038"></a>
+
+        <div class="method-heading">
+          <a href="#M000038" class="method-signature">
+          <span class="method-name">name</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000038-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000038-source">
+<pre>
+     <span class="ruby-comment cmt"># File app/models/user.rb, line 193</span>
+193:   <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">name</span>
+194:     [ <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">firstname</span>, <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">lastname</span> ].<span class="ruby-identifier">join</span>(<span class="ruby-value str">&quot; &quot;</span>)
+195:   <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000045" class="method-detail">
+        <a name="M000045"></a>
+
+        <div class="method-heading">
+          <a href="#M000045" class="method-signature">
+          <span class="method-name">premium?</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000045-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000045-source">
+<pre>
+     <span class="ruby-comment cmt"># File app/models/user.rb, line 248</span>
+248:   <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">premium?</span>
+249:     <span class="ruby-comment cmt"># TODO Crikey Weekender here is a Hack for Crikey!</span>
+250:     <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">subscriptions</span>.<span class="ruby-identifier">any?</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">sub</span><span class="ruby-operator">|</span>
+251:       <span class="ruby-identifier">sub</span>.<span class="ruby-identifier">active?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">sub</span>.<span class="ruby-identifier">publication</span>.<span class="ruby-identifier">name</span> <span class="ruby-operator">!=</span> <span class="ruby-value str">'Crikey Weekender'</span>
+252:     <span class="ruby-keyword kw">end</span>
+253:   <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000044" class="method-detail">
+        <a name="M000044"></a>
+
+        <div class="method-heading">
+          <a href="#M000044" class="method-signature">
+          <span class="method-name">publications_for_wordpress</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Return a string of publications and their states in the format of
+&quot;publication1_id,publication2_id|publication1_state,publication2_state&quot;
+etc.
+</p>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000044-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000044-source">
+<pre>
+     <span class="ruby-comment cmt"># File app/models/user.rb, line 244</span>
+244:   <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">publications_for_wordpress</span>
+245:     <span class="ruby-identifier">subscriptions</span>.<span class="ruby-identifier">map</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">s</span><span class="ruby-operator">|</span> [<span class="ruby-identifier">s</span>.<span class="ruby-identifier">publication_id</span>, <span class="ruby-identifier">s</span>.<span class="ruby-identifier">state</span>, <span class="ruby-identifier">s</span>.<span class="ruby-identifier">expires_at</span>].<span class="ruby-identifier">map</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">:to_s</span>) }.<span class="ruby-identifier">transpose</span>.<span class="ruby-identifier">map</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">a</span><span class="ruby-operator">|</span> <span class="ruby-node">&quot;#{a.join(',')}&quot;</span> }.<span class="ruby-identifier">join</span>(<span class="ruby-value str">'|'</span>)
+246:   <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000048" class="method-detail">
+        <a name="M000048"></a>
+
+        <div class="method-heading">
+          <a href="#M000048" class="method-signature">
+          <span class="method-name">store_credit_card_on_gateway</span><span class="method-args">(credit_card)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000048-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000048-source">
+<pre>
+     <span class="ruby-comment cmt"># File app/models/user.rb, line 274</span>
+274:   <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">store_credit_card_on_gateway</span>(<span class="ruby-identifier">credit_card</span>)
+275:     <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">credit_card</span>.<span class="ruby-identifier">valid?</span>
+276:       <span class="ruby-identifier">raise</span> <span class="ruby-constant">Exceptions</span><span class="ruby-operator">::</span><span class="ruby-constant">CannotStoreCard</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">credit_card</span>.<span class="ruby-identifier">errors</span>.<span class="ruby-identifier">full_messages</span>.<span class="ruby-identifier">join</span>(<span class="ruby-value str">&quot;,&amp;nbsp;&quot;</span>))
+277:     <span class="ruby-keyword kw">end</span>
+278:     <span class="ruby-comment cmt"># TODO: user module ActiveMerchant::module Utils</span>
+279:     <span class="ruby-identifier">token</span> = <span class="ruby-constant">Utilities</span>.<span class="ruby-identifier">generate_unique_token</span>(<span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">id</span>, <span class="ruby-value">10</span>)
+280:     <span class="ruby-comment cmt"># The amount is 1 cent to keep SecurePay happy but nothing is charged at this point</span>
+281:     <span class="ruby-identifier">response</span> = <span class="ruby-constant">GATEWAY</span>.<span class="ruby-identifier">setup_recurrent</span>(<span class="ruby-value">1</span>, <span class="ruby-identifier">credit_card</span>, <span class="ruby-identifier">token</span>)
+282:     <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">response</span>.<span class="ruby-identifier">success?</span>
+283:       <span class="ruby-identifier">raise</span> <span class="ruby-constant">Exceptions</span><span class="ruby-operator">::</span><span class="ruby-constant">CannotStoreCard</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">response</span>.<span class="ruby-identifier">message</span>)
+284:     <span class="ruby-keyword kw">end</span>
+285:     <span class="ruby-identifier">update_attributes!</span>(<span class="ruby-identifier">:payment_gateway_token</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">token</span>)
+286:     <span class="ruby-identifier">save!</span>
+287:   <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000042" class="method-detail">
+        <a name="M000042"></a>
+
+        <div class="method-heading">
+          <a href="#M000042" class="method-signature">
+          <span class="method-name">sync_to_campaign_master</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000042-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000042-source">
+<pre>
+     <span class="ruby-comment cmt"># File app/models/user.rb, line 217</span>
+217:   <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">sync_to_campaign_master</span>
+218:     <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">subscriptions</span>.<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">:sync_to_campaign_master</span>)
+219:   <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000043" class="method-detail">
+        <a name="M000043"></a>
+
+        <div class="method-heading">
+          <a href="#M000043" class="method-signature">
+          <span class="method-name">sync_to_wordpress</span><span class="method-args">(password = nil)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000043-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000043-source">
+<pre>
+     <span class="ruby-comment cmt"># File app/models/user.rb, line 221</span>
+221:   <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">sync_to_wordpress</span>(<span class="ruby-identifier">password</span> = <span class="ruby-keyword kw">nil</span>)
+222:     <span class="ruby-identifier">options</span> = {
+223:       <span class="ruby-identifier">:login</span>        =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">login</span>,
+224:       <span class="ruby-identifier">:firstname</span>    =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">firstname</span>,
+225:       <span class="ruby-identifier">:lastname</span>     =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">lastname</span>,
+226:       <span class="ruby-identifier">:email</span>        =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">email</span>,
+227:       <span class="ruby-identifier">:premium</span>      =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">premium?</span>,
+228:       <span class="ruby-identifier">:publications</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">publications_for_wordpress</span>
+229:     }
+230:     <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:pword</span>] = <span class="ruby-identifier">password</span> <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">password</span>.<span class="ruby-identifier">blank?</span>
+231:     <span class="ruby-keyword kw">if</span> <span class="ruby-constant">Wordpress</span>.<span class="ruby-identifier">exists?</span>(<span class="ruby-identifier">:login</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">login</span>)
+232:       <span class="ruby-constant">Wordpress</span>.<span class="ruby-identifier">update</span>(<span class="ruby-identifier">options</span>)
+233:     <span class="ruby-keyword kw">elsif</span> <span class="ruby-constant">Wordpress</span>.<span class="ruby-identifier">exists?</span>(<span class="ruby-identifier">:email</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">email</span>)
+234:       <span class="ruby-identifier">raise</span> <span class="ruby-constant">Wordpress</span><span class="ruby-operator">::</span><span class="ruby-constant">PrimaryKeyMismatch</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value str">&quot;The login stored in subscriptus does not match that stored in Wordpress. You will need to manually update the user's details in Subscriptus so that the logins match.&quot;</span>)
+235:     <span class="ruby-keyword kw">else</span>
+236:       <span class="ruby-comment cmt"># Can't create a WP user if we don't have a password - so we will create a random one!</span>
+237:       <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:pword</span>] = <span class="ruby-constant">User</span>.<span class="ruby-identifier">random_password</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:pword</span>].<span class="ruby-identifier">blank?</span>
+238:       <span class="ruby-constant">Wordpress</span>.<span class="ruby-identifier">create</span>(<span class="ruby-identifier">options</span>)
+239:     <span class="ruby-keyword kw">end</span>
+240:   <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000049" class="method-detail">
+        <a name="M000049"></a>
+
+        <div class="method-heading">
+          <a href="#M000049" class="method-signature">
+          <span class="method-name">valid_password?</span><span class="method-args">(password)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Authenticate non-admin users against the wordpress database
+</p>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000049-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000049-source">
+<pre>
+     <span class="ruby-comment cmt"># File app/models/user.rb, line 290</span>
+290:   <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">valid_password?</span>(<span class="ruby-identifier">password</span>)
+291:     <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">role</span> <span class="ruby-operator">==</span> <span class="ruby-identifier">:admin</span>
+292:       <span class="ruby-keyword kw">super</span>
+293:     <span class="ruby-keyword kw">else</span>
+294:       <span class="ruby-constant">Wordpress</span>.<span class="ruby-identifier">authenticate</span>(<span class="ruby-identifier">:email</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">email</span>, <span class="ruby-identifier">:pword</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">password</span>)
+295:     <span class="ruby-keyword kw">end</span>
+296:   <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+
+
+  </div>
+
+
+<div id="validator-badges">
+  <p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+</div>
+
+</body>
+</html>

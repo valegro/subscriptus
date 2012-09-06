@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Module: Billing::Charger</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Script-Type" content="text/javascript" />
+  <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
+  <script type="text/javascript">
+  // <![CDATA[
+
+  function popupCode( url ) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+
+  function toggleCode( id ) {
+    if ( document.getElementById )
+      elem = document.getElementById( id );
+    else if ( document.all )
+      elem = eval( "document.all." + id );
+    else
+      return false;
+
+    elemStyle = elem.style;
+    
+    if ( elemStyle.display != "block" ) {
+      elemStyle.display = "block"
+    } else {
+      elemStyle.display = "none"
+    }
+
+    return true;
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln( "<style type=\"text/css\">div.method-source-code { display: none }</style>" )
+  
+  // ]]>
+  </script>
+
+</head>
+<body>
+
+
+
+    <div id="classHeader">
+        <table class="header-table">
+        <tr class="top-aligned-row">
+          <td><strong>Module</strong></td>
+          <td class="class-name-in-header">Billing::Charger</td>
+        </tr>
+        <tr class="top-aligned-row">
+            <td><strong>In:</strong></td>
+            <td>
+                <a href="../../files/lib/billing/charger_rb.html">
+                lib/billing/charger.rb
+                </a>
+        <br />
+                <a href="../../files/lib/billing/charger/credit_card_rb.html">
+                lib/billing/charger/credit_card.rb
+                </a>
+        <br />
+                <a href="../../files/lib/billing/charger/invoicer_rb.html">
+                lib/billing/charger/invoicer.rb
+                </a>
+        <br />
+            </td>
+        </tr>
+
+        </table>
+    </div>
+  <!-- banner header -->
+
+  <div id="bodyContent">
+
+
+
+  <div id="contextContent">
+
+
+
+   </div>
+
+    <div id="method-list">
+      <h3 class="section-bar">Methods</h3>
+
+      <div class="name-list">
+      <a href="#M000387">advance_renewal_period_by</a>&nbsp;&nbsp;
+      <a href="#M000384">amount_in_cents</a>&nbsp;&nbsp;
+      <a href="#M000383">calculate_discount</a>&nbsp;&nbsp;
+      <a href="#M000386">charge</a>&nbsp;&nbsp;
+      <a href="#M000385">charge!</a>&nbsp;&nbsp;
+      <a href="#M000382">included</a>&nbsp;&nbsp;
+      </div>
+    </div>
+
+  </div>
+
+
+    <!-- if includes -->
+
+    <div id="section">
+
+    <div id="class-list">
+      <h3 class="section-bar">Classes and Modules</h3>
+
+      Module <a href="Charger/CreditCard.html" class="link">Billing::Charger::CreditCard</a><br />
+Module <a href="Charger/Invoicer.html" class="link">Billing::Charger::Invoicer</a><br />
+
+    </div>
+
+    <div id="constants-list">
+      <h3 class="section-bar">Constants</h3>
+
+      <div class="name-list">
+        <table summary="Constants">
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">CREDIT_CARD</td>
+          <td>=</td>
+          <td class="context-item-value">0</td>
+        </tr>
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">INVOICE</td>
+          <td>=</td>
+          <td class="context-item-value">1</td>
+        </tr>
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">PAYMENT_METHODS</td>
+          <td>=</td>
+          <td class="context-item-value">[ CREDIT_CARD, INVOICE ]</td>
+        </tr>
+        </table>
+      </div>
+    </div>
+
+
+
+      
+
+
+    <!-- if method_list -->
+    <div id="methods">
+      <h3 class="section-bar">Public Class methods</h3>
+
+      <div id="method-M000383" class="method-detail">
+        <a name="M000383"></a>
+
+        <div class="method-heading">
+          <a href="#M000383" class="method-signature">
+          <span class="method-name">calculate_discount</span><span class="method-args">(renewal_period, monthly_cost)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000383-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000383-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/billing/charger.rb, line 15</span>
+15:     <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">calculate_discount</span>(<span class="ruby-identifier">renewal_period</span>, <span class="ruby-identifier">monthly_cost</span>)
+16:       <span class="ruby-identifier">cost</span> = <span class="ruby-identifier">renewal_period</span> <span class="ruby-operator">*</span> <span class="ruby-identifier">monthly_cost</span>
+17:       <span class="ruby-identifier">discount</span> = <span class="ruby-constant">Subscription</span><span class="ruby-operator">::</span><span class="ruby-constant">RENEWAL_DISCOUNTS</span>[<span class="ruby-identifier">renewal_period</span>]
+18:       <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">discount</span>.<span class="ruby-identifier">try</span>(<span class="ruby-identifier">:&gt;</span>, <span class="ruby-value">0</span>) <span class="ruby-operator">?</span> (<span class="ruby-identifier">cost</span> <span class="ruby-operator">-</span> <span class="ruby-identifier">cost</span> <span class="ruby-operator">*</span> <span class="ruby-identifier">discount</span>) <span class="ruby-operator">:</span> <span class="ruby-identifier">cost</span>
+19:     <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000382" class="method-detail">
+        <a name="M000382"></a>
+
+        <div class="method-heading">
+          <a href="#M000382" class="method-signature">
+          <span class="method-name">included</span><span class="method-args">(klass)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000382-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000382-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/billing/charger.rb, line 9</span>
+ 9:     <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">included</span>(<span class="ruby-identifier">klass</span>)
+10:       <span class="ruby-identifier">klass</span>.<span class="ruby-identifier">send</span> <span class="ruby-identifier">:named_scope</span>, <span class="ruby-identifier">:payment_due</span>, <span class="ruby-identifier">lambda</span> {
+11:         { <span class="ruby-identifier">:conditions</span> =<span class="ruby-operator">&gt;</span> [ <span class="ruby-value str">' next_renewal_at &lt;= ? '</span>, <span class="ruby-constant">Time</span>.<span class="ruby-identifier">now</span>.<span class="ruby-identifier">utc</span> ] }
+12:       }
+13:     <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="section-bar">Public Instance methods</h3>
+
+      <div id="method-M000387" class="method-detail">
+        <a name="M000387"></a>
+
+        <div class="method-heading">
+          <a href="#M000387" class="method-signature">
+          <span class="method-name">advance_renewal_period_by</span><span class="method-args">(options = {})</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000387-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000387-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/billing/charger.rb, line 45</span>
+45:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">advance_renewal_period_by</span>(<span class="ruby-identifier">options</span> = {})
+46:       <span class="ruby-identifier">current_renewal_date</span> = (<span class="ruby-identifier">next_renewal_at</span> <span class="ruby-operator">||</span> <span class="ruby-constant">Time</span>.<span class="ruby-identifier">now</span>)
+47:       <span class="ruby-identifier">update_attributes</span>(<span class="ruby-identifier">:next_renewal_at</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">current_renewal_date</span>.<span class="ruby-identifier">advance</span>(<span class="ruby-identifier">options</span>))
+48:     <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000384" class="method-detail">
+        <a name="M000384"></a>
+
+        <div class="method-heading">
+          <a href="#M000384" class="method-signature">
+          <span class="method-name">amount_in_cents</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000384-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000384-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/billing/charger.rb, line 21</span>
+21:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">amount_in_cents</span>
+22:       (<span class="ruby-identifier">amount</span> <span class="ruby-operator">*</span> <span class="ruby-value">100</span>).<span class="ruby-identifier">to_i</span>
+23:     <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000386" class="method-detail">
+        <a name="M000386"></a>
+
+        <div class="method-heading">
+          <a href="#M000386" class="method-signature">
+          <span class="method-name">charge</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000386-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000386-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/billing/charger.rb, line 37</span>
+37:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">charge</span>
+38:       <span class="ruby-keyword kw">begin</span>
+39:         <span class="ruby-identifier">charge!</span>
+40:       <span class="ruby-keyword kw">rescue</span>
+41:         <span class="ruby-keyword kw">false</span>
+42:       <span class="ruby-keyword kw">end</span>
+43:     <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000385" class="method-detail">
+        <a name="M000385"></a>
+
+        <div class="method-heading">
+          <a href="#M000385" class="method-signature">
+          <span class="method-name">charge!</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000385-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000385-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/billing/charger.rb, line 25</span>
+25:     <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">charge!</span>
+26:       <span class="ruby-constant">ApplicationError</span>.<span class="ruby-identifier">catch!</span> <span class="ruby-identifier">:error</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-constant">ApplicationError</span><span class="ruby-operator">::</span><span class="ruby-constant">BILLING</span> <span class="ruby-keyword kw">do</span>
+27:         <span class="ruby-constant">ActiveRecord</span><span class="ruby-operator">::</span><span class="ruby-constant">Base</span>.<span class="ruby-identifier">transaction</span> <span class="ruby-keyword kw">do</span>
+28:           <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">payment_method</span> <span class="ruby-operator">==</span> <span class="ruby-constant">Billing</span><span class="ruby-operator">::</span><span class="ruby-constant">Charger</span><span class="ruby-operator">::</span><span class="ruby-constant">CREDIT_CARD</span>
+29:             <span class="ruby-constant">Billing</span><span class="ruby-operator">::</span><span class="ruby-constant">Charger</span><span class="ruby-operator">::</span><span class="ruby-constant">CreditCard</span>.<span class="ruby-identifier">charge</span> <span class="ruby-keyword kw">self</span>
+30:           <span class="ruby-keyword kw">elsif</span> <span class="ruby-identifier">payment_method</span> <span class="ruby-operator">==</span> <span class="ruby-constant">Billing</span><span class="ruby-operator">::</span><span class="ruby-constant">Charger</span><span class="ruby-operator">::</span><span class="ruby-constant">INVOICE</span>
+31:             <span class="ruby-constant">Billing</span><span class="ruby-operator">::</span><span class="ruby-constant">Charger</span><span class="ruby-operator">::</span><span class="ruby-constant">Invoicer</span>.<span class="ruby-identifier">charge</span> <span class="ruby-keyword kw">self</span>
+32:           <span class="ruby-keyword kw">end</span>
+33:         <span class="ruby-keyword kw">end</span>
+34:       <span class="ruby-keyword kw">end</span>
+35:     <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+
+
+  </div>
+
+
+<div id="validator-badges">
+  <p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+</div>
+
+</body>
+</html>

@@ -31,22 +31,22 @@ config.action_mailer.logger = Logger.new("log/mail.log")
 =begin
 # NetFox Sendgrid (for now)
 config.action_mailer.smtp_settings = {
-  :address        => "smtp.sendgrid.net",
+  :address        => "192.168.1.101",
   :port           => "25",
   :authentication => :plain,
-  :user_name      => 'daniel@netfox.com',
-  :password       => '12qwaszx',
-  :domain         => 'crikey.com.au'
+  :user_name      => 'admin@subscriptus.co',
+  :password       => 'Dfkl!4',
+  :domain         => 'subscriptus.co'
 }
 =end
 
 config.action_mailer.smtp_settings = {
   :address        => "localhost",
   :port           => "25",
-  :domain         => 'crikey.com.au'
+  :domain         => 'subscriptus.co'
 }
 
-ActionMailer::Base.default_url_options[:host] = "subscribe.crikey.com.au"
+ActionMailer::Base.default_url_options[:host] = "valegro.subscriptus.co"
 
 # Enable threaded mode
 # config.threadsafe!
@@ -60,8 +60,8 @@ config.after_initialize do
   )
 end
 
-CAMPAIGNMASTER_USERNAME = 'ddraper'
-CAMPAIGNMASTER_PASSWORD = 'netfox'
-CAMPAIGNMASTER_CLIENT_ID = '5032'
+#CAMPAIGNMASTER_USERNAME = 'ddraper'
+#CAMPAIGNMASTER_PASSWORD = 'netfox'
+#CAMPAIGNMASTER_CLIENT_ID = '5032'
 
 Wordpress.enabled = true

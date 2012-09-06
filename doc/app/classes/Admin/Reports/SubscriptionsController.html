@@ -1,0 +1,268 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Class: Admin::Reports::SubscriptionsController</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Script-Type" content="text/javascript" />
+  <link rel="stylesheet" href="../../.././rdoc-style.css" type="text/css" media="screen" />
+  <script type="text/javascript">
+  // <![CDATA[
+
+  function popupCode( url ) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+
+  function toggleCode( id ) {
+    if ( document.getElementById )
+      elem = document.getElementById( id );
+    else if ( document.all )
+      elem = eval( "document.all." + id );
+    else
+      return false;
+
+    elemStyle = elem.style;
+    
+    if ( elemStyle.display != "block" ) {
+      elemStyle.display = "block"
+    } else {
+      elemStyle.display = "none"
+    }
+
+    return true;
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln( "<style type=\"text/css\">div.method-source-code { display: none }</style>" )
+  
+  // ]]>
+  </script>
+
+</head>
+<body>
+
+
+
+    <div id="classHeader">
+        <table class="header-table">
+        <tr class="top-aligned-row">
+          <td><strong>Class</strong></td>
+          <td class="class-name-in-header">Admin::Reports::SubscriptionsController</td>
+        </tr>
+        <tr class="top-aligned-row">
+            <td><strong>In:</strong></td>
+            <td>
+                <a href="../../../files/app/controllers/admin/reports/subscriptions_controller_rb.html">
+                app/controllers/admin/reports/subscriptions_controller.rb
+                </a>
+        <br />
+            </td>
+        </tr>
+
+        <tr class="top-aligned-row">
+            <td><strong>Parent:</strong></td>
+            <td>
+                <a href="../ReportsController.html">
+                Admin::ReportsController
+               </a>
+            </td>
+        </tr>
+        </table>
+    </div>
+  <!-- banner header -->
+
+  <div id="bodyContent">
+
+
+
+  <div id="contextContent">
+
+
+
+   </div>
+
+    <div id="method-list">
+      <h3 class="section-bar">Methods</h3>
+
+      <div class="name-list">
+      <a href="#M000275">index</a>&nbsp;&nbsp;
+      <a href="#M000273">new</a>&nbsp;&nbsp;
+      <a href="#M000276">set_daterange</a>&nbsp;&nbsp;
+      <a href="#M000274">show</a>&nbsp;&nbsp;
+      </div>
+    </div>
+
+  </div>
+
+
+    <!-- if includes -->
+
+    <div id="section">
+
+
+
+
+
+      
+
+
+    <!-- if method_list -->
+    <div id="methods">
+      <h3 class="section-bar">Public Instance methods</h3>
+
+      <div id="method-M000275" class="method-detail">
+        <a name="M000275"></a>
+
+        <div class="method-heading">
+          <a href="#M000275" class="method-signature">
+          <span class="method-name">index</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000275-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000275-source">
+<pre>
+    <span class="ruby-comment cmt"># File app/controllers/admin/reports/subscriptions_controller.rb, line 12</span>
+12:   <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">index</span>
+13:     <span class="ruby-ivar">@pub_id</span> = <span class="ruby-value str">&quot;1&quot;</span>
+14: 
+15:     <span class="ruby-ivar">@date_range</span> = <span class="ruby-value str">&quot;All time&quot;</span>
+16: 
+17:     <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">params</span>[<span class="ruby-identifier">:pending</span>] <span class="ruby-operator">==</span> <span class="ruby-value str">&quot;false&quot;</span>
+18:       <span class="ruby-ivar">@pending</span> = <span class="ruby-keyword kw">false</span>
+19:       <span class="ruby-identifier">state_where</span> = <span class="ruby-value str">&quot;state = 'active'&quot;</span>
+20:     <span class="ruby-keyword kw">else</span>
+21:       <span class="ruby-ivar">@pending</span> = <span class="ruby-keyword kw">true</span>
+22:       <span class="ruby-identifier">state_where</span> = <span class="ruby-value str">&quot;(state = 'active' OR state = 'pending')&quot;</span>
+23:     <span class="ruby-keyword kw">end</span>
+24: 
+25:     <span class="ruby-ivar">@subscriptions</span> = <span class="ruby-constant">Array</span>(<span class="ruby-constant">Subscription</span>.<span class="ruby-identifier">find_by_sql</span>(<span class="ruby-value str">&quot;select s.offer_id, o.name as offer_name, IFNULL(z.count_renew,0) as count_renew, IFNULL(y.count_new,0)+IFNULL(z.count_renew,0) as count_total, IFNULL(y.count_new,0) as count_new from subscriptions s left join (select s.offer_id, count(distinct s.id) as count_renew from subscriptions s, subscription_actions a where s.id = a.subscription_id and a.renewal =1 and &quot;</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">state_where</span> <span class="ruby-operator">+</span> <span class="ruby-value str">&quot; AND s.publication_id=&quot;</span> <span class="ruby-operator">+</span> <span class="ruby-ivar">@pub_id</span> <span class="ruby-operator">+</span> <span class="ruby-value str">&quot; group by s.offer_id) z on z.offer_id = s.offer_id left join (select s.offer_id, count(distinct s.id) as count_new from subscriptions s, subscription_actions a where s.id = a.subscription_id and a.renewal =0 and &quot;</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">state_where</span> <span class="ruby-operator">+</span> <span class="ruby-value str">&quot; AND s.publication_id=&quot;</span> <span class="ruby-operator">+</span> <span class="ruby-ivar">@pub_id</span> <span class="ruby-operator">+</span> <span class="ruby-value str">&quot; group by s.offer_id) y on y.offer_id = s.offer_id left join offers o on (s.offer_id = o.id) where &quot;</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">state_where</span> <span class="ruby-operator">+</span> <span class="ruby-value str">&quot; AND s.publication_id=&quot;</span> <span class="ruby-operator">+</span> <span class="ruby-ivar">@pub_id</span> <span class="ruby-operator">+</span> <span class="ruby-value str">&quot; AND IFNULL(y.count_new,0)+IFNULL(z.count_renew,0)&gt;0 group by s.offer_id order by o.name asc&quot;</span>)).<span class="ruby-identifier">paginate</span>(<span class="ruby-identifier">:page</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">params</span>[<span class="ruby-identifier">:page</span>])
+26: 
+27:     <span class="ruby-ivar">@subscriptions_count</span> = <span class="ruby-constant">Subscription</span>.<span class="ruby-identifier">count</span>(<span class="ruby-identifier">:conditions</span> =<span class="ruby-operator">&gt;</span> [<span class="ruby-value str">&quot;publication_id = ? AND &quot;</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">state_where</span>, <span class="ruby-ivar">@pub_id</span>]).<span class="ruby-identifier">to_s</span>()  <span class="ruby-operator">+</span> <span class="ruby-value str">&quot; people are currenty subscribed&quot;</span>
+28: 
+29:   <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000273" class="method-detail">
+        <a name="M000273"></a>
+
+        <div class="method-heading">
+          <a href="#M000273" class="method-signature">
+          <span class="method-name">new</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000273-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000273-source">
+<pre>
+   <span class="ruby-comment cmt"># File app/controllers/admin/reports/subscriptions_controller.rb, line 3</span>
+3:   <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">new</span>
+4: 
+5:   <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000276" class="method-detail">
+        <a name="M000276"></a>
+
+        <div class="method-heading">
+          <a href="#M000276" class="method-signature">
+          <span class="method-name">set_daterange</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000276-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000276-source">
+<pre>
+    <span class="ruby-comment cmt"># File app/controllers/admin/reports/subscriptions_controller.rb, line 31</span>
+31:   <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">set_daterange</span>
+32:     <span class="ruby-identifier">respond_to</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">format</span><span class="ruby-operator">|</span>
+33:       <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">request</span>.<span class="ruby-identifier">post?</span>
+34:         <span class="ruby-identifier">format</span>.<span class="ruby-identifier">js</span> {
+35:           <span class="ruby-identifier">render</span> <span class="ruby-identifier">:update</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">page</span><span class="ruby-operator">|</span>
+36:             <span class="ruby-identifier">page</span>.<span class="ruby-identifier">insert_html</span> <span class="ruby-identifier">:bottom</span>, <span class="ruby-value str">'content'</span>, <span class="ruby-identifier">:partial</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value str">'set_daterange_dialog'</span>
+37:             <span class="ruby-identifier">page</span>[<span class="ruby-value str">'set-daterange-dialog'</span>].<span class="ruby-identifier">dialog</span>(<span class="ruby-value str">'open'</span>)
+38:           <span class="ruby-keyword kw">end</span>
+39:         }
+40:       <span class="ruby-keyword kw">else</span>
+41: 
+42:         <span class="ruby-identifier">start_date</span> = <span class="ruby-identifier">params</span>[<span class="ruby-identifier">:set_daterange</span>][<span class="ruby-value str">&quot;start_date(1i)&quot;</span>] <span class="ruby-operator">+</span> <span class="ruby-value str">&quot;-&quot;</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">params</span>[<span class="ruby-identifier">:set_daterange</span>][<span class="ruby-value str">&quot;start_date(2i)&quot;</span>] <span class="ruby-operator">+</span> <span class="ruby-value str">&quot;-&quot;</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">params</span>[<span class="ruby-identifier">:set_daterange</span>][<span class="ruby-value str">&quot;start_date(3i)&quot;</span>] 
+43:         <span class="ruby-identifier">end_date</span> = <span class="ruby-identifier">params</span>[<span class="ruby-identifier">:set_daterange</span>][<span class="ruby-value str">&quot;end_date(1i)&quot;</span>] <span class="ruby-operator">+</span> <span class="ruby-value str">&quot;-&quot;</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">params</span>[<span class="ruby-identifier">:set_daterange</span>][<span class="ruby-value str">&quot;end_date(2i)&quot;</span>] <span class="ruby-operator">+</span> <span class="ruby-value str">&quot;-&quot;</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">params</span>[<span class="ruby-identifier">:set_daterange</span>][<span class="ruby-value str">&quot;end_date(3i)&quot;</span>]
+44:         
+45:     <span class="ruby-comment cmt"># adjust for UTC on database</span>
+46:     <span class="ruby-identifier">date_where</span> = <span class="ruby-value str">&quot; AND a.applied_at &gt;= DATE_SUB('&quot;</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">start_date</span> <span class="ruby-operator">+</span> <span class="ruby-value str">&quot; 14:00:00', INTERVAL 1 DAY) AND a.applied_at &lt;= '&quot;</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">end_date</span>  <span class="ruby-operator">+</span> <span class="ruby-value str">&quot; 14:00:00'&quot;</span>
+47: 
+48:         <span class="ruby-ivar">@date_range</span> = <span class="ruby-constant">Date</span>.<span class="ruby-identifier">strptime</span>(<span class="ruby-identifier">start_date</span>, <span class="ruby-value str">&quot;%Y-%m-%d&quot;</span>).<span class="ruby-identifier">strftime</span>(<span class="ruby-value str">&quot;%d/%m/%Y&quot;</span>) <span class="ruby-operator">+</span> <span class="ruby-value str">&quot; to &quot;</span> <span class="ruby-operator">+</span> <span class="ruby-constant">Date</span>.<span class="ruby-identifier">strptime</span>(<span class="ruby-identifier">end_date</span>, <span class="ruby-value str">&quot;%Y-%m-%d&quot;</span>).<span class="ruby-identifier">strftime</span>(<span class="ruby-value str">&quot;%d/%m/%Y&quot;</span>)
+49: 
+50:         <span class="ruby-ivar">@pub_id</span> = <span class="ruby-value str">&quot;1&quot;</span>
+51:         
+52:         <span class="ruby-ivar">@pending</span> = <span class="ruby-keyword kw">false</span>
+53: 
+54: 
+55:         <span class="ruby-comment cmt"># no pagination because that uses 'get' and the dialog only allows date select with POST</span>
+56:         <span class="ruby-ivar">@subscriptions</span> = <span class="ruby-constant">Array</span>(<span class="ruby-constant">Subscription</span>.<span class="ruby-identifier">find_by_sql</span>(<span class="ruby-value str">&quot;select count(distinct subscription_id) as count_total, z.count_renew, y.count_new, a.offer_name from subscriptions s ,subscription_actions a left join (select a.offer_name, count(distinct subscription_id) as count_renew from subscription_actions a, subscriptions s where s.id = a.subscription_id and a.term_length &gt; 0 and s.publication_id=1 AND a.renewal = 1 &quot;</span><span class="ruby-operator">+</span><span class="ruby-identifier">date_where</span><span class="ruby-operator">+</span><span class="ruby-value str">&quot; group by a.offer_name) z on z.offer_name = a.offer_name left join (select a.offer_name, count(distinct subscription_id) as count_new from subscription_actions a, subscriptions s where s.id = a.subscription_id and a.term_length &gt; 0 and s.publication_id=1 AND a.renewal = 0 &quot;</span><span class="ruby-operator">+</span><span class="ruby-identifier">date_where</span><span class="ruby-operator">+</span><span class="ruby-value str">&quot; group by a.offer_name) y on y.offer_name = a.offer_name where s.id = a.subscription_id and a.term_length &gt; 0 and s.publication_id=1 &quot;</span><span class="ruby-operator">+</span><span class="ruby-identifier">date_where</span><span class="ruby-operator">+</span><span class="ruby-value str">&quot; group by a.offer_name&quot;</span>))
+57: 
+58:         <span class="ruby-ivar">@subscriptions_count</span> = <span class="ruby-constant">Array</span>(<span class="ruby-constant">Subscription</span>.<span class="ruby-identifier">find_by_sql</span>(<span class="ruby-value str">&quot;select count(distinct subscription_id) as count_total from subscription_actions a, subscriptions s where s.id = a.subscription_id and a.term_length &gt; 0 and s.publication_id=1 &quot;</span> <span class="ruby-operator">+</span> <span class="ruby-identifier">date_where</span>))
+59:         <span class="ruby-ivar">@subscriptions_count</span> = <span class="ruby-ivar">@subscriptions_count</span>[<span class="ruby-value">0</span>][<span class="ruby-value str">'count_total'</span>].<span class="ruby-identifier">to_s</span> <span class="ruby-operator">+</span> <span class="ruby-value str">&quot; people subscribed in this period&quot;</span>
+60: 
+61:         <span class="ruby-identifier">format</span>.<span class="ruby-identifier">html</span> { 
+62:           <span class="ruby-identifier">render</span> <span class="ruby-identifier">:action</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">:index</span>
+63:         }
+64:       <span class="ruby-keyword kw">end</span>
+65:     <span class="ruby-keyword kw">end</span>
+66:   <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000274" class="method-detail">
+        <a name="M000274"></a>
+
+        <div class="method-heading">
+          <a href="#M000274" class="method-signature">
+          <span class="method-name">show</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000274-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000274-source">
+<pre>
+   <span class="ruby-comment cmt"># File app/controllers/admin/reports/subscriptions_controller.rb, line 7</span>
+7:   <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">show</span>
+8: 
+9:   <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+
+
+  </div>
+
+
+<div id="validator-badges">
+  <p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+</div>
+
+</body>
+</html>

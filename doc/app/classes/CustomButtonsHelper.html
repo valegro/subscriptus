@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Module: CustomButtonsHelper</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Script-Type" content="text/javascript" />
+  <link rel="stylesheet" href=".././rdoc-style.css" type="text/css" media="screen" />
+  <script type="text/javascript">
+  // <![CDATA[
+
+  function popupCode( url ) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+
+  function toggleCode( id ) {
+    if ( document.getElementById )
+      elem = document.getElementById( id );
+    else if ( document.all )
+      elem = eval( "document.all." + id );
+    else
+      return false;
+
+    elemStyle = elem.style;
+    
+    if ( elemStyle.display != "block" ) {
+      elemStyle.display = "block"
+    } else {
+      elemStyle.display = "none"
+    }
+
+    return true;
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln( "<style type=\"text/css\">div.method-source-code { display: none }</style>" )
+  
+  // ]]>
+  </script>
+
+</head>
+<body>
+
+
+
+    <div id="classHeader">
+        <table class="header-table">
+        <tr class="top-aligned-row">
+          <td><strong>Module</strong></td>
+          <td class="class-name-in-header">CustomButtonsHelper</td>
+        </tr>
+        <tr class="top-aligned-row">
+            <td><strong>In:</strong></td>
+            <td>
+                <a href="../files/app/helpers/custom_buttons_helper_rb.html">
+                app/helpers/custom_buttons_helper.rb
+                </a>
+        <br />
+            </td>
+        </tr>
+
+        </table>
+    </div>
+  <!-- banner header -->
+
+  <div id="bodyContent">
+
+
+
+  <div id="contextContent">
+
+
+
+   </div>
+
+    <div id="method-list">
+      <h3 class="section-bar">Methods</h3>
+
+      <div class="name-list">
+      <a href="#M000236">wizardly_image_submit</a>&nbsp;&nbsp;
+      <a href="#M000235">wizardly_submit</a>&nbsp;&nbsp;
+      </div>
+    </div>
+
+  </div>
+
+
+    <!-- if includes -->
+
+    <div id="section">
+
+
+
+
+
+      
+
+
+    <!-- if method_list -->
+    <div id="methods">
+      <h3 class="section-bar">Public Instance methods</h3>
+
+      <div id="method-M000236" class="method-detail">
+        <a name="M000236"></a>
+
+        <div class="method-heading">
+          <a href="#M000236" class="method-signature">
+          <span class="method-name">wizardly_image_submit</span><span class="method-args">(asset_dir = nil, opts = {})</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000236-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000236-source">
+<pre>
+    <span class="ruby-comment cmt"># File app/helpers/custom_buttons_helper.rb, line 15</span>
+15:   <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">wizardly_image_submit</span>(<span class="ruby-identifier">asset_dir</span> = <span class="ruby-keyword kw">nil</span>, <span class="ruby-identifier">opts</span> = {})
+16:     <span class="ruby-ivar">@@wizardly_image_submit</span> <span class="ruby-operator">||=</span>{}
+17:     <span class="ruby-identifier">step_id</span> = <span class="ruby-node">&quot;#{controller_name}_#{@step}&quot;</span>.<span class="ruby-identifier">to_sym</span>
+18:     <span class="ruby-keyword kw">unless</span> <span class="ruby-ivar">@@wizardly_image_submit</span>[<span class="ruby-identifier">step_id</span>]
+19:       <span class="ruby-identifier">asset_dir</span> = <span class="ruby-identifier">asset_dir</span> <span class="ruby-value">? </span><span class="ruby-node">&quot;#{asset_dir}/&quot;</span>.<span class="ruby-identifier">squeeze</span>(<span class="ruby-value str">&quot;/&quot;</span>).<span class="ruby-identifier">sub</span>(<span class="ruby-regexp re">/^\//</span>,<span class="ruby-value str">''</span>) <span class="ruby-operator">:</span> <span class="ruby-value str">&quot;wizardly/&quot;</span>
+20:       <span class="ruby-identifier">buttons</span> = <span class="ruby-ivar">@wizard</span>.<span class="ruby-identifier">pages</span>[<span class="ruby-ivar">@step</span>].<span class="ruby-identifier">buttons</span>
+21:       <span class="ruby-identifier">opts</span>[<span class="ruby-identifier">:name</span>] = <span class="ruby-value str">'commit'</span>
+22:       <span class="ruby-ivar">@@wizardly_image_submit</span>[<span class="ruby-identifier">step_id</span>] = <span class="ruby-identifier">buttons</span>.<span class="ruby-identifier">inject</span>(<span class="ruby-constant">StringIO</span>.<span class="ruby-identifier">new</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">io</span>, <span class="ruby-identifier">button</span><span class="ruby-operator">|</span>
+23:         <span class="ruby-identifier">opts</span>[<span class="ruby-identifier">:value</span>] = <span class="ruby-identifier">button</span>.<span class="ruby-identifier">name</span>
+24:         <span class="ruby-identifier">io</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">image_submit_tag</span>(<span class="ruby-node">&quot;#{asset_dir}#{button.id}.png&quot;</span>, <span class="ruby-identifier">opts</span>)
+25:       <span class="ruby-keyword kw">end</span>.<span class="ruby-identifier">string</span>
+26:     <span class="ruby-keyword kw">end</span>
+27:     <span class="ruby-ivar">@@wizardly_image_submit</span>[<span class="ruby-identifier">step_id</span>]
+28:   <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000235" class="method-detail">
+        <a name="M000235"></a>
+
+        <div class="method-heading">
+          <a href="#M000235" class="method-signature">
+          <span class="method-name">wizardly_submit</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000235-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000235-source">
+<pre>
+    <span class="ruby-comment cmt"># File app/helpers/custom_buttons_helper.rb, line 3</span>
+ 3:   <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">wizardly_submit</span>
+ 4:     <span class="ruby-ivar">@@wizardly_submit</span> <span class="ruby-operator">||=</span> {}
+ 5:     <span class="ruby-identifier">step_id</span> = <span class="ruby-node">&quot;#{controller_name}_#{@step}&quot;</span>.<span class="ruby-identifier">to_sym</span>
+ 6:     <span class="ruby-keyword kw">unless</span> <span class="ruby-ivar">@@wizardly_submit</span>[<span class="ruby-identifier">step_id</span>]
+ 7:       <span class="ruby-identifier">buttons</span> = <span class="ruby-ivar">@wizard</span>.<span class="ruby-identifier">pages</span>[<span class="ruby-ivar">@step</span>].<span class="ruby-identifier">buttons</span>
+ 8:       <span class="ruby-ivar">@@wizardly_submit</span>[<span class="ruby-identifier">step_id</span>] = <span class="ruby-identifier">buttons</span>.<span class="ruby-identifier">inject</span>(<span class="ruby-constant">StringIO</span>.<span class="ruby-identifier">new</span>) <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">io</span>, <span class="ruby-identifier">button</span><span class="ruby-operator">|</span>
+ 9:         <span class="ruby-identifier">io</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">submit_tag</span>(<span class="ruby-identifier">button</span>.<span class="ruby-identifier">name</span>)
+10:       <span class="ruby-keyword kw">end</span>.<span class="ruby-identifier">string</span>
+11:     <span class="ruby-keyword kw">end</span>
+12:     <span class="ruby-ivar">@@wizardly_submit</span>[<span class="ruby-identifier">step_id</span>]
+13:   <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+
+
+  </div>
+
+
+<div id="validator-badges">
+  <p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+</div>
+
+</body>
+</html>

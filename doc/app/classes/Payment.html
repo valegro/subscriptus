@@ -1,0 +1,318 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Class: Payment</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Script-Type" content="text/javascript" />
+  <link rel="stylesheet" href=".././rdoc-style.css" type="text/css" media="screen" />
+  <script type="text/javascript">
+  // <![CDATA[
+
+  function popupCode( url ) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+
+  function toggleCode( id ) {
+    if ( document.getElementById )
+      elem = document.getElementById( id );
+    else if ( document.all )
+      elem = eval( "document.all." + id );
+    else
+      return false;
+
+    elemStyle = elem.style;
+    
+    if ( elemStyle.display != "block" ) {
+      elemStyle.display = "block"
+    } else {
+      elemStyle.display = "none"
+    }
+
+    return true;
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln( "<style type=\"text/css\">div.method-source-code { display: none }</style>" )
+  
+  // ]]>
+  </script>
+
+</head>
+<body>
+
+
+
+    <div id="classHeader">
+        <table class="header-table">
+        <tr class="top-aligned-row">
+          <td><strong>Class</strong></td>
+          <td class="class-name-in-header">Payment</td>
+        </tr>
+        <tr class="top-aligned-row">
+            <td><strong>In:</strong></td>
+            <td>
+                <a href="../files/app/models/payment_rb.html">
+                app/models/payment.rb
+                </a>
+        <br />
+            </td>
+        </tr>
+
+        <tr class="top-aligned-row">
+            <td><strong>Parent:</strong></td>
+            <td>
+                ActiveRecord::Base
+            </td>
+        </tr>
+        </table>
+    </div>
+  <!-- banner header -->
+
+  <div id="bodyContent">
+
+
+
+  <div id="contextContent">
+
+
+
+   </div>
+
+    <div id="method-list">
+      <h3 class="section-bar">Methods</h3>
+
+      <div class="name-list">
+      <a href="#M000114">credit_card</a>&nbsp;&nbsp;
+      <a href="#M000115">description</a>&nbsp;&nbsp;
+      <a href="#M000113">process!</a>&nbsp;&nbsp;
+      <a href="#M000116">split_name</a>&nbsp;&nbsp;
+      <a href="#M000112">validate_on_create</a>&nbsp;&nbsp;
+      </div>
+    </div>
+
+  </div>
+
+
+    <!-- if includes -->
+    <div id="includes">
+      <h3 class="section-bar">Included Modules</h3>
+
+      <div id="includes-list">
+        <span class="include-name">ActionView::Helpers::NumberHelper</span>
+        <span class="include-name">ActiveMerchant::Utils</span>
+        <span class="include-name">ActiveSupport::Callbacks</span>
+      </div>
+    </div>
+
+    <div id="section">
+
+
+
+
+
+    <div id="attribute-list">
+      <h3 class="section-bar">Attributes</h3>
+
+      <div class="name-list">
+        <table>
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">card_verification</td>
+          <td class="context-item-value">&nbsp;[RW]&nbsp;</td>
+          <td class="context-item-desc"></td>
+        </tr>
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">full_name</td>
+          <td class="context-item-value">&nbsp;[RW]&nbsp;</td>
+          <td class="context-item-desc"></td>
+        </tr>
+        </table>
+      </div>
+    </div>
+      
+
+
+    <!-- if method_list -->
+    <div id="methods">
+      <h3 class="section-bar">Public Instance methods</h3>
+
+      <div id="method-M000114" class="method-detail">
+        <a name="M000114"></a>
+
+        <div class="method-heading">
+          <a href="#M000114" class="method-signature">
+          <span class="method-name">credit_card</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000114-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000114-source">
+<pre>
+    <span class="ruby-comment cmt"># File app/models/payment.rb, line 76</span>
+76:   <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">credit_card</span>
+77:     <span class="ruby-constant">ActiveMerchant</span><span class="ruby-operator">::</span><span class="ruby-constant">Billing</span><span class="ruby-operator">::</span><span class="ruby-constant">CreditCard</span>.<span class="ruby-identifier">new</span>(
+78:       <span class="ruby-identifier">:number</span>     =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">card_number</span>,
+79:       <span class="ruby-identifier">:month</span>      =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">card_expiry_date</span>.<span class="ruby-identifier">try</span>(<span class="ruby-identifier">:month</span>),
+80:       <span class="ruby-identifier">:year</span>       =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">card_expiry_date</span>.<span class="ruby-identifier">try</span>(<span class="ruby-identifier">:year</span>),
+81:       <span class="ruby-identifier">:first_name</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">first_name</span>,
+82:       <span class="ruby-identifier">:last_name</span>  =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">last_name</span>,
+83:       <span class="ruby-identifier">:verification_value</span>  =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">card_verification</span>
+84:     )
+85:   <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000115" class="method-detail">
+        <a name="M000115"></a>
+
+        <div class="method-heading">
+          <a href="#M000115" class="method-signature">
+          <span class="method-name">description</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000115-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000115-source">
+<pre>
+    <span class="ruby-comment cmt"># File app/models/payment.rb, line 87</span>
+87:   <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">description</span>
+88:     <span class="ruby-identifier">returning</span> <span class="ruby-identifier">str</span> = [ <span class="ruby-identifier">number_to_currency</span>(<span class="ruby-identifier">amount</span>), <span class="ruby-identifier">payment_type</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">humanize</span> ].<span class="ruby-identifier">join</span>(<span class="ruby-value str">&quot; by &quot;</span>) <span class="ruby-keyword kw">do</span>
+89:       <span class="ruby-identifier">str</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-node">&quot; (Ref: #{reference})&quot;</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">reference</span>
+90:     <span class="ruby-keyword kw">end</span>
+91:   <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000113" class="method-detail">
+        <a name="M000113"></a>
+
+        <div class="method-heading">
+          <a href="#M000113" class="method-signature">
+          <span class="method-name">process!</span><span class="method-args">(options = {})</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Process and save the payment Only valid option is :token (to be used for
+token payments)
+</p>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000113-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000113-source">
+<pre>
+    <span class="ruby-comment cmt"># File app/models/payment.rb, line 42</span>
+42:   <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">process!</span>(<span class="ruby-identifier">options</span> = {})
+43:     <span class="ruby-identifier">raise</span> <span class="ruby-constant">ActiveRecord</span><span class="ruby-operator">::</span><span class="ruby-constant">RecordInvalid</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword kw">self</span>) <span class="ruby-keyword kw">unless</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">valid?</span>
+44:     <span class="ruby-keyword kw">if</span> (<span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">credit_card?</span> <span class="ruby-operator">||</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">payment_type</span>.<span class="ruby-identifier">nil?</span>) <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">new_record?</span>
+45:       <span class="ruby-identifier">raise</span> <span class="ruby-constant">Exceptions</span><span class="ruby-operator">::</span><span class="ruby-constant">PaymentAlreadyProcessed</span>.<span class="ruby-identifier">new</span>(<span class="ruby-value str">&quot;You are trying to process a Credit Card payment that has already been saved - consider using a token payment&quot;</span>)
+46:     <span class="ruby-keyword kw">end</span>
+47:     <span class="ruby-identifier">raise</span> <span class="ruby-constant">Exceptions</span><span class="ruby-operator">::</span><span class="ruby-constant">PaymentAlreadyProcessed</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">processed_at</span>
+48:     <span class="ruby-comment cmt"># Generate a reference number</span>
+49:     <span class="ruby-keyword kw">if</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">credit_card?</span> <span class="ruby-operator">||</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">payment_type</span>.<span class="ruby-identifier">nil?</span>
+50:       <span class="ruby-comment cmt"># Charge the card</span>
+51:       <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">reference</span> = <span class="ruby-identifier">generate_unique_id</span>
+52:       <span class="ruby-identifier">response</span> = <span class="ruby-constant">GATEWAY</span>.<span class="ruby-identifier">purchase</span>((<span class="ruby-identifier">amount</span> <span class="ruby-operator">*</span> <span class="ruby-value">100</span>).<span class="ruby-identifier">to_i</span>, <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">credit_card</span>,
+53:         <span class="ruby-identifier">:order_id</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">reference</span>,
+54:         <span class="ruby-identifier">:address</span> =<span class="ruby-operator">&gt;</span> (<span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">subscription_action</span>.<span class="ruby-identifier">try</span>(<span class="ruby-identifier">:subscription</span>).<span class="ruby-identifier">try</span>(<span class="ruby-identifier">:user</span>).<span class="ruby-identifier">try</span>(<span class="ruby-identifier">:address_hash</span>) <span class="ruby-operator">||</span> {}),
+55:         <span class="ruby-identifier">:description</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value str">'Crikey Subscription Payment'</span>,
+56:         <span class="ruby-identifier">:email</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">subscription_action</span>.<span class="ruby-identifier">try</span>(<span class="ruby-identifier">:subscription</span>).<span class="ruby-identifier">try</span>(<span class="ruby-identifier">:user</span>).<span class="ruby-identifier">try</span>(<span class="ruby-identifier">:email</span>)
+57:       )
+58:       <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">response</span>.<span class="ruby-identifier">success?</span>
+59:         <span class="ruby-identifier">raise</span> <span class="ruby-constant">Exceptions</span><span class="ruby-operator">::</span><span class="ruby-constant">PaymentFailedException</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">response</span>.<span class="ruby-identifier">message</span>)
+60:       <span class="ruby-keyword kw">end</span>
+61:     <span class="ruby-keyword kw">end</span>
+62:     <span class="ruby-keyword kw">if</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">token?</span>
+63:       <span class="ruby-identifier">raise</span> <span class="ruby-constant">Exceptions</span><span class="ruby-operator">::</span><span class="ruby-constant">PaymentTokenMissing</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:token</span>].<span class="ruby-identifier">blank?</span>
+64:       <span class="ruby-identifier">response</span> = <span class="ruby-constant">GATEWAY</span>.<span class="ruby-identifier">trigger_recurrent</span>((<span class="ruby-identifier">amount</span> <span class="ruby-operator">*</span> <span class="ruby-value">100</span>).<span class="ruby-identifier">to_i</span>, <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:token</span>])
+65:       <span class="ruby-keyword kw">unless</span> <span class="ruby-identifier">response</span>.<span class="ruby-identifier">success?</span>
+66:         <span class="ruby-identifier">raise</span> <span class="ruby-constant">Exceptions</span><span class="ruby-operator">::</span><span class="ruby-constant">PaymentFailedException</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">response</span>.<span class="ruby-identifier">message</span>)
+67:       <span class="ruby-keyword kw">end</span>
+68:       <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">reference</span> = <span class="ruby-identifier">response</span>.<span class="ruby-identifier">params</span>[<span class="ruby-value str">'ponum'</span>]
+69:     <span class="ruby-keyword kw">end</span>
+70:     <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">processed_at</span> = <span class="ruby-constant">Time</span>.<span class="ruby-identifier">now</span>
+71:     <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">save!</span>
+72:     <span class="ruby-identifier">run_callbacks</span>(<span class="ruby-identifier">:after_process</span>)
+73:     <span class="ruby-keyword kw">return</span> <span class="ruby-keyword kw">true</span>
+74:   <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000116" class="method-detail">
+        <a name="M000116"></a>
+
+        <div class="method-heading">
+          <a href="#M000116" class="method-signature">
+          <span class="method-name">split_name</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000116-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000116-source">
+<pre>
+    <span class="ruby-comment cmt"># File app/models/payment.rb, line 93</span>
+93:   <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">split_name</span>
+94:     <span class="ruby-keyword kw">unless</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">full_name</span>.<span class="ruby-identifier">blank?</span>
+95:       <span class="ruby-identifier">toks</span> = <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">full_name</span>.<span class="ruby-identifier">split</span>(<span class="ruby-regexp re">/\s+/</span>)
+96:       <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">first_name</span> = <span class="ruby-identifier">toks</span>[<span class="ruby-value">0</span>]
+97:       <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">last_name</span> = <span class="ruby-identifier">toks</span>[<span class="ruby-value">1</span><span class="ruby-operator">..</span><span class="ruby-value">-1</span>].<span class="ruby-identifier">join</span>(<span class="ruby-value str">&quot; &quot;</span>)
+98:     <span class="ruby-keyword kw">end</span>
+99:   <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000112" class="method-detail">
+        <a name="M000112"></a>
+
+        <div class="method-heading">
+          <a href="#M000112" class="method-signature">
+          <span class="method-name">validate_on_create</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000112-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000112-source">
+<pre>
+    <span class="ruby-comment cmt"># File app/models/payment.rb, line 23</span>
+23:   <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">validate_on_create</span>
+24:     <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">credit_card?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">credit_card</span>.<span class="ruby-identifier">valid?</span>
+25:       <span class="ruby-identifier">errors</span>.<span class="ruby-identifier">add_to_base</span>(<span class="ruby-value str">&quot;Credit Card is not valid - check the details and try again&quot;</span>)
+26:     <span class="ruby-keyword kw">end</span>
+27:   <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+
+
+  </div>
+
+
+<div id="validator-badges">
+  <p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+</div>
+
+</body>
+</html>

@@ -10,14 +10,14 @@ User.destroy_all
 Publication.destroy_all
 Offer.destroy_all
 
-User.create!(:login => "netfox",
-            :firstname => "netfox", 
-            :lastname => "netfox", 
-            :email => "admin@crikey.netfox.com", 
-            :email_confirmation => "admin@crikey.netfox.com", 
-            :phone_number => "netfox",
-            :address_1 => "netfox",
-            :city => "adelaide",
+User.create!(:login => "admin",
+            :firstname => "Subscriptus", 
+            :lastname => "Administrator", 
+            :email => "admin@subscriptus.co", 
+            :email_confirmation => "admin@subscriptus.co", 
+            :phone_number => "03 90187510",
+            :address_1 => "Subscriptus",
+            :city => "subscriptus",
             :postcode => "5000",
             :state => :sa,
             :country => "Australia",

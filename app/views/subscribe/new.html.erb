@@ -165,7 +165,7 @@
                 <h4>Click the FINISH button below once you’ve chosen your payment option:</h4>
                 <ol>
                   <% if @publication.try(:direct_debit?) %>
-                    <li>Download our <%= link_to("subscription form", "/forms/crikey_directdebit_bank.pdf", :target => :new) %> and fax it to 03 8623 9975 or mail it to Crikey, Level 6, 22 William Street, Melbourne VIC 3000; or</li>
+                    <li>Download our <%= link_to("subscription form", "/forms/subscription_form.pdf", :target => :new) %> and mail it to Subscriptus, 22 William Street, Melbourne VIC 3000; or</li>
                   <% end %>
                   <li>You can do a direct transfer into our bank account – make sure you include your name in the reference so we can match up your payment:</li>
                 </ol>
@@ -183,8 +183,8 @@
             </div>
 
             <div id='bottom-right'>
-              <p class='phone'>
-                1800 985 502
+              <p>
+              
               </p>
             </div>
                 

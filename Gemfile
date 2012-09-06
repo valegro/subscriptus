@@ -1,95 +1,102 @@
 source 'http://rubygems.org'
-gem "rails", "2.3.9"
-gem "ruby-debug"
 
-gem "rake", "0.8.7"
-gem 'i18n', '0.5.0'
+group :production do 
 
-# Postgres support
-#group :postgres do
-  gem 'pg'
-#end
+end 
+group :development, :test, :cucumber do 
+	gem 'webmock', '1.6.2', :require => false
+        gem 'pg', '0.10.1'
+        gem 'selenium-webdriver', '0.1.2'
+        gem 'capybara', '0.4.0'
+        gem 'database_cleaner', '0.6.0'
+        gem 'spork', '0.8.4'
+        gem 'launchy', '0.3.7'
+        gem 'cucumber', '0.8.5'
+        gem 'pickle', '0.4.4'
+        gem 'factory_girl', '1.3.3'
+        gem 'faker', '0.9.4'
+        gem 'shoulda', '2.11.3'
+        gem 'gherkin', '2.1.4'
+        gem 'rack-test', '0.5.4'
+        gem 'rspec', '1.3.1'
+        gem 'rspec-rails', '1.3.3'
+        gem 'mocha', '0.9.10'
+        gem 'timecop', '0.3.5'
+        gem 'akephalos', '0.2.5'
+        gem 'ruby-prof', '0.10.7'
+end 
 
-group :production do
-  gem 'mysql'
-end
 
-gem 'fastercsv'
-gem 'rest-client'
-
-gem 'rack', '1.1.0'
-
-# These are "core" gems we always use
-gem 'authlogic'
-gem 'searchlogic'
-gem 'navigasmic'
-gem 'will_paginate', "2.3.15"
-gem 'json_pure'
-gem 'capistrano'
-
-gem 'hoptoad_notifier'
-
-# Used for Data Migration
-gem 'activerecord-sqlserver-adapter'
-# gem 'tiny_tds'
-
-# soft delete- Hiding records instead of deleting-- acts_as_paranoid doesnt work correctly with new activerecord
-# Use this fork because the mover gem doesn't work with Postgres :(
-gem 'mover', :git => 'git://github.com/codefire/mover.git'
-# Use this fork because of https://github.com/winton/acts_as_archive/pull/18
-gem 'acts_as_archive', :git => 'git://github.com/comboy/acts_as_archive.git'
-
-# Crontab support
-gem 'whenever', :require => false
-
-# jQuery
-gem 'jrails'
-
-# Textile user content formatting
-gem 'RedCloth'
-
-# Paperclip for attachments, plus DJ for async resizes
-# http://jstorimer.com/ruby/2010/01/30/delayed-paperclip.html
-#gem 'paperclip'
+gem 'aaronh-chronic', '0.3.9'
+gem 'actionmailer', '2.3.9'
+gem 'actionpack', '2.3.9'
+gem 'activerecord', '2.3.9'
+gem 'activerecord-sqlserver-adapter', '2.3.18'
+gem 'activeresource', '2.3.9'
+gem 'activesupport', '2.3.9'
+gem 'acts_as_archive', '0.3.4'
+gem 'addressable', '2.2.4'
+gem 'also_migrate', '0.3.4'
+gem 'authlogic', '2.1.6'
+gem 'aws-s3', '0.6.2'
+gem 'builder', '2.1.2'
+gem 'capistrano', '2.5.19'
+gem 'childprocess', '0.1.6'
+gem 'cocaine', '0.2.0'
+gem 'columnize', '0.3.2'
+gem 'configuration', '1.2.0'
+gem 'crack', '0.1.8'
+gem 'cucumber-rails', '0.3.2'
+gem 'culerity', '0.2.15'
+gem 'daemons', '1.0.10'
 gem 'delayed_job', '2.0.7'
 gem 'delayed_paperclip'
-
-gem 'mechanize'
-
-# Needed for Campaign Master
-gem 'httpclient'
-gem 'soap4r'
-
-# Others
-gem 'aws-s3', :require => "aws/s3"
-gem 'wizardly'
-gem 'enumerated_attribute'
-
-gem 'ruby-debug'
-
-gem 'liquid'
-gem 'domainatrix'
-
-group :development, :test, :cucmber do
-  gem 'pg'
-  gem 'webmock', :require => false
-  gem 'selenium-webdriver'
-  gem 'capybara', "0.4.1.2"
-  gem 'database_cleaner'
-  gem 'spork'
-  gem 'launchy'    # So you can do Then show me the page
-  gem 'cucumber', "0.8.5"
-  gem 'cucumber-rails'
-  gem 'pickle', "0.4.10"
-  gem 'factory_girl'
-  gem 'faker', '0.9.5'
-  gem 'shoulda'
-  gem 'gherkin', '2.1.4'
-  gem 'rack-test', "0.5.4"
-  gem 'rspec', '1.3.1'
-  gem 'rspec-rails', '1.3.3'
-  gem 'mocha', '~> 0.9.8'
-  gem 'timecop'
-  gem 'akephalos'
-  gem 'ruby-prof'
-end
+gem 'diff-lcs', '1.1.2'
+gem 'domainatrix', '0.0.10'
+gem 'enumerated_attribute', '0.2.16'
+gem 'fastercsv', '1.5.4'
+gem 'ffi', '0.6.3'
+gem 'highline', '1.6.1'
+gem 'hoptoad_notifier', '2.4.9'
+gem 'httpclient', '2.2.1'
+gem 'i18n', '0.5.0'
+gem 'jrails', '0.6.0'
+gem 'jruby-jars', '1.6.3'
+gem 'json_pure', '1.4.6'
+gem 'linecache', '0.43'
+gem 'liquid', '2.2.2'
+gem 'mechanize', '1.0.0'
+gem 'meta_programming', '0.2.2'
+gem 'mime-types', '1.16'
+gem 'mover', '0.3.6'
+gem 'mysql', '2.8.1'
+gem 'navigasmic', '0.5.5'
+gem 'net-http-digest_auth', '1.1.1'
+gem 'net-http-persistent', '1.8.1'
+gem 'net-scp', '1.0.4'
+gem 'net-sftp', '2.0.5'
+gem 'net-ssh', '2.1.0'
+gem 'net-ssh-gateway', '1.0.1'
+gem 'nokogiri', '1.5.0'
+gem 'paperclip', '2.3.16'
+gem 'rack', '1.1.0'
+gem 'rails', '2.3.9'
+gem 'rake', '0.8.7'
+gem 'rbx-require-relative', '0.0.5'
+gem 'RedCloth', '4.2.3'
+gem 'rest-client', '1.6.1'
+gem 'ruby-debug', '0.10.4'
+gem 'ruby-debug-base', '0.10.4'
+gem 'rubyzip', '0.9.4'
+gem 'searchlogic', '2.4.27'
+gem 'soap4r', '1.5.8'
+gem 'term-ansicolor', '1.0.5'
+gem 'trollop', '1.16.2'
+gem 'webrobots', '0.0.11'
+gem 'whenever', '0.6.2'
+gem 'will_paginate', '2.3.15'
+gem 'wizardly', '0.1.8.9'
+gem 'xml-simple', '1.0.13'
+gem 'xpath', '0.1.3'
+gem 'yard', '0.6.4'
+gem 'rmagick', '2.13.1'

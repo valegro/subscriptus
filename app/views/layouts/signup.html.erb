@@ -26,12 +26,11 @@
     <div id='page'>
     
       <div id='top-right'>
-        <p class='phone'>
-          1800 985 502
+        <p>
         </p>
         <% if @publication.try(:direct_debit?) %>
           <p class='other'>
-            Want to pay by fax or mail? <a href='/forms/crikey_directdebit_bank.pdf' target="_blank">Download the Subscription form</a>
+            Want to pay by fax or mail? <a href='/forms/subscription_form.pdf' target="_blank">Download the Subscription form</a>
           </p>
         <% end %>
       </div>

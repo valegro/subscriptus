@@ -1,8 +1,15 @@
 <%= form.error_messages %>
+<%= form.enum_select :title, :include_blank => false, :required => true %>
+<%= form.text_field :firstname, :required => true %>
+<%= form.text_field :lastname, :required => true %>
+<%= form.text_field :email, :required => true %>
 <%= form.text_field :login %>
-<%= form.text_field :firstname %>
-<%= form.text_field :lastname %>
-<%= form.text_field :email %>
 <%= form.password_field :password %>
 <%= form.password_field :password_confirmation %>
-
+<%= form.text_field :phone_number %>
+<%= form.text_field :address_1 %>
+<%= form.text_field :address_2 %>
+<%= form.text_field :city %>
+<%= form.enum_select :state, :include_blank => false %>
+<%= form.text_field :postcode %>
+<%= form.country_select :country, ['Australia'] %>

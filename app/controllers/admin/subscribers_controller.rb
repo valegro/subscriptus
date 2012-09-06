@@ -2,11 +2,11 @@ class Admin::SubscribersController < AdminController
   layout 'admin/subscriptions'
   before_filter :find_subscriber, :except => [ :new, :create ]
 
-  rescue_from Wordpress::Error do |error|
+ rescue_from Wordpress::Error do |error|
     flash[:error] = "Wordpress Error: #{error.message}"
     notify_hoptoad(error)
     render :action => :edit
-  end
+ end
 
   def new
     @subscriber = User.new(:role => 'subscriber')
@@ -54,8 +54,8 @@ class Admin::SubscribersController < AdminController
   end
 
   def sync
-    @subscriber.sync_to_wordpress
-    @subscriber.sync_to_campaign_master
+      @subscriber.sync_to_wordpress
+   #  @subscriber.sync_to_campaign_master
     flash[:notice] = "Synchronised User"
     redirect_to :action => :show
   end

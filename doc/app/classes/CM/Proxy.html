@@ -1,0 +1,324 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Class: CM::Proxy</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Script-Type" content="text/javascript" />
+  <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
+  <script type="text/javascript">
+  // <![CDATA[
+
+  function popupCode( url ) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+
+  function toggleCode( id ) {
+    if ( document.getElementById )
+      elem = document.getElementById( id );
+    else if ( document.all )
+      elem = eval( "document.all." + id );
+    else
+      return false;
+
+    elemStyle = elem.style;
+    
+    if ( elemStyle.display != "block" ) {
+      elemStyle.display = "block"
+    } else {
+      elemStyle.display = "none"
+    }
+
+    return true;
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln( "<style type=\"text/css\">div.method-source-code { display: none }</style>" )
+  
+  // ]]>
+  </script>
+
+</head>
+<body>
+
+
+
+    <div id="classHeader">
+        <table class="header-table">
+        <tr class="top-aligned-row">
+          <td><strong>Class</strong></td>
+          <td class="class-name-in-header">CM::Proxy</td>
+        </tr>
+        <tr class="top-aligned-row">
+            <td><strong>In:</strong></td>
+            <td>
+                <a href="../../files/lib/cm/recipient_rb.html">
+                lib/cm/recipient.rb
+                </a>
+        <br />
+            </td>
+        </tr>
+
+        <tr class="top-aligned-row">
+            <td><strong>Parent:</strong></td>
+            <td>
+                <a href="Base.html">
+                Base
+               </a>
+            </td>
+        </tr>
+        </table>
+    </div>
+  <!-- banner header -->
+
+  <div id="bodyContent">
+
+
+
+  <div id="contextContent">
+
+
+
+   </div>
+
+    <div id="method-list">
+      <h3 class="section-bar">Methods</h3>
+
+      <div class="name-list">
+      <a href="#M000247">add_recipient</a>&nbsp;&nbsp;
+      <a href="#M000249">conditions_to_criteria</a>&nbsp;&nbsp;
+      <a href="#M000250">delete_all_recipients</a>&nbsp;&nbsp;
+      <a href="#M000248">get_recipients</a>&nbsp;&nbsp;
+      <a href="#M000251">log_cm_error</a>&nbsp;&nbsp;
+      </div>
+    </div>
+
+  </div>
+
+
+    <!-- if includes -->
+
+    <div id="section">
+
+
+    <div id="constants-list">
+      <h3 class="section-bar">Constants</h3>
+
+      <div class="name-list">
+        <table summary="Constants">
+        <tr class="top-aligned-row context-row">
+          <td class="context-item-name">Operators</td>
+          <td>=</td>
+          <td class="context-item-value">{ '==' =&gt; CmBooleanBinaryOperator::Equals,                   '!=' =&gt; CmBooleanBinaryOperator::NotEqual,                   '&lt;' =&gt; CmBooleanBinaryOperator::LessThan,                   '&lt;=' =&gt;  CmBooleanBinaryOperator::LessThanEquals,                   '&gt;' =&gt; CmBooleanBinaryOperator::GreaterThan,                   '&gt;=' =&gt; CmBooleanBinaryOperator::GreaterThanEquals</td>
+        </tr>
+        </table>
+      </div>
+    </div>
+
+
+
+      
+
+
+    <!-- if method_list -->
+    <div id="methods">
+      <h3 class="section-bar">Public Class methods</h3>
+
+      <div id="method-M000247" class="method-detail">
+        <a name="M000247"></a>
+
+        <div class="method-heading">
+          <a href="#M000247" class="method-signature">
+          <span class="method-name">add_recipient</span><span class="method-args">(hash, operation = CmOperationType::Insert)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000247-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000247-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/cm/recipient.rb, line 62</span>
+62:     <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">add_recipient</span>(<span class="ruby-identifier">hash</span>, <span class="ruby-identifier">operation</span> = <span class="ruby-constant">CmOperationType</span><span class="ruby-operator">::</span><span class="ruby-constant">Insert</span>)
+63:       <span class="ruby-identifier">recipient</span> = <span class="ruby-constant">Recipient</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">hash</span>)
+64:       <span class="ruby-identifier">result</span> = <span class="ruby-identifier">driver</span>.<span class="ruby-constant">AddRecipient</span>(
+65:         <span class="ruby-identifier">:token</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">access_token</span>,
+66:         <span class="ruby-identifier">:recipientInfo</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">recipient</span>.<span class="ruby-identifier">info</span>,
+67:         <span class="ruby-identifier">:operationType</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">operation</span>,
+68:         <span class="ruby-identifier">:primaryKeyName</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-constant">Recipient</span><span class="ruby-operator">::</span><span class="ruby-constant">PRIMARY_KEY_NAME</span>
+69:       )
+70:       <span class="ruby-constant">ServiceReturn</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">result</span>)
+71:     <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000249" class="method-detail">
+        <a name="M000249"></a>
+
+        <div class="method-heading">
+          <a href="#M000249" class="method-signature">
+          <span class="method-name">conditions_to_criteria</span><span class="method-args">(conditions, camelize_field = false, criterion_order = 1)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000249-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000249-source">
+<pre>
+     <span class="ruby-comment cmt"># File lib/cm/recipient.rb, line 88</span>
+ 88:     <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">conditions_to_criteria</span>(<span class="ruby-identifier">conditions</span>, <span class="ruby-identifier">camelize_field</span> = <span class="ruby-keyword kw">false</span>, <span class="ruby-identifier">criterion_order</span> = <span class="ruby-value">1</span>)
+ 89:       <span class="ruby-identifier">criteria</span> = []
+ 90:       <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">criteria</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">conditions</span>.<span class="ruby-identifier">blank?</span>
+ 91: 
+ 92:       <span class="ruby-identifier">conditions</span>.<span class="ruby-identifier">each_pair</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">k</span>,<span class="ruby-identifier">v</span><span class="ruby-operator">|</span>
+ 93:         <span class="ruby-identifier">criterion</span> = <span class="ruby-constant">CmCriterion</span>.<span class="ruby-identifier">new</span>
+ 94:         <span class="ruby-identifier">match</span> = <span class="ruby-identifier">k</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">match</span>(<span class="ruby-regexp re">/([\w{}\d]+)([&lt;&gt;=!]+)?/</span>)
+ 95:         <span class="ruby-identifier">criterion</span>.<span class="ruby-identifier">fieldName</span> = <span class="ruby-identifier">match</span>[<span class="ruby-value">1</span>]
+ 96:         <span class="ruby-identifier">criterion</span>.<span class="ruby-identifier">fieldName</span> = <span class="ruby-identifier">criterion</span>.<span class="ruby-identifier">fieldName</span>.<span class="ruby-identifier">camelize</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">camelize_field</span>
+ 97:         <span class="ruby-identifier">criterion</span>.<span class="ruby-identifier">operator</span> = <span class="ruby-constant">Operators</span>[ ( <span class="ruby-identifier">match</span>[<span class="ruby-value">2</span>] <span class="ruby-operator">||</span> <span class="ruby-value str">'=='</span> ) ]
+ 98:         <span class="ruby-identifier">criterion</span>.<span class="ruby-identifier">operand</span> = <span class="ruby-identifier">v</span>
+ 99: 
+100:         <span class="ruby-comment cmt"># soap4r complains without these</span>
+101:         <span class="ruby-identifier">criterion</span>.<span class="ruby-identifier">order</span> = <span class="ruby-identifier">criterion_order</span>
+102:         <span class="ruby-identifier">criterion</span>.<span class="ruby-identifier">logicalOperator</span> = <span class="ruby-constant">LogicalOperator</span><span class="ruby-operator">::</span><span class="ruby-constant">And</span>
+103:         <span class="ruby-identifier">criterion</span>.<span class="ruby-identifier">leftParentheses</span> = <span class="ruby-value">1</span>
+104:         <span class="ruby-identifier">criterion</span>.<span class="ruby-identifier">rightParentheses</span> = <span class="ruby-value">1</span>
+105: 
+106:         <span class="ruby-identifier">criteria</span>.<span class="ruby-identifier">push</span>(<span class="ruby-identifier">criterion</span>)
+107:         <span class="ruby-identifier">criterion_order</span> <span class="ruby-operator">+=</span> <span class="ruby-value">1</span>
+108:       }
+109:       <span class="ruby-keyword kw">return</span> <span class="ruby-identifier">criteria</span>
+110:     <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000250" class="method-detail">
+        <a name="M000250"></a>
+
+        <div class="method-heading">
+          <a href="#M000250" class="method-signature">
+          <span class="method-name">delete_all_recipients</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+there doesn&#8216;t seem to be any &quot;delete&quot; method in the
+api&#8230; this one goes through the Web UI. TODO: find out if there is
+pagination (then modify if necessary)
+</p>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000250-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000250-source">
+<pre>
+     <span class="ruby-comment cmt"># File lib/cm/recipient.rb, line 123</span>
+123:     <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">delete_all_recipients</span>
+124:       <span class="ruby-identifier">web_ui_username</span> = <span class="ruby-ivar">@@username</span>
+125:       <span class="ruby-identifier">web_ui_password</span> = <span class="ruby-ivar">@@password</span>
+126:       <span class="ruby-identifier">agent</span> = <span class="ruby-constant">Mechanize</span>.<span class="ruby-identifier">new</span>
+127:       <span class="ruby-identifier">login_page</span> = <span class="ruby-identifier">agent</span>.<span class="ruby-identifier">get</span>(<span class="ruby-node">&quot;http://www.ecm7.com/cm/public/#{@@client_id}/clientlogin.clsp&quot;</span>)
+128:       <span class="ruby-identifier">login_form</span> = <span class="ruby-identifier">login_page</span>.<span class="ruby-identifier">forms</span>[<span class="ruby-value">0</span>]
+129:       <span class="ruby-identifier">login_form</span>.<span class="ruby-identifier">send</span> <span class="ruby-value str">&quot;ctl00$ctl00$ctl00$PageRoot$SiteBody$PageContent$NormalAuthenticationCtrl$txtUsername=&quot;</span>, <span class="ruby-identifier">web_ui_username</span>
+130:       <span class="ruby-identifier">login_form</span>.<span class="ruby-identifier">send</span> <span class="ruby-value str">&quot;ctl00$ctl00$ctl00$PageRoot$SiteBody$PageContent$NormalAuthenticationCtrl$txtPassword=&quot;</span>, <span class="ruby-identifier">web_ui_password</span>
+131:       <span class="ruby-identifier">logged_in_page</span> = <span class="ruby-identifier">agent</span>.<span class="ruby-identifier">submit</span>(<span class="ruby-identifier">login_form</span>, <span class="ruby-identifier">login_form</span>.<span class="ruby-identifier">buttons</span>[<span class="ruby-value">0</span>])
+132:       <span class="ruby-identifier">find_recipients_page</span> = <span class="ruby-identifier">logged_in_page</span>.<span class="ruby-identifier">link_with</span>(<span class="ruby-identifier">:href</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-regexp re">/FindRecipients.aspx/</span>).<span class="ruby-identifier">click</span>
+133:       <span class="ruby-identifier">find_form</span> = <span class="ruby-identifier">find_recipients_page</span>.<span class="ruby-identifier">forms</span>[<span class="ruby-value">0</span>]
+134:       <span class="ruby-identifier">find_form</span>.<span class="ruby-identifier">add_field!</span>( <span class="ruby-value str">'__EVENTTARGET'</span>, <span class="ruby-value str">'ctl00$ctl00$ctl00$PageRoot$SiteBody$PageContent$btnSearch'</span>)
+135:       <span class="ruby-identifier">find_form</span>.<span class="ruby-identifier">add_field!</span>( <span class="ruby-value str">'__EVENTARGUMENT'</span>, <span class="ruby-value str">''</span>)
+136:       <span class="ruby-identifier">find_result</span> = <span class="ruby-identifier">find_form</span>.<span class="ruby-identifier">submit</span>
+137:       <span class="ruby-identifier">delete_form</span> = <span class="ruby-identifier">find_result</span>.<span class="ruby-identifier">forms</span>[<span class="ruby-value">0</span>]
+138:       <span class="ruby-identifier">delete_form</span>.<span class="ruby-identifier">checkboxes</span>.<span class="ruby-identifier">each</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">:click</span>)
+139:       <span class="ruby-identifier">delete_form</span>.<span class="ruby-identifier">add_field!</span>( <span class="ruby-value str">'__EVENTTARGET'</span>, <span class="ruby-value str">'ctl00$ctl00$ctl00$PageRoot$SiteBody$PageContent$ctrlRecipientList$btnDelete'</span>)
+140:       <span class="ruby-identifier">delete_form</span>.<span class="ruby-identifier">add_field!</span>( <span class="ruby-value str">'__EVENTARGUMENT'</span>, <span class="ruby-value str">''</span>)
+141:       <span class="ruby-identifier">delete_result</span> = <span class="ruby-identifier">agent</span>.<span class="ruby-identifier">submit</span>(<span class="ruby-identifier">delete_form</span>)
+142:     <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000248" class="method-detail">
+        <a name="M000248"></a>
+
+        <div class="method-heading">
+          <a href="#M000248" class="method-signature">
+          <span class="method-name">get_recipients</span><span class="method-args">(conditions)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+you could specify operation in the form like:
+:&#8217;email_address!=&#8217; =&gt; &#8216;foo&#8217;, or
+:&#8217;last_modified&gt;=&#8217; =&gt;
+&#8216;2010-09-01T12:00:00.000&#8217; by default, this assumes operator is
+&#8217;==&#8217; Note :&#8217;last_modfied=&gt;&#8217; will be interpreted
+as :&#8217;last_modified==&#8217; due to &#8217;=&gt;&#8217; not being a
+valid operator.
+</p>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000248-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000248-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/cm/recipient.rb, line 78</span>
+78:     <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">get_recipients</span>(<span class="ruby-identifier">conditions</span>)
+79:       <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">conditions</span>.<span class="ruby-identifier">kind_of?</span>(<span class="ruby-constant">Hash</span>)
+80:         <span class="ruby-identifier">extra_fields</span> = <span class="ruby-identifier">conditions</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">:fields</span>) <span class="ruby-operator">||</span> {}
+81:         <span class="ruby-identifier">criteria</span> = <span class="ruby-identifier">conditions_to_criteria</span>(<span class="ruby-identifier">conditions</span>, <span class="ruby-keyword kw">true</span>, <span class="ruby-value">1</span>)
+82:         <span class="ruby-identifier">criteria</span> <span class="ruby-operator">+=</span> <span class="ruby-identifier">conditions_to_criteria</span>(<span class="ruby-identifier">extra_fields</span>, <span class="ruby-keyword kw">false</span>, <span class="ruby-identifier">criteria</span>.<span class="ruby-identifier">size</span> <span class="ruby-operator">+</span> <span class="ruby-value">1</span>)
+83:       <span class="ruby-keyword kw">end</span>
+84:       <span class="ruby-identifier">result</span> = <span class="ruby-identifier">driver</span>.<span class="ruby-constant">GetRecipients</span>(<span class="ruby-identifier">:token</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">access_token</span>, <span class="ruby-identifier">:page</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-value">1</span>, <span class="ruby-identifier">:criteria</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">criteria</span>)
+85:       <span class="ruby-keyword kw">return</span> <span class="ruby-constant">ServiceReturn</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">result</span>)
+86:     <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000251" class="method-detail">
+        <a name="M000251"></a>
+
+        <div class="method-heading">
+          <a href="#M000251" class="method-signature">
+          <span class="method-name">log_cm_error</span><span class="method-args">(ex)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+TODO: decide what to do, where to record etc. maybe new table?
+</p>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000251-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000251-source">
+<pre>
+     <span class="ruby-comment cmt"># File lib/cm/recipient.rb, line 145</span>
+145:     <span class="ruby-keyword kw">def</span> <span class="ruby-keyword kw">self</span>.<span class="ruby-identifier">log_cm_error</span>(<span class="ruby-identifier">ex</span>)
+146:       <span class="ruby-constant">Rails</span>.<span class="ruby-identifier">logger</span>.<span class="ruby-identifier">error</span>( <span class="ruby-node">&quot;CAMPAIGN MASTER ERROR: #{ex.class.to_s}: #{ex.message}&quot;</span> )
+147:     <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+
+
+  </div>
+
+
+<div id="validator-badges">
+  <p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+</div>
+
+</body>
+</html>

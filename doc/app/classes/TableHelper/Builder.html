@@ -1,0 +1,440 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <title>Class: TableHelper::Builder</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Script-Type" content="text/javascript" />
+  <link rel="stylesheet" href="../.././rdoc-style.css" type="text/css" media="screen" />
+  <script type="text/javascript">
+  // <![CDATA[
+
+  function popupCode( url ) {
+    window.open(url, "Code", "resizable=yes,scrollbars=yes,toolbar=no,status=no,height=150,width=400")
+  }
+
+  function toggleCode( id ) {
+    if ( document.getElementById )
+      elem = document.getElementById( id );
+    else if ( document.all )
+      elem = eval( "document.all." + id );
+    else
+      return false;
+
+    elemStyle = elem.style;
+    
+    if ( elemStyle.display != "block" ) {
+      elemStyle.display = "block"
+    } else {
+      elemStyle.display = "none"
+    }
+
+    return true;
+  }
+  
+  // Make codeblocks hidden by default
+  document.writeln( "<style type=\"text/css\">div.method-source-code { display: none }</style>" )
+  
+  // ]]>
+  </script>
+
+</head>
+<body>
+
+
+
+    <div id="classHeader">
+        <table class="header-table">
+        <tr class="top-aligned-row">
+          <td><strong>Class</strong></td>
+          <td class="class-name-in-header">TableHelper::Builder</td>
+        </tr>
+        <tr class="top-aligned-row">
+            <td><strong>In:</strong></td>
+            <td>
+                <a href="../../files/lib/table_helper/builder_rb.html">
+                lib/table_helper/builder.rb
+                </a>
+        <br />
+            </td>
+        </tr>
+
+        <tr class="top-aligned-row">
+            <td><strong>Parent:</strong></td>
+            <td>
+                <a href="../Object.html">
+                Object
+               </a>
+            </td>
+        </tr>
+        </table>
+    </div>
+  <!-- banner header -->
+
+  <div id="bodyContent">
+
+
+
+  <div id="contextContent">
+
+
+
+   </div>
+
+    <div id="method-list">
+      <h3 class="section-bar">Methods</h3>
+
+      <div class="name-list">
+      <a href="#M000360">footer</a>&nbsp;&nbsp;
+      <a href="#M000361">grouping</a>&nbsp;&nbsp;
+      <a href="#M000359">header</a>&nbsp;&nbsp;
+      <a href="#M000365">html_helper</a>&nbsp;&nbsp;
+      <a href="#M000355">new</a>&nbsp;&nbsp;
+      <a href="#M000356">options</a>&nbsp;&nbsp;
+      <a href="#M000358">record_set</a>&nbsp;&nbsp;
+      <a href="#M000364">rows</a>&nbsp;&nbsp;
+      <a href="#M000363">search</a>&nbsp;&nbsp;
+      <a href="#M000357">title</a>&nbsp;&nbsp;
+      <a href="#M000362">tool</a>&nbsp;&nbsp;
+      </div>
+    </div>
+
+  </div>
+
+
+    <!-- if includes -->
+
+    <div id="section">
+
+    <div id="class-list">
+      <h3 class="section-bar">Classes and Modules</h3>
+
+      Module <a href="Builder/TableHelpers.html" class="link">TableHelper::Builder::TableHelpers</a><br />
+Class <a href="Builder/OptionCollector.html" class="link">TableHelper::Builder::OptionCollector</a><br />
+Class <a href="Builder/RowDefiniton.html" class="link">TableHelper::Builder::RowDefiniton</a><br />
+Class <a href="Builder/SearchBuilder.html" class="link">TableHelper::Builder::SearchBuilder</a><br />
+
+    </div>
+
+
+
+
+      
+
+
+    <!-- if method_list -->
+    <div id="methods">
+      <h3 class="section-bar">Public Class methods</h3>
+
+      <div id="method-M000355" class="method-detail">
+        <a name="M000355"></a>
+
+        <div class="method-heading">
+          <a href="#M000355" class="method-signature">
+          <span class="method-name">new</span><span class="method-args">(record_set, template) {|self| ...}</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000355-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000355-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/table_helper/builder.rb, line 77</span>
+77:   <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">initialize</span>(<span class="ruby-identifier">record_set</span>, <span class="ruby-identifier">template</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+78:     <span class="ruby-ivar">@record_set</span> = <span class="ruby-identifier">record_set</span>
+79:     <span class="ruby-ivar">@template</span> = <span class="ruby-identifier">template</span>
+80:     <span class="ruby-ivar">@table_headers</span> = []
+81:     <span class="ruby-ivar">@table_footers</span> = []
+82:     <span class="ruby-ivar">@tools</span> = []
+83:     <span class="ruby-ivar">@rows</span> = []
+84:     <span class="ruby-ivar">@groups</span> = []
+85:     <span class="ruby-ivar">@options</span> = {}
+86:     <span class="ruby-ivar">@options_collector</span> = <span class="ruby-constant">OptionCollector</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@options</span>)
+87:     <span class="ruby-keyword kw">yield</span>(<span class="ruby-keyword kw">self</span>)
+88:     <span class="ruby-ivar">@options</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-ivar">@options_collector</span>.<span class="ruby-identifier">options</span>)
+89:   <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <h3 class="section-bar">Public Instance methods</h3>
+
+      <div id="method-M000360" class="method-detail">
+        <a name="M000360"></a>
+
+        <div class="method-heading">
+          <a href="#M000360" class="method-signature">
+          <span class="method-name">footer</span><span class="method-args">(*args)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000360-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000360-source">
+<pre>
+     <span class="ruby-comment cmt"># File lib/table_helper/builder.rb, line 126</span>
+126:   <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">footer</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>)
+127:     <span class="ruby-identifier">options</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">last</span>.<span class="ruby-identifier">kind_of?</span>(<span class="ruby-constant">Hash</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">pop</span> <span class="ruby-operator">:</span> {}
+128:     [<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>].<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">title</span><span class="ruby-operator">|</span>
+129:       <span class="ruby-identifier">label_text</span> = <span class="ruby-identifier">options</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-identifier">:label</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:label</span>] <span class="ruby-operator">:</span> <span class="ruby-constant">TableHelpers</span>.<span class="ruby-identifier">titleize</span>(<span class="ruby-identifier">title</span>)
+130:       <span class="ruby-identifier">options</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">:label</span>) <span class="ruby-comment cmt"># Just to make sure.</span>
+131:       <span class="ruby-identifier">label_text</span> = <span class="ruby-value str">'&amp;nbsp;'</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">label_text</span>.<span class="ruby-identifier">blank?</span>
+132:       <span class="ruby-ivar">@table_footers</span> <span class="ruby-operator">&lt;&lt;</span> { <span class="ruby-identifier">:label</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">label_text</span>, <span class="ruby-identifier">:sym</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">title</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">downcase</span>.<span class="ruby-identifier">to_sym</span>, <span class="ruby-identifier">:options</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">options</span> }
+133:     <span class="ruby-keyword kw">end</span>
+134:   <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000361" class="method-detail">
+        <a name="M000361"></a>
+
+        <div class="method-heading">
+          <a href="#M000361" class="method-signature">
+          <span class="method-name">grouping</span><span class="method-args">(record_set, options = {}, &amp;block)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000361-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000361-source">
+<pre>
+     <span class="ruby-comment cmt"># File lib/table_helper/builder.rb, line 136</span>
+136:   <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">grouping</span>(<span class="ruby-identifier">record_set</span>, <span class="ruby-identifier">options</span> = {}, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+137:     <span class="ruby-ivar">@groups</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">TableHelper</span><span class="ruby-operator">::</span><span class="ruby-constant">Builder</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">record_set</span>, <span class="ruby-ivar">@template</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>).<span class="ruby-identifier">html_helper</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">options</span>)
+138:   <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000359" class="method-detail">
+        <a name="M000359"></a>
+
+        <div class="method-heading">
+          <a href="#M000359" class="method-signature">
+          <span class="method-name">header</span><span class="method-args">(*args, &amp;block)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000359-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000359-source">
+<pre>
+     <span class="ruby-comment cmt"># File lib/table_helper/builder.rb, line 104</span>
+104:   <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">header</span>(<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+105:     <span class="ruby-identifier">options</span> = <span class="ruby-identifier">args</span>.<span class="ruby-identifier">last</span>.<span class="ruby-identifier">kind_of?</span>(<span class="ruby-constant">Hash</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">args</span>.<span class="ruby-identifier">pop</span> <span class="ruby-operator">:</span> {}
+106:     [<span class="ruby-operator">*</span><span class="ruby-identifier">args</span>].<span class="ruby-identifier">each</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">title</span><span class="ruby-operator">|</span>
+107:       <span class="ruby-identifier">label_text</span> = <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">options</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-identifier">:label</span>)
+108:         <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:label</span>]
+109:       <span class="ruby-keyword kw">elsif</span> <span class="ruby-identifier">block_given?</span>
+110:         <span class="ruby-identifier">label_text</span> = <span class="ruby-identifier">block</span>.<span class="ruby-identifier">call</span>
+111:       <span class="ruby-keyword kw">else</span>
+112:         <span class="ruby-constant">TableHelpers</span>.<span class="ruby-identifier">titleize</span>(<span class="ruby-identifier">title</span>)
+113:       <span class="ruby-keyword kw">end</span>
+114:       <span class="ruby-identifier">options</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">:label</span>) <span class="ruby-comment cmt"># Just to make sure.</span>
+115:       <span class="ruby-identifier">label_text</span> = <span class="ruby-value str">'&amp;nbsp;'</span> <span class="ruby-keyword kw">if</span> <span class="ruby-identifier">label_text</span>.<span class="ruby-identifier">blank?</span>
+116:       <span class="ruby-identifier">sort_by</span> = <span class="ruby-identifier">options</span>.<span class="ruby-identifier">delete</span>(<span class="ruby-identifier">:sort_by</span>)
+117:       <span class="ruby-ivar">@table_headers</span> <span class="ruby-operator">&lt;&lt;</span> {
+118:         <span class="ruby-identifier">:label</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">label_text</span>,
+119:         <span class="ruby-identifier">:sym</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">title</span>.<span class="ruby-identifier">to_s</span>.<span class="ruby-identifier">downcase</span>.<span class="ruby-identifier">to_sym</span>,
+120:         <span class="ruby-identifier">:options</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">options</span>,
+121:         <span class="ruby-identifier">:sort_by</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">sort_by</span>
+122:       }
+123:     <span class="ruby-keyword kw">end</span>
+124:   <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000365" class="method-detail">
+        <a name="M000365"></a>
+
+        <div class="method-heading">
+          <a href="#M000365" class="method-signature">
+          <span class="method-name">html_helper</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000365-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000365-source">
+<pre>
+     <span class="ruby-comment cmt"># File lib/table_helper/builder.rb, line 156</span>
+156:   <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">html_helper</span>
+157:     { <span class="ruby-identifier">:table_headers</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-ivar">@table_headers</span>, <span class="ruby-identifier">:tools</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-ivar">@tools</span>, <span class="ruby-identifier">:rows</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-ivar">@rows</span>, <span class="ruby-identifier">:groups</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-ivar">@groups</span>, <span class="ruby-identifier">:record_set</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-ivar">@record_set</span>, <span class="ruby-identifier">:options</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-ivar">@options</span> }
+158:   <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000356" class="method-detail">
+        <a name="M000356"></a>
+
+        <div class="method-heading">
+          <a href="#M000356" class="method-signature">
+          <span class="method-name">options</span><span class="method-args">(opts = {})</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000356-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000356-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/table_helper/builder.rb, line 91</span>
+91:   <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">options</span>(<span class="ruby-identifier">opts</span> = {})
+92:     <span class="ruby-ivar">@options</span>.<span class="ruby-identifier">merge</span>(<span class="ruby-identifier">opts</span>)
+93:     <span class="ruby-ivar">@options_collector</span>
+94:   <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000358" class="method-detail">
+        <a name="M000358"></a>
+
+        <div class="method-heading">
+          <a href="#M000358" class="method-signature">
+          <span class="method-name">record_set</span><span class="method-args">()</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000358-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000358-source">
+<pre>
+     <span class="ruby-comment cmt"># File lib/table_helper/builder.rb, line 100</span>
+100:   <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">record_set</span>
+101:     <span class="ruby-ivar">@record_set</span>
+102:   <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000364" class="method-detail">
+        <a name="M000364"></a>
+
+        <div class="method-heading">
+          <a href="#M000364" class="method-signature">
+          <span class="method-name">rows</span><span class="method-args">(&amp;block)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000364-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000364-source">
+<pre>
+     <span class="ruby-comment cmt"># File lib/table_helper/builder.rb, line 150</span>
+150:   <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">rows</span>(<span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+151:     <span class="ruby-ivar">@record_set</span>.<span class="ruby-identifier">each_with_index</span> <span class="ruby-keyword kw">do</span> <span class="ruby-operator">|</span><span class="ruby-identifier">record</span>, <span class="ruby-identifier">idx</span><span class="ruby-operator">|</span>
+152:       <span class="ruby-ivar">@rows</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-constant">RowDefiniton</span>.<span class="ruby-identifier">new</span>(<span class="ruby-identifier">record</span>, <span class="ruby-identifier">idx</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>).<span class="ruby-identifier">_definition</span>
+153:     <span class="ruby-keyword kw">end</span>
+154:   <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000363" class="method-detail">
+        <a name="M000363"></a>
+
+        <div class="method-heading">
+          <a href="#M000363" class="method-signature">
+          <span class="method-name">search</span><span class="method-args">(title, path, object, options = {}, &amp;block)</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000363-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000363-source">
+<pre>
+     <span class="ruby-comment cmt"># File lib/table_helper/builder.rb, line 146</span>
+146:   <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">search</span>(<span class="ruby-identifier">title</span>, <span class="ruby-identifier">path</span>, <span class="ruby-identifier">object</span>, <span class="ruby-identifier">options</span> = {}, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+147:     <span class="ruby-ivar">@tools</span> <span class="ruby-operator">&lt;&lt;</span> { <span class="ruby-identifier">:title</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-constant">TableHelpers</span>.<span class="ruby-identifier">titleize</span>(<span class="ruby-identifier">title</span>), <span class="ruby-identifier">:path</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">path</span>, <span class="ruby-identifier">:options</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">options</span>, <span class="ruby-identifier">:body</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-constant">SearchBuilder</span>.<span class="ruby-identifier">new</span>(<span class="ruby-ivar">@template</span>, <span class="ruby-identifier">path</span>, <span class="ruby-identifier">object</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>).<span class="ruby-identifier">build</span> }
+148:   <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000357" class="method-detail">
+        <a name="M000357"></a>
+
+        <div class="method-heading">
+          <a href="#M000357" class="method-signature">
+          <span class="method-name">title</span><span class="method-args">(title = nil) {|: title| ...}</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000357-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000357-source">
+<pre>
+    <span class="ruby-comment cmt"># File lib/table_helper/builder.rb, line 96</span>
+96:   <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">title</span>(<span class="ruby-identifier">title</span> = <span class="ruby-keyword kw">nil</span>, <span class="ruby-operator">&amp;</span><span class="ruby-identifier">block</span>)
+97:     <span class="ruby-ivar">@options</span>[<span class="ruby-identifier">:title</span>] = <span class="ruby-identifier">block_given?</span> <span class="ruby-value">? </span><span class="ruby-keyword kw">yield</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">title</span>
+98:   <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+      <div id="method-M000362" class="method-detail">
+        <a name="M000362"></a>
+
+        <div class="method-heading">
+          <a href="#M000362" class="method-signature">
+          <span class="method-name">tool</span><span class="method-args">(title, path, options = {})</span>
+          </a>
+        </div>
+      
+        <div class="method-description">
+          <p>
+Added custom <a href="Builder.html#M000357">title</a>
+</p>
+          <p><a class="source-toggle" href="#"
+            onclick="toggleCode('M000362-source');return false;">[Source]</a></p>
+          <div class="method-source-code" id="M000362-source">
+<pre>
+     <span class="ruby-comment cmt"># File lib/table_helper/builder.rb, line 141</span>
+141:   <span class="ruby-keyword kw">def</span> <span class="ruby-identifier">tool</span>(<span class="ruby-identifier">title</span>, <span class="ruby-identifier">path</span>, <span class="ruby-identifier">options</span> = {})
+142:     <span class="ruby-identifier">label_text</span> = <span class="ruby-identifier">options</span>.<span class="ruby-identifier">has_key?</span>(<span class="ruby-identifier">:label</span>) <span class="ruby-operator">?</span> <span class="ruby-identifier">options</span>[<span class="ruby-identifier">:label</span>] <span class="ruby-operator">:</span> <span class="ruby-constant">TableHelpers</span>.<span class="ruby-identifier">titleize</span>(<span class="ruby-identifier">title</span>)
+143:     <span class="ruby-ivar">@tools</span> <span class="ruby-operator">&lt;&lt;</span>  { <span class="ruby-identifier">:title</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">label_text</span>, <span class="ruby-identifier">:path</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">path</span>, <span class="ruby-identifier">:options</span> =<span class="ruby-operator">&gt;</span> <span class="ruby-identifier">options</span> }
+144:   <span class="ruby-keyword kw">end</span>
+</pre>
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+
+
+  </div>
+
+
+<div id="validator-badges">
+  <p><small><a href="http://validator.w3.org/check/referer">[Validate]</a></small></p>
+</div>
+
+</body>
+</html>
