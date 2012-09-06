@@ -3,9 +3,18 @@
   <% actions.each do |action| %>
     <li class="activity-item <%= action.renewal? ? 'renew' : 'new-sub' %>">
     <span class="value"><%= action.payment.blank? ? "$0" : number_to_currency(action.payment.amount, :precision => 0) %></span>
-    <span class="type"><strong><%= action.renewal? ? 'Renewal' : 'New Subscription' %>:</strong> <%= link_to("#{action.subscription.reference}: #{action.subscription.publication.name}", admin_subscription_path(action.subscription)) %></span>
+    
+    <span class="type">
+      <% if action.subscription %>
+        <strong><%= action.renewal? ? 'Renewal' : 'New Subscription' %>:</strong>
+        <%= link_to("#{action.subscription.reference}: #{action.subscription.publication.name}", admin_subscription_path(action.subscription)) %>
+      <% else %>
+        <strong>Pending Subscription</strong>
+      <% end %>
+    </span>
+
       <span class="timestamp"><%= format_timestamp(action.applied_at) %></span>
-      <span class="description"><%= link_to(action.subscription.try(:user).try(:name), admin_subscriber_path(action.subscription.user)) if action.subscription.user %> chose offer: <%= action.offer_name %> and selected <a href="#"><%= pluralize(action.gifts.count, "gift") %></a> via <a href="#">A Source</a></span>
+      <span class="description"><%= link_to(action.subscription.try(:user).try(:name), admin_subscriber_path(action.subscription.user)) if action.subscription && action.subscription.user %> chose offer: <%= action.offer_name %> and selected <a href="#"><%= pluralize(action.gifts.count, "gift") %></a> via <a href="#">A Source</a></span>
       <span class="term"><strong>Term length:</strong> <%= pluralize(action.term_length, "month") %></span>
       <span class="payref"><strong>Payment Reference:</strong> <%= action.payment.blank? ? 'None available' : action.payment.reference %></span>	
     </li>
