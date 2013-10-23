@@ -5,7 +5,7 @@
     
     <meta http-equiv="X-UA-Compatible" content="IE=8" />
     
-    <title><%= @publication.try(:name) %> Subscription form</title>
+    <title><%= @publication.try(:name) %> - Buy now</title>
     
     <%= stylesheet_link_tag File.join('..', 'templates', @publication.try(:template_name) || '', 'stylesheets', 'signup.css') %>
     
@@ -28,11 +28,6 @@
       <div id='top-right'>
         <p>
         </p>
-        <% if @publication.try(:direct_debit?) %>
-          <p class='other'>
-            Want to pay by fax or mail? <a href='/forms/subscription_form.pdf' target="_blank">Download the Subscription form</a>
-          </p>
-        <% end %>
       </div>
       
       <div class='clear'></div>

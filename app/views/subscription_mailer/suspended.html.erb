@@ -16,33 +16,7 @@
                                         <TR>
                                             <TD>
                                             <TABLE border=0 cellSpacing=0 width="100%">
-                                                <!-- DAILY MAIL -->
-                                                <TBODY>
-                                                    <TR>
-                                                        <TD colSpan=3><A href="#"><IMG border=0 alt="Crikey Daily Mail" src="http://media.crikey.com.au/wp-content/uploads/2011/04/crikey-logo.jpg"></A> </TD>
-                                                        <TD style="FONT-FAMILY: Arial, Helvetica, sans-serif; COLOR: #666666; FONT-SIZE: 24px" vAlign=top colSpan=4 align=right>PH: 1800 985 502</TD>
-                                                    </TR>
-                                                    <!-- DAILY MAIL --><!-- ACTIONS -->
-                                                    <TR>
-                                                        <TD height=10 colSpan=7></TD>
-                                                    </TR>
-                                                    <TR>
-                                                        <TD bgColor=#f5f5f5 height=10 colSpan=7></TD>
-                                                    </TR>
-                                                    <TR>
-                                                        <TD bgColor=#f5f5f5 width=10></TD>
-                                                        <TD style="FONT: bold 14px Georgia,'Times New Roman',Serif" bgColor=#f5f5f5 vAlign=center width=340></TD>
-                                                        <TD bgColor=#f5f5f5 width=20>&nbsp;</TD>
-                                                        <TD style="TEXT-ALIGN: right; FONT: 12px Georgia,'Times New Roman',Serif" bgColor=#f5f5f5 vAlign=center width=200><A href="mailto:subs@crikey.com.au">Contact Us</A>&nbsp;|&nbsp;<A href="http://www.crikey.com.au/subscribe/">Subscribe</A> </TD>
-                                                        <TD bgColor=#f5f5f5 width=20>&nbsp;</TD>
-                                                        <TD bgColor=#f5f5f5 vAlign=center width=85 align=middle><A href="http://www.crikey.com.au/tipoff/"><IMG style="BORDER-BOTTOM: 0px; BORDER-LEFT: 0px; BORDER-TOP: 0px; BORDER-RIGHT: 0px" border=0 alt="Tip Off Crikey" src="http://media.crikey.com.au/dm/dailymail/new/action-tip-off.gif"></A></TD>
-                                                        <TD bgColor=#f5f5f5 width=10>&nbsp;</TD>
-                                                    </TR>
-                                                    <TR>
-                                                        <TD bgColor=#f5f5f5 height=10 colSpan=7></TD>
-                                                    </TR>
-                                                    <!-- END ACTIONS -->
-                                                </TBODY>
+                                                
                                             </TABLE>
                                             <TABLE width="100%">
                                                 <TBODY>
@@ -55,15 +29,14 @@
                                                                     <TD style="FONT-FAMILY: Georgia, 'Times New Roman', Times, serif; FONT-SIZE: 14px" vAlign=top><BR>
                                                                       Dear <%= @user.fullname %>,<BR>
                                                                     <BR>
-                                                                    <P>This email confirms that your Crikey subscription has been suspended from <%= @subscription.state_updated_at.strftime("%d/%m/%Y") %> to <%= @subscription.state_expires_at.strftime("%d/%m/%Y") %>.<BR>
+                                                                    <P>This email confirms that your subscription to <%= @publication.try(:name) %> has been suspended from <%= @subscription.state_updated_at.strftime("%d/%m/%Y") %> to <%= @subscription.state_expires_at.strftime("%d/%m/%Y") %>.<BR>
                                                                     <BR>
                                                                     Your subscription will restart automatically on <%= @subscription.state_expires_at.strftime("%d/%m/%Y") %>.<BR>
                                                                     <BR>
-                                                                    If you have any queries, don't hesitate to contact us at <A href="mailto:subs@crikey.com.au">subs@crikey.com.au</A> or on 1800 985 502.</P>
-                                                                    <P>We hope you are enjoying your subscription to Crikey! </P>
+                                                                    If you have any queries, don't hesitate to contact us at <A href="mailto:accounts@subscriptus.co">accounts@subscriptus.co</A> or on 1800 985 502.</P>
                                                                     <BR>
                                                                     <P>Cheers,<BR>
-                                                                    The Crikey Crew.</P>
+                                                                    Team Subscriptus</P>
                                                                     <P><SPAN style="FONT-SIZE: 10px">Your email address is registered as <%= @user.email %> - you can unsubscribe <%= link_to("here", unsubscribe_url(:user_id => @user.id)) %></SPAN></P>
                                                                     </TD>
                                                                 </TR>
@@ -82,15 +55,13 @@
                                     <TBODY>
                                     </TBODY>
                                 </TABLE>
-                                <!-- CONNECT WITH CRIKEY --><!-- END CONNECT WITH CRIKEY --></TD>
                             </TR>
                         </TBODY>
                     </TABLE>
                     </TD>
                 </TR>
                 <TR>
-                    <TD style="FONT-FAMILY: Arial, Helvetica, sans-serif; COLOR: #ffffff; FONT-SIZE: 11px" colSpan=5 align=middle><A href="http://www.crikey.com.au/subscribe/"><SPAN style="TEXT-DECORATION: underline"></SPAN></A></TD>
-                </TR>
+                                    </TR>
                 <TR>
                     <TD>&nbsp;</TD>
                 </TR>

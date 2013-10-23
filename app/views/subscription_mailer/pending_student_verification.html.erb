@@ -16,33 +16,7 @@
                                         <TR>
                                             <TD>
                                             <TABLE border=0 cellSpacing=0 width="100%">
-                                                <!-- DAILY MAIL -->
-                                                <TBODY>
-                                                    <TR>
-                                                        <TD colSpan=3><A href="#"><IMG border=0 alt="Crikey Daily Mail" src="http://media.crikey.com.au/wp-content/uploads/2011/04/crikey-logo.jpg"></A> </TD>
-                                                        <TD style="FONT-FAMILY: Arial, Helvetica, sans-serif; COLOR: #666666; FONT-SIZE: 24px" vAlign=top colSpan=4 align=right>PH: 1800 985 502</TD>
-                                                    </TR>
-                                                    <!-- DAILY MAIL --><!-- ACTIONS -->
-                                                    <TR>
-                                                        <TD height=10 colSpan=7></TD>
-                                                    </TR>
-                                                    <TR>
-                                                        <TD bgColor=#f5f5f5 height=10 colSpan=7></TD>
-                                                    </TR>
-                                                    <TR>
-                                                        <TD bgColor=#f5f5f5 width=10></TD>
-                                                        <TD style="FONT: bold 14px Georgia,'Times New Roman',Serif" bgColor=#f5f5f5 vAlign=center width=340></TD>
-                                                        <TD bgColor=#f5f5f5 width=20>&nbsp;</TD>
-                                                        <TD style="TEXT-ALIGN: right; FONT: 12px Georgia,'Times New Roman',Serif" bgColor=#f5f5f5 vAlign=center width=200><A href="mailto:subs@crikey.com.au">Contact Us</A>&nbsp;|&nbsp;<A href="http://www.crikey.com.au/subscribe/">Subscribe</A> </TD>
-                                                        <TD bgColor=#f5f5f5 width=20>&nbsp;</TD>
-                                                        <TD bgColor=#f5f5f5 vAlign=center width=85 align=middle><A href="http://www.crikey.com.au/tipoff/"><IMG style="BORDER-BOTTOM: 0px; BORDER-LEFT: 0px; BORDER-TOP: 0px; BORDER-RIGHT: 0px" border=0 alt="Tip Off Crikey" src="http://media.crikey.com.au/dm/dailymail/new/action-tip-off.gif"></A></TD>
-                                                        <TD bgColor=#f5f5f5 width=10>&nbsp;</TD>
-                                                    </TR>
-                                                    <TR>
-                                                        <TD bgColor=#f5f5f5 height=10 colSpan=7></TD>
-                                                    </TR>
-                                                    <!-- END ACTIONS -->
-                                                </TBODY>
+                                               
                                             </TABLE>
                                             <TABLE width="100%">
                                                 <TBODY>
@@ -55,18 +29,17 @@
                                                                     <TD style="FONT-FAMILY: Georgia, 'Times New Roman', Times, serif; FONT-SIZE: 14px" vAlign=top><BR>
                                                                       Dear <%= @user.fullname %>,<BR>
                                                                     <BR>
-                                                                    <P>Your subscription to Crikey is nearly complete - you signed up to our discount student rate on <%= @subscription.created_at.strftime("%d/%m/%Y") %> and we need a copy of your student card before we can start your subscription. </P>
-                                                                    <P>There are 3 ways to get a copy of your card to us:</P>
-                                                                    <P><STRONG>EMAIL:</STRONG> scan your student card and email it to <A href="mailto:subs@crikey.com.au">subs@crikey.com.au</A> <BR>
+                                                                    <P>Your subscription to <%= @publication.try(:name) %> is nearly complete - you signed up to our education discount rate on <%= @subscription.created_at.strftime("%d/%m/%Y") %> and we need a copy of your education status card before we can start your subscription. </P>
+                                                                    <P>There are 2 ways to get a copy of your card to us:</P>
+                                                                    <P><STRONG>EMAIL:</STRONG> scan your education card and email it to <A href="mailto:accounts@subcriptus.co">accounts@subscriptus.co</A> <BR>
+                                                                    
                                                                     <BR>
-                                                                    <STRONG>FAX:</STRONG> Fax a copy to 03 8623 9975<BR>
-                                                                    <BR>
-                                                                    <STRONG>MAIL:</STRONG> Crikey, Level 7, 22 William Street, Melbourne VIC 3000</P>
+                                                                    <STRONG>MAIL:</STRONG> Subscriptus Pty Ltd, PO Box 155, Collins Street West, Melbourne VIC 8007</P>
                                                                     <P>Make sure you include your name and email address so we can match up your card to your subscription.</P>
-                                                                    <P>If you've changed your mind about the type of subscription you've signed up for or how you want to pay for it, don't hesitate to contact us at <A href="mailto:subs@crikey.com.au">subs@crikey.com.au</A> or on 1800 985 502 and we can help sort out the details.</P>
+                                                                    <P>If you've changed your mind about the type of subscription you've signed up for or how you want to pay for it, don't hesitate to contact us at <A href="mailto:accounts@subscriptus.co">accounts@subscriptus.co</A> or phone us on +61 3 9018 7510 and we can help sort out the details.</P>
                                                                     <P>We look forward to having you on board.</P>
                                                                     <P>Cheers,<BR>
-                                                                    The Crikey Crew.</P>
+                                                                    Team Subscriptus</P>
                                                                     <P><SPAN style="FONT-SIZE: 10px">Your email address is registered as <%= @user.email %> - you can unsubscribe <%= link_to("here", unsubscribe_url(:user_id => @user.id)) %></SPAN></P>
                                                                     </TD>
                                                                 </TR>
@@ -92,8 +65,7 @@
                     </TD>
                 </TR>
                 <TR>
-                    <TD style="FONT-FAMILY: Arial, Helvetica, sans-serif; COLOR: #ffffff; FONT-SIZE: 11px" colSpan=5 align=middle><A href="http://www.crikey.com.au/subscribe/"><SPAN style="TEXT-DECORATION: underline"></SPAN></A></TD>
-                </TR>
+                                    </TR>
                 <TR>
                     <TD>&nbsp;</TD>
                 </TR>

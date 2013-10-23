@@ -326,7 +326,7 @@ a:hover {
 }
 
 .table table a.pay { 
-	background: transparent url(/images/s/icons/dollar-small.png) no-repeat right center;
+	background: transparent;
 }
 
 .table table a.destroy {

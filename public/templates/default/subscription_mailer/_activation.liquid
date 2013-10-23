@@ -1,7 +1,7 @@
 <body style="font-family: arial; text-align: left;">
 
 	<p style="padding-bottom: 10px"><strong>Dear {{ user.firstname }} {{ user.lastname }}</strong></p>
-	<p style="padding-bottom: 10px">Thank you for subscribing to Valegro.</p>
+	<p style="padding-bottom: 10px">Thank you for subscribing to Valegro's Subscriptus offer</p>
 	<p style="padding-bottom: 5px"><strong>Your Order Details</strong></p>
 
     <h2>TAX INVOICE</h2>
@@ -15,7 +15,7 @@
 		Order Number: {{ subscription.reference }}<br/>
 		Order Date: {{ order_date }}<br/>
 		Payment Method: Credit Card<br/>
-    Payment Cost: {{ cost }} (includes {{ gst }} GST)<br/>
+    		Payment Cost: {{ cost }} (includes {{ gst }} GST)<br/>
 		(Please note: Subscriptus will appear as the transaction detail on your statement)<br/>
 	</p>
 
@@ -44,13 +44,13 @@
 		Country: {{ user.country }}<br/>
 	</p>
 
-	<p style="padding: 5px 0px 5px 0px">Please send email through to our subscriptions team at subs@crikey.com.au if you have any problems.</p>
+	<p style="padding: 5px 0px 5px 0px">Please send email through to our saless team (sales@valegro.com.au) if you have any problems.</p>
 
 	<p>
-		Team Valegro<br/>
-		<a target='_blank' href="http://www.valegro.com.au/">www.valegro.com.au</a><br/><br/>
+		Valegro Salees<br/>
+		<a target='_blank' href="http://valegro.subscriptus.com.au/">valegro.subscriptus.com.au</a><br/><br/>
 	</p>
 
-	<p style="padding: 5px 0px 5px 0px"><strong>Copyright © 2010 Valegro Pty Ltd. All rights reserved</strong></p>
+	<p style="padding: 5px 0px 5px 0px"><strong>Copyright &copy; 2013 Valegro Pty Ltd. All rights reserved</strong></p>
   <p>Your email address is registered as {{ user.email }} - you can unsubscribe here: {{ unsubscribe_url }}</p>
 </body>

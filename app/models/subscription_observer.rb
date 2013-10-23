@@ -49,7 +49,7 @@ class SubscriptionObserver < ActiveRecord::Observer
       if user = subscription.try(:user)
         Rails.logger.info "Scheduling wordpress sync for user: #{user.inspect}"
         user.delay.sync_to_wordpress
-        # user.sync_to_wordpress
+        user.sync_to_wordpress
       end
     end
   end

@@ -6,15 +6,14 @@
 
     <% if @gifts.include?75 %>
       <h2>You're nearly done!</h2>
-      <h3 style='margin:0 0 40px 140px'>Please select your Text Classic ebook <a style='font-size:1.0em; font-weight:normal' href='http://offers.crikey.com.au/text-classic-collection/'>here.</a></h3>
     <% end %>
 
-    <h2>Thanks for subscribing to <%= @publication.try(:name) %> We hope you enjoy it.</h2>
+    <h2>Thanks for your order.</h2>
 
     <h3>Invoice</h3>
 
     <% if @subscription.pending? %>
-      <p class='subscription-description'>Please check your inbox for instructions on how to activate your subscription</p>
+      <p class='subscription-description'>Please check your inbox for instructions on how to activate your account</p>
     <% else %>
       <p class='subscription-description'><%= link_to("View and print your invoice for your records", url_for(:action => "invoice"), :target => :new) %></p>
     <% end %>
@@ -23,22 +22,12 @@
     
     <h2>Complete your registration</h2>
 
-    <% if @publication.try(:weekend_edition?) && !@has_weekender %>
-      <h3><%= @publication.try(:name) %> Weekender</h3>
-      <p>Have you signed up for <%= @publication.try(:name) %> Weekender yet? It's our weekly arts and culture wrap &mdash; delivered direct to your inbox every Friday morning. You'll love it.</p>
-    <% end %>
-    
     <% form_for @subscription, :url => complete_path do |form| %>
 
-      <% if @publication.try(:weekend_edition?) && !@has_weekender %>
-        <%= check_box_tag :weekender, "1", true %>
-        <label for="weekender">Yes &mdash; send me your Weekender</label>
-      <% end %>
-      
       <h3>Promotional Materials</h3>
       
       <%= form.check_box :solus %>
-      <label for="subscription_solus">Tick this box if you want to receive carefully selected offers by email from advertisers screened by <%= @publication.try(:name) %></label>
+      <label for="subscription_solus">Tick this box if you want to receive carefully selected offers by email.</label>
       
       <div id="">
       <%= image_submit_tag template_image_path('completerego.png'), :disable_with => "Processing...", :id => "btnSubmit" %>

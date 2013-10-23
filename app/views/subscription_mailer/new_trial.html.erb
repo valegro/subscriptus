@@ -8,14 +8,7 @@
                     <TD>
                     <TABLE style="BACKGROUND-COLOR: #ffffff" border=0 cellSpacing=0 cellPadding=0 align=center>
                         <TBODY>
-                            <TR>
-                                <TD height=20 vAlign=top width=20><SPAN style="FONT-FAMILY: Arial; FONT-SIZE: 16px"><BR>
-                                </SPAN></TD>
-                                <TD height=20 vAlign=top width=450><SPAN style="FONT-FAMILY: Arial; FONT-SIZE: 16px"><BR>
-                                </SPAN></TD>
-                                <TD height=20 vAlign=top width=20><SPAN style="FONT-FAMILY: Arial; FONT-SIZE: 16px"><BR>
-                                </SPAN></TD>
-                            </TR>
+                            
                             <TR>
                                 <TD vAlign=top width=20><SPAN style="FONT-FAMILY: Arial; FONT-SIZE: 16px"><BR>
                                 </SPAN></TD>
@@ -23,7 +16,6 @@
                                 <TABLE style="BACKGROUND-COLOR: #ffffff; WIDTH: 600px" cellSpacing=0 cellPadding=10>
                                     <TBODY>
                                         <TR>
-                                            <TD><IMG src="http://edition.crikey.com.au/LiveAssets/images/5032/crikey-logo-simple.png"></A></SPAN></TD>
                                         </TR>
                                         <TR>
                                             <TD style="FONT-SIZE: 14px">
@@ -34,23 +26,21 @@
                                             <DIV align=left>
                                               <DIV align=left><SPAN style="FONT-FAMILY: Arial; FONT-SIZE: 14px"><SPAN style="FONT-SIZE: 16px">Dear <%= @user.firstname %>,<BR>
                                             <BR>
-                                            Thanks for registering for Crikey!<BR>
+                                            Thanks for subscribing to <%= @publication.try(:name) %><BR>
                                             <BR>
-                                            You now have full access to Crikey's subscriber-only content for the next 21 days, which is delivered via a lunchtime email newsletter, as well as on the </SPAN><A href="http://www.crikey.com.au"><SPAN style="FONT-SIZE: 16px">Crikey website</SPAN></A><SPAN style="FONT-SIZE: 16px">.<BR>
-                                            <BR>
-                                            Your website login details are as follows:<BR>
+                                            You are now a registered trial subscriber of <%= @publication.try(:name) %><BR>
+
+                                            Your subscriber login details are as follows:<BR>
                                             <BR>
                                             Login: <STRONG><%= @user.email %><BR>
-                                            </STRONG>Password: <STRONG><%= @password %></STRONG><BR>
+                                            
                                             <BR>
-                                            We recommend you login and change your password, and also set the display name that you'd like us to use&nbsp;if you comment on any articles.<BR>
+                                            We recommend you login and change your password, and also set the display name that you'd like to use.<BR>
                                             <BR>
-                                            The Crikey email newsletter will be sent to you each weekday around lunchtime, and if you have any delivery issues, please contact Anastasia at </SPAN><A href="mailto:subs@crikey.com.au"><SPAN style="FONT-SIZE: 16px">subs@crikey.com.au</SPAN></A><SPAN style="FONT-SIZE: 16px"> - she'll be able to help you out.<BR>
                                             <BR>
-                                            We hope you enjoy your Crikey experience, why not head back to the&nbsp;</SPAN><A href="http://www.crikey.com.au"><SPAN style="FONT-SIZE: 16px">website</SPAN></A><SPAN style="FONT-SIZE: 16px"> now and start clicking!<BR>
-                                            <BR>
+                                                                                        <BR>
                                             Cheers,<BR>
-                                            The Crikey Crew</SPAN><BR>
+                                            Team Subscriptus</SPAN><BR>
                                             </SPAN></DIV>
                                             </DIV>
                                             </DIV>

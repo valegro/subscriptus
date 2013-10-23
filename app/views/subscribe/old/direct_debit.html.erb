@@ -1,4 +1,4 @@
-<h1 style="color: green; padding-bottom:25px;">Subscribe to Crikey</h1>
+<h1 style="color: green; padding-bottom:25px;">Buy now,  <%= @publication.try(:name) %></h1>
 
 <div style="border: 1px solid; padding: 20px;">
 	<strong>Dear <%= @name %></strong>
@@ -6,7 +6,7 @@
 	<h3 style="color: green">Your Account Has Been Set Up</h3>
 	
 	<p>
-		Thanks for subscribing to Crikey!<br/>
+		Thanks for subscribing to <%= @publication.try(:name) %><br/>
 		However, we need a few more details from you in order to activate your subscription.
 		Please refer to the relevant instructions below.
 	</p>
@@ -25,7 +25,7 @@
 		Use this form to pay your direct debit subscription via your Credit Card.
 	</p>
 	
-	<p>please email us at <font style="color:green" title="email">subs@crikey.com.au</font> if you have any questions.</p>
+	<p>please email us at <font style="color:green" title="email">accounts@subscriptus.co</font> if you have any questions.</p>
 
 </div>
 

@@ -1,2 +1,14 @@
-      <%= form.error_messages %>
-      <%= form.text_field :email, :required => true %>
+<!--      <%= form.error_messages %>
+      <%= form.text_field :email, :required => true %> -->
+<%= form.error_messages %>
+<%= form.enum_select :title,:readonly => true %>
+<%= form.text_field :firstname,:readonly => true %>
+<%= form.text_field :lastname,:readonly => true %>
+<%= form.text_field :email, :required => true %>
+<%= form.text_field :phone_number,:readonly => true %>
+<%= form.text_field :address_1,:readonly => true %>
+<%= form.text_field :address_2,:readonly => true %>
+<%= form.text_field :city,:readonly => true %>
+<%= form.enum_select :state,:readonly => true %>
+<%= form.text_field :postcode,:readonly => true %>
+<%= form.country_select :country,:readonly => true %>

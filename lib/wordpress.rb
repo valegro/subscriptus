@@ -48,7 +48,6 @@ class Wordpress
 private
   def self.make_request(opts)
     if self.enabled
-      #res = RestClient.get(Wordpress.config[:endpoint], :params => opts.map{|k,v| "#{k}=#{v}"}.join('&'), :accept => :text).to_str
       res = RestClient.get(Wordpress.config[:endpoint], :params => opts.merge(:key => Wordpress.config[:key], "subscriptus" => ""), :accept => :text).to_str
       res
     else

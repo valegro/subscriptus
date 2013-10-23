@@ -9,7 +9,7 @@
   <div class="frame span_6">
     <% form_for [:admin, @subscriber], :url => admin_subscriber_path(@subscriber), :builder => Reform::Builder, :html => { :class => "form" } do |form| %>
       <%= render :partial => "form", :object => form %>
-      <%= form.text_field :login, :label => "Wordpress ID", :help => "Only change this if you know what you're doing" %>
+      <%= form.text_field :login, :label => "Publication ID", :help => "Do not change this unless you really need to" %>
       <%= form.submit "Update" %>
     <% end %>
   </div>

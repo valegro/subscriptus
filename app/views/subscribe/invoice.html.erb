@@ -248,33 +248,33 @@
 				<%= image_tag(template_image_path('logo.png'), :alt => @publication.name) %>
 			</div>
 
-		<h1>Thank you for subscribing to <%= @publication.try(:name) %>.</h1>
+		<h1><%= @publication.try(:name) %></h1>
 		
 		<hr />
 
     <h2>TAX INVOICE</h2>
     <p>
-    Blimey Holdings (trading as Crikey)<br/>
-    ABN 98 101 558 847
+    Subscriptus Pty Ltd<br/>
+    ABN 16 147 864 560
     </p>
 		
 		<h2>Your Order Details</h2>
 
 		<p>
-			<strong>Supplier:</strong> Crikey<br/>
+			<strong>Supplier:</strong>Subscriptus Pty Ltd<br/>
       <strong>Order Number:</strong> <%= @subscription.reference %><br/>
       <strong>Order Date:</strong> <%= @subscription.updated_at.try(:strftime, "%d/%m/%Y") %><br/>
-			<strong>Payment Method:</strong> Credit Card<br/>
+			<!--<strong>Payment Method:</strong> Credit Card<br/>-->
       <strong>Payment Cost:</strong> <%= number_to_currency @subscription.actions.first.payment.amount, :unit => "AUD $" %> (includes <%= number_to_currency(@subscription.actions.first.payment.amount/11.0) %> GST)<br/>
 			<br />
-			<em class="small">(Please note: Blimey Holdings will appear as the transaction detail on your statement)</em><br/>
+			<em class="small">(Please note: Subscriptus Pty Ltd will appear as the transaction detail on your statement)</em><br/>
 		</p>
 
 		<hr />
 
-		<h2>Your Subscription Details</h2>
+		<h2>Product Details</h2>
 		
-    <p><strong>Publication Name:</strong> <%= @subscription.publication.name %></p>
+    <p><strong>Product Name:</strong> <%= @subscription.publication.name %></p>
 		<p>
       <strong>Subscription Starts:</strong> <%= @subscription.state_updated_at.try(:strftime, "%d/%m/%Y") %><br/>
       <strong>Subscription Ends:</strong> <%= @subscription.expires_at.try(:strftime, "%d/%m/%Y") %>
@@ -305,7 +305,7 @@
 		<hr />
 		
 		<div id="activation-footer">
-      <p>Please <%= mail_to("subs@crikey.com.au", "contact us") %>, quoting your order number if you have any problems.</p>
+      <p>Please <%= mail_to("sales@subscriptus.co", "contact us") %>, quoting your order number if you have any problems.</p>
 
 		<div id="print-page-button">
 		<a id="print-page"></a>
@@ -317,7 +317,7 @@
       });
     </script>
 
-    <p class="copyright">Copyright &copy; <%= Time.now.year %> Private Media Pty Ltd. All rights reserved</p>
+    <p class="copyright">Copyright &copy; <%= Time.now.year %> Subscriptus Pty Ltd. All rights reserved</p>
 		</div>
 	
 		</div> <!-- closes #page -->

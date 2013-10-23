@@ -214,9 +214,9 @@ class User < ActiveRecord::Base
     }
   end
 
-  def sync_to_campaign_master
-    self.subscriptions.each(&:sync_to_campaign_master)
-  end
+  #def sync_to_campaign_master
+  #  self.subscriptions.each(&:sync_to_campaign_master)
+  #end
 
   def sync_to_wordpress(password = nil)
     options = {

@@ -10,9 +10,9 @@ class UserObserver < ActiveRecord::Observer
   def after_save(user)
     # Only sync if a sync'd column changes
     unless user.admin?
-      if user.changes.keys.any? { |column| User::MAIL_SYSTEM_SYNC_COLUMNS.include?(column.to_s) }
-        user.delay.sync_to_campaign_master
-      end
+      #if user.changes.keys.any? { |column| User::MAIL_SYSTEM_SYNC_COLUMNS.include?(column.to_s) }
+      #  user.delay.sync_to_campaign_master
+      #end
       if user.changes.keys.any? { |column| User::CMS_SYNC_COLUMNS.include?(column.to_s) }
         user.delay.sync_to_wordpress(user.password)
       end

@@ -29,9 +29,9 @@ config.action_mailer.default_charset = "utf-8"
 config.action_mailer.logger = Logger.new("log/mail.log")
 
 =begin
-# NetFox Sendgrid (for now)
+# Sendgrid
 config.action_mailer.smtp_settings = {
-  :address        => "192.168.1.101",
+  :address        => "192.168.0.101",
   :port           => "25",
   :authentication => :plain,
   :user_name      => 'admin@subscriptus.co',
@@ -53,15 +53,26 @@ ActionMailer::Base.default_url_options[:host] = "valegro.subscriptus.co"
 
 # Setup Active Merchant for Staging Production
 config.after_initialize do
+    # PayPal Gateway Settings
+    paypal_options = {
+    :login => "accounts_api1.subscriptus.com.au",
+    :password => "7PMAFKXAD9XAR9ZP",
+    :signature => "AJ6OK3GoSm94We8j-ryLwKM.QHXcAHaJSjZBAz75YQ0FoDqSqjfVh9xr"
+  }
+  ::EXPRESS_GATEWAY = ActiveMerchant::Billing::PaypalExpressGateway.new(paypal_options)
+end
+
+# Setup Active Merchant for Staging Production
+config.after_initialize do
   # Secure Pay Gateway Settings
   ::GATEWAY = ActiveMerchant::Billing::SecurePayAuExtendedGateway.new(  # the default_currency of this gateway is 'AUD'
-    :login => 'CKR0030',  # <MerchantID> input to Au securePay Gateway.
+    :login => 'abc0001',  # <MerchantID> input to Au securePay Gateway.
     :password => "abc123"
   )
 end
 
-#CAMPAIGNMASTER_USERNAME = 'ddraper'
-#CAMPAIGNMASTER_PASSWORD = 'netfox'
-#CAMPAIGNMASTER_CLIENT_ID = '5032'
+#CAMPAIGNMASTER_USERNAME = ''
+#CAMPAIGNMASTER_PASSWORD = ''
+#CAMPAIGNMASTER_CLIENT_ID = ''
 
 Wordpress.enabled = true

@@ -5,12 +5,12 @@
 	<% if @subscription.state == :squatter %>
 		<p style="padding-bottom: 10px">Your subscription has been canceled.</p>
 	<% else %>
-		<p style="padding-bottom: 10px">Your have recently requested to cancel your subscription to Crikey.</p>
+		<p style="padding-bottom: 10px">Your have recently requested to cancel your subscription to <%= @publication.try(:name) %>.</p>
 		<p style="padding-bottom: 10px">Please note that we are processing your cancelation and inform you shortly about the result with a separate email.</p>
 	<% end %>
 
 	<p style="padding: 10px 0px 10px 0px"><strong>Your Subscription Details</strong></p>
-	<p style="padding-bottom: 5px">Publication Name: <%= h @subscription.publication.name %></p>
+	<p style="padding-bottom: 5px">Product Name: <%= h @subscription.publication.name %></p>
 
 	<p style="padding: 10pt;">
 		<strong>Included Gifts:</strong><br/>
@@ -29,12 +29,12 @@
 		Country: <%= h @subscription.user.try(:country) %><br/>
 	</p>
 
-	<p style="padding: 5px 0px 5px 0px">Please send email through to our subscriptions team at subs@crikey.com.au if you have any problems.</p>
+	<p style="padding: 5px 0px 5px 0px">Please send email through to our sales team at accounts@subscriptus.co if you have any problems.</p>
 
-	<p>
-		The Crikey Crew<br/>
-		<a target='_blank' href="http://www.crikey.com.au/">www.crikey.com.au</a><br/><br/>
+	<p>    Cheers, <br />
+		Team Subscriptus<br/>
+		<a target='_blank' href="http://www.subscriptus.co/">www.subscriptus.co</a><br/><br/>
 	</p>
 
-	<p style="padding: 5px 0px 5px 0px"><strong>Copyright © 2010 Private Media Pty Ltd. All rights reserved</strong></p>
+	<p style="padding: 5px 0px 5px 0px"><strong>Copyright &copy; <%= Time.now.year %> Subscriptus Pty Ltd. All rights reserved</strong></p>
 </body>

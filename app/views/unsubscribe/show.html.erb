@@ -1,6 +1,6 @@
 <div class='section' id="unsubscribe">
   <h2>Unsubscribe</h2>
-  <p>Unsubscribe from Crikey and we won't send you any more emails &mdash; check the boxes to the publications you do NOT wish to receive any more.</p>
+  <p>Unsubscribe to <%= @publication.try(:name) %> and we won't send you any more emails.</p>
   <% unless flash[:error].blank? %>
     <div id="flash"><%= flash[:error] %></div>
   <% end %>

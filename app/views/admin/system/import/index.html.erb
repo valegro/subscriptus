@@ -1,14 +1,14 @@
 <div class="title">
-  <%= content_tag :h2, "Import Subscribers" %>
+  <%= content_tag :h2, "Import clients" %>
   <div class="actions">
     <%= link_to 'Upload CSV', new_admin_system_import_path, :class => 'create' %>
   </div>
 </div>
 
 <div id="instructions">
-	<h3>Upload a CSV of your current subscribers</h3>
+	<h3>Upload a CSV of your current clients</h3>
 	<h4>Format</h4>
-	<p>You can import a CSV file of your current Subscribers in the following format:</p>
+	<p>You can import a CSV file of your current clients in the following format:</p>
 	<blockquote>`firstname`, `lastname`, `email`, `phone_number`, `address_1`, `address_2`, `city`, `state`, `postcode`, `country`, `title`, `login`, `company`, `gender`, `publication_name`, `subscription_state`, `created_at` `expires_at`, `state_expires_at`</blockquote>
 	<h4>Explanation of fields</h4> 
 	<p>All fields are mandatory fields unless otherwise specified</p>
@@ -27,97 +27,97 @@
                         <tr>
                                 <td>firstname</td>
                                 <td>varchar(255)</td>
-                                <td>Subscriber's first name</td>
+                                <td>Client's first name</td>
                         </tr>
                         <tr>
                                 <td>lastname</td>
                                 <td>varchar(255)</td>
-                                <td>Subscriber's last name</td>
+                                <td>Client's last name</td>
                         </tr>
                         <tr>
                                 <td>email</td>
                                 <td>varchar(255)</td>
-                                <td>Subscriber's email address</td>
+                                <td>Client's email address</td>
                         </tr>
                         <tr>
                                 <td>phone_number</td>
                                 <td>varchar(255)</td>
-                                <td>Subscriber's phone number (optional)</td>
+                                <td>Client's phone number (optional)</td>
                         </tr>
                         <tr>
                                 <td>address_1</td>
                                 <td>varchar(255)</td>
-                                <td>First line of Subscriber's address (optional)</td>
+                                <td>First line of Client's address (optional)</td>
                         </tr>
                         <tr>
                                 <td>address_2</td>
                                 <td>varchar(255)</td>
-                                <td>Second line of Subscriber's address (optional)</td>
+                                <td>Second line of Client's address (optional)</td>
                         </tr>
                         <tr>
                                 <td>city</td>
                                 <td>varchar(255)</td>
-                                <td>Subscriber's city (optional)</td>
+                                <td>Client's city (optional)</td>
                         </tr>
                         <tr>
                                 <td>state</td>
                                 <td>varchar(255)</td>
-                                <td>Subscriber's state (optional)</td>
+                                <td>Client's state (optional)</td>
                         </tr>
                         <tr>
                                 <td>postcode</td>
                                 <td>varchar(255)</td>
-                                <td>Subscriber's postcode (optional)</td>
+                                <td>Client's postcode (optional)</td>
                         </tr>
                         <tr>
                                 <td>country</td>
                                 <td>varchar(255)</td>
-                                <td>Subscriber's country (optional)</td>
+                                <td>Client's country (optional)</td>
                         </tr>
                         <tr>
                                 <td>title</td>
                                 <td>varchar(255)</td>
-                                <td>Subscriber's title (e.g. 'Mr') (optional)</td>
+                                <td>Client's title (e.g. 'Mr') (optional)</td>
                         </tr>
                         <tr>
                                 <td>login</td>
                                 <td>varchar(255)</td>
-                                <td>Subscriber's login name for Subscriptus. Can be their email address if no login name is stored.</td>
+                                <td>Client's login name for Subscriptus. Can be their email address if no login name is stored.</td>
                         </tr>
                         <tr>
                                 <td>company</td>
                                 <td>varchar(255)</td>
-                                <td>Subsciber's company name (optional)</td>
+                                <td>Client's company name (optional)</td>
                         </tr>
                         <tr>
                                 <td>gender</td>
                                 <td>varchar(255)</td>
-                                <td>Subscriber's gender (e.g. 'Male') (optional)</td>
+                                <td>Client's gender (e.g. 'Male') (optional)</td>
                         </tr>
 			<tr>	
 				<td>publication_name</td>
 				<td>varchar(255)</td>
-				<td>The name of the Publication the Subscriber is Subscribed to. It must be an existing publication in Subscriptus and the name must match exactly.</td>
+				<td>The name of the product the client is signed up for. It must be an existing product in Subscriptus and the name must match exactly.</td>
 			</tr>
                         <tr>
                                 <td>subscription_state</td>
                                 <td>varchar(255)</td>
-                                <td>Subscriber's subscription status ('active' | 'squatter' | 'unsubscribed' | 'suspended')</td>
+                                <td>Client's status ('active' | 'squatter' | 'unsubscribed' | 'suspended')</td>
                         </tr>
                         <tr>
                                 <td>created_at</td>
                                 <td>datetime</td>
-                                <td>The date the Subscriber's Subscription started (e.g. '2012-09-06 06:26:50')</td>
+                                <td>The date the Client's service started (e.g. '2012-09-06 06:26:50')</td>
                         </tr>
                         <tr>
                                 <td>expires_at</td>
                                 <td>datetime</td>
-                                <td>The date the Subscrber's Subscription ends (e.g. '2015-10-01 00:00:00')</td>
+                                <td>The date the client's service ends (e.g. '2015-10-01 00:00:00')</td>
                         </tr>
                         <tr>
                                 <td>state_expires_at</td>
                                 <td>datetime</td>
-                                <td>The date the Subscriber's Subscription status is set to change. This may be the same as `expires_at` but in the case of a suspension may be diffferent.</td>
+                                <td>The date the Client's status is set to change. This may be the same as `expires_at` but in the case of a suspension may be diffferent.</td>
                         </tr>                        
 		</tbody>
 	</table>

@@ -49,6 +49,7 @@ ActionController::Routing::Routes.draw do |map|
     end
     admin.namespace :system do |system|
       system.resources :users
+      system.resources :import
     end
   end
 
