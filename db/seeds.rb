@@ -22,8 +22,8 @@ User.create!(:login => "admin",
             :state => :sa,
             :country => "Australia",
             :role => "admin",
-            :password => "netfox",
-            :password_confirmation => "netfox")
+            :password => "admin",
+            :password_confirmation => "admin")
             
 crikey = Publication.create!(
   :name => "Crikey!",
