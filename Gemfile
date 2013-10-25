@@ -4,19 +4,17 @@ group :production do
 
 end 
 group :development, :test, :cucumber do 
+        gem 'cucumber-rails'
 	gem 'webmock', '1.6.2', :require => false
-        gem 'pg', '0.10.1'
         gem 'selenium-webdriver', '0.1.2'
         gem 'capybara', '0.4.0'
         gem 'database_cleaner', '0.6.0'
         gem 'spork', '0.8.4'
         gem 'launchy', '0.3.7'
-        gem 'cucumber', '0.8.5'
         gem 'pickle', '0.4.4'
         gem 'factory_girl', '1.3.3'
         gem 'faker', '0.9.4'
         gem 'shoulda', '2.11.3'
-        gem 'gherkin', '2.1.4'
         gem 'rack-test', '0.5.4'
         gem 'rspec', '1.3.1'
         gem 'rspec-rails', '1.3.3'
@@ -46,7 +44,6 @@ gem 'cocaine', '0.2.0'
 gem 'columnize', '0.3.2'
 gem 'configuration', '1.2.0'
 gem 'crack', '0.1.8'
-gem 'cucumber-rails', '0.3.2'
 gem 'culerity', '0.2.15'
 gem 'daemons', '1.0.10'
 gem 'delayed_job', '2.0.7'
