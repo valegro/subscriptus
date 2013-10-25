@@ -35,9 +35,10 @@ crikey = Publication.create!(
   :trial => true,
   :direct_debit => true,
   :weekend_edition => true,
-  :terms_url => 'http://www.crikey.com.au/about/terms-conditions/'
-  
+  :terms_url => 'http://www.crikey.com.au/about/terms-conditions/',
+  :from_email_address => 'crikey@example.com'
 )
+
 crikey.offers.create!(
   {
     :name => "Crikey Offer",
@@ -57,9 +58,10 @@ powerindex = Publication.create!(
   :forgot_password_link => "http://example.com",
   :custom_domain => "powerindex.dev",
   :template_name => "powerindex",
-  :terms_url => 'http://www.thepowerindex.com.au/terms-and-conditions'
-  
+  :terms_url => 'http://www.thepowerindex.com.au/terms-and-conditions',
+  :from_email_address => 'tpi@example.com'
 )
+
 powerindex.offers.create!(
   {
     :name => "The Power Index Offer",
