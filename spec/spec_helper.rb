@@ -15,7 +15,7 @@ require 'capybara/dsl'
 WebMock.disable_net_connect!(
   :allow_localhost => true,
   :allow => 'https://api.securepay.com.au/xmlapi/payment',
-  :allow => 'https://www.securepay.com.au/test/payment',
+  :allow => 'https://www.securepay.com.au/test/payment'
 )
 
 factories = Dir.glob('*/factories.rb') + Dir.glob('*/factories/*.rb')
