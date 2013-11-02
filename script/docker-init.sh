@@ -11,12 +11,12 @@ if ! mysqladmin ping 2>/dev/null; then
   done
 fi
 
-bundle exec rake db:drop || true
-bundle exec rake db:create
-mysql subscriptus_development < db/seeds.2013-10-18.sql
+if bundle exec rake db:create; then
+  mysql subscriptus_development < db/seeds.2013-10-18.sql
+fi
 
 export RAILS_ENV=test
-bundle exec rake db:drop || true
-bundle exec rake db:create
-bundle exec rake db:schema:load
+if bundle exec rake db:create; then
+  bundle exec rake db:schema:load
+fi
 unset RAILS_ENV
