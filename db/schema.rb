@@ -34,7 +34,7 @@ ActiveRecord::Schema.define(:version => 20111006104012) do
   add_index "archived_publications", ["id"], :name => "index_archived_publications_on_id"
 
   create_table "archived_subscriptions", :id => false, :force => true do |t|
-    t.integer  "id",                                                             :default => 0,     :null => false
+    t.integer  "id",                :default => 0,     :null => false
     t.integer  "user_id"
     t.integer  "offer_id"
     t.integer  "publication_id"
@@ -42,7 +42,7 @@ ActiveRecord::Schema.define(:version => 20111006104012) do
     t.string   "card_number"
     t.string   "card_expiration"
     t.string   "payment_method"
-    t.integer  "price",             :limit => 10, :precision => 10, :scale => 0
+    t.integer  "price"
     t.boolean  "auto_renew"
     t.datetime "state_updated_at"
     t.datetime "expires_at"
@@ -51,12 +51,12 @@ ActiveRecord::Schema.define(:version => 20111006104012) do
     t.datetime "deleted_at"
     t.integer  "source_id"
     t.text     "referrer"
-    t.boolean  "solus",                                                          :default => false
-    t.boolean  "weekender",                                                      :default => true
+    t.boolean  "solus",             :default => false
+    t.boolean  "weekender",         :default => true
     t.string   "pending"
     t.datetime "state_expires_at"
     t.integer  "term_length"
-    t.boolean  "concession",                                                     :default => false
+    t.boolean  "concession",        :default => false
     t.integer  "pending_action_id"
   end
 
@@ -105,11 +105,11 @@ ActiveRecord::Schema.define(:version => 20111006104012) do
 
   create_table "offer_terms", :force => true do |t|
     t.integer  "offer_id"
-    t.integer  "price",      :limit => 10, :precision => 10, :scale => 0
+    t.integer  "price"
     t.integer  "months"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.boolean  "concession",                                              :default => false
+    t.boolean  "concession", :default => false
   end
 
   create_table "offers", :force => true do |t|
@@ -157,7 +157,7 @@ ActiveRecord::Schema.define(:version => 20111006104012) do
     t.string   "first_name"
     t.string   "last_name"
     t.datetime "card_expiry_date"
-    t.integer  "amount",                 :limit => 10, :precision => 10, :scale => 0
+    t.integer  "amount"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "payment_type"
@@ -277,7 +277,7 @@ ActiveRecord::Schema.define(:version => 20111006104012) do
     t.string   "card_number"
     t.string   "card_expiration"
     t.string   "payment_method"
-    t.integer  "price",             :limit => 10, :precision => 10, :scale => 0
+    t.integer  "price"
     t.boolean  "auto_renew"
     t.datetime "state_updated_at"
     t.datetime "expires_at"
@@ -285,12 +285,12 @@ ActiveRecord::Schema.define(:version => 20111006104012) do
     t.datetime "updated_at"
     t.integer  "source_id"
     t.text     "referrer"
-    t.boolean  "solus",                                                          :default => false
-    t.boolean  "weekender",                                                      :default => true
+    t.boolean  "solus",             :default => false
+    t.boolean  "weekender",         :default => true
     t.string   "pending"
     t.datetime "state_expires_at"
     t.integer  "term_length"
-    t.boolean  "concession",                                                     :default => false
+    t.boolean  "concession",        :default => false
     t.integer  "pending_action_id"
   end
 
@@ -300,7 +300,7 @@ ActiveRecord::Schema.define(:version => 20111006104012) do
     t.string   "recurrent_id"
     t.integer  "user_id"
     t.string   "action"
-    t.integer  "money",           :limit => 10, :precision => 10, :scale => 0
+    t.integer  "money"
     t.boolean  "success"
     t.string   "message"
     t.datetime "created_at"
