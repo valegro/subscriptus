@@ -1,37 +1,3 @@
-<% content_for :ujs do %>
-  <script language="javascript">
-    $(document).ready(function() {
-
-      if ($('#payment-radio-direct-debit').attr('checked')) { enableDirectDebit(); }
-      if ($('#payment-radio-credit-card').attr('checked')) { enableCreditCard(); }
-
-      function enableDirectDebit() {
-        $('.payment-option').hide();
-        $('#payment_by_direct_debit').show();
-        $('.cc-field').attr("disabled", "disabled");
-      }
-
-      function enableCreditCard() {
-        $('.payment-option').hide();
-        $('#payment_by_credit_card').show();
-        $('.cc-field').attr("disabled", "");
-      }
-
-      $(".payment-radio").live('click', function() {
-        if ($(this).val() == 'credit_card') {
-          enableCreditCard();
-        } else {
-          enableDirectDebit();
-        }
-      });
-
-      $('#select_offer_id').change(function() {
-        window.location.search = jQuery.query.set("offer_id", $(this).val());
-      });
-    });
-  </script>
-<% end %>
-
 <% if @for && current_user.admin? %>
   <p id="admin-renew">
     Renewing subscription to <%= link_to(@subscription.publication.try(:name), admin_catalogue_publication_path(@subscription.publication)) %> for <%= link_to(@user.name, admin_subscriber_path(@user)) %><br/>
@@ -40,162 +6,58 @@
   <hr/>
 <% end %>
 
-<% form_for @subscription, :url => get_subscribe_submit_path(@offer, @source, @tab, @renewing, @for), :builder => SubscribeFormBuilder do |f| %>
 
-  <div class='section' id='step1'>
-    <%= image_tag(template_image_path('step1.png'), :class => 'step', :alt => 'step 1')%>
-    <div class='content'>
+<div class='section' id='step1'>
+  <%= image_tag(template_image_path('step1.png'), :class => 'step', :alt => 'step 1')%>
+  <div class='content'>
 
-      <% if @renewing %>
-        <h2>Choose your Renewal</h2>
-      <% else %>
-        <h2 class="step">Choose your Offer</h2>
-      <% end %>
+    <% if @renewing %>
+      <h2>Choose your Renewal</h2>
+    <% else %>
+      <h2 class="step">Choose your Offer</h2>
+    <% end %>
 
-      <h3><%= h(@offer.publication.try(:name)) %></h3>
-      <p class='subscription-description'><%= h(@offer.publication.description) %></p>
+    <h3><%= h(@offer.publication.try(:name)) %></h3>
+    <p class='subscription-description'><%= h(@offer.publication.description) %></p>
 
-      <!-- Error Messages -->
-      <div id="form-errors">
-      <%= error_messages(@errors) %>
-      <% unless flash[:error].blank? %>
-        <div id="flash"><%= flash[:error] %></div>
-      <% end %>
-      </div> <!-- closes #form-errors -->
-      
-      <ul id='subscription-tabs'>
-        <li id="subscriptions-tab" class='<%= "active" if @tab == 'subscriptions' || @tab.blank? %>'>
-          <%= link_to("SUBSCRIPTION", tab_path('subscriptions')) %>
+    <!-- Error Messages -->
+    <div id="form-errors">
+    <%= error_messages(@errors) %>
+    <% unless flash[:error].blank? %>
+      <div id="flash"><%= flash[:error] %></div>
+    <% end %>
+    </div> <!-- closes #form-errors -->
+    
+    <ul id='subscription-tabs'>
+      <li id="subscriptions-tab" class='<%= "active" if @tab == 'subscriptions' || @tab.blank? %>'>
+        <%= link_to("SUBSCRIPTION", tab_path('subscriptions')) %>
+      </li>
+      <% unless @offer.offer_terms.concession.blank? %>
+        <li id="students-tab" class='<%= "active" if @tab == 'students' %>'>
+          <%= link_to("EDUCATION", tab_path('students')) %>
         </li>
-        <% unless @offer.offer_terms.concession.blank? %>
-          <li id="students-tab" class='<%= "active" if @tab == 'students' %>'>
-            <%= link_to("EDUCATION", tab_path('students')) %>
-          </li>
-          <li id="concessions-tab" class='<%= "active" if @tab == 'concessions' %>'>
-            <%= link_to("NOT FOR PROFIT", tab_path('concessions')) %>
-          </li> 
-          <!-- <li id="groups-tab" class='<%= "active" if @tab == 'groups' %> last'>
-            <%= link_to("GROUP", tab_path('groups')) %>
-          </li> -->
-        <% end %>
-      </ul>
-      <div class="clear"></div>
+        <li id="concessions-tab" class='<%= "active" if @tab == 'concessions' %>'>
+          <%= link_to("NOT FOR PROFIT", tab_path('concessions')) %>
+        </li> 
+        <!-- <li id="groups-tab" class='<%= "active" if @tab == 'groups' %> last'>
+          <%= link_to("GROUP", tab_path('groups')) %>
+        </li> -->
+      <% end %>
+    </ul>
+    <div class="clear"></div>
 
-      <%= render :partial => "subscribe/#{@tab}" %>
-     
-    </div>
-    <div class='clear'></div>
-  </div> <!-- Step 1 -->
+    <%= render :partial => "subscribe/#{@tab}" %>
+   
+  </div>
+  <div class='clear'></div>
+</div> <!-- Step 1 -->
 
-  <% unless @tab == 'groups' %>
-    <div class='section' id='step2'>
-      <%= image_tag(template_image_path('step2.png'), :class => 'step', :alt => 'step 2')%>
-      <div class='content'> 
-        <% if @user.new_record? %>
-          <h2 class="step">Provide your Details</h2>
-        <% else %>
-          <h2>Confirm Your Details</h2>
-        <% end %>
 
-        <div id='new-user' class="login-option">
-          <% fields_for :user, @user, :builder => SubscribeFormBuilder do |u| %>
-	    <%= u.enum_select :title, :include_blank => false, :required => true %>
-            <%= u.text_field :firstname, :required => true, :label => "First Name" %>
-            <%= u.text_field :lastname, :required => true, :label => "Last Name" %>
-            <%= u.text_field :email, :help => "This is the email address #{@offer.publication.try(:name)} will be sent to", :required => true %>
-            <%= u.text_field :email_confirmation, :required => true %>
-            <%= u.text_field :phone_number, :help => "If there are problems with email delivery this is how we contact you", :required => true %>
-            <%= u.text_field :company %>
-            <%= u.text_field :address_1, :label => "Street Address Line 1", :required => true %>
-            <%= u.text_field :address_2, :label => "Street Address Line 2" %>
-            <%= u.text_field :city, :required => true %>
-            <%= u.enum_select :state, :required => true %>
-            <%= u.text_field :postcode, :required => true %>
-            <%= u.country_select :country, ['Australia'], :required => true %>
-            <% unless @renewing %>
-              <%= u.password_field :password, :required => true, :label => "Nominate your password" %>
-              <%= u.password_field :password_confirmation, :required => true %>
-            <% end %>
-          <% end %>
-        </div>
-      </div>
+<div class='section' id='step2'>
+  <%= image_tag(template_image_path('step2.png'), :class => 'step', :alt => 'step 2')%>
+  <div class="content">
+    <%= link_to image_tag("https://www.paypal.com/en_US/i/btn/btn_xpressCheckout.gif"), paypal_express_path, :id => "btnSubmit" %>
+  </div>
 
-      <div class='clear'></div>
-    </div> <!-- Step 2 -->
-
-    <div class='section' id='step3'>
-      <%= image_tag(template_image_path('step3.png'), :class => 'step', :alt => 'step 3')%>
-      <div class='content'>     
-        <div id='payment' class='form-section'>
-          <h2 class="step">Select Your Payment Method</h2>
-
-          <img id='securepay' src="/images/securepay.png" alt="Powered by Secure Pay" />
-          <div id='payment-options'>
-            <input class="payment-radio" type='radio' name='payment_option' value="credit_card" id='payment-radio-credit-card' <%= 'checked="true"' if (@payment_option.blank? || @payment_option == 'credit_card' || !@direct_debit_allowed) %> />
-            <label for='payment-radio-credit-card'>
-              Credit Card
-            </label>
-            
-            <% if @direct_debit_allowed %>
-              <input type='radio' class="payment-radio" name='payment_option' value="direct_debit" id='payment-radio-direct-debit' <%= 'checked="true"' if @payment_option == 'direct_debit' %> />
-              <label for='payment-radio-direct-debit'>
-                Direct Transfer/Direct Debit
-              </label>                  
-            <% end %>
-              
-            <label for='payment-radio-credit-card'>
-              <img src='/images/cc.png' alt='Credit Cards' /> 
-            </label>
-          </div>
-
-          <div id='payment-details'>
-            <div class="payment-option" id="payment_by_credit_card" style="<%= 'display:none;' if @payment_option != 'credit_card' && !@payment_option.blank? %>">
-              <h4>Credit Card Details</h4>
-              <% fields_for :payment, @payment, :builder => SubscribeFormBuilder do |p| %>
-                <%= p.text_field :full_name, :required => true, :class => "cc-field", :label => "Name on Card" %>
-                <%= p.text_field :card_number, :required => true, :class => "cc-field", :help => "e.g. 0000123455677675" %>
-                <%= p.date_select :card_expiry_date, :discard_day => true, :start_year => Time.now.year, :label => "Expiry", :required => true, :class => "cc-field" %>
-                <%= p.text_field :card_verification, :class => "smallText cc-field", :required => true, :label => "Card Verification (CVV Number)" %>
-              <% end %>
-            </div>
-
-            <% if @tab.blank? || @tab == 'subscriptions' %>
-              <div class="payment-option" id="payment_by_direct_debit" style="<%= 'display:none;' unless @payment_option == 'direct_debit' %>">
-                <h4>Direct Transfer/Direct Debit</h4>
-                <h4>Click the FINISH button below once you've chosen your payment option:</h4>
-                <ol>
-                  <!-- <% if @publication.try(:direct_debit?) %>
-                    <li>Download our <%= link_to("subscription form", "/forms/subscription_form.pdf", :target => :new) %> and mail it to Subscriptus, 22 William Street, Melbourne VIC 3000; or</li>
-                  <% end %> -->
-                  <li>You can do a direct transfer into our bank account, make sure you include your name in the reference so we can match up your payment:</li>
-                </ol>
-                <p>
-                BSB: 063 000<br/>
-                Account Number: 1204 0821<br/>
-                Account Name: Subscriptus Pty Ltd
-                </p>
-              </div>
-            <% end %>
-            
-            <div id='terms'>
-              <%= f.check_box :terms, :label => "I agree to the " %>
-              <%= link_to('Terms and Conditions', @publication.try(:terms_url), :target => '_blank') %>
-            </div>
-
-            <div id='bottom-right'>
-              <p>
-              
-              </p>
-            </div>
-                
-            <%= image_submit_tag template_image_path('nextstep.png'), :disable_with => "Processing...", :id => "btnSubmit" %>
-            <div class='clear'></div>
-          </div>
-
-        </div>
-      </div>
-      <div class='clear'></div>
-    </div> <!-- Step 3 -->
-  <% end %>
-
-<% end %>
+  <div class='clear'></div>
+</div> <!-- Step 2 -->
