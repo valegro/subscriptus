@@ -46,13 +46,22 @@ class SubscribeController < ApplicationController
   def paypal_express
     @offer_term = @offer.offer_terms.find(params[:offer_term])
 
-    response = EXPRESS_GATEWAY.setup_purchase(@offer_term.price * 100,
+    prince_in_cents = @offer_term.price * 100
+
+    response = EXPRESS_GATEWAY.setup_purchase(prince_in_cents,
       :ip                => request.remote_ip,
-      :return_url        => new_subscribe_url,
-      :cancel_return_url => new_subscribe_url
+      :return_url        => paypal_express_return_url,
+      :cancel_return_url => new_subscribe_url,
+      :currency          => "AUD"
     )
 
     redirect_to EXPRESS_GATEWAY.redirect_url_for(response.token, :review => false)
+  end
+
+  def paypal_express_return
+    token = params[:token]
+    logger.info EXPRESS_GATEWAY.details_for(token)
+    redirect_to thanks_path
   end
 
   def edit

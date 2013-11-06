@@ -71,7 +71,8 @@ ActionController::Routing::Routes.draw do |map|
     s.new_renew      '/renew',       :action => "edit",    :conditions => { :method => :get }
     s.renew          '/renew',       :action => "update",  :conditions => { :method => :put }
     s.new_subscribe  '/subscribe',   :action => "new",     :conditions => { :method => :get }
-    s.paypal_express '/subscribe/paypal', :action => "paypal_express",  :conditions => { :method => :post }
+    s.paypal_express '/subscribe/paypal', :action => "paypal_express", :conditions => { :method => :post }
+    s.paypal_express_return '/subscribe/paypal_return', :action => "paypal_express_return", :conditions => { :method => :get }
     s.thanks         '/thanks',      :action => "thanks"
     s.complete       '/complete',    :action => "complete"
   end
