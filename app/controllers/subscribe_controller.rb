@@ -43,33 +43,13 @@ class SubscribeController < ApplicationController
     @subscription.offer = @offer
   end
 
-  def create
-    @payment_option = params[:payment_option]
-    Subscription.transaction do
-      # First check if a user exists with the given email
-     @user = User.find_by_email(params[:user].try(:[], :email))
-     if @user
-        @subscription = @user.subscriptions.first(
-          :conditions => { :publication_id => @offer.publication.id }
-        )
-        if @subscription && !@subscription.trial? && !@subscription.squatter?
-          redirect_to new_renew_path(:offer_id => @offer, :source_id => @source)
-          return
-        end
-      end
-      @user ||= User.new(params[:user])
-      @user.rollback_active_record_state! do
-        if @user
-          @user.update_attributes!(params[:user])
-        else
-          @user.save!
-        end
-        @factory = get_factory
-        @subscription = @subscription ? @factory.update(@subscription) : @factory.build
-      end
-      store_subscription_in_session
-      redirect_to thanks_path
-    end
+  def paypal_express
+    response = EXPRESS_GATEWAY.setup_purchase(100,
+      :ip                => request.remote_ip,
+      :return_url        => new_subscribe_url,
+      :cancel_return_url => new_subscribe_url
+    )
+    redirect_to EXPRESS_GATEWAY.redirect_url_for(response.token)
   end
 
   def edit
