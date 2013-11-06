@@ -29,8 +29,8 @@ crikey = Publication.create!(
   :name => "Crikey!",
   :description => "This is a test publication.",
   :forgot_password_link => "http://example.com",
-  :custom_domain => "crikey.dev",
-  :template_name => "crikey",
+  :custom_domain => "localhost",
+  :template_name => "default",
   :concession => true,
   :trial => true,
   :direct_debit => true,
@@ -47,7 +47,8 @@ crikey.offers.create!(
     :trial => true,
     :primary_offer => false,
     :offer_terms_attributes => {
-      0 => { :price => 100, :months => 12 }
+      0 => { :price => 100, :months => 12 },
+      1 => { :price => 180, :months => 24 }
     }
   }
 )
