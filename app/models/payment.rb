@@ -16,7 +16,7 @@ class Payment < ActiveRecord::Base
   attr_accessor :full_name
   attr_accessor :card_verification
 
-  enum_attr :payment_type, %w(credit_card token direct_debit cheque historical), :init => :credit_card
+  enum_attr :payment_type, %w(credit_card token direct_debit cheque historical paypal), :init => :credit_card
 
   default_scope :order => "created_at desc"
 

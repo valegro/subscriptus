@@ -47,21 +47,73 @@ class SubscribeController < ApplicationController
     @offer_term = @offer.offer_terms.find(params[:offer_term])
 
     prince_in_cents = @offer_term.price * 100
+    description = "#{@offer_term.months} month(s) - #{@offer.name}"
 
     response = EXPRESS_GATEWAY.setup_purchase(prince_in_cents,
+      :description       => description,
       :ip                => request.remote_ip,
       :return_url        => paypal_express_return_url,
       :cancel_return_url => new_subscribe_url,
       :currency          => "AUD"
     )
 
+    @subscription = Subscription.new(:state => 'pending', :offer => @offer, :publication => @publication)
+    # TODO fix source
+    @subscription_action = @subscription.actions.build(:offer_name => @offer.name, :term_length => @offer_term.months, :source => nil)
+    @subscription.pending = 'payment'
+    @subscription.pending_action = @subscription_action
+    @payment = @subscription_action.build_payment(
+      :payment_type => 'paypal',
+      :amount => @offer_term.price,
+      :paypal_express_token => response.token,
+      :ip_address => request.remote_ip
+    )
+
+    @subscription.save!
+
     redirect_to EXPRESS_GATEWAY.redirect_url_for(response.token, :review => false)
   end
 
   def paypal_express_return
     token = params[:token]
-    logger.info EXPRESS_GATEWAY.details_for(token)
-    redirect_to thanks_path
+
+    @payment = Payment.find_by_paypal_express_token!(token)
+    @payment.paypal_express_payer_id = params[:PayerID]
+    @payment.save!
+
+    details = EXPRESS_GATEWAY.details_for(token)
+
+    logger.info details
+    price_in_cents = @payment.amount * 100
+
+    purchase = EXPRESS_GATEWAY.purchase(price_in_cents,
+      :ip       => request.remote_ip,
+      :token    => @payment.paypal_express_token,
+      :payer_id => @payment.paypal_express_payer_id,
+      :currency => "AUD"
+    )
+
+    if purchase.success?
+      Subscription.transaction do
+        @subscription_action = @payment.subscription_action
+        @subscription = @subscription_action.subscription
+
+        @subscription.pending = nil
+        @subscription.pending_action = nil
+        @subscription.paid!
+        @subscription.save!
+
+        @payment.processed_at = Time.now
+        @payment.paypal_express_authorization = purchase.authorization
+        @payment.paypal_express_message = purchase.message
+        @payment.paypal_express_params = purchase.params
+        @payment.save!
+      end
+
+      redirect_to thanks_path
+    else 
+      raise
+    end
   end
 
   def edit
