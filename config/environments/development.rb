@@ -19,13 +19,13 @@ ActionMailer::Base.default_url_options[:host] = "127.0.0.1:3000"
 
 # Setup Active Merchant for development
 config.after_initialize do
-  # Secure Pay Gateway Settings
   ActiveMerchant::Billing::Base.mode = :test
-  ::GATEWAY = ActiveMerchant::Billing::SecurePayAuExtendedGateway.new(  # the default_currency of this gateway is 'AUD'
-    :login => 'CKR0030',  # <MerchantID> input to Au securePay Gateway.
-    :password => "q02nnn8h",
-    :test => true
-  )
+  paypal_options = {
+    :login => "seller-test_api1.subscriptus.co",
+    :password => "1383696094",
+    :signature => "AdOb1a8PmsP4erl28o3NciuAEeFvA4shg-tq639slIl.QZW64ob6DJU7"
+  }
+  ::EXPRESS_GATEWAY = ActiveMerchant::Billing::PaypalExpressGateway.new(paypal_options)
 
   # Mock Wordpress
   require 'mocha'
