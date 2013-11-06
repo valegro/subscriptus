@@ -44,9 +44,9 @@ class SubscribeController < ApplicationController
   end
 
   def paypal_express
-    @subscription = Subscription.new(params[:subscription])
+    @offer_term = @offer.offer_terms.find(params[:offer_term])
 
-    response = EXPRESS_GATEWAY.setup_purchase(100,
+    response = EXPRESS_GATEWAY.setup_purchase(@offer_term.price * 100,
       :ip                => request.remote_ip,
       :return_url        => new_subscribe_url,
       :cancel_return_url => new_subscribe_url
