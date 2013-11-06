@@ -44,12 +44,15 @@ class SubscribeController < ApplicationController
   end
 
   def paypal_express
+    @subscription = Subscription.new(params[:subscription])
+
     response = EXPRESS_GATEWAY.setup_purchase(100,
       :ip                => request.remote_ip,
       :return_url        => new_subscribe_url,
       :cancel_return_url => new_subscribe_url
     )
-    redirect_to EXPRESS_GATEWAY.redirect_url_for(response.token)
+
+    redirect_to EXPRESS_GATEWAY.redirect_url_for(response.token, :review => false)
   end
 
   def edit

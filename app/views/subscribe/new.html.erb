@@ -6,6 +6,7 @@
   <hr/>
 <% end %>
 
+<% form_for @subscription, :url => paypal_express_path, :builder => SubscribeFormBuilder do |f| %>
 
 <div class='section' id='step1'>
   <%= image_tag(template_image_path('step1.png'), :class => 'step', :alt => 'step 1')%>
@@ -26,7 +27,8 @@
     <% unless flash[:error].blank? %>
       <div id="flash"><%= flash[:error] %></div>
     <% end %>
-    </div> <!-- closes #form-errors -->
+    </div>
+    <!-- closes #form-errors -->
     
     <ul id='subscription-tabs'>
       <li id="subscriptions-tab" class='<%= "active" if @tab == 'subscriptions' || @tab.blank? %>'>
@@ -56,8 +58,10 @@
 <div class='section' id='step2'>
   <%= image_tag(template_image_path('step2.png'), :class => 'step', :alt => 'step 2')%>
   <div class="content">
-    <%= link_to image_tag("https://www.paypal.com/en_US/i/btn/btn_xpressCheckout.gif"), paypal_express_path, :id => "btnSubmit" %>
+    <%= image_submit_tag "https://www.paypal.com/en_US/i/btn/btn_xpressCheckout.gif", :disable_with => "Processing...", :id => "btnSubmit" %>
   </div>
 
   <div class='clear'></div>
 </div> <!-- Step 2 -->
+
+<% end %>
