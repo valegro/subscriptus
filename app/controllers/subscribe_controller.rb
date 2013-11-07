@@ -58,7 +58,7 @@ class SubscribeController < ApplicationController
     )
 
     @subscription = Subscription.new(:state => 'pending', :offer => @offer, :publication => @publication)
-    # TODO fix source
+    # FIXME PAYPAL fix source
     @subscription_action = @subscription.actions.build(:offer_name => @offer.name, :term_length => @offer_term.months, :source => nil)
     @subscription.pending = 'payment'
     @subscription.pending_action = @subscription_action
@@ -76,14 +76,39 @@ class SubscribeController < ApplicationController
 
   def paypal_express_return
     token = params[:token]
+    details = EXPRESS_GATEWAY.details_for(token)
+    logger.info details.inspect
 
     @payment = Payment.find_by_paypal_express_token!(token)
+    raise "payment already processed" if @payment.processed_at.present?
     @payment.paypal_express_payer_id = params[:PayerID]
     @payment.save!
 
-    details = EXPRESS_GATEWAY.details_for(token)
+    @subscription_action = @payment.subscription_action
+    @subscription = @subscription_action.subscription
+    @user = @subscription.user || @subscription.build_user
 
-    logger.info details
+    # FIXME PAYPAL what if these email addresses do not match?
+    # FIXME PAYPAL what if these email address is already taken?
+    @user.email     = details.params["payer"]
+    @user.title     = details.params["saluation"]
+    @user.firstname = details.params["first_name"]
+    @user.lastname  = details.params["last_name"]
+    @user.address_1 = details.params["street1"]
+    @user.address_2 = details.params["street2"]
+    @user.city      = details.params["city_name"]
+    @user.state     = details.params["state_or_province"]
+    @user.postcode  = details.params["postal_code"]
+    @user.country   = details.params["country_name"]
+
+    # FIXME PAYPAL where does this password go?
+    unless @user.password
+      @user.password = User.random_password
+      @user.password_confirmation = @user.password
+    end
+
+    @user.save!
+
     price_in_cents = @payment.amount * 100
 
     purchase = EXPRESS_GATEWAY.purchase(price_in_cents,
@@ -92,27 +117,27 @@ class SubscribeController < ApplicationController
       :payer_id => @payment.paypal_express_payer_id,
       :currency => "AUD"
     )
+    logger.info purchase.inspect
+
+    @payment.processed_at = Time.now
+    @payment.success = purchase.success?
+    @payment.paypal_express_authorization = purchase.authorization
+    @payment.paypal_express_message = purchase.message
+    @payment.paypal_express_params = purchase.params
+    @payment.save!
 
     if purchase.success?
-      Subscription.transaction do
-        @subscription_action = @payment.subscription_action
-        @subscription = @subscription_action.subscription
+      @subscription.pending = nil
+      @subscription.pending_action = nil
+      @subscription.paid!
+      @subscription.save!
 
-        @subscription.pending = nil
-        @subscription.pending_action = nil
-        @subscription.paid!
-        @subscription.save!
-
-        @payment.processed_at = Time.now
-        @payment.paypal_express_authorization = purchase.authorization
-        @payment.paypal_express_message = purchase.message
-        @payment.paypal_express_params = purchase.params
-        @payment.save!
-      end
-
+      store_subscription_in_session
       redirect_to thanks_path
-    else 
-      raise
+
+    else
+      raise purchase.message
+
     end
   end
 
@@ -153,12 +178,11 @@ class SubscribeController < ApplicationController
  
     @order = Order.all(:conditions => {:subscription_id => @subscription.id})
     if @order.last
- 	@orderitems = OrderItem.all(:conditions => {:order_id => @order.last.id})
-    	@orderitems.each do |orderitem|
-        	@gifts << orderitem.gift_id
-        end
+      @orderitems = OrderItem.all(:conditions => {:order_id => @order.last.id})
+      @orderitems.each do |orderitem|
+        @gifts << orderitem.gift_id
+      end
     end
-
   end
 
   def complete

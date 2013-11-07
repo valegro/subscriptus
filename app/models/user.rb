@@ -21,30 +21,10 @@ class User < ActiveRecord::Base
   attr_accessor :overide_wordpress
 
   enum_attr :role, %w(admin subscriber)
-  enum_attr :title, %w(Mr Sir Fr Mrs Ms Miss Lady)
-  
-  enum_attr :gender, %w(male female) do
-    labels :male => 'Male'
-    labels :female => 'Female'
-  end
 
-  enum_attr :state, %w(act nsw nt qld sa tas vic wa intl) do
-    labels :intl => "Outside of Australia"
-    labels :act => 'ACT'
-    labels :nsw => 'NSW'
-    labels :nt  => 'NT'
-    labels :qld => 'QLD'
-    labels :sa  => 'SA'
-    labels :tas => 'TAS'
-    labels :vic => 'VIC'
-    labels :wa  => 'WA'
-  end
-
-  validates_format_of :email, :with => /\A([^@\s]+)@((?:[-a-z0-9]+\.)+[a-z]{2,})\Z/i
   validates_presence_of :login, :if => Proc.new { |user| User.validate_as == :admin }
-  validates_presence_of :phone_number, :address_1, :city, :postcode, :state, :country, :if => Proc.new { |user| User.validate_as == :subscriber }
+  validates_presence_of :address_1, :city, :postcode, :state, :country, :if => Proc.new { |user| User.validate_as == :subscriber }
   validates_presence_of :firstname, :lastname, :email, :role
-
 
   validates_uniqueness_of :email
   validates_confirmation_of :email #, :on => :create, :unless => Proc.new { |user| user.admin? }

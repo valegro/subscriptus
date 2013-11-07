@@ -44,20 +44,6 @@ class Subscription < ActiveRecord::Base
   validates_presence_of :publication, :state
   validates_acceptance_of :terms
 
-  def paypal_details=(details)
-    build_user unless user
-
-    user.title     = details.params[:saluation]
-    user.firstname = details.params[:first_name]
-    user.lastname  = details.params[:last_name]
-    user.address_1 = details.params[:street1]
-    user.address_2 = details.params[:street2]
-    user.city      = details.params[:city_name]
-    user.state     = details.params[:state_or_province]
-    user.postcode  = details.params[:postal_code]
-    user.country   = details.params[:country_name]
-  end
-
   def validate_on_create
     if state == 'pending'
       if self.pending_action.blank?
@@ -113,7 +99,7 @@ class Subscription < ActiveRecord::Base
       transition :active => :renewal_due
     end
     on :paid do
-      transition :pending => :paid
+      transition :pending => :active
       transition :renewal_due => :active
     end
     on :fail_payment do
