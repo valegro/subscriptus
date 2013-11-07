@@ -16,7 +16,7 @@
       <span class="timestamp"><%= format_timestamp(action.applied_at) %></span>
       <span class="description"><%= link_to(action.subscription.try(:user).try(:name), admin_subscriber_path(action.subscription.user)) if action.subscription && action.subscription.user %> chose offer: <%= action.offer_name %> and selected <a href="#"><%= pluralize(action.gifts.count, "gift") %></a> via <a href="#">A Source</a></span>
       <span class="term"><strong>Term length:</strong> <%= pluralize(action.term_length, "month") %></span>
-      <span class="payref"><strong>Payment Reference:</strong> <%= action.payment.blank? ? 'None available' : action.payment.reference %></span>	
+      <span class="payref"><strong>Payment Reference:</strong> <%= action.payment.blank? ? 'None available' : action.payment.reference || action.payment.paypal_express_authorization %></span>	
     </li>
   <% end %>
 </ul>
