@@ -29,16 +29,21 @@ ActionMailer::Base.default_url_options[:host] = "example.com"
 # config.active_record.schema_format = :sql
 
 # Setup Active Merchant for testing
+# config.after_initialize do
+#  ActiveMerchant::Billing::Base.mode = :test
+#  # Secure Pay Gateway Settings
+#  ::GATEWAY = ActiveMerchant::Billing::SecurePayAuExtendedGateway.new(  # the default_currency of this gateway is 'AUD'
+#        :login => 'CKR0030',  # <MerchantID> input to Au securePay Gateway.
+#        :password => "q02nnn8h"
+#  )
+# end
 config.after_initialize do
   ActiveMerchant::Billing::Base.mode = :test
-  # Secure Pay Gateway Settings
-  ::GATEWAY = ActiveMerchant::Billing::SecurePayAuExtendedGateway.new(  # the default_currency of this gateway is 'AUD'
-        :login => 'CKR0030',  # <MerchantID> input to Au securePay Gateway.
-        :password => "q02nnn8h"
-  )
+  ::GATEWAY = ActiveMerchant::Billing::BogusGateway.new
 end
 
 
-CAMPAIGNMASTER_USERNAME = 'ddraperaaa'
-CAMPAIGNMASTER_PASSWORD = 'netfox'
-CAMPAIGNMASTER_CLIENT_ID = '5032'
+
+# CAMPAIGNMASTER_USERNAME = 'ddraperaaa'
+# CAMPAIGNMASTER_PASSWORD = 'netfox'
+# CAMPAIGNMASTER_CLIENT_ID = '5032'

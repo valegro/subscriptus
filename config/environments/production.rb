@@ -53,23 +53,23 @@ ActionMailer::Base.default_url_options[:host] = "valegro.subscriptus.co"
 
 # Setup Active Merchant for Staging Production
 config.after_initialize do
-    # PayPal Gateway Settings
-    paypal_options = {
-    :login => "accounts_api1.subscriptus.com.au",
-    :password => "7PMAFKXAD9XAR9ZP",
-    :signature => "AJ6OK3GoSm94We8j-ryLwKM.QHXcAHaJSjZBAz75YQ0FoDqSqjfVh9xr"
-  }
-  ::EXPRESS_GATEWAY = ActiveMerchant::Billing::PaypalExpressGateway.new(paypal_options)
+ 	ActiveMerchant::Billing::Base.mode = :production
+    	# PayPal Gateway Settings
+	::GATEWAY = ActiveMerchant::Billing::PaypalGateway.new(
+    	:login => "accounts_api1.subscriptus.com.au",
+    	:password => "7PMAFKXAD9XAR9ZP",
+    	:signature => "AJ6OK3GoSm94We8j-ryLwKM.QHXcAHaJSjZBAz75YQ0FoDqSqjfVh9xr"
+	)
 end
 
 # Setup Active Merchant for Staging Production
-config.after_initialize do
+# config.after_initialize do
   # Secure Pay Gateway Settings
-  ::GATEWAY = ActiveMerchant::Billing::SecurePayAuExtendedGateway.new(  # the default_currency of this gateway is 'AUD'
-    :login => 'abc0001',  # <MerchantID> input to Au securePay Gateway.
-    :password => "abc123"
-  )
-end
+  # ::GATEWAY = ActiveMerchant::Billing::SecurePayAuExtendedGateway.new(  # the default_currency of this gateway is 'AUD'
+  #  :login => 'abc0001',  # <MerchantID> input to Au securePay Gateway.
+  #  :password => "abc123"
+  # )
+# end
 
 #CAMPAIGNMASTER_USERNAME = ''
 #CAMPAIGNMASTER_PASSWORD = ''

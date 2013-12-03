@@ -30,6 +30,7 @@ end
 gem 'aaronh-chronic', '0.3.9'
 gem 'actionmailer', '2.3.9'
 gem 'actionpack', '2.3.9'
+gem 'activemerchant', '1.4.1'
 gem 'activerecord', '2.3.9'
 gem 'activerecord-sqlserver-adapter', '2.3.18'
 gem 'activeresource', '2.3.9'

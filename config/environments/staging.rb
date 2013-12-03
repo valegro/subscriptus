@@ -52,19 +52,19 @@ ActionMailer::Base.default_url_options[:host] = "zebra.crikey.com.au"
 # config.threadsafe!
 
 # Setup Active Merchant for Staging Production
-config.after_initialize do
+# config.after_initialize do
   # Secure Pay Gateway Settings
-  ActiveMerchant::Billing::Base.mode = :test
-  ::GATEWAY = ActiveMerchant::Billing::SecurePayAuExtendedGateway.new(  # the default_currency of this gateway is 'AUD'
-    :login => 'CKR0030',  # <MerchantID> input to Au securePay Gateway.
-    :password => "q02nnn8h",
-    :test => true
-  )
+#  ActiveMerchant::Billing::Base.mode = :test
+#  ::GATEWAY = ActiveMerchant::Billing::SecurePayAuExtendedGateway.new(  # the default_currency of this gateway is 'AUD'
+#    :login => 'CKR0030',  # <MerchantID> input to Au securePay Gateway.
+#    :password => "q02nnn8h",
+#    :test => true
+#  )
   
-end
+# end
 
-CAMPAIGNMASTER_USERNAME = 'ddraper'
-CAMPAIGNMASTER_PASSWORD = 'netfox'
-CAMPAIGNMASTER_CLIENT_ID = '5032'
+# CAMPAIGNMASTER_USERNAME = 'ddraper'
+# CAMPAIGNMASTER_PASSWORD = 'netfox'
+# CAMPAIGNMASTER_CLIENT_ID = '5032'
 
 Wordpress.enabled = true

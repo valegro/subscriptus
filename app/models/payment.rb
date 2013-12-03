@@ -50,10 +50,15 @@ class Payment < ActiveRecord::Base
       # Charge the card
       self.reference = generate_unique_id
       response = GATEWAY.purchase((amount * 100).to_i, self.credit_card,
-        :order_id => self.reference,
-        :address => (self.subscription_action.try(:subscription).try(:user).try(:address_hash) || {}),
-        :description => 'Crikey Subscription Payment',
-        :email => self.subscription_action.try(:subscription).try(:user).try(:email)
+        :ip => "127.0.0.1",
+	:billing_address => {
+        :name     => "Subs Payments",
+        :address1 => "William Street",
+        :city     => "Melbourne",
+        :state    => "VIC",
+        :country  => "AU",
+        :zip      => "3000"
+      	}
       )
       unless response.success?
         raise Exceptions::PaymentFailedException.new(response.message)

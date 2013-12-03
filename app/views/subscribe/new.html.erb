@@ -129,7 +129,6 @@
         <div id='payment' class='form-section'>
           <h2 class="step">Select Your Payment Method</h2>
 
-          <img id='securepay' src="/images/securepay.png" alt="Powered by Secure Pay" />
           <div id='payment-options'>
             <input class="payment-radio" type='radio' name='payment_option' value="credit_card" id='payment-radio-credit-card' <%= 'checked="true"' if (@payment_option.blank? || @payment_option == 'credit_card' || !@direct_debit_allowed) %> />
             <label for='payment-radio-credit-card'>

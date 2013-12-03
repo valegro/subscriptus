@@ -18,28 +18,38 @@ config.action_mailer.raise_delivery_errors = false
 ActionMailer::Base.default_url_options[:host] = "127.0.0.1:3000"
 
 # Setup Active Merchant for development
-config.after_initialize do
+# config.after_initialize do
   # Secure Pay Gateway Settings
-  ActiveMerchant::Billing::Base.mode = :test
-  ::GATEWAY = ActiveMerchant::Billing::SecurePayAuExtendedGateway.new(  # the default_currency of this gateway is 'AUD'
-    :login => 'CKR0030',  # <MerchantID> input to Au securePay Gateway.
-    :password => "q02nnn8h",
-    :test => true
-  )
+#  ActiveMerchant::Billing::Base.mode = :test
+#  ::GATEWAY = ActiveMerchant::Billing::SecurePayAuExtendedGateway.new(  # the default_currency of this gateway is 'AUD'
+#    :login => 'CKR0030',  # <MerchantID> input to Au securePay Gateway.
+#    :password => "q02nnn8h",
+#    :test => true
+#  )
 
-  # Mock Wordpress
-  require 'mocha'
-  Wordpress.stubs(:authenticate).returns(true)
+  #  Mock Wordpress
+  #  require 'mocha'
+  #  Wordpress.stubs(:authenticate).returns(true)
+# end
+
+config.after_initialize do
+  ActiveMerchant::Billing::Base.mode = :test
+  ::GATEWAY = ActiveMerchant::Billing::PaypalGateway.new(
+    :login => "accounts_api1.subscriptus.com.au",
+    :password => "7PMAFKXAD9XAR9ZP",
+    :signature => "AJ6OK3GoSm94We8j-ryLwKM.QHXcAHaJSjZBAz75YQ0FoDqSqjfVh9xr"
+  )
 end
 
-CAMPAIGNMASTER_USERNAME = 'ddraperaaa'
-CAMPAIGNMASTER_PASSWORD = 'netfox'
-CAMPAIGNMASTER_CLIENT_ID = '5032'
+
+# CAMPAIGNMASTER_USERNAME = 'ddraperaaa'
+# CAMPAIGNMASTER_PASSWORD = 'netfox'
+# CAMPAIGNMASTER_CLIENT_ID = '5032'
 
 Wordpress.enabled = false
 
 config.action_mailer.smtp_settings = {
   :address        => "localhost",
   :port           => "1025",
-  :domain         => 'crikey.com.au'
+  :domain         => 'subscriptus.com.au'
 }
