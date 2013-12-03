@@ -62,5 +62,4 @@ STANDARD_DATE_FORMAT = '%d/%m/%Y'
 APP_TIMEZONE = 'Melbourne'
 
 require 'delayed_job'
-require 'also_migrate_hack'
 

@@ -12,7 +12,7 @@
 ActiveRecord::Schema.define(:version => 20111006104012) do
 
   create_table "archived_publications", :id => false, :force => true do |t|
-    t.integer  "id"
+    t.integer  "id",                             :default => 0, :null => false
     t.string   "name"
     t.text     "description"
     t.string   "publication_image_file_name"
@@ -34,7 +34,7 @@ ActiveRecord::Schema.define(:version => 20111006104012) do
   add_index "archived_publications", ["id"], :name => "index_archived_publications_on_id"
 
   create_table "archived_subscriptions", :id => false, :force => true do |t|
-    t.integer  "id"
+    t.integer  "id",                :default => 0,     :null => false
     t.integer  "user_id"
     t.integer  "offer_id"
     t.integer  "publication_id"
@@ -42,24 +42,25 @@ ActiveRecord::Schema.define(:version => 20111006104012) do
     t.string   "card_number"
     t.string   "card_expiration"
     t.string   "payment_method"
-    t.decimal  "price"
+    t.integer  "price"
     t.boolean  "auto_renew"
     t.datetime "state_updated_at"
     t.datetime "expires_at"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "order_num"
+    t.datetime "deleted_at"
     t.integer  "source_id"
     t.text     "referrer"
-    t.boolean  "solus"
-    t.boolean  "weekender"
-    t.datetime "deleted_at"
+    t.boolean  "solus",             :default => false
+    t.boolean  "weekender",         :default => true
     t.string   "pending"
     t.datetime "state_expires_at"
     t.integer  "term_length"
     t.boolean  "concession",        :default => false
     t.integer  "pending_action_id"
   end
+
+  add_index "archived_subscriptions", ["id"], :name => "index_archived_subscriptions_on_id"
 
   create_table "audit_log_entries", :force => true do |t|
     t.integer  "user_id"
@@ -104,7 +105,7 @@ ActiveRecord::Schema.define(:version => 20111006104012) do
 
   create_table "offer_terms", :force => true do |t|
     t.integer  "offer_id"
-    t.decimal  "price"
+    t.integer  "price"
     t.integer  "months"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -156,7 +157,7 @@ ActiveRecord::Schema.define(:version => 20111006104012) do
     t.string   "first_name"
     t.string   "last_name"
     t.datetime "card_expiry_date"
-    t.decimal  "amount"
+    t.integer  "amount"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "payment_type"
@@ -232,7 +233,7 @@ ActiveRecord::Schema.define(:version => 20111006104012) do
     t.integer  "gift_id"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.boolean  "included"
+    t.boolean  "included",               :default => false
   end
 
   create_table "subscription_invoices", :force => true do |t|
@@ -276,13 +277,12 @@ ActiveRecord::Schema.define(:version => 20111006104012) do
     t.string   "card_number"
     t.string   "card_expiration"
     t.string   "payment_method"
-    t.decimal  "price"
+    t.integer  "price"
     t.boolean  "auto_renew"
     t.datetime "state_updated_at"
     t.datetime "expires_at"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "order_num"
     t.integer  "source_id"
     t.text     "referrer"
     t.boolean  "solus",             :default => false
@@ -300,7 +300,7 @@ ActiveRecord::Schema.define(:version => 20111006104012) do
     t.string   "recurrent_id"
     t.integer  "user_id"
     t.string   "action"
-    t.decimal  "money"
+    t.integer  "money"
     t.boolean  "success"
     t.string   "message"
     t.datetime "created_at"
@@ -335,7 +335,6 @@ ActiveRecord::Schema.define(:version => 20111006104012) do
     t.datetime "updated_at"
     t.string   "role"
     t.boolean  "admin"
-    t.string   "recurrent_id"
     t.boolean  "auto_created"
     t.string   "hear_about"
     t.string   "company"
